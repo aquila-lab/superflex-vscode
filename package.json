@@ -1,14 +1,47 @@
 {
   "name": "element-ai",
-  "displayName": "element-ai",
+  "displayName": "ElementAI",
   "description": "AI pair programmer for frontend engineers",
   "version": "0.0.1",
+  "author": "Riphal <bjankovic998@gmail.com> (https://twitter.com/_riphal_)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AquilaLab/element-ai-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/AquilaLab/element-ai-vscode/issues",
+    "email": "bjankovic998@gmail.com"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Chat",
+    "AI",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "javascript",
+    "typescript",
+    "autocomplete",
+    "chat",
+    "code completion",
+    "code generation",
+    "html",
+    "css",
+    "react",
+    "ai",
+    "figma",
+    "ui components",
+    "generate components",
+    "intellicode",
+    "intellisense",
+    "refactor"
+  ],
   "engines": {
     "vscode": "^1.90.0"
   },
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
@@ -24,8 +57,13 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "vsce:package": "vsce package",
+    "vsce:publish": "vsce publish"
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",
