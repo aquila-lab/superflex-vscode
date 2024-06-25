@@ -1,0 +1,6 @@
+**
+!out/
+!out/extension.js
+!package.json
+!LICENSE
+!README.md
