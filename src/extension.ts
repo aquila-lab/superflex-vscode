@@ -16,11 +16,21 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       let scriptSrc = panel.webview.asWebviewUri(
-        vscode.Uri.joinPath(context.extensionUri, "web", "dist", "index.js")
+        vscode.Uri.joinPath(
+          context.extensionUri,
+          "webview-ui",
+          "dist",
+          "index.js"
+        )
       );
 
       let cssSrc = panel.webview.asWebviewUri(
-        vscode.Uri.joinPath(context.extensionUri, "web", "dist", "index.css")
+        vscode.Uri.joinPath(
+          context.extensionUri,
+          "webview-ui",
+          "dist",
+          "index.css"
+        )
       );
 
       panel.webview.html = `<!DOCTYPE html>
