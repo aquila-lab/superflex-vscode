@@ -1,14 +1,8 @@
 import * as vscode from "vscode";
 import { ColorThemeKind } from "vscode";
 
-import { sendEvent } from "../binary/requests/sendEvent";
 import { GET_CHAT_STATE_COMMAND } from "../utils/consts";
 import { EventRegistry } from "./EventRegistry";
-
-type SendEventRequest = {
-  eventName: string;
-  properties?: { [key: string]: string };
-};
 
 type ChatMessageProps = {
   text: string;
@@ -47,17 +41,15 @@ export class ChatAPI {
   });
 
   constructor(context: vscode.ExtensionContext, config: APIConfig) {
-    if (process.env.IS_EVAL_MODE === "true") {
-      context.subscriptions.push(
-        vscode.commands.registerCommand(
-          GET_CHAT_STATE_COMMAND,
-          () =>
-            context.globalState.get(CHAT_CONVERSATIONS_KEY, {
-              conversations: {},
-            }) as ChatState
-        )
-      );
-    }
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        GET_CHAT_STATE_COMMAND,
+        () =>
+          context.globalState.get(CHAT_CONVERSATIONS_KEY, {
+            conversations: {},
+          }) as ChatState
+      )
+    );
 
     this.chatEventRegistry
       .registerEvent<void, InitResponse>("init", async () => {
@@ -71,25 +63,18 @@ export class ChatAPI {
           ...config,
         });
       })
-      .registerEvent<SendEventRequest, void>(
-        "send_event",
-        async (req: SendEventRequest) => {
-          await sendEvent({
-            name: req.eventName,
-            properties: req.properties,
-          });
-        }
-      )
       .registerEvent<ChatConversation, void>(
         "update_chat_conversation",
         async (conversation: ChatConversation) => {
           const chatState = context.globalState.get(CHAT_CONVERSATIONS_KEY, {
             conversations: {},
           }) as ChatState;
+
           chatState.conversations[conversation.id] = {
             id: conversation.id,
             messages: conversation.messages,
           };
+
           await context.globalState.update(CHAT_CONVERSATIONS_KEY, chatState);
         }
       )
