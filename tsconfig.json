@@ -8,5 +8,5 @@
 		"strict": true,
 		"sourceMap": true
 	},
-	"exclude": ["node_modules", ".vscode-test", "./out", ".eslintrc.json"]
+	"exclude": ["node_modules", ".vscode-test", "./out", "./web", ".eslintrc.json"]
 }
