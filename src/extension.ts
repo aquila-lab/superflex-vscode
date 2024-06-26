@@ -1,54 +1,30 @@
 import * as vscode from "vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  let webview = vscode.commands.registerCommand(
-    "react-ext.namasteworld",
-    () => {
-      let panel = vscode.window.createWebviewPanel(
-        "webview",
-        "React",
-        vscode.ViewColumn.One,
-        {
-          enableScripts: true,
-        }
-      );
+import { Logger } from "./utils/logger";
+import { ChatAPI } from "./chat/ChatApi";
+import ChatViewProvider from "./chat/ChatViewProvider";
+import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 
-      let scriptSrc = panel.webview.asWebviewUri(
-        vscode.Uri.joinPath(
-          context.extensionUri,
-          "webview-ui",
-          "dist",
-          "index.js"
-        )
-      );
+export async function activate(
+  context: vscode.ExtensionContext
+): Promise<void> {
+  Logger.init(context);
 
-      let cssSrc = panel.webview.asWebviewUri(
-        vscode.Uri.joinPath(
-          context.extensionUri,
-          "webview-ui",
-          "dist",
-          "index.css"
-        )
-      );
+  // Do not await on this function as we do not want VSCode to wait for it to finish
+  // before considering ElementAI ready to operate.
+  void backgroundInit(context);
 
-      panel.webview.html = `<!DOCTYPE html>
-        <html lang="en">
-          <head>
-            <link rel="stylesheet" href="${cssSrc}" />
-          </head>
-          <body>
-            <noscript>You need to enable JavaScript to run this app.</noscript>
-            <div id="root"></div>
-            <script src="${scriptSrc}"></script>
-          </body>
-        </html>
-        `;
-    }
+  return Promise.resolve();
+}
+
+async function backgroundInit(context: vscode.ExtensionContext) {
+  registerChatWidgetWebview(
+    context,
+    new ChatViewProvider(
+      context,
+      new ChatAPI(context, { serverUrl: process.env.CHAT_SERVER_URL })
+    )
   );
-
-  context.subscriptions.push(webview);
 }
 
 // This method is called when your extension is deactivated
