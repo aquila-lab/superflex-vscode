@@ -97,23 +97,13 @@
     },
     "commands": [
       {
-        "command": "elementai.chat.submit-message",
-        "title": "Submit message",
-        "when": "elementai.chat.ready"
-      },
-      {
-        "command": "elementai.chat.state",
-        "title": "Chat global state",
-        "when": "elementai.chat.ready"
-      },
-      {
         "command": "elementai.chat.clear-all-conversations",
-        "title": "Clear all Element AI chat conversations",
+        "title": "Element AI: Clear all chat conversations",
         "when": "elementai.chat.ready"
       },
       {
         "command": "elementai.chat.focus-input",
-        "title": "Focus chat input"
+        "title": "Element AI: Focus chat input"
       }
     ],
     "keybindings": [
