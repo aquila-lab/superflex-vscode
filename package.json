@@ -44,14 +44,6 @@
   },
   "activationEvents": [],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "react-ext.namasteworld",
-        "title": "React Web View"
-      }
-    ]
-  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -64,6 +56,71 @@
     "lint:fix": "eslint . --fix",
     "vsce:package": "vsce package",
     "vsce:publish": "vsce publish"
+  },
+  "contributes": {
+    "submenus": [
+      {
+        "id": "elementai.chat.submenu",
+        "label": "Element AI"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "elementai",
+          "title": "Element AI",
+          "icon": "small_logo.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "elementai.loading",
+        "contents": "Loading please wait..."
+      }
+    ],
+    "views": {
+      "tabnine": [
+        {
+          "type": "webview",
+          "id": "elementai.chat",
+          "name": "Chat",
+          "when": "elementai.chat.webview == 'chat'"
+        },
+        {
+          "id": "elementai.loading",
+          "name": "Loading",
+          "when": "elementai.chat.webview == 'loading'"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "elementai.chat.submit-message",
+        "title": "Submit message",
+        "when": "elementai.chat.ready"
+      },
+      {
+        "command": "elementai.chat.state",
+        "title": "Chat global state",
+        "when": "elementai.chat.ready"
+      },
+      {
+        "command": "elementai.chat.clear-all-conversations",
+        "title": "Clear all Element AI chat conversations",
+        "when": "elementai.chat.ready"
+      },
+      {
+        "command": "elementai.chat.focus-input",
+        "title": "Focus chat input"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "ctrl+shift+q",
+        "command": "elementai.chat.focus-input"
+      }
+    ]
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",

@@ -4,3 +4,9 @@
 !package.json
 !LICENSE
 !README.md
+
+!webview-ui/dist/
+!webview-ui/public/
+!webview-ui/package.json
+
+!small_logo.svg
