@@ -47,8 +47,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "element-ai.helloWorld",
-        "title": "Hello World"
+        "command": "react-ext.namasteworld",
+        "title": "React Web View"
       }
     ]
   },
