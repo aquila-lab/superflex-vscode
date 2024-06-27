@@ -46,6 +46,8 @@
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
+    "uuidv4": "^6.2.13",
+    "vscode-uri": "^3.0.8",
     "web-vitals": "^2.1.4"
   }
 }

@@ -41,12 +41,6 @@ function registerWebview(
   // Register commands
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "elementai.chat.submit-message",
-      (message: string) => {
-        void chatProvider.handleMessageSubmitted(message);
-      }
-    ),
-    vscode.commands.registerCommand(
       "elementai.chat.clear-all-conversations",
       () => {
         chatProvider.clearAllConversations();

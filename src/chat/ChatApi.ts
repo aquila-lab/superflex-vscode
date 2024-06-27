@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { ColorThemeKind } from "vscode";
 
 import { GET_CHAT_STATE_COMMAND } from "../utils/consts";
 import { EventRegistry } from "./EventRegistry";
@@ -17,12 +16,6 @@ type ChatConversation = {
 
 type ChatState = {
   conversations: { [id: string]: ChatConversation };
-};
-
-type InitResponse = {
-  ide: string;
-  isDarkTheme: boolean;
-  serverUrl?: string;
 };
 
 type APIConfig = {
@@ -52,17 +45,6 @@ export class ChatAPI {
     );
 
     this.chatEventRegistry
-      .registerEvent<void, InitResponse>("init", async () => {
-        this.ready.fire();
-        return Promise.resolve({
-          ide: "vscode",
-          isDarkTheme: [
-            ColorThemeKind.HighContrast,
-            ColorThemeKind.Dark,
-          ].includes(vscode.window.activeColorTheme.kind),
-          ...config,
-        });
-      })
       .registerEvent<ChatConversation, void>(
         "update_chat_conversation",
         async (conversation: ChatConversation) => {

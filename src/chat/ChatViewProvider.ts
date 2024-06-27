@@ -3,12 +3,7 @@ import * as vscode from "vscode";
 import { ChatAPI } from "./ChatApi";
 import { Logger } from "../utils/logger";
 import { createWebviewTemplate } from "../webview/webviewTemplates";
-
-interface RequestMessage {
-  id: string;
-  command: string;
-  data: any;
-}
+import { EventMessage } from "../protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private chatWebviewView?: vscode.WebviewView;
@@ -30,7 +25,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     this.chatWebview.onDidReceiveMessage(
-      async (message: RequestMessage) => {
+      async (message: EventMessage) => {
         try {
           const payload = await this.chatApi.handleEvent(
             message.command,
@@ -53,19 +48,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     );
   }
 
-  async handleMessageSubmitted(userInput: string) {
-    await this.focusChatInput();
-
-    setTimeout(() => {
-      void this.chatWebview?.postMessage({
-        command: "submit-message",
-        data: {
-          input: userInput,
-        },
-      });
-    }, 500);
-  }
-
   async focusChatInput() {
     void vscode.commands.executeCommand("workbench.view.extension.elementai");
     await this.waitForChatInitiated();
@@ -76,9 +58,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   clearAllConversations() {
-    void this.chatWebview?.postMessage({
-      command: "clear-all-conversations",
-    });
+    void this.chatWebview?.postMessage({ command: "clear-all-conversations" });
   }
 
   waitForChatInitiated(): Promise<unknown> {
