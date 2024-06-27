@@ -43,7 +43,9 @@
   "engines": {
     "vscode": "^1.90.0"
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "scripts": {
     "vscode:prepublish": "npm run compile",
