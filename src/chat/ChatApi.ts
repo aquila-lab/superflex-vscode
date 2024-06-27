@@ -45,6 +45,9 @@ export class ChatAPI {
     );
 
     this.chatEventRegistry
+      .registerEvent<void, void>("ready", async () => {
+        this.ready.fire();
+      })
       .registerEvent<ChatConversation, void>(
         "update_chat_conversation",
         async (conversation: ChatConversation) => {

@@ -107,12 +107,6 @@
         "command": "elementai.chat.focus-input",
         "title": "Element AI: Focus chat input"
       }
-    ],
-    "keybindings": [
-      {
-        "key": "ctrl+shift+q",
-        "command": "elementai.chat.focus-input"
-      }
     ]
   },
   "devDependencies": {

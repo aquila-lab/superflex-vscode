@@ -1,4 +1,4 @@
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 
 export interface EventMessage {
   id: string;
@@ -11,7 +11,7 @@ export function newRequestEventMessage(
   command: string,
   data?: any
 ): EventMessage {
-  return { id: uuid(), command, data };
+  return { id: uuidv4(), command, data };
 }
 
 export function newResponseEventMessage(

@@ -40,6 +40,9 @@ function registerWebview(
 
   // Register commands
   context.subscriptions.push(
+    vscode.commands.registerCommand("elementai.chat.focus-input", () => {
+      void chatProvider.focusChatInput();
+    }),
     vscode.commands.registerCommand(
       "elementai.chat.clear-all-conversations",
       () => {
