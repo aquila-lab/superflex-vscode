@@ -35,6 +35,7 @@
     "tailwindcss": "^3.4.4"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.4",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -42,6 +43,7 @@
     "@types/node": "^16.18.101",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@vscode/codicons": "^0.0.36",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",

@@ -92,6 +92,20 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this.extensionUri, "webview-ui", "dist", "index.css")
     );
 
-    webviewView.webview.html = createWebviewTemplate(scriptSrc, cssSrc);
+    const codiconsUri = webviewView.webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.extensionUri,
+        "node_modules",
+        "@vscode/codicons",
+        "dist",
+        "codicon.css"
+      )
+    );
+
+    webviewView.webview.html = createWebviewTemplate(
+      scriptSrc,
+      cssSrc,
+      codiconsUri
+    );
   }
 }
