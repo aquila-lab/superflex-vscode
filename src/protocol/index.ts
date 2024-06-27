@@ -4,6 +4,7 @@ export interface EventMessage {
   id: string;
   command: string;
   data?: any;
+  error?: string;
 }
 
 export function newRequestEventMessage(
@@ -14,9 +15,8 @@ export function newRequestEventMessage(
 }
 
 export function newResponseEventMessage(
-  id: string,
-  command: string,
-  data?: any
+  req: EventMessage,
+  resData?: any
 ): EventMessage {
-  return { id, command, data };
+  return { id: req.id, command: req.command, data: resData };
 }
