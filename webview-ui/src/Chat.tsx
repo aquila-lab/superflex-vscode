@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { PaperClipIcon } from '@heroicons/react/24/outline';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscode-api';
-import { Button } from './components';
+import { Button, FilePicker } from './components';
+
+type Message = {
+  id: number;
+  text: string;
+  sender: 'user' | 'bot';
+  imageUrl?: string;
+};
 
 const Chat: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
 }> = ({ vscodeAPI }) => {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
@@ -21,6 +27,7 @@ const Chat: React.FunctionComponent<{
     }
   ]);
   const [input, setInput] = useState('');
+  const [imageUrl, setImageUrl] = useState<string>();
 
   const handleSend = () => {
     if (input.trim()) {
@@ -29,10 +36,23 @@ const Chat: React.FunctionComponent<{
     }
   };
 
+  const handleImageUpload = (file: File) => {
+    setImageUrl(URL.createObjectURL(file));
+    setMessages([
+      ...messages,
+      {
+        id: Date.now(),
+        text: 'Processing image...',
+        imageUrl: URL.createObjectURL(file),
+        sender: 'bot'
+      }
+    ]);
+  };
+
   return (
     <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">
       <div className="flex-1 flex flex-col justify-start overflow-y-auto mb-4">
-        {messages.map((message, index) => (
+        {messages.map((message) => (
           <div
             key={message.id}
             className={`py-4 px-2 border-b border-neutral-700 text-left ${
@@ -42,10 +62,11 @@ const Chat: React.FunctionComponent<{
               {message.sender === 'user' ? 'You' : 'Element AI'}
             </p>
             <p className="whitespace-pre-wrap">{message.text}</p>
+            {message.imageUrl && <img alt="preview image" src={message.imageUrl} />}
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <TextareaAutosize
           autoFocus
           value={input}
@@ -54,9 +75,17 @@ const Chat: React.FunctionComponent<{
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
         />
-        <button className="p-2 text-neutral-400">
-          <PaperClipIcon className="size-5" />
-        </button>
+
+        <FilePicker
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            handleImageUpload(file);
+          }}
+        />
+
         <Button onClick={handleSend}>Send</Button>
       </div>
     </div>
