@@ -1,9 +1,9 @@
 require("dotenv").config();
 
+import fs from "fs";
 import OpenAI from "openai";
 import * as vscode from "vscode";
 
-import { Logger } from "./utils/logger";
 import { decodeUriAndRemoveFilePrefix } from "./utils";
 import { findFiles } from "./scanner";
 import { ChatAPI } from "./chat/ChatApi";
@@ -14,8 +14,6 @@ import { SUPPORTED_FILE_EXTENSIONS } from "./utils/consts";
 export async function activate(
   context: vscode.ExtensionContext
 ): Promise<void> {
-  Logger.init(context);
-
   const openai = new OpenAI();
 
   void scanWorkspaces(context, openai);
@@ -31,7 +29,7 @@ async function scanWorkspaces(
   context: vscode.ExtensionContext,
   openai: OpenAI
 ) {
-  Logger.info(`Scanning workspace folders for files`);
+  console.info(`Scanning workspace folders for files`);
 
   const workspaceFolders = vscode.workspace.workspaceFolders || [];
   for (const workspaceFolder of workspaceFolders) {
@@ -68,18 +66,26 @@ async function scanWorkspaces(
       );
 
       const vectorStore = await openai.beta.vectorStores.create({
-        name: `${workspaceFolder.name} Vector Store`,
+        name: `${workspaceFolder.name}-vector-store`,
+        expires_after: {
+          anchor: "last_active_at",
+          days: 7,
+        },
       });
 
-      // Upload files to the vector store in batches of 500
+      // Upload files to the storage in batches of 500
       const batchSize = 500;
       for (let i = 0; i < documentsUri.length; i += batchSize) {
-        Logger.info(`Scanning files: ${batchSize * i}/${documentsUri.length}`);
+        console.info(`Scanning files: ${batchSize * i}/${documentsUri.length}`);
 
-        await openai.beta.vectorStores.fileBatches.createAndPoll(
+        const fileStreams = documentsUri
+          .slice(i, i + batchSize)
+          .map((path) => fs.createReadStream(path));
+
+        await openai.beta.vectorStores.fileBatches.uploadAndPoll(
           vectorStore.id,
           {
-            file_ids: documentsUri.slice(i, i + batchSize),
+            files: fileStreams,
           }
         );
       }
@@ -97,8 +103,10 @@ async function scanWorkspaces(
           })
         )
       );
+
+      console.info("Finished scanning workspace folders for files");
     } catch (err) {
-      Logger.error(err);
+      console.error(err);
     }
   }
 }

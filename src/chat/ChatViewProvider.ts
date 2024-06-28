@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 
 import { ChatAPI } from "./ChatApi";
-import { Logger } from "../utils/logger";
 import { createWebviewTemplate } from "../webview/webviewTemplates";
 import { EventMessage, newEventMessage } from "../protocol";
 
@@ -37,7 +36,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
             data: payload,
           } as EventMessage);
         } catch (e) {
-          Logger.error(`failed to handle event. message: ${message.data}`);
+          console.error(`failed to handle event. message: ${message.data}`);
           void this.chatWebview?.postMessage({
             id: message.id,
             command: message.command,
