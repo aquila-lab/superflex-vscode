@@ -122,6 +122,9 @@
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.36",
+    "dotenv": "^16.4.5",
+    "fast-glob": "^3.3.2",
+    "openai": "^4.52.1",
     "uuidv4": "^6.2.13"
   }
 }

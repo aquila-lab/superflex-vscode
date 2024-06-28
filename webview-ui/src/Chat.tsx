@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 
-import { VSCodeWrapper } from './api/vscode-api';
+import { VSCodeWrapper } from './api/vscodeApi';
 import { Button, FilePicker } from './components';
 import { newEventMessage } from './api/protocol';
 

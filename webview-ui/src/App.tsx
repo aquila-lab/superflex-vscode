@@ -3,7 +3,7 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 
 import Chat from './Chat';
-import { VSCodeWrapper } from './api/vscode-api';
+import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
 
 type View = 'chat' | 'login';
