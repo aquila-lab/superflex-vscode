@@ -3,11 +3,7 @@ import * as vscode from "vscode";
 import { ChatAPI } from "./ChatApi";
 import { Logger } from "../utils/logger";
 import { createWebviewTemplate } from "../webview/webviewTemplates";
-import {
-  EventMessage,
-  newRequestEventMessage,
-  newResponseEventMessage,
-} from "../protocol";
+import { EventMessage, newEventMessage } from "../protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private chatWebviewView?: vscode.WebviewView;
@@ -35,9 +31,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
             message.command,
             message.data
           );
-          void this.chatWebview?.postMessage(
-            newResponseEventMessage(message, payload)
-          );
+          void this.chatWebview?.postMessage({
+            id: message.id,
+            command: message.command,
+            data: payload,
+          } as EventMessage);
         } catch (e) {
           Logger.error(`failed to handle event. message: ${message.data}`);
           void this.chatWebview?.postMessage({
@@ -56,12 +54,12 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void vscode.commands.executeCommand("workbench.view.extension.elementai");
     await this.waitForChatInitiated();
     void this.chatWebviewView?.show(true);
-    void this.chatWebview?.postMessage(newRequestEventMessage("focus-input"));
+    void this.chatWebview?.postMessage(newEventMessage("focus-input"));
   }
 
   clearAllConversations() {
     void this.chatWebview?.postMessage(
-      newRequestEventMessage("clear-all-conversations")
+      newEventMessage("clear-all-conversations")
     );
   }
 

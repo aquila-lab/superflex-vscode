@@ -7,10 +7,6 @@ export interface EventMessage {
   error?: string;
 }
 
-export function newRequestEventMessage(command: string, data?: any): EventMessage {
+export function newEventMessage(command: string, data?: any): EventMessage {
   return { id: uuidv4(), command, data };
-}
-
-export function newResponseEventMessage(req: EventMessage, resData?: any): EventMessage {
-  return { id: req.id, command: req.command, data: resData };
 }

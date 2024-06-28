@@ -3,6 +3,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscode-api';
 import { Button, FilePicker } from './components';
+import { newEventMessage } from './api/protocol';
 
 type Message = {
   id: number;
@@ -19,15 +20,9 @@ const Chat: React.FunctionComponent<{
       id: 1,
       text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
       sender: 'bot'
-    },
-    {
-      id: 2,
-      text: 'Labore laboris nostrud et labore ea esse occaecat quis exercitation.',
-      sender: 'user'
     }
   ]);
   const [input, setInput] = useState('');
-  const [imageUrl, setImageUrl] = useState<string>();
 
   const handleSend = () => {
     if (input.trim()) {
@@ -37,7 +32,6 @@ const Chat: React.FunctionComponent<{
   };
 
   const handleImageUpload = (file: File) => {
-    setImageUrl(URL.createObjectURL(file));
     setMessages([
       ...messages,
       {
@@ -47,6 +41,25 @@ const Chat: React.FunctionComponent<{
         sender: 'bot'
       }
     ]);
+
+    vscodeAPI.postMessage(
+      newEventMessage('process_image', { imageUrl: URL.createObjectURL(file) })
+    );
+
+    vscodeAPI.onMessage((message) => {
+      switch (message.command) {
+        case 'image_processed':
+          setMessages([
+            ...messages,
+            {
+              id: Date.now(),
+              text: 'Generating component...',
+              sender: 'bot'
+            }
+          ]);
+          break;
+      }
+    });
   };
 
   return (
@@ -62,7 +75,9 @@ const Chat: React.FunctionComponent<{
               {message.sender === 'user' ? 'You' : 'Element AI'}
             </p>
             <p className="whitespace-pre-wrap">{message.text}</p>
-            {message.imageUrl && <img alt="preview image" src={message.imageUrl} />}
+            {message.imageUrl && (
+              <img alt="preview image" className="mt-2" src={message.imageUrl} />
+            )}
           </div>
         ))}
       </div>
