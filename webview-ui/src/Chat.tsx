@@ -3,6 +3,7 @@ import { PaperClipIcon } from '@heroicons/react/24/outline';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscode-api';
+import { Button } from './components';
 
 const Chat: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -56,11 +57,7 @@ const Chat: React.FunctionComponent<{
         <button className="p-2 text-neutral-400">
           <PaperClipIcon className="size-5" />
         </button>
-        <button
-          onClick={handleSend}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none">
-          Send
-        </button>
+        <Button onClick={handleSend}>Send</Button>
       </div>
     </div>
   );
