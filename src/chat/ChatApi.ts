@@ -2,6 +2,10 @@ import * as vscode from "vscode";
 
 import { EventRegistry } from "./EventRegistry";
 
+type ProcessImageRequest = {
+  imageUrl: string;
+};
+
 type APIConfig = {
   serverUrl?: string | undefined;
 };
@@ -20,9 +24,12 @@ export class ChatAPI {
       .registerEvent<void, void>("ready", async () => {
         this.ready.fire();
       })
-      .registerEvent<void, void>("process_image", async () => {
-        // TODO: Implement image processing
-      });
+      .registerEvent<ProcessImageRequest, void>(
+        "process_image",
+        async (req) => {
+          // TODO: Implement image processing
+        }
+      );
   }
 
   async handleEvent<Req, Res>(
