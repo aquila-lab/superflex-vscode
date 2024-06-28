@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
+import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscode-api';
 
@@ -24,7 +25,6 @@ const Chat: React.FunctionComponent<{
     if (input.trim()) {
       setMessages([...messages, { id: Date.now(), text: input, sender: 'user' }]);
       setInput('');
-      // Here you would also send the message to your AI backend and get the response
     }
   };
 
@@ -45,16 +45,16 @@ const Chat: React.FunctionComponent<{
         ))}
       </div>
       <div className="flex items-center gap-2">
-        <input
-          type="text"
+        <TextareaAutosize
+          autoFocus
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask ElementAI or type / for commands"
-          className="flex-1 p-2 bg-neutral-800 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="flex-1 p-2 bg-neutral-800 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[2rem] max-h-[15rem]"
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
         />
         <button className="p-2 text-neutral-400">
-          <PaperClipIcon className="w-5 h-5" />
+          <PaperClipIcon className="size-5" />
         </button>
         <button
           onClick={handleSend}
