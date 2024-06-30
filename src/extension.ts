@@ -1,8 +1,10 @@
 require("dotenv").config();
 
 import fs from "fs";
+import path from "path";
 import OpenAI from "openai";
 import * as vscode from "vscode";
+import { homedir } from "os";
 
 import { decodeUriAndRemoveFilePrefix } from "./utils";
 import { findFiles } from "./scanner";
@@ -39,16 +41,22 @@ async function scanWorkspaces(
       continue;
     }
 
-    // Check do we aleady have created a workspace OpenAI Vector Store
-    const settingsUri = vscode.Uri.joinPath(
-      workspaceFolder.uri,
+    const elementaiCacheFolder = path.join(
+      homedir(),
       ".elementai",
-      "settings.json"
+      workspaceFolder.name
     );
+    await fs.mkdirSync(elementaiCacheFolder, { recursive: true });
+
+    // Check do we aleady have created a workspace OpenAI Vector Store
+    const settingsUri = path.join(elementaiCacheFolder, "settings.json");
     try {
-      const settingsBuffer = await vscode.workspace.fs.readFile(settingsUri);
+      const settingsBuffer = await fs.readFileSync(settingsUri);
       const settings = JSON.parse(settingsBuffer.toString());
       if (settings.vectorStoreIds[workspaceFolder.name]) {
+        console.info(
+          `Workspace ${workspaceFolder.name} already has a vector store`
+        );
         return;
       }
     } catch (err) {}
@@ -73,12 +81,29 @@ async function scanWorkspaces(
         },
       });
 
+      // Copy the files to cache folder
+      const cacheFolder = path.join(elementaiCacheFolder, "files");
+      await fs.mkdirSync(cacheFolder, { recursive: true });
+
+      const documentPaths: string[] = [];
+      for (const documentUri of documentsUri) {
+        const documentPath = path.join(
+          cacheFolder,
+          `${path.basename(documentUri)}.txt`
+        );
+
+        await fs.copyFileSync(documentUri, documentPath);
+        documentPaths.push(documentPath);
+      }
+
       // Upload files to the storage in batches of 500
       const batchSize = 500;
-      for (let i = 0; i < documentsUri.length; i += batchSize) {
-        console.info(`Scanning files: ${batchSize * i}/${documentsUri.length}`);
+      for (let i = 0; i < documentPaths.length; i += batchSize) {
+        console.info(
+          `Scanning files: ${batchSize * i}/${documentPaths.length}`
+        );
 
-        const fileStreams = documentsUri
+        const fileStreams = documentPaths
           .slice(i, i + batchSize)
           .map((path) => fs.createReadStream(path));
 
@@ -93,7 +118,7 @@ async function scanWorkspaces(
       // Write the vector store id to root folder
       // This will be used to identify the vector store for the workspace
       // and to update it when new files are added
-      await vscode.workspace.fs.writeFile(
+      await fs.writeFileSync(
         settingsUri,
         Buffer.from(
           JSON.stringify({
