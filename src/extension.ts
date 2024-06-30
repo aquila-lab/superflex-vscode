@@ -115,6 +115,19 @@ async function scanWorkspaces(
         );
       }
 
+      const assistant = await openai.beta.assistants.create({
+        name: "ElementAI UI Assistant",
+        description:
+          "You are an expert frontend development assistant. You help developers by converting visual sketches and design elements into clean, maintainable HTML and CSS code. You understand design patterns, code styles, and existing components in the codebase to ensure consistency and efficiency. Additionally, you provide suggestions and improvements based on best practices in frontend development.",
+        model: "gpt-4o",
+        tools: [{ type: "file_search" }],
+        tool_resources: {
+          file_search: {
+            vector_store_ids: [vectorStore.id],
+          },
+        },
+      });
+
       // Write the vector store id to root folder
       // This will be used to identify the vector store for the workspace
       // and to update it when new files are added
@@ -122,6 +135,7 @@ async function scanWorkspaces(
         settingsUri,
         Buffer.from(
           JSON.stringify({
+            assistant_id: assistant.id,
             vector_store_id: vectorStore.id,
           })
         )
