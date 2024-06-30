@@ -53,7 +53,7 @@ async function scanWorkspaces(
     try {
       const settingsBuffer = await fs.readFileSync(settingsUri);
       const settings = JSON.parse(settingsBuffer.toString());
-      if (settings.vectorStoreIds[workspaceFolder.name]) {
+      if (settings.vector_store_id) {
         console.info(
           `Workspace ${workspaceFolder.name} already has a vector store`
         );
@@ -122,9 +122,7 @@ async function scanWorkspaces(
         settingsUri,
         Buffer.from(
           JSON.stringify({
-            vectorStoreIds: {
-              [workspaceFolder.name]: vectorStore.id,
-            },
+            vector_store_id: vectorStore.id,
           })
         )
       );
