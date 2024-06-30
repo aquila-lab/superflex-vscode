@@ -142,6 +142,7 @@ async function scanWorkspaces(
 Always return the solution's source code as output first, followed by a brief explanation.`,
         model: "gpt-4o",
         tools: [{ type: "file_search" }],
+        temperature: 0.35,
         tool_resources: {
           file_search: {
             vector_store_ids: [vectorStore.id],
