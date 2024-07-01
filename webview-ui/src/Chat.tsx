@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
+import Markdown from 'markdown-to-jsx';
 
 import { VSCodeWrapper } from './api/vscodeApi';
 import { Button, FilePicker } from './components';
 import { newEventMessage } from './api/protocol';
 
 type Message = {
-  id: number;
+  id: string;
   text: string;
   sender: 'user' | 'bot';
   imageUrl?: string;
@@ -17,49 +18,59 @@ const Chat: React.FunctionComponent<{
 }> = ({ vscodeAPI }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: 1,
+      id: '1',
       text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
       sender: 'bot'
     }
   ]);
   const [input, setInput] = useState('');
+  const [streamResponse, setStreamResponse] = useState('');
+
+  useEffect(
+    () =>
+      vscodeAPI.onMessage((message) => {
+        console.log('message <<<', message);
+        switch (message.command) {
+          case 'new_message':
+            setMessages([
+              ...messages,
+              {
+                id: message.id,
+                text: 'Starting to process your message...',
+                sender: 'bot'
+              }
+            ]);
+            break;
+          case 'message_processing':
+            setStreamResponse((prev) => prev + message.data);
+            break;
+        }
+      }),
+    [vscodeAPI, messages]
+  );
 
   const handleSend = () => {
     if (input.trim()) {
-      setMessages([...messages, { id: Date.now(), text: input, sender: 'user' }]);
-      setInput('');
+      setMessages([...messages, { id: `${Date.now()}`, text: input, sender: 'user' }]);
+
+      vscodeAPI.postMessage(newEventMessage('process_message', { message: input }));
     }
+
+    setInput('');
   };
 
   const handleImageUpload = (file: File) => {
     setMessages([
       ...messages,
       {
-        id: Date.now(),
+        id: `${Date.now()}`,
         text: 'Processing image...',
         imageUrl: URL.createObjectURL(file),
         sender: 'bot'
       }
     ]);
 
-    vscodeAPI.postMessage(
-      newEventMessage('process_message', { imageUrl: URL.createObjectURL(file) })
-    );
-
-    vscodeAPI.onMessage((message) => {
-      switch (message.command) {
-        case 'message_processed':
-          setMessages([
-            ...messages,
-            {
-              id: Date.now(),
-              text: 'Generating component...',
-              sender: 'bot'
-            }
-          ]);
-          break;
-      }
-    });
+    vscodeAPI.postMessage(newEventMessage('process_message', { imageUrl: (file as any).path }));
   };
 
   return (
@@ -74,12 +85,22 @@ const Chat: React.FunctionComponent<{
             <p className="text-sm font-medium text-neutral-300 mb-2">
               {message.sender === 'user' ? 'You' : 'Element AI'}
             </p>
-            <p className="whitespace-pre-wrap">{message.text}</p>
+
+            <Markdown>{message.text}</Markdown>
+
             {message.imageUrl && (
               <img alt="preview image" className="mt-2" src={message.imageUrl} />
             )}
           </div>
         ))}
+
+        {streamResponse && (
+          <div className={`py-4 px-2 border-b border-neutral-700 text-left`}>
+            <p className="text-sm font-medium text-neutral-300 mb-2">Element AI</p>
+
+            <Markdown>{streamResponse}</Markdown>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-1">
         <TextareaAutosize

@@ -23,6 +23,8 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
+    this.chatApi.setWebview(this.chatWebview);
+
     this.chatWebview.onDidReceiveMessage(
       async (message: EventMessage) => {
         try {

@@ -11,13 +11,13 @@ type View = 'chat' | 'login';
 const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI }) => {
   const [view, setView] = useState<View>('chat');
 
-  useEffect(
-    () =>
-      vscodeAPI.onMessage((message) => {
-        console.log('message', message);
-      }),
-    [view, vscodeAPI]
-  );
+  // useEffect(
+  //   () =>
+  //     vscodeAPI.onMessage((message) => {
+  //       console.log('message', message);
+  //     }),
+  //   [view, vscodeAPI]
+  // );
 
   useEffect(() => {
     // Notify the extension host that we are ready to receive events

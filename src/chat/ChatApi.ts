@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import * as vscode from "vscode";
 
 import { EventRegistry } from "./EventRegistry";
+import { EventMessage, newEventMessage } from "../protocol";
 
 type ProcessMessageRequest = {
   message?: string;
@@ -19,13 +20,13 @@ type AssistantStream = any;
 
 export class ChatAPI {
   private ready = new vscode.EventEmitter<void>();
-  private initialized = new vscode.EventEmitter<void>();
   private thread?: OpenAI.Beta.Threads.Thread;
 
   private chatEventRegistry = new EventRegistry();
   private openai: OpenAI;
   private assistant?: OpenAI.Beta.Assistants.Assistant;
   private vectorStore?: OpenAI.Beta.VectorStores.VectorStore;
+  private webview?: vscode.Webview;
 
   constructor(context: vscode.ExtensionContext, service: APIService) {
     this.openai = service.openai;
@@ -37,7 +38,6 @@ export class ChatAPI {
       .registerEvent<ProcessMessageRequest, void>(
         "process_message",
         async (req) => {
-          await this.onInitialized();
           if (!this.assistant) {
             console.error("IMPOSSIBLE STATE: Assistant not set");
             return;
@@ -55,7 +55,8 @@ export class ChatAPI {
             });
           }
 
-          this.addMessage(req);
+          const messages = await this.addMessage(req);
+          console.log("messages", JSON.stringify(messages));
         }
       );
   }
@@ -81,15 +82,6 @@ export class ChatAPI {
       });
     }
     if (message.imageUrl) {
-      content.push({
-        type: "text",
-        text: `Analize the image below focus on the following:
-1. Identify the layout of the image, including the position of elements.
-2. Identify elements such as input fields, buttons, dropdowns, etc.
-3. If any part of the image is unclear, ask follow-up questions for clarification.
-4. Once you have a clear understanding, proceed to recreate the layout in code, adhering to the project's coding style, design patterns, and reusing existing components.`,
-      });
-
       const imageFile = await this.openai.files.create({
         purpose: "vision",
         file: fs.createReadStream(message.imageUrl),
@@ -109,6 +101,9 @@ export class ChatAPI {
       content,
     });
 
+    const newMessageEvent = newEventMessage("new_message");
+    void this.webview?.postMessage(newMessageEvent);
+
     const stream = this.openai.beta.threads.runs.stream(this.thread.id, {
       assistant_id: this.assistant.id,
       tools: [{ type: "file_search", file_search: { max_num_results: 50 } }],
@@ -116,7 +111,15 @@ export class ChatAPI {
 
     stream
       .on("textDelta", (event) => {
-        console.log("assistent.textDelta <<<", JSON.stringify(event));
+        if (!this.webview) {
+          return;
+        }
+
+        void this.webview?.postMessage({
+          id: newMessageEvent.id,
+          command: "message_processing",
+          data: event.value,
+        } as EventMessage);
       })
       .on("end", () => {
         const currentRun = stream.currentRun();
@@ -132,19 +135,16 @@ export class ChatAPI {
     });
   }
 
-  public onInitialized(): Promise<void> {
-    return new Promise((resolve) => {
-      this.initialized.event(resolve);
-    });
-  }
-
-  async setAssistant(
+  public setAssistant(
     assistant: OpenAI.Beta.Assistants.Assistant,
     vectorStore: OpenAI.Beta.VectorStores.VectorStore
-  ): Promise<void> {
+  ): void {
     this.assistant = assistant;
     this.vectorStore = vectorStore;
-    this.initialized.fire();
+  }
+
+  public setWebview(webview: vscode.Webview): void {
+    this.webview = webview;
   }
 
   async handleEvent<Req, Res>(
