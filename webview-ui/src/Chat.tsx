@@ -43,12 +43,12 @@ const Chat: React.FunctionComponent<{
     ]);
 
     vscodeAPI.postMessage(
-      newEventMessage('process_image', { imageUrl: URL.createObjectURL(file) })
+      newEventMessage('process_message', { imageUrl: URL.createObjectURL(file) })
     );
 
     vscodeAPI.onMessage((message) => {
       switch (message.command) {
-        case 'image_processed':
+        case 'message_processed':
           setMessages([
             ...messages,
             {

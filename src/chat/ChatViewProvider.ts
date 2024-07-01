@@ -51,7 +51,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   async focusChatInput() {
     void vscode.commands.executeCommand("workbench.view.extension.elementai");
-    await this.waitForChatInitiated();
+    await this.chatApi.onReady();
     void this.chatWebviewView?.show(true);
     void this.chatWebview?.postMessage(newEventMessage("focus-input"));
   }
@@ -60,10 +60,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void this.chatWebview?.postMessage(
       newEventMessage("clear-all-conversations")
     );
-  }
-
-  waitForChatInitiated(): Promise<unknown> {
-    return this.chatApi.onReady;
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {

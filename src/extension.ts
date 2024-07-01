@@ -13,23 +13,36 @@ import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import { SUPPORTED_FILE_EXTENSIONS } from "./utils/consts";
 
+type AppState = {
+  openai: OpenAI;
+  chatApi: ChatAPI;
+  chatViewProvider: ChatViewProvider;
+};
+
 export async function activate(
   context: vscode.ExtensionContext
 ): Promise<void> {
   const openai = new OpenAI();
+  const chatApi = new ChatAPI(context, { openai: new OpenAI() });
 
-  void scanWorkspaces(context, openai);
+  const appState: AppState = {
+    openai: openai,
+    chatApi: chatApi,
+    chatViewProvider: new ChatViewProvider(context, chatApi),
+  };
+
+  void scanWorkspaces(context, appState);
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
   // before considering ElementAI ready to operate.
-  void backgroundInit(context, openai);
+  void backgroundInit(context, appState);
 
   return Promise.resolve();
 }
 
 async function scanWorkspaces(
   context: vscode.ExtensionContext,
-  openai: OpenAI
+  appState: AppState
 ) {
   console.info(`Scanning workspace folders for files`);
 
@@ -53,10 +66,19 @@ async function scanWorkspaces(
     try {
       const settingsBuffer = await fs.readFileSync(settingsUri);
       const settings = JSON.parse(settingsBuffer.toString());
-      if (settings.vector_store_id) {
+      if (settings.assistant_id && settings.vector_store_id) {
         console.info(
           `Workspace ${workspaceFolder.name} already has a vector store`
         );
+
+        const assistant = await appState.openai.beta.assistants.retrieve(
+          settings.assistant_id
+        );
+        const vectorStore = await appState.openai.beta.vectorStores.retrieve(
+          settings.vector_store_id
+        );
+        appState.chatApi.setAssistant(assistant, vectorStore);
+
         return;
       }
     } catch (err) {}
@@ -73,7 +95,7 @@ async function scanWorkspaces(
         ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
       );
 
-      const vectorStore = await openai.beta.vectorStores.create({
+      const vectorStore = await appState.openai.beta.vectorStores.create({
         name: `${workspaceFolder.name}-vector-store`,
         expires_after: {
           anchor: "last_active_at",
@@ -107,7 +129,7 @@ async function scanWorkspaces(
           .slice(i, i + batchSize)
           .map((path) => fs.createReadStream(path));
 
-        await openai.beta.vectorStores.fileBatches.uploadAndPoll(
+        await appState.openai.beta.vectorStores.fileBatches.uploadAndPoll(
           vectorStore.id,
           {
             files: fileStreams,
@@ -115,7 +137,7 @@ async function scanWorkspaces(
         );
       }
 
-      const assistant = await openai.beta.assistants.create({
+      const assistant = await appState.openai.beta.assistants.create({
         name: "ElementAI UI Assistant",
         description:
           "You are an expert frontend development assistant. You help developers by converting visual sketches and design elements into clean, maintainable code. You understand design patterns, code styles, and existing components in the codebase to ensure consistency and efficiency. Additionally, you provide suggestions and improvements based on best practices in frontend development.",
@@ -150,6 +172,8 @@ Always return the solution's source code as output first, followed by a brief ex
         },
       });
 
+      appState.chatApi.setAssistant(assistant, vectorStore);
+
       // Write the vector store id to root folder
       // This will be used to identify the vector store for the workspace
       // and to update it when new files are added
@@ -172,12 +196,9 @@ Always return the solution's source code as output first, followed by a brief ex
 
 async function backgroundInit(
   context: vscode.ExtensionContext,
-  openai: OpenAI
+  appState: AppState
 ) {
-  registerChatWidgetWebview(
-    context,
-    new ChatViewProvider(context, new ChatAPI(context, { openai: openai }))
-  );
+  registerChatWidgetWebview(context, appState.chatViewProvider);
 }
 
 // This method is called when your extension is deactivated
