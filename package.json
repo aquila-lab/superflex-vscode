@@ -110,6 +110,7 @@
     ]
   },
   "devDependencies": {
+    "@types/async": "^3.2.24",
     "@types/mocha": "^10.0.6",
     "@types/node": "20.x",
     "@types/vscode": "^1.90.0",
@@ -122,6 +123,7 @@
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.36",
+    "async": "^3.2.5",
     "dotenv": "^16.4.5",
     "fast-glob": "^3.3.2",
     "openai": "^4.52.1",

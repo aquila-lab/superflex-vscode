@@ -1,6 +1,7 @@
 import fs from "fs";
 import OpenAI from "openai";
 import * as vscode from "vscode";
+import async from "async";
 
 import { EventRegistry } from "./EventRegistry";
 import { EventMessage, newEventMessage } from "../protocol";
@@ -14,13 +15,23 @@ type APIService = {
   openai: OpenAI;
 };
 
-// AssistantStream is currently not exposed by openai package
-// Replace this once when it is exposed
-type AssistantStream = any;
+const codeBlockStartRegex = /```([A-Za-z]*)?\n/;
+const codeBlockRegex = /```([A-Za-z]*)?\n([\s\S]*?)```/;
 
 export class ChatAPI {
   private ready = new vscode.EventEmitter<void>();
   private thread?: OpenAI.Beta.Threads.Thread;
+  private queue = async.queue(async (word: string, callback) => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showInformationMessage("No active editor found!");
+      callback();
+      return;
+    }
+
+    await this.writeWord(editor, word);
+    callback();
+  }, 1); // Ensure tasks are processed one at a time
 
   private chatEventRegistry = new EventRegistry();
   private openai: OpenAI;
@@ -82,6 +93,11 @@ export class ChatAPI {
       });
     }
     if (message.imageUrl) {
+      content.push({
+        type: "text",
+        text: "Scan the image and generate me component from it. NOTE: First return the source code after that write a short step by step explanation what you did.",
+      });
+
       const imageFile = await this.openai.files.create({
         purpose: "vision",
         file: fs.createReadStream(message.imageUrl),
@@ -109,10 +125,43 @@ export class ChatAPI {
       tools: [{ type: "file_search", file_search: { max_num_results: 50 } }],
     });
 
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      throw new Error("No active text editor");
+    }
+    await this.clearEditorContent(editor);
+
+    let writeIntoFile = false;
+    let matchString = "";
+    let disableWrite = false;
+
     stream
       .on("textDelta", (event) => {
         if (!this.webview) {
           return;
+        }
+
+        matchString += event.value;
+        if (
+          !disableWrite &&
+          writeIntoFile &&
+          matchString.match(codeBlockRegex)
+        ) {
+          writeIntoFile = false;
+          disableWrite = true;
+          matchString = "";
+        }
+
+        if (writeIntoFile && !disableWrite) {
+          this.enqueueWord(event.value || "");
+        }
+
+        if (
+          !disableWrite &&
+          !writeIntoFile &&
+          matchString.match(codeBlockStartRegex)
+        ) {
+          writeIntoFile = true;
         }
 
         void this.webview?.postMessage({
@@ -126,7 +175,12 @@ export class ChatAPI {
         console.log("assistent.currentRun <<<", JSON.stringify(currentRun));
       });
 
-    return stream.finalMessages();
+    const final = await stream.finalMessages();
+    return final;
+  }
+
+  private enqueueWord(word: string) {
+    this.queue.push(word);
   }
 
   public onReady(): Promise<void> {
@@ -145,6 +199,32 @@ export class ChatAPI {
 
   public setWebview(webview: vscode.Webview): void {
     this.webview = webview;
+  }
+
+  private async clearEditorContent(editor: vscode.TextEditor) {
+    const document = editor.document;
+    const fullRange = new vscode.Range(
+      document.positionAt(0),
+      document.positionAt(document.getText().length)
+    );
+
+    await editor.edit((editBuilder) => {
+      editBuilder.delete(fullRange);
+    });
+    const startPosition = new vscode.Position(0, 0);
+    editor.selection = new vscode.Selection(startPosition, startPosition);
+  }
+
+  private async writeWord(editor: vscode.TextEditor, word: string) {
+    const currentPosition = editor.selection.active;
+    await editor.edit((editBuilder) => {
+      editBuilder.insert(currentPosition, word);
+    });
+
+    const newPosition = editor.document.positionAt(
+      editor.document.getText().length
+    );
+    editor.selection = new vscode.Selection(newPosition, newPosition);
   }
 
   async handleEvent<Req, Res>(
