@@ -93,11 +93,6 @@ export class ChatAPI {
       });
     }
     if (message.imageUrl) {
-      content.push({
-        type: "text",
-        text: "Scan the image and generate me component from it. NOTE: First return the source code after that write a short step by step explanation what you did.",
-      });
-
       const imageFile = await this.openai.files.create({
         purpose: "vision",
         file: fs.createReadStream(message.imageUrl),
@@ -107,7 +102,7 @@ export class ChatAPI {
         type: "image_file",
         image_file: {
           file_id: imageFile.id,
-          detail: "low",
+          detail: "auto",
         },
       });
     }

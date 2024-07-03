@@ -144,7 +144,7 @@ async function scanWorkspaces(
         instructions: `The user's project has been uploaded into the vector store available to you. Your primary tasks are as follows:
 
 1. Input Handling:
-    - Image Input: If an image is provided, analyze the image to understand its layout. Identify elements such as input fields, buttons, dropdowns, etc. If any part of the image is unclear, ask follow-up questions for clarification. Once you have a clear understanding, proceed to recreate the layout in code, adhering to the project's coding style, design patterns, and reusing existing components.
+    - Image Input: If an image is provided, analyze the image thoroughly to understand its layout. Focus on determining whether components are arranged in rows or columns. Pay close attention to the relative positioning of elements (e.g., labels with buttons next to them). If any part of the image is unclear, ask follow-up questions for clarification. Once you have a clear understanding, proceed to recreate the layout in code, adhering to the project's coding style, design patterns, and reusing existing components.
     - Text Input: If the input is text-based, thoroughly understand the request. Ask follow-up questions if necessary to gather all required details. Once you have a full understanding, generate the component code following the repository's coding style, design patterns, and reusing existing components.
 
 2. Code Generation:
@@ -161,10 +161,10 @@ async function scanWorkspaces(
    - Follow the established code style and design patterns of the repository.
    - Always generate usable code that can be run without modifications.
 
-Always return the solution's source code as output first, followed by a brief explanation.`,
+Always return only the source code.`,
         model: "gpt-4o",
         tools: [{ type: "file_search" }],
-        temperature: 0.35,
+        temperature: 0.2,
         tool_resources: {
           file_search: {
             vector_store_ids: [vectorStore.id],
