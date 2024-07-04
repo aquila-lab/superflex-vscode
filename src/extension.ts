@@ -61,6 +61,28 @@ async function scanWorkspaces(
     );
     await fs.mkdirSync(elementaiCacheFolder, { recursive: true });
 
+    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(
+      workspaceFolder.uri.toString()
+    );
+
+    const documentsUri: string[] = await findFiles(
+      workspaceFolderPath,
+      SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
+      ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
+    );
+
+    const outputFilePath = path.join(elementaiCacheFolder, "combined_code.txt");
+    const writeStream = fs.createWriteStream(outputFilePath);
+
+    for (const documentUri of documentsUri) {
+      const relativeFilePath = path.relative(workspaceFolderPath, documentUri);
+      const fileContent = await fs.promises.readFile(documentUri, "utf-8");
+      writeStream.write(`// ${relativeFilePath}\n`);
+      writeStream.write(fileContent + "\n\n");
+    }
+
+    writeStream.end();
+
     // Check do we aleady have created a workspace OpenAI Vector Store
     const settingsUri = path.join(elementaiCacheFolder, "settings.json");
     try {
@@ -144,7 +166,13 @@ async function scanWorkspaces(
         instructions: `The user's project has been uploaded into the vector store available to you. Your primary tasks are as follows:
 
 1. Input Handling:
-    - Image Input: If an image is provided, analyze the image thoroughly to understand its layout. Focus on determining whether components are arranged in rows or columns. Pay close attention to the relative positioning of elements (e.g., labels with buttons next to them). If any part of the image is unclear, ask follow-up questions for clarification. Once you have a clear understanding, proceed to recreate the layout in code, adhering to the project's coding style, design patterns, and reusing existing components.
+    - Image Input: If an image is provided, analyze the image thoroughly to understand its layout. Focus on determining whether components are arranged in rows or columns. Pay close attention to the relative positioning of elements (e.g., elements next to each other in the same row or stacked in the same column).  For example:
+        - 'This is a [modal, dropdown, etc.].'
+        - (0, 0): [Title]
+        - (0, 1): [X button to close the modal]
+        - (1, 0): [<"Element description">]
+      If any part of the image is unclear, ask follow-up questions for clarification. Once you have a clear understanding, describe the layout generically by specifying the positions of elements in terms of rows and columns, then proceed to recreate the layout in code. Ensure the code adheres to the project's coding style, design patterns, and reuses existing components.
+
     - Text Input: If the input is text-based, thoroughly understand the request. Ask follow-up questions if necessary to gather all required details. Once you have a full understanding, generate the component code following the repository's coding style, design patterns, and reusing existing components.
 
 2. Code Generation:
