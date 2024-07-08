@@ -7,6 +7,7 @@ import ElementAIAuthenticationProvider, { AUTH_PROVIDER_ID } from "../authentica
 async function signIn(provider: ElementAIAuthenticationProvider): Promise<void> {
   const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: true });
   setAuthHeader(session.accessToken, () => signOut(provider));
+  vscode.window.showInformationMessage(`Signed in as ${session.account.label} 🎉`);
 }
 
 async function signOut(provider: ElementAIAuthenticationProvider): Promise<void> {
@@ -17,6 +18,8 @@ async function signOut(provider: ElementAIAuthenticationProvider): Promise<void>
 
   ApiProvider.setHeader("Authorization", null);
   ApiProvider.removeResponseInterceptor();
+
+  vscode.window.showInformationMessage("Signed out!");
 }
 
 /**
