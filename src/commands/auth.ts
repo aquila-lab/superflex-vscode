@@ -6,7 +6,6 @@ import ElementAIAuthenticationProvider, { AUTH_PROVIDER_ID } from "../authentica
 
 async function signIn(provider: ElementAIAuthenticationProvider): Promise<void> {
   const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: true });
-  console.log("session >>>", session);
   setAuthHeader(session.accessToken, () => signOut(provider));
 }
 
@@ -18,6 +17,25 @@ async function signOut(provider: ElementAIAuthenticationProvider): Promise<void>
 
   ApiProvider.setHeader("Authorization", null);
   ApiProvider.removeResponseInterceptor();
+}
+
+/**
+ * We need to authenticate the user on extension activation to ensure that the user is authenticated before making any API calls.
+ * @param provider
+ * @returns
+ */
+async function authenticate(provider: ElementAIAuthenticationProvider, accessToken?: string): Promise<void> {
+  if (accessToken) {
+    setAuthHeader(accessToken, () => signOut(provider));
+    return;
+  }
+
+  const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: false });
+  if (!session) {
+    return;
+  }
+
+  setAuthHeader(session.accessToken, () => signOut(provider));
 }
 
 async function setAuthHeader(token: string, logoutAction: any): Promise<void> {
@@ -52,4 +70,4 @@ function handleUnauthorizedResponse(response: any, logoutAction: any): void {
   logoutAction();
 }
 
-export { signIn, signOut };
+export { signIn, signOut, authenticate };

@@ -18,6 +18,7 @@ import * as api from "../api";
 import { UserData } from "../core/User.model";
 import { APP_BASE_URL, BRAND_NAME } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
+import { authenticate } from "../commands";
 
 export const AUTH_PROVIDER_ID = `${BRAND_NAME}.auth`;
 const AUTH_PROVIDER_LABEL = "Element AI Authentication";
@@ -75,6 +76,8 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
       if (!accessToken) {
         throw new Error("Element AI - Auth login failure");
       }
+
+      authenticate(this, accessToken);
 
       const userinfo: UserData = await api.getUserInfo();
 
@@ -148,7 +151,7 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
         this._pendingStates.push(stateID);
 
         const searchParams = new URLSearchParams([["state", encodeURIComponent(callbackUri.toString(true))]]);
-        const uri = Uri.parse(`${APP_BASE_URL}/element-ai/auth?${searchParams.toString()}`);
+        const uri = Uri.parse(`${APP_BASE_URL}/element-ai/login?${searchParams.toString()}`);
 
         remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
 
@@ -183,8 +186,6 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
   private handleUri: () => PromiseAdapter<Uri, TokenInformation> = () => async (uri, resolve, reject) => {
     const query = new URLSearchParams(uri.query);
     const accessToken = query.get("access_token");
-
-    console.log(`Access token handleUri: ${query}`);
 
     if (!accessToken) {
       reject(new Error("No access token"));

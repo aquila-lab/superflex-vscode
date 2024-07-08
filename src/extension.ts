@@ -13,7 +13,7 @@ import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import { SUPPORTED_FILE_EXTENSIONS } from "./common/constants";
 import ElementAIAuthenticationProvider, { AUTH_PROVIDER_ID } from "./authentication/ElementAIAuthenticationProvider";
-import { signIn, signOut } from "./commands";
+import { authenticate, signIn, signOut } from "./commands";
 
 type AppState = {
   openai: OpenAI;
@@ -198,16 +198,18 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   registerChatWidgetWebview(context, appState.chatViewProvider);
 }
 
-function registerAuthenticationProviders(
+async function registerAuthenticationProviders(
   context: vscode.ExtensionContext,
   authProvider: ElementAIAuthenticationProvider
-): void {
+): Promise<void> {
   context.subscriptions.push(authProvider);
 
   context.subscriptions.push(
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(authProvider)),
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(authProvider))
   );
+
+  authenticate(authProvider);
 }
 
 // This method is called when your extension is deactivated
