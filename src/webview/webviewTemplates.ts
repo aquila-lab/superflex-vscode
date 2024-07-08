@@ -1,6 +1,6 @@
 import { Uri } from "vscode";
 
-export const createWebviewTemplate = (
+export const createWebviewHTMLTemplate = (
   scriptSrc: Uri,
   cssSrc: Uri,
   codiconsSrc: Uri

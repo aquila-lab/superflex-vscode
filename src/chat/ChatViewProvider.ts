@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { ChatAPI } from "./ChatApi";
-import { createWebviewTemplate } from "../webview/webviewTemplates";
+import { createWebviewHTMLTemplate } from "../webview/webviewTemplates";
 import { EventMessage, newEventMessage } from "../protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -97,7 +97,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       )
     );
 
-    webviewView.webview.html = createWebviewTemplate(
+    webviewView.webview.html = createWebviewHTMLTemplate(
       scriptSrc,
       cssSrc,
       codiconsUri
