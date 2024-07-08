@@ -99,13 +99,26 @@
     },
     "commands": [
       {
+        "command": "elementai.auth.signin",
+        "category": "Element AI",
+        "title": "Sign In"
+      },
+      {
+        "command": "elementai.auth.signout",
+        "category": "Element AI",
+        "title": "Sign Out",
+        "icon": "$(sign-out)"
+      },
+      {
         "command": "elementai.chat.clear-all-conversations",
-        "title": "Element AI: Clear all chat conversations",
+        "category": "Element AI",
+        "title": "Clear all chat conversations",
         "when": "elementai.chat.ready"
       },
       {
         "command": "elementai.chat.focus-input",
-        "title": "Element AI: Focus chat input"
+        "category": "Element AI",
+        "title": "Focus chat input"
       }
     ]
   },

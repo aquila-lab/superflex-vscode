@@ -1,13 +1,9 @@
 import path from "path";
 import fg from "fast-glob";
 
-import { decodeUriAndRemoveFilePrefix } from "../utils";
+import { decodeUriAndRemoveFilePrefix } from "../common/utils";
 
-export async function findFiles(
-  baseUri: string,
-  globPatterns: string[],
-  ignore: string[] = []
-): Promise<string[]> {
+export async function findFiles(baseUri: string, globPatterns: string[], ignore: string[] = []): Promise<string[]> {
   const relativePaths = await fg(globPatterns, {
     cwd: baseUri,
     ignore,
@@ -16,7 +12,5 @@ export async function findFiles(
     dot: true,
   });
 
-  return relativePaths.map((rp) =>
-    decodeUriAndRemoveFilePrefix(path.join(baseUri, rp))
-  );
+  return relativePaths.map((rp) => decodeUriAndRemoveFilePrefix(path.join(baseUri, rp)));
 }

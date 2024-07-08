@@ -6,12 +6,17 @@ import OpenAI from "openai";
 import * as vscode from "vscode";
 import { homedir } from "os";
 
-import { decodeUriAndRemoveFilePrefix } from "./utils";
+import { decodeUriAndRemoveFilePrefix } from "./common/utils";
 import { findFiles } from "./scanner";
 import { ChatAPI } from "./chat/ChatApi";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
-import { SUPPORTED_FILE_EXTENSIONS } from "./utils/consts";
+import { SUPPORTED_FILE_EXTENSIONS } from "./common/constants";
+import ElementAIAuthenticationProvider, {
+  AUTH_PROVIDER_LABEL,
+  AUTH_PROVIDER_ID,
+} from "./authentication/ElementAIAuthenticationProvider";
+import { signIn, signOut } from "./commands";
 
 type AppState = {
   openai: OpenAI;
@@ -19,9 +24,7 @@ type AppState = {
   chatViewProvider: ChatViewProvider;
 };
 
-export async function activate(
-  context: vscode.ExtensionContext
-): Promise<void> {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const openai = new OpenAI();
   const chatApi = new ChatAPI(context, { openai: new OpenAI() });
 
@@ -40,10 +43,7 @@ export async function activate(
   return Promise.resolve();
 }
 
-async function scanWorkspaces(
-  context: vscode.ExtensionContext,
-  appState: AppState
-) {
+async function scanWorkspaces(context: vscode.ExtensionContext, appState: AppState) {
   console.info(`Scanning workspace folders for files`);
 
   const workspaceFolders = vscode.workspace.workspaceFolders || [];
@@ -54,16 +54,10 @@ async function scanWorkspaces(
       continue;
     }
 
-    const elementaiCacheFolder = path.join(
-      homedir(),
-      ".elementai",
-      workspaceFolder.name
-    );
+    const elementaiCacheFolder = path.join(homedir(), ".elementai", workspaceFolder.name);
     await fs.mkdirSync(elementaiCacheFolder, { recursive: true });
 
-    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(
-      workspaceFolder.uri.toString()
-    );
+    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(workspaceFolder.uri.toString());
 
     const documentsUri: string[] = await findFiles(
       workspaceFolderPath,
@@ -89,16 +83,10 @@ async function scanWorkspaces(
       const settingsBuffer = await fs.readFileSync(settingsUri);
       const settings = JSON.parse(settingsBuffer.toString());
       if (settings.assistant_id && settings.vector_store_id) {
-        console.info(
-          `Workspace ${workspaceFolder.name} already has a vector store`
-        );
+        console.info(`Workspace ${workspaceFolder.name} already has a vector store`);
 
-        const assistant = await appState.openai.beta.assistants.retrieve(
-          settings.assistant_id
-        );
-        const vectorStore = await appState.openai.beta.vectorStores.retrieve(
-          settings.vector_store_id
-        );
+        const assistant = await appState.openai.beta.assistants.retrieve(settings.assistant_id);
+        const vectorStore = await appState.openai.beta.vectorStores.retrieve(settings.vector_store_id);
         appState.chatApi.setAssistant(assistant, vectorStore);
 
         return;
@@ -107,9 +95,7 @@ async function scanWorkspaces(
 
     // Find all files in the workspace folder and put them in OpenAI Vector Store
     try {
-      const workspaceFolderPath = decodeUriAndRemoveFilePrefix(
-        workspaceFolder.uri.toString()
-      );
+      const workspaceFolderPath = decodeUriAndRemoveFilePrefix(workspaceFolder.uri.toString());
 
       const documentsUri: string[] = await findFiles(
         workspaceFolderPath,
@@ -131,10 +117,7 @@ async function scanWorkspaces(
 
       const documentPaths: string[] = [];
       for (const documentUri of documentsUri) {
-        const documentPath = path.join(
-          cacheFolder,
-          `${path.basename(documentUri)}.txt`
-        );
+        const documentPath = path.join(cacheFolder, `${path.basename(documentUri)}.txt`);
 
         await fs.copyFileSync(documentUri, documentPath);
         documentPaths.push(documentPath);
@@ -143,20 +126,13 @@ async function scanWorkspaces(
       // Upload files to the storage in batches of 500
       const batchSize = 500;
       for (let i = 0; i < documentPaths.length; i += batchSize) {
-        console.info(
-          `Scanning files: ${batchSize * i}/${documentPaths.length}`
-        );
+        console.info(`Scanning files: ${batchSize * i}/${documentPaths.length}`);
 
-        const fileStreams = documentPaths
-          .slice(i, i + batchSize)
-          .map((path) => fs.createReadStream(path));
+        const fileStreams = documentPaths.slice(i, i + batchSize).map((path) => fs.createReadStream(path));
 
-        await appState.openai.beta.vectorStores.fileBatches.uploadAndPoll(
-          vectorStore.id,
-          {
-            files: fileStreams,
-          }
-        );
+        await appState.openai.beta.vectorStores.fileBatches.uploadAndPoll(vectorStore.id, {
+          files: fileStreams,
+        });
       }
 
       const assistant = await appState.openai.beta.assistants.create({
@@ -217,11 +193,23 @@ Always return only the source code.`,
   }
 }
 
-async function backgroundInit(
-  context: vscode.ExtensionContext,
-  appState: AppState
-) {
+async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
+  registerAuthenticationProviders(context);
+
   registerChatWidgetWebview(context, appState.chatViewProvider);
+}
+
+function registerAuthenticationProviders(context: vscode.ExtensionContext): void {
+  const provider = new ElementAIAuthenticationProvider(context);
+  context.subscriptions.push(
+    vscode.authentication.registerAuthenticationProvider(AUTH_PROVIDER_ID, AUTH_PROVIDER_LABEL, provider),
+    provider
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(provider)),
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(provider))
+  );
 }
 
 // This method is called when your extension is deactivated
