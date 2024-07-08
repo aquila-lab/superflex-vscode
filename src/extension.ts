@@ -12,15 +12,13 @@ import { ChatAPI } from "./chat/ChatApi";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import { SUPPORTED_FILE_EXTENSIONS } from "./common/constants";
-import ElementAIAuthenticationProvider, {
-  AUTH_PROVIDER_LABEL,
-  AUTH_PROVIDER_ID,
-} from "./authentication/ElementAIAuthenticationProvider";
+import ElementAIAuthenticationProvider, { AUTH_PROVIDER_ID } from "./authentication/ElementAIAuthenticationProvider";
 import { signIn, signOut } from "./commands";
 
 type AppState = {
   openai: OpenAI;
   chatApi: ChatAPI;
+  authProvider: ElementAIAuthenticationProvider;
   chatViewProvider: ChatViewProvider;
 };
 
@@ -31,6 +29,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const appState: AppState = {
     openai: openai,
     chatApi: chatApi,
+    authProvider: new ElementAIAuthenticationProvider(context),
     chatViewProvider: new ChatViewProvider(context, chatApi),
   };
 
@@ -194,21 +193,20 @@ Always return only the source code.`,
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
-  registerAuthenticationProviders(context);
+  registerAuthenticationProviders(context, appState.authProvider);
 
   registerChatWidgetWebview(context, appState.chatViewProvider);
 }
 
-function registerAuthenticationProviders(context: vscode.ExtensionContext): void {
-  const provider = new ElementAIAuthenticationProvider(context);
-  context.subscriptions.push(
-    vscode.authentication.registerAuthenticationProvider(AUTH_PROVIDER_ID, AUTH_PROVIDER_LABEL, provider),
-    provider
-  );
+function registerAuthenticationProviders(
+  context: vscode.ExtensionContext,
+  authProvider: ElementAIAuthenticationProvider
+): void {
+  context.subscriptions.push(authProvider);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(provider)),
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(provider))
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(authProvider)),
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(authProvider))
   );
 }
 
