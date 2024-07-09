@@ -29,7 +29,6 @@ const Chat: React.FunctionComponent<{
   useEffect(
     () =>
       vscodeAPI.onMessage((message) => {
-        console.log('message <<<', message);
         switch (message.command) {
           case 'new_message':
             setMessages([
@@ -88,9 +87,7 @@ const Chat: React.FunctionComponent<{
 
             <Markdown>{message.text}</Markdown>
 
-            {message.imageUrl && (
-              <img alt="preview image" className="mt-2" src={message.imageUrl} />
-            )}
+            {message.imageUrl && <img alt="preview image" className="mt-2" src={message.imageUrl} />}
           </div>
         ))}
 
