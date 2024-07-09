@@ -5,39 +5,33 @@ import { createWebviewHTMLTemplate } from "../webview/webviewTemplates";
 import { EventMessage, newEventMessage } from "../protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
-  private chatWebviewView?: vscode.WebviewView;
+  private _extensionUri: vscode.Uri;
+  private _eventMessagesQueue: EventMessage[] = [];
 
-  private chatWebview?: vscode.Webview;
-
-  private extensionUri: vscode.Uri;
+  private _chatWebviewView?: vscode.WebviewView;
+  private _chatWebview?: vscode.Webview;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
-    this.extensionUri = context.extensionUri;
+    this._extensionUri = context.extensionUri;
   }
 
   private init() {
-    if (!this.chatWebview) {
+    if (!this._chatWebview) {
       return;
     }
 
-    this.chatApi.setWebview(this.chatWebview);
+    this.chatApi.setWebview(this._chatWebview);
 
-    this.chatWebview.onDidReceiveMessage(
+    this._chatWebview.onDidReceiveMessage(
       async (message: EventMessage) => {
-        try {
-          const payload = await this.chatApi.handleEvent(message.command, message.data);
-          void this.chatWebview?.postMessage({
-            id: message.id,
-            command: message.command,
-            data: payload,
-          } as EventMessage);
-        } catch (e) {
-          console.error(`failed to handle event. message: ${message.data}`);
-          void this.chatWebview?.postMessage({
-            id: message.id,
-            command: message.command,
-            error: (e as Error).message,
-          } as EventMessage);
+        switch (message.command) {
+          case "ready":
+            // Consume all queued messages
+            while (this._eventMessagesQueue.length) {
+              const msg = this._eventMessagesQueue.shift();
+              void this._chatWebview?.postMessage(msg);
+            }
+            break;
         }
       },
       undefined,
@@ -46,24 +40,30 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   sendEventMessage(msg: EventMessage): void {
-    void this.chatWebview?.postMessage(msg);
+    // If the webview is not ready, queue the message
+    if (!this._chatWebview) {
+      this._eventMessagesQueue.push(msg);
+      return;
+    }
+
+    void this._chatWebview.postMessage(msg);
   }
 
   async focusChatInput() {
     void vscode.commands.executeCommand("workbench.view.extension.elementai");
     await this.chatApi.onReady();
-    void this.chatWebviewView?.show(true);
-    void this.chatWebview?.postMessage(newEventMessage("focus-input"));
+    void this._chatWebviewView?.show(true);
+    void this._chatWebview?.postMessage(newEventMessage("focus-input"));
   }
 
   clearAllConversations() {
-    void this.chatWebview?.postMessage(newEventMessage("clear-all-conversations"));
+    void this._chatWebview?.postMessage(newEventMessage("clear-all-conversations"));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
     const localWebviewView = webviewView;
-    this.chatWebviewView = localWebviewView;
-    this.chatWebview = localWebviewView.webview;
+    this._chatWebviewView = localWebviewView;
+    this._chatWebview = localWebviewView.webview;
     localWebviewView.webview.options = {
       enableScripts: true,
       enableCommandUris: true,
@@ -76,15 +76,15 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   setWebviewHtml(webviewView: vscode.WebviewView): void {
     let scriptSrc = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "webview-ui", "dist", "index.js")
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "index.js")
     );
 
     let cssSrc = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "webview-ui", "dist", "index.css")
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "index.css")
     );
 
     const codiconsUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "node_modules", "@vscode/codicons", "dist", "codicon.css")
+      vscode.Uri.joinPath(this._extensionUri, "node_modules", "@vscode/codicons", "dist", "codicon.css")
     );
 
     webviewView.webview.html = createWebviewHTMLTemplate(scriptSrc, cssSrc, codiconsUri);
