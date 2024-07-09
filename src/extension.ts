@@ -11,13 +11,14 @@ import { findFiles } from "./scanner";
 import { ChatAPI } from "./chat/ChatApi";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
-import { SUPPORTED_FILE_EXTENSIONS } from "./common/constants";
-import ElementAIAuthenticationProvider, { AUTH_PROVIDER_ID } from "./authentication/ElementAIAuthenticationProvider";
-import { authenticate, signIn, signOut } from "./commands";
+import { AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "./common/constants";
+import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
+import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
 
 type AppState = {
   openai: OpenAI;
   chatApi: ChatAPI;
+  authService: ElementAIAuthenticationService;
   authProvider: ElementAIAuthenticationProvider;
   chatViewProvider: ChatViewProvider;
 };
@@ -25,12 +26,15 @@ type AppState = {
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const openai = new OpenAI();
   const chatApi = new ChatAPI(context, { openai: new OpenAI() });
+  const chatWebviewProvider = new ChatViewProvider(context, chatApi);
+  const authService = new ElementAIAuthenticationService(chatWebviewProvider);
 
   const appState: AppState = {
     openai: openai,
     chatApi: chatApi,
-    authProvider: new ElementAIAuthenticationProvider(context),
-    chatViewProvider: new ChatViewProvider(context, chatApi),
+    authService: authService,
+    authProvider: new ElementAIAuthenticationProvider(context, authService),
+    chatViewProvider: chatWebviewProvider,
   };
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
@@ -41,23 +45,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
-  registerAuthenticationProviders(context, appState.authProvider);
+  registerAuthenticationProviders(context, appState);
 
   registerChatWidgetWebview(context, appState.chatViewProvider);
 }
 
-async function registerAuthenticationProviders(
-  context: vscode.ExtensionContext,
-  authProvider: ElementAIAuthenticationProvider
-): Promise<void> {
-  context.subscriptions.push(authProvider);
+async function registerAuthenticationProviders(context: vscode.ExtensionContext, state: AppState): Promise<void> {
+  context.subscriptions.push(state.authProvider);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(authProvider)),
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(authProvider))
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => state.authService.signIn(state.authProvider)),
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => state.authService.signOut(state.authProvider))
   );
 
-  authenticate(authProvider);
+  state.authService.authenticate(state.authProvider);
 }
 
 // This method is called when your extension is deactivated

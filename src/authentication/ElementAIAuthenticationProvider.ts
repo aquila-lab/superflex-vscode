@@ -16,11 +16,10 @@ import {
 
 import * as api from "../api";
 import { UserData } from "../core/User.model";
-import { APP_BASE_URL, BRAND_NAME } from "../common/constants";
+import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
-import { authenticate } from "../commands";
+import AuthService from "./ElementAIAuthenticationService";
 
-export const AUTH_PROVIDER_ID = `${BRAND_NAME}.auth`;
 const AUTH_PROVIDER_LABEL = "Element AI Authentication";
 const SESSIONS_SECRET_KEY = `${AUTH_PROVIDER_ID}.sessions`;
 
@@ -42,8 +41,11 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
   private _uriHandler = new UriEventHandler();
   private _sessionChangeEmitter = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
   private _codeExchangePromises = new Map<string, { promise: Promise<TokenInformation>; cancel: EventEmitter<void> }>();
+  private _authService: AuthService;
 
-  constructor(private readonly context: ExtensionContext) {
+  constructor(private readonly context: ExtensionContext, authService: AuthService) {
+    this._authService = authService;
+
     this._disposable = Disposable.from(
       authentication.registerAuthenticationProvider(AUTH_PROVIDER_ID, AUTH_PROVIDER_LABEL, this, {
         supportsMultipleAccounts: false,
@@ -77,7 +79,7 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
         throw new Error("Element AI - Auth login failure");
       }
 
-      authenticate(this, accessToken);
+      this._authService.authenticate(this, accessToken);
 
       const userinfo: UserData = await api.getUserInfo();
 

@@ -11,10 +11,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   private extensionUri: vscode.Uri;
 
-  constructor(
-    private context: vscode.ExtensionContext,
-    private chatApi: ChatAPI
-  ) {
+  constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this.extensionUri = context.extensionUri;
   }
 
@@ -28,10 +25,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this.chatWebview.onDidReceiveMessage(
       async (message: EventMessage) => {
         try {
-          const payload = await this.chatApi.handleEvent(
-            message.command,
-            message.data
-          );
+          const payload = await this.chatApi.handleEvent(message.command, message.data);
           void this.chatWebview?.postMessage({
             id: message.id,
             command: message.command,
@@ -51,6 +45,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     );
   }
 
+  sendEventMessage(msg: EventMessage): void {
+    void this.chatWebview?.postMessage(msg);
+  }
+
   async focusChatInput() {
     void vscode.commands.executeCommand("workbench.view.extension.elementai");
     await this.chatApi.onReady();
@@ -59,9 +57,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   clearAllConversations() {
-    void this.chatWebview?.postMessage(
-      newEventMessage("clear-all-conversations")
-    );
+    void this.chatWebview?.postMessage(newEventMessage("clear-all-conversations"));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
@@ -88,19 +84,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     );
 
     const codiconsUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.extensionUri,
-        "node_modules",
-        "@vscode/codicons",
-        "dist",
-        "codicon.css"
-      )
+      vscode.Uri.joinPath(this.extensionUri, "node_modules", "@vscode/codicons", "dist", "codicon.css")
     );
 
-    webviewView.webview.html = createWebviewHTMLTemplate(
-      scriptSrc,
-      cssSrc,
-      codiconsUri
-    );
+    webviewView.webview.html = createWebviewHTMLTemplate(scriptSrc, cssSrc, codiconsUri);
   }
 }
