@@ -33,14 +33,35 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     chatViewProvider: new ChatViewProvider(context, chatApi),
   };
 
-  void scanWorkspaces(context, appState);
-
   // Do not await on this function as we do not want VSCode to wait for it to finish
-  // before considering ElementAI ready to operate.
+  // before considering Element AI ready to operate.
   void backgroundInit(context, appState);
 
   return Promise.resolve();
 }
+
+async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
+  registerAuthenticationProviders(context, appState.authProvider);
+
+  registerChatWidgetWebview(context, appState.chatViewProvider);
+}
+
+async function registerAuthenticationProviders(
+  context: vscode.ExtensionContext,
+  authProvider: ElementAIAuthenticationProvider
+): Promise<void> {
+  context.subscriptions.push(authProvider);
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(authProvider)),
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(authProvider))
+  );
+
+  authenticate(authProvider);
+}
+
+// This method is called when your extension is deactivated
+export function deactivate() {}
 
 async function scanWorkspaces(context: vscode.ExtensionContext, appState: AppState) {
   console.info(`Scanning workspace folders for files`);
@@ -191,26 +212,3 @@ Always return only the source code.`,
     }
   }
 }
-
-async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
-  registerAuthenticationProviders(context, appState.authProvider);
-
-  registerChatWidgetWebview(context, appState.chatViewProvider);
-}
-
-async function registerAuthenticationProviders(
-  context: vscode.ExtensionContext,
-  authProvider: ElementAIAuthenticationProvider
-): Promise<void> {
-  context.subscriptions.push(authProvider);
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => signIn(authProvider)),
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => signOut(authProvider))
-  );
-
-  authenticate(authProvider);
-}
-
-// This method is called when your extension is deactivated
-export function deactivate() {}
