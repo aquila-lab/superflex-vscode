@@ -1,5 +1,7 @@
 import OpenAI from "openai";
+import { AssistantCreateParams } from "openai/src/resources/beta/assistants.js";
 
+import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
 import { AIProvider, Assistant, FileObject, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
 
 class OpenAIVectorStore implements VectorStore {
@@ -47,19 +49,50 @@ export default class OpenAIProvider implements AIProvider {
     this._openai = openai;
   }
 
-  retrieveVectorStore(id: string): VectorStore {
-    throw new Error("Method not implemented.");
+  async retrieveVectorStore(id: string): Promise<VectorStore> {
+    const vectorStore = await this._openai.beta.vectorStores.retrieve(id);
+
+    return new OpenAIVectorStore(vectorStore.id, this._openai);
   }
 
-  createVectorStore(name: string): VectorStore {
-    throw new Error("Method not implemented.");
+  async createVectorStore(name: string): Promise<VectorStore> {
+    const vectorStore = await this._openai.beta.vectorStores.create({
+      name: `${name}-vector-store`,
+      expires_after: {
+        anchor: "last_active_at",
+        days: 7,
+      },
+    });
+
+    return new OpenAIVectorStore(vectorStore.id, this._openai);
   }
 
-  retrieveAssistant(id: string): Assistant {
-    throw new Error("Method not implemented.");
+  async retrieveAssistant(id: string): Promise<Assistant> {
+    const assistant = await this._openai.beta.assistants.retrieve(id);
+
+    return new OpenAIAssistant(assistant.id, this._openai);
   }
 
-  createAssistant(vectorStore?: VectorStore): Assistant {
-    throw new Error("Method not implemented.");
+  async createAssistant(vectorStore?: VectorStore): Promise<Assistant> {
+    const createParams: AssistantCreateParams = {
+      name: ASSISTANT_NAME,
+      description: ASSISTANT_DESCRIPTION,
+      instructions: ASSISTANT_INSTRUCTIONS,
+      model: "gpt-4o",
+      tools: [{ type: "file_search" }],
+      temperature: 0.2,
+    };
+
+    if (vectorStore) {
+      createParams.tool_resources = {
+        file_search: {
+          vector_store_ids: [vectorStore.id],
+        },
+      };
+    }
+
+    const assistant = await this._openai.beta.assistants.create(createParams);
+
+    return new OpenAIAssistant(assistant.id, this._openai);
   }
 }

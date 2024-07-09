@@ -118,7 +118,7 @@ export interface AIProvider {
    * @param id - The ID of the vector store to retrieve.
    * @returns The vector store instance.
    */
-  retrieveVectorStore(id: string): VectorStore;
+  retrieveVectorStore(id: string): Promise<VectorStore>;
 
   /**
    * Create a vector store.
@@ -126,7 +126,7 @@ export interface AIProvider {
    * @param name - The name of the vector store to create.
    * @returns The vector store instance.
    */
-  createVectorStore(name: string): VectorStore;
+  createVectorStore(name: string): Promise<VectorStore>;
 
   /**
    * Retrieve assistant by ID.
@@ -134,7 +134,7 @@ export interface AIProvider {
    * @param id - The ID of the assistant to retrieve.
    * @returns The assistant instance.
    */
-  retrieveAssistant(id: string): Assistant;
+  retrieveAssistant(id: string): Promise<Assistant>;
 
   /**
    * Create an assistant.
@@ -142,5 +142,5 @@ export interface AIProvider {
    * @param vectorStore - Optional parameter to specify the vector store to create the assistant with.
    * @returns The assistant instance.
    */
-  createAssistant(vectorStore?: VectorStore): Assistant;
+  createAssistant(vectorStore?: VectorStore): Promise<Assistant>;
 }
