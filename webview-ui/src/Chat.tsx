@@ -48,6 +48,11 @@ const Chat: React.FunctionComponent<{
     [vscodeAPI, messages]
   );
 
+  useEffect(() => {
+    // If we are here that means we are authenticated and have active subscription
+    vscodeAPI.postMessage(newEventMessage('start_project_indexing'));
+  }, [vscodeAPI]);
+
   const handleSend = () => {
     if (input.trim()) {
       setMessages([...messages, { id: `${Date.now()}`, text: input, sender: 'user' }]);

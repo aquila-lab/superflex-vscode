@@ -41,12 +41,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // before considering Element AI ready to operate.
   void backgroundInit(context, appState);
 
+  scanWorkspaces(context, appState);
+
   return Promise.resolve();
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
   registerAuthenticationProviders(context, appState);
-
   registerChatWidgetWebview(context, appState.chatViewProvider);
 }
 
