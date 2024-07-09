@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import * as vscode from "vscode";
 import async from "async";
 
-import { EventRegistry } from "./EventRegistry";
+import { EventRegistry, Handler } from "./EventRegistry";
 import { EventMessage, newEventMessage } from "../protocol";
 
 type ProcessMessageRequest = {
@@ -68,7 +68,11 @@ export class ChatAPI {
       });
   }
 
-  async addMessage(
+  registerEvent<Req, Res>(command: string, handler: Handler<Req, Res>): void {
+    this.chatEventRegistry.registerEvent<Req, Res>(command, handler);
+  }
+
+  private async addMessage(
     message: ProcessMessageRequest,
     sendEventMessageCb: (msg: EventMessage) => void
   ): Promise<OpenAI.Beta.Threads.Message[]> {

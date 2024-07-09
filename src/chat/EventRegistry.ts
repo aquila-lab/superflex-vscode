@@ -1,6 +1,6 @@
 import { EventMessage } from "../protocol";
 
-type Handler<RequestPayload = unknown, ResponsePayload = unknown> = (
+export type Handler<RequestPayload = unknown, ResponsePayload = unknown> = (
   payload: RequestPayload,
   sendEventMessageCb: (msg: EventMessage) => void
 ) => Promise<ResponsePayload> | ResponsePayload;

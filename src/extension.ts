@@ -58,6 +58,10 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => state.authService.signOut(state.authProvider))
   );
 
+  state.chatApi.registerEvent("login_clicked", async () => {
+    await state.authService.signIn(state.authProvider);
+  });
+
   state.authService.authenticate(state.authProvider);
 }
 
