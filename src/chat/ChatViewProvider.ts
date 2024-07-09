@@ -20,18 +20,26 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    this.chatApi.setWebview(this._chatWebview);
-
     this._chatWebview.onDidReceiveMessage(
       async (message: EventMessage) => {
-        switch (message.command) {
-          case "ready":
-            // Consume all queued messages
-            while (this._eventMessagesQueue.length) {
-              const msg = this._eventMessagesQueue.shift();
-              void this._chatWebview?.postMessage(msg);
-            }
-            break;
+        // When webview is ready consume all queued messages
+        if (message.command === "ready") {
+          while (this._eventMessagesQueue.length) {
+            const msg = this._eventMessagesQueue.shift();
+            void this._chatWebview?.postMessage(msg);
+          }
+        }
+
+        try {
+          await this.chatApi.handleEvent(message.command, message.data, this.sendEventMessage);
+        } catch (err) {
+          console.error(`Failed to handle event. message: ${message.data}`);
+
+          void this.sendEventMessage({
+            id: message.id,
+            command: message.command,
+            error: (err as Error).message,
+          } as EventMessage);
         }
       },
       undefined,

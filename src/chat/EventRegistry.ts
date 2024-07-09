@@ -1,5 +1,8 @@
+import { EventMessage } from "../protocol";
+
 type Handler<RequestPayload = unknown, ResponsePayload = unknown> = (
-  payload: RequestPayload
+  payload: RequestPayload,
+  sendEventMessageCb: (msg: EventMessage) => void
 ) => Promise<ResponsePayload> | ResponsePayload;
 
 export class EventRegistry {
@@ -16,11 +19,12 @@ export class EventRegistry {
 
   async handleEvent<Req, Res>(
     event: string,
-    requestPayload: Req
+    requestPayload: Req,
+    sendEventMessageCb: (msg: EventMessage) => void
   ): Promise<Res> {
     const handler = this.events[event] as Handler<Req, Res>;
     if (handler) {
-      return handler(requestPayload);
+      return handler(requestPayload, sendEventMessageCb);
     }
     throw new Error(`Event: ${event} does not exist in the registry`);
   }

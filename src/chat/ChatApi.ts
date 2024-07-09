@@ -37,7 +37,6 @@ export class ChatAPI {
   private openai: OpenAI;
   private assistant?: OpenAI.Beta.Assistants.Assistant;
   private vectorStore?: OpenAI.Beta.VectorStores.VectorStore;
-  private webview?: vscode.Webview;
 
   constructor(context: vscode.ExtensionContext, service: APIService) {
     this.openai = service.openai;
@@ -46,34 +45,32 @@ export class ChatAPI {
       .registerEvent<void, void>("ready", async () => {
         this.ready.fire();
       })
-      .registerEvent<ProcessMessageRequest, void>(
-        "process_message",
-        async (req) => {
-          if (!this.assistant) {
-            console.error("IMPOSSIBLE STATE: Assistant not set");
-            return;
-          }
-
-          if (!this.thread) {
-            this.thread = await service.openai.beta.threads.create({
-              messages: [
-                {
-                  role: "assistant",
-                  content:
-                    "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
-                },
-              ],
-            });
-          }
-
-          const messages = await this.addMessage(req);
-          console.log("messages", JSON.stringify(messages));
+      .registerEvent<ProcessMessageRequest, void>("process_message", async (req, sendEventMessageCb) => {
+        if (!this.assistant) {
+          console.error("IMPOSSIBLE STATE: Assistant not set");
+          return;
         }
-      );
+
+        if (!this.thread) {
+          this.thread = await service.openai.beta.threads.create({
+            messages: [
+              {
+                role: "assistant",
+                content:
+                  "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
+              },
+            ],
+          });
+        }
+
+        const messages = await this.addMessage(req, sendEventMessageCb);
+        console.log("messages", JSON.stringify(messages));
+      });
   }
 
   async addMessage(
-    message: ProcessMessageRequest
+    message: ProcessMessageRequest,
+    sendEventMessageCb: (msg: EventMessage) => void
   ): Promise<OpenAI.Beta.Threads.Message[]> {
     if (!this.assistant) {
       throw new Error("Assistant not initialized");
@@ -113,7 +110,7 @@ export class ChatAPI {
     });
 
     const newMessageEvent = newEventMessage("new_message");
-    void this.webview?.postMessage(newMessageEvent);
+    sendEventMessageCb(newMessageEvent);
 
     const stream = this.openai.beta.threads.runs.stream(this.thread.id, {
       assistant_id: this.assistant.id,
@@ -132,16 +129,8 @@ export class ChatAPI {
 
     stream
       .on("textDelta", (event) => {
-        if (!this.webview) {
-          return;
-        }
-
         matchString += event.value;
-        if (
-          !disableWrite &&
-          writeIntoFile &&
-          matchString.match(codeBlockRegex)
-        ) {
+        if (!disableWrite && writeIntoFile && matchString.match(codeBlockRegex)) {
           writeIntoFile = false;
           disableWrite = true;
           matchString = "";
@@ -151,15 +140,11 @@ export class ChatAPI {
           this.enqueueWord(event.value || "");
         }
 
-        if (
-          !disableWrite &&
-          !writeIntoFile &&
-          matchString.match(codeBlockStartRegex)
-        ) {
+        if (!disableWrite && !writeIntoFile && matchString.match(codeBlockStartRegex)) {
           writeIntoFile = true;
         }
 
-        void this.webview?.postMessage({
+        sendEventMessageCb({
           id: newMessageEvent.id,
           command: "message_processing",
           data: event.value,
@@ -192,16 +177,9 @@ export class ChatAPI {
     this.vectorStore = vectorStore;
   }
 
-  public setWebview(webview: vscode.Webview): void {
-    this.webview = webview;
-  }
-
   private async clearEditorContent(editor: vscode.TextEditor) {
     const document = editor.document;
-    const fullRange = new vscode.Range(
-      document.positionAt(0),
-      document.positionAt(document.getText().length)
-    );
+    const fullRange = new vscode.Range(document.positionAt(0), document.positionAt(document.getText().length));
 
     await editor.edit((editBuilder) => {
       editBuilder.delete(fullRange);
@@ -216,16 +194,15 @@ export class ChatAPI {
       editBuilder.insert(currentPosition, word);
     });
 
-    const newPosition = editor.document.positionAt(
-      editor.document.getText().length
-    );
+    const newPosition = editor.document.positionAt(editor.document.getText().length);
     editor.selection = new vscode.Selection(newPosition, newPosition);
   }
 
   async handleEvent<Req, Res>(
     event: string,
-    requestPayload: Req
+    requestPayload: Req,
+    sendEventMessageCb: (msg: EventMessage) => void
   ): Promise<Res> {
-    return this.chatEventRegistry.handleEvent(event, requestPayload);
+    return this.chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
   }
 }
