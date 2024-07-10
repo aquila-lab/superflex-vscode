@@ -57,9 +57,8 @@ export class ChatAPI {
           return false;
         }
 
-        this.initialize(openWorkspace.name);
+        await this.initialize(openWorkspace.name);
         this._initialized.fire();
-
         return true;
       })
       .registerEvent<ProcessMessageRequest, void>("process_message", async (req, sendEventMessageCb) => {});
