@@ -11,6 +11,7 @@ import ElementAIAuthenticationService from "./authentication/ElementAIAuthentica
 import { ElementAICache } from "./cache/ElementAICache";
 import { AIProvider } from "./providers/AIProvider";
 import OpenAIProvider from "./providers/OpenAIProvider";
+import { getOpenWorkspace } from "./common/utils";
 
 type AppState = {
   aiProvider: AIProvider;
@@ -42,16 +43,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
-  registerCache(context);
+  ElementAICache.setStoragePath(context.storageUri?.toString());
+
   registerAuthenticationProviders(context, appState);
   registerChatWidgetWebview(context, appState.chatViewProvider);
-}
-
-function registerCache(context: vscode.ExtensionContext): void {
-  ElementAICache.setStoragePath(context.storageUri?.toString());
-  vscode.workspace.onDidChangeWorkspaceFolders((e) => {
-    ElementAICache.setStoragePath(context.storageUri?.toString());
-  });
 }
 
 async function registerAuthenticationProviders(context: vscode.ExtensionContext, state: AppState): Promise<void> {

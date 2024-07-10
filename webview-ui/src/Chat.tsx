@@ -49,8 +49,8 @@ const Chat: React.FunctionComponent<{
   );
 
   useEffect(() => {
-    // If we are here that means we are authenticated and have active subscription
-    vscodeAPI.postMessage(newEventMessage('start_project_indexing'));
+    // If we are here that means we are authenticated and have active subscription or token
+    vscodeAPI.postMessage(newEventMessage('initialized'));
   }, [vscodeAPI]);
 
   const handleSend = () => {

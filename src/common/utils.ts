@@ -31,10 +31,10 @@ export function sha256(buffer: string | Uint8Array): Buffer {
   return crypto.createHash("sha256").update(buffer).digest();
 }
 
-export function getOpenWorkspace(): vscode.WorkspaceFolder {
+export function getOpenWorkspace(): vscode.WorkspaceFolder | undefined {
   const workspaceFolders = vscode.workspace.workspaceFolders || [];
   if (workspaceFolders.length === 0) {
-    throw new Error("There is no workspace folder open.");
+    return undefined;
   }
 
   return workspaceFolders[0];
