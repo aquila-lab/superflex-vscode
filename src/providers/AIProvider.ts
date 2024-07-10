@@ -5,9 +5,10 @@ export type FileObject = {
   id: string;
 
   /**
-   * The name of the file.
+   * The relative filepath of the file.
+   * Can be used as unique identifier for the file in workspace scope.
    */
-  filename: string;
+  relativeFilepath: string;
 
   /**
    * The Unix timestamp (in seconds) for when the file was created.
@@ -22,27 +23,14 @@ export interface VectorStore {
   id: string;
 
   /**
-   * Fetch files from the vector store.
-   *
-   * @returns A promise that resolves with the files in the vector store.
-   */
-  fetchFiles(): Promise<FileObject[]>;
-
-  /**
-   * Upload files to the vector store. If there are duplicate file names, the files will be overwritten.
+   * Upload files to the vector store. Always send all files that should be in the vector store.
+   * If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
+   * The files that are uploaded but missing from the filePaths will be removed.
    *
    * @param filePaths - The paths of the files to upload.
    * @returns A promise that resolves with the uploaded files.
    */
-  uploadFiles(filePaths: string[]): Promise<void>;
-
-  /**
-   * Remove files from the vector store.
-   *
-   * @param filePaths - The paths of the files to remove.
-   * @returns A promise that resolves when the files have been removed from the vector store.
-   */
-  removeFiles(filePaths: string[]): Promise<void>;
+  uploadAndRemoveFiles(filePaths: string[]): Promise<void>;
 }
 
 /**

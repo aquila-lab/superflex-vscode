@@ -18,12 +18,7 @@ class OpenAIVectorStore implements VectorStore {
     this._openai = openai;
   }
 
-  async fetchFiles(): Promise<FileObject[]> {
-    // Implement in the way that you will save file ids mapped to file path in the cache folder
-    throw new Error("Method not implemented.");
-  }
-
-  async uploadFiles(filePaths: string[]): Promise<void> {
+  async uploadAndRemoveFiles(filePaths: string[]): Promise<void> {
     const cachedFilePathToIDMap = ElementAICache.get(FILE_ID_MAP_NAME);
     const filePathToIDMap: any = cachedFilePathToIDMap ? JSON.parse(cachedFilePathToIDMap) : {};
 
@@ -62,10 +57,6 @@ class OpenAIVectorStore implements VectorStore {
 
     ElementAICache.set(FILE_ID_MAP_NAME, JSON.stringify(filePathToIDMap));
     ElementAICache.removeCachedFilesSync();
-  }
-
-  async removeFiles(filePaths: string[]): Promise<void> {
-    // Not supported: Files that are not used in the vector store will expire after 7 days
   }
 }
 
