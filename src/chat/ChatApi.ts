@@ -1,10 +1,10 @@
 import async from "async";
 import * as vscode from "vscode";
 
-import { EventRegistry, Handler } from "./EventRegistry";
 import { EventMessage } from "../protocol";
 import { AIProvider } from "../providers/AIProvider";
 import OpenAIProvider from "../providers/OpenAIProvider";
+import { EventRegistry, Handler } from "./EventRegistry";
 
 type ProcessMessageRequest = {
   message?: string;
