@@ -179,8 +179,8 @@ class OpenAIAssistant implements Assistant {
 export default class OpenAIProvider implements AIProvider {
   private _openai: OpenAI;
 
-  constructor(openai: OpenAI) {
-    this._openai = openai;
+  constructor() {
+    this._openai = new OpenAI();
   }
 
   async retrieveVectorStore(id: string): Promise<VectorStore> {
