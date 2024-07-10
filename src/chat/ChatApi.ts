@@ -1,4 +1,4 @@
-import async from "async";
+import asyncQ from "async";
 import * as vscode from "vscode";
 
 import { findFiles } from "../scanner";
@@ -27,7 +27,7 @@ export class ChatAPI {
   private _ready = new vscode.EventEmitter<void>();
   private _initialized = new vscode.EventEmitter<void>();
   private _chatEventRegistry = new EventRegistry();
-  private _queue = async.queue(async (word: string, callback) => {
+  private _queue = asyncQ.queue(async (word: string, callback) => {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
       vscode.window.showInformationMessage("No active editor found!");

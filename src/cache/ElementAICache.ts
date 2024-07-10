@@ -3,12 +3,12 @@ import path from "path";
 
 import { decodeUriAndRemoveFilePrefix } from "../common/utils";
 
-type CacheFileObject = {
+export type CachedFileObject = {
   originalPath: string;
   cachedPath: string;
 };
 
-type CacheFileOptions = {
+export type CacheFileOptions = {
   /**
    * The file extension to use for the cached files.
    */
@@ -74,7 +74,7 @@ class ElementAICacheClass {
     fs.writeFileSync(path.join(this.storagePath, filename), writeBuffer);
   }
 
-  cacheFilesSync(filePaths: string[], options?: CacheFileOptions): CacheFileObject[] {
+  cacheFilesSync(filePaths: string[], options?: CacheFileOptions): CachedFileObject[] {
     if (!this.workspaceFolderPath || !this.storagePath) {
       throw new Error("Workspace folder path or storage path is not set");
     }
@@ -84,7 +84,7 @@ class ElementAICacheClass {
       fs.mkdirSync(cacheFolder, { recursive: true });
     }
 
-    const cacheFiles: CacheFileObject[] = [];
+    const cacheFiles: CachedFileObject[] = [];
     for (const filePath of filePaths) {
       const documentPath = path.join(
         cacheFolder,

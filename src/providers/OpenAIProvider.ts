@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
+import asyncQ from "async";
 import OpenAI from "openai";
 
-import { ElementAICache } from "../cache/ElementAICache";
+import { CachedFileObject, ElementAICache } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
 import { AIProvider, Assistant, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
 import { jsonToMap, mapToJson } from "../common/utils";
@@ -46,12 +47,30 @@ class OpenAIVectorStore implements VectorStore {
 
     const documentPaths = ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" });
     const progressCoefficient = 98 / documentPaths.length;
-    for (let i = 0; i < documentPaths.length; i++) {
-      if (progressCb) {
-        progressCb(Math.round(i * progressCoefficient));
-      }
 
-      const documentPath = documentPaths[i];
+    const workers = this.createSyncWorkers(filePathToIDMap, storagePath, 10);
+    await this.processFiles(workers, documentPaths, progressCoefficient, progressCb);
+
+    if (progressCb) {
+      progressCb(99);
+    }
+
+    await this.cleanUpFiles(filePathToIDMap, documentPaths, storagePath);
+
+    ElementAICache.set(FILE_ID_MAP_NAME, mapToJson(filePathToIDMap));
+    ElementAICache.removeCachedFilesSync();
+
+    if (progressCb) {
+      progressCb(100);
+    }
+  }
+
+  private createSyncWorkers(
+    filePathToIDMap: Map<string, CachedFile>,
+    storagePath: string,
+    concurrency: number
+  ): asyncQ.QueueObject<CachedFileObject> {
+    const workers = asyncQ.queue(async (documentPath: CachedFileObject, callback) => {
       const fileStat = fs.statSync(documentPath.originalPath);
 
       const relativeFilepath = path.relative(storagePath, documentPath.cachedPath);
@@ -59,7 +78,8 @@ class OpenAIVectorStore implements VectorStore {
 
       // Skip uploading the file if it has not been modified since the last upload
       if (cachedFile && fileStat.mtime.getTime() <= cachedFile.createdAt) {
-        continue;
+        callback();
+        return;
       }
 
       try {
@@ -77,14 +97,51 @@ class OpenAIVectorStore implements VectorStore {
         filePathToIDMap.set(relativeFilepath, { fileID: file.id, createdAt: fileStat.mtime.getTime() });
       } catch (err: any) {
         console.error(`Failed to upload file ${documentPath}: ${err?.message}`);
+      } finally {
+        callback();
       }
-    }
+    }, concurrency); // Number of concurrent workers
 
-    if (progressCb) {
-      progressCb(99);
-    }
+    return workers;
+  }
 
-    // Remove the files that are uploaded but missing from the filePaths input
+  private processFiles(
+    workers: asyncQ.QueueObject<CachedFileObject>,
+    documentPaths: CachedFileObject[],
+    progressCoefficient: number,
+    progressCb?: (current: number) => void
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      documentPaths.forEach((documentPath, index) => {
+        workers.push(documentPath, (err) => {
+          if (err) {
+            console.error(`Error processing file ${documentPath}: ${err.message}`);
+          }
+          if (progressCb) {
+            progressCb(Math.round(index * progressCoefficient));
+          }
+        });
+      });
+
+      // Resolve the promise when all tasks are finished
+      workers.drain(() => {
+        console.log("All files have been processed.");
+        resolve();
+      });
+
+      // Optionally handle errors
+      workers.error((err, task) => {
+        console.error(`Error processing file ${task}: ${err.message}`);
+        reject(err);
+      });
+    });
+  }
+
+  private async cleanUpFiles(
+    filePathToIDMap: Map<string, CachedFile>,
+    documentPaths: CachedFileObject[],
+    storagePath: string
+  ): Promise<void> {
     for (const [relativeFilepath, cachedFile] of filePathToIDMap) {
       const exists = documentPaths.find(
         (documentPath) => path.relative(storagePath, documentPath.cachedPath) === relativeFilepath
@@ -99,13 +156,6 @@ class OpenAIVectorStore implements VectorStore {
       } catch (err: any) {
         console.error(`Failed to delete file ${relativeFilepath}: ${err?.message}`);
       }
-    }
-
-    ElementAICache.set(FILE_ID_MAP_NAME, mapToJson(filePathToIDMap));
-    ElementAICache.removeCachedFilesSync();
-
-    if (progressCb) {
-      progressCb(100);
     }
   }
 }
