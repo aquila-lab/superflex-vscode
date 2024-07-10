@@ -43,10 +43,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
-  ElementAICache.setStoragePath(context.storageUri?.toString());
-
+  registerElementAICache(context);
   registerAuthenticationProviders(context, appState);
   registerChatWidgetWebview(context, appState.chatViewProvider);
+}
+
+function registerElementAICache(context: vscode.ExtensionContext): void {
+  ElementAICache.setStoragePath(context.storageUri?.toString());
+
+  const openWorkspace = getOpenWorkspace();
+  if (openWorkspace) {
+    ElementAICache.setWorkspaceFolderPath(openWorkspace.uri.toString());
+  }
 }
 
 async function registerAuthenticationProviders(context: vscode.ExtensionContext, state: AppState): Promise<void> {

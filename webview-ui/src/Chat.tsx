@@ -46,6 +46,15 @@ const Chat: React.FunctionComponent<{
             setStreamResponse((prev) => prev + message.data);
             break;
           case 'sync_progress':
+            if (message.data.progress === 0) {
+              // Sync has started
+              setSyncProgress(0);
+            }
+
+            if (syncProgress >= message.data.progress) {
+              return;
+            }
+
             setSyncProgress(message.data.progress);
             break;
         }

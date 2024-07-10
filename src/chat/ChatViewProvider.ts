@@ -31,7 +31,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         }
 
         try {
-          const payload = await this.chatApi.handleEvent(message.command, message.data, this.sendEventMessage);
+          const payload = await this.chatApi.handleEvent(
+            message.command,
+            message.data,
+            this.sendEventMessage.bind(this)
+          );
 
           // Uncomment the following line to see the event messages in the console, used for debugging
           // console.log({ id: message.id, command: message.command, data: JSON.stringify(payload) });

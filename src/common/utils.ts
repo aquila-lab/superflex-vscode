@@ -39,3 +39,14 @@ export function getOpenWorkspace(): vscode.WorkspaceFolder | undefined {
 
   return workspaceFolders[0];
 }
+
+// Generic helper function to convert Map to JSON
+export function mapToJson<T>(map: Map<string, T>): string {
+  return JSON.stringify(Array.from(map.entries()));
+}
+
+// Generic helper function to convert JSON to Map
+export function jsonToMap<T>(jsonStr: string, reviver?: (key: string, value: any) => T): Map<string, T> {
+  const entries: [string, T][] = JSON.parse(jsonStr);
+  return new Map<string, T>(entries.map(([key, value]) => [key, reviver ? reviver(key, value) : value]));
+}

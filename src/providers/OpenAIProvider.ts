@@ -5,8 +5,19 @@ import OpenAI from "openai";
 import { ElementAICache } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
 import { AIProvider, Assistant, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
+import { jsonToMap, mapToJson } from "../common/utils";
 
 const FILE_ID_MAP_NAME = "open-ai-file-id-map.json";
+
+type CachedFile = {
+  fileID: string;
+  createdAt: number;
+};
+
+// Reviver function to handle specific deserialization logic for CachedFile
+function cachedFileReviver(key: string, value: any): CachedFile {
+  return { ...value };
+}
 
 class OpenAIVectorStore implements VectorStore {
   id: string;
@@ -29,7 +40,9 @@ class OpenAIVectorStore implements VectorStore {
 
     const storagePath = ElementAICache.storagePath;
     const cachedFilePathToIDMap = ElementAICache.get(FILE_ID_MAP_NAME);
-    const filePathToIDMap: any = cachedFilePathToIDMap ? JSON.parse(cachedFilePathToIDMap) : {};
+    const filePathToIDMap: Map<string, CachedFile> = cachedFilePathToIDMap
+      ? jsonToMap<CachedFile>(cachedFilePathToIDMap, cachedFileReviver)
+      : new Map<string, CachedFile>();
 
     const documentPaths = ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" });
     const progressCoefficient = 98 / documentPaths.length;
@@ -42,10 +55,10 @@ class OpenAIVectorStore implements VectorStore {
       const fileStat = fs.statSync(documentPath.originalPath);
 
       const relativeFilepath = path.relative(storagePath, documentPath.cachedPath);
-      const cachedFile = filePathToIDMap[relativeFilepath];
+      const cachedFile = filePathToIDMap.get(relativeFilepath);
 
       // Skip uploading the file if it has not been modified since the last upload
-      if (cachedFile && new Date(fileStat.mtime).getTime() <= new Date(cachedFile.createdAt).getTime()) {
+      if (cachedFile && fileStat.mtime.getTime() <= cachedFile.createdAt) {
         continue;
       }
 
@@ -61,7 +74,7 @@ class OpenAIVectorStore implements VectorStore {
 
         await this._openai.beta.vectorStores.files.createAndPoll(this.id, { file_id: file.id });
 
-        filePathToIDMap[relativeFilepath] = { fileID: file.id, createdAt: fileStat.mtime };
+        filePathToIDMap.set(relativeFilepath, { fileID: file.id, createdAt: fileStat.mtime.getTime() });
       } catch (err: any) {
         console.error(`Failed to upload file ${documentPath}: ${err?.message}`);
       }
@@ -72,7 +85,7 @@ class OpenAIVectorStore implements VectorStore {
     }
 
     // Remove the files that are uploaded but missing from the filePaths input
-    for (const relativeFilepath of filePathToIDMap) {
+    for (const [relativeFilepath, cachedFile] of filePathToIDMap) {
       const exists = documentPaths.find(
         (documentPath) => path.relative(storagePath, documentPath.cachedPath) === relativeFilepath
       );
@@ -81,14 +94,14 @@ class OpenAIVectorStore implements VectorStore {
       }
 
       try {
-        await this._openai.files.del(filePathToIDMap[relativeFilepath].fileID);
-        delete filePathToIDMap[relativeFilepath];
+        await this._openai.files.del(cachedFile.fileID);
+        filePathToIDMap.delete(relativeFilepath);
       } catch (err: any) {
         console.error(`Failed to delete file ${relativeFilepath}: ${err?.message}`);
       }
     }
 
-    ElementAICache.set(FILE_ID_MAP_NAME, JSON.stringify(filePathToIDMap));
+    ElementAICache.set(FILE_ID_MAP_NAME, mapToJson(filePathToIDMap));
     ElementAICache.removeCachedFilesSync();
 
     if (progressCb) {
