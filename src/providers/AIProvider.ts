@@ -23,14 +23,14 @@ export interface VectorStore {
   id: string;
 
   /**
-   * Upload files to the vector store. Always send all files that should be in the vector store.
+   * Sync files upload files to the vector store. Always send all files that should be in the vector store.
    * If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
-   * The files that are uploaded but missing from the filePaths will be removed.
+   * The files that are uploaded but missing from the filePaths input will be removed.
    *
    * @param filePaths - The paths of the files to upload.
    * @returns A promise that resolves with the uploaded files.
    */
-  uploadAndRemoveFiles(filePaths: string[]): Promise<void>;
+  syncFiles(filePaths: string[]): Promise<void>;
 }
 
 /**

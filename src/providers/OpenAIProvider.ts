@@ -18,7 +18,7 @@ class OpenAIVectorStore implements VectorStore {
     this._openai = openai;
   }
 
-  async uploadAndRemoveFiles(filePaths: string[]): Promise<void> {
+  async syncFiles(filePaths: string[]): Promise<void> {
     const cachedFilePathToIDMap = ElementAICache.get(FILE_ID_MAP_NAME);
     const filePathToIDMap: any = cachedFilePathToIDMap ? JSON.parse(cachedFilePathToIDMap) : {};
 
