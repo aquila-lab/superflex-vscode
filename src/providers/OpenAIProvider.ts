@@ -1,10 +1,11 @@
 import fs from "fs";
+import path from "path";
 import OpenAI from "openai";
 import { AssistantCreateParams } from "openai/src/resources/beta/assistants.js";
 
 import { ElementAICache } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
-import { AIProvider, Assistant, FileObject, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
+import { AIProvider, Assistant, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
 
 const FILE_ID_MAP_NAME = "open-ai-file-id-map.json";
 
@@ -19,17 +20,17 @@ class OpenAIVectorStore implements VectorStore {
   }
 
   async syncFiles(filePaths: string[]): Promise<void> {
+    if (!ElementAICache.storagePath || ElementAICache.workspaceFolderPath) {
+      throw new Error("Storage path is not set");
+    }
+
     const cachedFilePathToIDMap = ElementAICache.get(FILE_ID_MAP_NAME);
     const filePathToIDMap: any = cachedFilePathToIDMap ? JSON.parse(cachedFilePathToIDMap) : {};
 
-    for (const documentPath of ElementAICache.cacheFilesSync(filePaths)) {
+    for (const documentPath of ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" })) {
       const fileStat = fs.statSync(documentPath.originalPath);
 
-      let relativeFilepath = documentPath.cachedPath;
-      if (ElementAICache.storagePath) {
-        relativeFilepath = documentPath.cachedPath.replace(ElementAICache.storagePath, "");
-      }
-
+      const relativeFilepath = documentPath.cachedPath.replace(ElementAICache.storagePath, "");
       const cachedFile = filePathToIDMap[relativeFilepath];
 
       // Skip uploading the file if it has not been modified since the last upload

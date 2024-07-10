@@ -6,9 +6,15 @@ type CacheFileObject = {
   cachedPath: string;
 };
 
-class ElementAICacheClass {
-  private _workspaceFolderPath: string | undefined;
+type CacheFileOptions = {
+  /**
+   * The file extension to use for the cached files.
+   */
+  ext: string;
+};
 
+class ElementAICacheClass {
+  workspaceFolderPath: string | undefined;
   storagePath: string | undefined;
 
   setWorkspaceFolderPath(workspaceFolderPath: string | undefined): void {
@@ -16,7 +22,7 @@ class ElementAICacheClass {
       workspaceFolderPath = workspaceFolderPath.replace("file://", "");
     }
 
-    this._workspaceFolderPath = workspaceFolderPath;
+    this.workspaceFolderPath = workspaceFolderPath;
   }
 
   setStoragePath(storagePath: string | undefined): void {
@@ -66,8 +72,8 @@ class ElementAICacheClass {
     fs.writeFileSync(path.join(this.storagePath, filename), writeBuffer);
   }
 
-  cacheFilesSync(filePaths: string[]): CacheFileObject[] {
-    if (!this._workspaceFolderPath || !this.storagePath) {
+  cacheFilesSync(filePaths: string[], options?: CacheFileOptions): CacheFileObject[] {
+    if (!this.workspaceFolderPath || !this.storagePath) {
       throw new Error("Workspace folder path or storage path is not set");
     }
 
@@ -78,7 +84,10 @@ class ElementAICacheClass {
 
     const cacheFiles: CacheFileObject[] = [];
     for (const filePath of filePaths) {
-      const documentPath = path.join(cacheFolder, `${filePath.replace(this._workspaceFolderPath, "")}.txt`);
+      const documentPath = path.join(
+        cacheFolder,
+        `${filePath.replace(this.workspaceFolderPath, "")}${options?.ext ?? ""}`
+      );
       if (!fs.existsSync(path.dirname(documentPath))) {
         fs.mkdirSync(path.dirname(documentPath), { recursive: true });
       }

@@ -1,21 +1,3 @@
-export type FileObject = {
-  /**
-   * The unique file identifier, which can be referenced to retrieve the file.
-   */
-  id: string;
-
-  /**
-   * The relative filepath of the file.
-   * Can be used as unique identifier for the file in workspace scope.
-   */
-  relativeFilepath: string;
-
-  /**
-   * The Unix timestamp (in seconds) for when the file was created.
-   */
-  createdAt: number;
-};
-
 export interface VectorStore {
   /**
    * The unique vector store identifier, which can be referenced to retrieve the vector store.
