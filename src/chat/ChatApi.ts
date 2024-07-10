@@ -44,7 +44,7 @@ export class ChatAPI {
     this._aiProvider = aiProvider;
 
     this._chatEventRegistry
-      .registerEvent<void, void>("ready", async () => {
+      .registerEvent<void, void>("ready", () => {
         this._ready.fire();
       })
       .registerEvent<void, boolean>("initialized", async () => {
@@ -80,7 +80,7 @@ export class ChatAPI {
     this._chatEventRegistry.registerEvent<Req, Res>(command, handler);
   }
 
-  async handleEvent<Req, Res>(
+  handleEvent<Req, Res>(
     event: string,
     requestPayload: Req,
     sendEventMessageCb: (msg: EventMessage) => void
@@ -88,7 +88,7 @@ export class ChatAPI {
     return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
   }
 
-  async initialize(workspaceName: string): Promise<void> {
+  private async initialize(workspaceName: string): Promise<void> {
     const rawSettings = ElementAICache.get(SETTINGS_FILE);
     if (rawSettings) {
       const settings = JSON.parse(rawSettings) as Settings;
