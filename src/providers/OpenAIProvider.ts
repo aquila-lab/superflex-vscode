@@ -177,19 +177,27 @@ class OpenAIAssistant implements Assistant {
 }
 
 export default class OpenAIProvider implements AIProvider {
-  private _openai: OpenAI;
+  private _openai?: OpenAI;
 
-  constructor() {
+  init(): void {
     this._openai = new OpenAI();
   }
 
   async retrieveVectorStore(id: string): Promise<VectorStore> {
+    if (!this._openai) {
+      throw new Error("OpenAI not initialized");
+    }
+
     const vectorStore = await this._openai.beta.vectorStores.retrieve(id);
 
     return new OpenAIVectorStore(vectorStore.id, this._openai);
   }
 
   async createVectorStore(name: string): Promise<VectorStore> {
+    if (!this._openai) {
+      throw new Error("OpenAI not initialized");
+    }
+
     const vectorStore = await this._openai.beta.vectorStores.create({
       name: `${name}-vector-store`,
       expires_after: {
@@ -202,12 +210,20 @@ export default class OpenAIProvider implements AIProvider {
   }
 
   async retrieveAssistant(id: string): Promise<Assistant> {
+    if (!this._openai) {
+      throw new Error("OpenAI not initialized");
+    }
+
     const assistant = await this._openai.beta.assistants.retrieve(id);
 
     return new OpenAIAssistant(assistant.id, this._openai);
   }
 
   async createAssistant(vectorStore?: VectorStore): Promise<Assistant> {
+    if (!this._openai) {
+      throw new Error("OpenAI not initialized");
+    }
+
     const createParams: OpenAI.Beta.AssistantCreateParams = {
       name: ASSISTANT_NAME,
       description: ASSISTANT_DESCRIPTION,

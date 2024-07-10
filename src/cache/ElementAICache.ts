@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 
+import { decodeUriAndRemoveFilePrefix } from "../common/utils";
+
 type CacheFileObject = {
   originalPath: string;
   cachedPath: string;
@@ -19,7 +21,7 @@ class ElementAICacheClass {
 
   setWorkspaceFolderPath(workspaceFolderPath: string | undefined): void {
     if (workspaceFolderPath) {
-      workspaceFolderPath = workspaceFolderPath.replace("file://", "");
+      workspaceFolderPath = decodeUriAndRemoveFilePrefix(workspaceFolderPath);
     }
 
     this.workspaceFolderPath = workspaceFolderPath;
@@ -27,7 +29,7 @@ class ElementAICacheClass {
 
   setStoragePath(storagePath: string | undefined): void {
     if (storagePath) {
-      storagePath = storagePath.replace("file://", "");
+      storagePath = decodeUriAndRemoveFilePrefix(storagePath);
 
       if (!fs.existsSync(storagePath)) {
         fs.mkdirSync(storagePath, { recursive: true });
