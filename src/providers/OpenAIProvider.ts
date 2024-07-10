@@ -6,7 +6,7 @@ import { ElementAICache } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
 import { AIProvider, Assistant, FileObject, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
 
-const FILE_ID_MAP_NAME = "file-id-map.json";
+const FILE_ID_MAP_NAME = "open-ai-file-id-map.json";
 
 class OpenAIVectorStore implements VectorStore {
   id: string;
