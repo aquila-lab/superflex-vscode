@@ -1,6 +1,8 @@
+import fs from "fs";
 import OpenAI from "openai";
 import { AssistantCreateParams } from "openai/src/resources/beta/assistants.js";
 
+import { ElementAICache } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
 import { AIProvider, Assistant, FileObject, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
 
@@ -14,16 +16,27 @@ class OpenAIVectorStore implements VectorStore {
     this._openai = openai;
   }
 
-  fetchFiles(): Promise<FileObject[]> {
+  async fetchFiles(): Promise<FileObject[]> {
+    // Implement in the way that you will save file ids mapped to file path in the cache folder
     throw new Error("Method not implemented.");
   }
 
-  uploadFiles(filePaths: string[]): Promise<FileObject[]> {
-    throw new Error("Method not implemented.");
+  // TODO(boris): Handle overwriting files
+  async uploadFiles(filePaths: string[]): Promise<void> {
+    const documentPaths = ElementAICache.cacheFilesSync(filePaths);
+
+    // Upload files to the storage in batches of 500
+    const batchSize = 500;
+    for (let i = 0; i < documentPaths.length; i += batchSize) {
+      const fileStreams = documentPaths.slice(i, i + batchSize).map((path) => fs.createReadStream(path));
+      await this._openai.beta.vectorStores.fileBatches.uploadAndPoll(this.id, { files: fileStreams });
+    }
+
+    ElementAICache.removeCachedFilesSync();
   }
 
-  removeFiles(filePaths: string[]): Promise<void> {
-    throw new Error("Method not implemented.");
+  async removeFiles(filePaths: string[]): Promise<void> {
+    // Not supported: Files that are not used in the vector store will expire after 7 days
   }
 }
 
@@ -37,7 +50,7 @@ class OpenAIAssistant implements Assistant {
     this._openai = openai;
   }
 
-  sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => Promise<void>): Promise<Message> {
+  async sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => Promise<void>): Promise<Message> {
     throw new Error("Method not implemented.");
   }
 }

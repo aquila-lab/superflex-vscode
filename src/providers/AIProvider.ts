@@ -34,7 +34,7 @@ export interface VectorStore {
    * @param filePaths - The paths of the files to upload.
    * @returns A promise that resolves with the uploaded files.
    */
-  uploadFiles(filePaths: string[]): Promise<FileObject[]>;
+  uploadFiles(filePaths: string[]): Promise<void>;
 
   /**
    * Remove files from the vector store.
