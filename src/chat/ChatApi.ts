@@ -1,12 +1,14 @@
 import async from "async";
 import * as vscode from "vscode";
 
-import { EventMessage } from "../protocol";
-import { AIProvider, Assistant, VectorStore } from "../providers/AIProvider";
+import { findFiles } from "../scanner";
+import { EventMessage, newEventMessage } from "../protocol";
 import OpenAIProvider from "../providers/OpenAIProvider";
-import { EventRegistry, Handler } from "./EventRegistry";
 import { ElementAICache } from "../cache/ElementAICache";
-import { getOpenWorkspace } from "../common/utils";
+import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
+import { AIProvider, Assistant, VectorStore } from "../providers/AIProvider";
+import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
+import { EventRegistry, Handler } from "./EventRegistry";
 
 const SETTINGS_FILE = "settings.json";
 
@@ -40,14 +42,14 @@ export class ChatAPI {
   private _vectorStore?: VectorStore;
   private _assistant?: Assistant;
 
-  constructor(context: vscode.ExtensionContext, aiProvider: AIProvider) {
+  constructor(aiProvider: AIProvider) {
     this._aiProvider = aiProvider;
 
     this._chatEventRegistry
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
       })
-      .registerEvent<void, boolean>("initialized", async () => {
+      .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
         if (this._aiProvider instanceof OpenAIProvider) {
           this._aiProvider.init();
         }
@@ -58,6 +60,18 @@ export class ChatAPI {
         }
 
         await this.initialize(openWorkspace.name);
+
+        const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
+        const documentsUri: string[] = await findFiles(
+          workspaceFolderPath,
+          SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
+          ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
+        );
+
+        await this._vectorStore?.syncFiles(documentsUri, (progress) => {
+          sendEventMessageCb(newEventMessage("sync_progress", { progress }));
+        });
+
         this._initialized.fire();
         return true;
       })

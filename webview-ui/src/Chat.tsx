@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
 import Markdown from 'markdown-to-jsx';
+import ProgressBar from '@ramonak/react-progress-bar';
+import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscodeApi';
 import { Button, FilePicker } from './components';
@@ -24,6 +25,7 @@ const Chat: React.FunctionComponent<{
     }
   ]);
   const [input, setInput] = useState('');
+  const [syncProgress, setSyncProgress] = useState(0);
   const [streamResponse, setStreamResponse] = useState('');
 
   useEffect(
@@ -42,6 +44,9 @@ const Chat: React.FunctionComponent<{
             break;
           case 'message_processing':
             setStreamResponse((prev) => prev + message.data);
+            break;
+          case 'sync_progress':
+            setSyncProgress(message.data.progress);
             break;
         }
       }),
@@ -104,6 +109,21 @@ const Chat: React.FunctionComponent<{
           </div>
         )}
       </div>
+
+      <div className={syncProgress === 100 ? 'hidden' : 'flex flex-col items-center gap-1 mb-4 w-full'}>
+        <p className="text-xs text-neutral-300">Syncing...</p>
+
+        <div className="flex-1 w-full">
+          <ProgressBar
+            animateOnRender={true}
+            completed={syncProgress}
+            bgColor="#2563eb"
+            height="6px"
+            isLabelVisible={false}
+          />
+        </div>
+      </div>
+
       <div className="flex items-center gap-1">
         <TextareaAutosize
           autoFocus

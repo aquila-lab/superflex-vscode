@@ -23,7 +23,7 @@ type AppState = {
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const aiProvider = new OpenAIProvider();
-  const chatApi = new ChatAPI(context, aiProvider);
+  const chatApi = new ChatAPI(aiProvider);
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
   const authService = new ElementAIAuthenticationService(chatWebviewProvider);
 
