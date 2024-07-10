@@ -90,26 +90,6 @@ async function scanWorkspaces(context: vscode.ExtensionContext, appState: AppSta
     const elementaiCacheFolder = path.join(homedir(), ".elementai", workspaceFolder.name);
     await fs.mkdirSync(elementaiCacheFolder, { recursive: true });
 
-    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(workspaceFolder.uri.toString());
-
-    const documentsUri: string[] = await findFiles(
-      workspaceFolderPath,
-      SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
-      ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
-    );
-
-    const outputFilePath = path.join(elementaiCacheFolder, "combined_code.txt");
-    const writeStream = fs.createWriteStream(outputFilePath);
-
-    for (const documentUri of documentsUri) {
-      const relativeFilePath = path.relative(workspaceFolderPath, documentUri);
-      const fileContent = await fs.promises.readFile(documentUri, "utf-8");
-      writeStream.write(`// ${relativeFilePath}\n`);
-      writeStream.write(fileContent + "\n\n");
-    }
-
-    writeStream.end();
-
     // Check do we aleady have created a workspace OpenAI Vector Store
     const settingsUri = path.join(elementaiCacheFolder, "settings.json");
     try {

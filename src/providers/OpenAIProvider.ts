@@ -42,7 +42,7 @@ class OpenAIVectorStore implements VectorStore {
       const documentPath = documentPaths[i];
       const fileStat = fs.statSync(documentPath.originalPath);
 
-      const relativeFilepath = documentPath.cachedPath.replace(storagePath, "");
+      const relativeFilepath = path.relative(storagePath, documentPath.cachedPath);
       const cachedFile = filePathToIDMap[relativeFilepath];
 
       // Skip uploading the file if it has not been modified since the last upload
@@ -75,7 +75,7 @@ class OpenAIVectorStore implements VectorStore {
     // Remove the files that are uploaded but missing from the filePaths input
     for (const relativeFilepath of filePathToIDMap) {
       const exists = documentPaths.find(
-        (documentPath) => documentPath.cachedPath.replace(storagePath, "") === relativeFilepath
+        (documentPath) => path.relative(storagePath, documentPath.cachedPath) === relativeFilepath
       );
       if (exists) {
         continue;
