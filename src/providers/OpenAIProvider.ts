@@ -20,17 +20,19 @@ class OpenAIVectorStore implements VectorStore {
   }
 
   async syncFiles(filePaths: string[]): Promise<void> {
-    if (!ElementAICache.storagePath || ElementAICache.workspaceFolderPath) {
+    if (!ElementAICache.storagePath) {
       throw new Error("Storage path is not set");
     }
 
+    const storagePath = ElementAICache.storagePath;
     const cachedFilePathToIDMap = ElementAICache.get(FILE_ID_MAP_NAME);
     const filePathToIDMap: any = cachedFilePathToIDMap ? JSON.parse(cachedFilePathToIDMap) : {};
 
-    for (const documentPath of ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" })) {
+    const documentPaths = ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" });
+    for (const documentPath of documentPaths) {
       const fileStat = fs.statSync(documentPath.originalPath);
 
-      const relativeFilepath = documentPath.cachedPath.replace(ElementAICache.storagePath, "");
+      const relativeFilepath = documentPath.cachedPath.replace(storagePath, "");
       const cachedFile = filePathToIDMap[relativeFilepath];
 
       // Skip uploading the file if it has not been modified since the last upload
@@ -53,6 +55,23 @@ class OpenAIVectorStore implements VectorStore {
         filePathToIDMap[relativeFilepath] = { fileID: file.id, createdAt: fileStat.mtime };
       } catch (err: any) {
         console.error(`Failed to upload file ${documentPath}: ${err?.message}`);
+      }
+    }
+
+    // Remove the files that are uploaded but missing from the filePaths input
+    for (const relativeFilepath of filePathToIDMap) {
+      const exists = documentPaths.find(
+        (documentPath) => documentPath.cachedPath.replace(storagePath, "") === relativeFilepath
+      );
+      if (exists) {
+        continue;
+      }
+
+      try {
+        await this._openai.files.del(filePathToIDMap[relativeFilepath].fileID);
+        delete filePathToIDMap[relativeFilepath];
+      } catch (err: any) {
+        console.error(`Failed to delete file ${relativeFilepath}: ${err?.message}`);
       }
     }
 
