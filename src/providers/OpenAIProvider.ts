@@ -19,9 +19,13 @@ class OpenAIVectorStore implements VectorStore {
     this._openai = openai;
   }
 
-  async syncFiles(filePaths: string[]): Promise<void> {
+  async syncFiles(filePaths: string[], progressCb?: (current: number) => void): Promise<void> {
     if (!ElementAICache.storagePath) {
       throw new Error("Storage path is not set");
+    }
+
+    if (progressCb) {
+      progressCb(0);
     }
 
     const storagePath = ElementAICache.storagePath;
@@ -29,7 +33,13 @@ class OpenAIVectorStore implements VectorStore {
     const filePathToIDMap: any = cachedFilePathToIDMap ? JSON.parse(cachedFilePathToIDMap) : {};
 
     const documentPaths = ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" });
-    for (const documentPath of documentPaths) {
+    const progressCoefficient = 98 / documentPaths.length;
+    for (let i = 0; i < documentPaths.length; i++) {
+      if (progressCb) {
+        progressCb(Math.round(i * progressCoefficient));
+      }
+
+      const documentPath = documentPaths[i];
       const fileStat = fs.statSync(documentPath.originalPath);
 
       const relativeFilepath = documentPath.cachedPath.replace(storagePath, "");
@@ -58,6 +68,10 @@ class OpenAIVectorStore implements VectorStore {
       }
     }
 
+    if (progressCb) {
+      progressCb(99);
+    }
+
     // Remove the files that are uploaded but missing from the filePaths input
     for (const relativeFilepath of filePathToIDMap) {
       const exists = documentPaths.find(
@@ -77,6 +91,10 @@ class OpenAIVectorStore implements VectorStore {
 
     ElementAICache.set(FILE_ID_MAP_NAME, JSON.stringify(filePathToIDMap));
     ElementAICache.removeCachedFilesSync();
+
+    if (progressCb) {
+      progressCb(100);
+    }
   }
 }
 

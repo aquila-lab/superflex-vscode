@@ -10,9 +10,10 @@ export interface VectorStore {
    * The files that are uploaded but missing from the filePaths input will be removed.
    *
    * @param filePaths - The paths of the files to upload.
+   * @param progressCb - Optional parameter to specify a callback function that will be called periodically with the current progress of syncing the files. "current" is value between 0 and 100.
    * @returns A promise that resolves with the uploaded files.
    */
-  syncFiles(filePaths: string[]): Promise<void>;
+  syncFiles(filePaths: string[], progressCb?: (current: number) => void): Promise<void>;
 }
 
 /**
