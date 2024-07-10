@@ -73,13 +73,20 @@ export interface Assistant {
   id: string;
 
   /**
-   * Send a message to the assistant.
+   * Create a new thread for the assistant.
+   *
+   * @returns A promise that resolves when the new thread is created.
+   */
+  createNewThread(): Promise<void>;
+
+  /**
+   * Send a message in a thread to the assistant. If there is no active thread, a new thread will be created.
    *
    * @param message - The message content to send.
    * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
    * @returns A promise that resolves with the response message.
    */
-  sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => Promise<void>): Promise<Message>;
+  sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => void): Promise<Message[]>;
 }
 
 export interface AIProvider {

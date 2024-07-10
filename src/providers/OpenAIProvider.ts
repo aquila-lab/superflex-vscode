@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
-import { AssistantCreateParams } from "openai/src/resources/beta/assistants.js";
 
 import { ElementAICache } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
@@ -102,14 +101,78 @@ class OpenAIAssistant implements Assistant {
   id: string;
 
   private _openai: OpenAI;
+  private _thread?: OpenAI.Beta.Threads.Thread;
 
   constructor(id: string, openai: OpenAI) {
     this.id = id;
     this._openai = openai;
   }
 
-  async sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => Promise<void>): Promise<Message> {
-    throw new Error("Method not implemented.");
+  async createNewThread(): Promise<void> {
+    this._thread = await this._openai.beta.threads.create({
+      messages: [
+        {
+          role: "assistant",
+          content:
+            "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
+        },
+      ],
+    });
+  }
+
+  async sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => void): Promise<Message[]> {
+    const content: OpenAI.Beta.Threads.Messages.MessageContentPartParam[] = [];
+    if (message.type === "text") {
+      content.push({
+        type: "text",
+        text: message.text,
+      });
+    }
+    if (message.type === "image") {
+      const imageFile = await this._openai.files.create({
+        purpose: "vision",
+        file: fs.createReadStream(message.imageUrl),
+      });
+
+      content.push({
+        type: "image_file",
+        image_file: {
+          file_id: imageFile.id,
+          detail: "auto",
+        },
+      });
+    }
+
+    // If there is no active thread, create a new one
+    if (!this._thread) {
+      await this.createNewThread();
+    }
+    if (!this._thread) {
+      throw new Error("Imposible case: thread is not created");
+    }
+
+    await this._openai.beta.threads.messages.create(this._thread.id, {
+      role: "user",
+      content,
+    });
+
+    const stream = this._openai.beta.threads.runs.stream(this._thread.id, {
+      assistant_id: this.id,
+      tools: [{ type: "file_search", file_search: { max_num_results: 50 } }],
+    });
+
+    if (streamResponse) {
+      stream.on("textDelta", (event) => streamResponse({ value: event.value }));
+    }
+
+    const final = await stream.finalMessages();
+    return final.map((msg) => {
+      return {
+        id: msg.id,
+        content: msg.content,
+        createdAt: new Date(msg.created_at).getTime(),
+      } as unknown as Message;
+    });
   }
 }
 
@@ -145,7 +208,7 @@ export default class OpenAIProvider implements AIProvider {
   }
 
   async createAssistant(vectorStore?: VectorStore): Promise<Assistant> {
-    const createParams: AssistantCreateParams = {
+    const createParams: OpenAI.Beta.AssistantCreateParams = {
       name: ASSISTANT_NAME,
       description: ASSISTANT_DESCRIPTION,
       instructions: ASSISTANT_INSTRUCTIONS,
