@@ -110,7 +110,7 @@ class ElementAICacheClass {
     }
 
     const cachedFilesFolder = path.join(this.storagePath, "files");
-    fs.rmdirSync(cachedFilesFolder, { recursive: true });
+    fs.rmSync(cachedFilesFolder, { recursive: true });
   }
 }
 

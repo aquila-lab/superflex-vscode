@@ -70,7 +70,7 @@ class OpenAIVectorStore implements VectorStore {
     storagePath: string,
     concurrency: number
   ): asyncQ.QueueObject<CachedFileObject> {
-    const workers = asyncQ.queue(async (documentPath: CachedFileObject, callback) => {
+    const workers = asyncQ.queue(async (documentPath: CachedFileObject) => {
       const fileStat = fs.statSync(documentPath.originalPath);
 
       const relativeFilepath = path.relative(storagePath, documentPath.cachedPath);
@@ -78,7 +78,6 @@ class OpenAIVectorStore implements VectorStore {
 
       // Skip uploading the file if it has not been modified since the last upload
       if (cachedFile && fileStat.mtime.getTime() <= cachedFile.createdAt) {
-        callback();
         return;
       }
 
@@ -97,8 +96,6 @@ class OpenAIVectorStore implements VectorStore {
         filePathToIDMap.set(relativeFilepath, { fileID: file.id, createdAt: fileStat.mtime.getTime() });
       } catch (err: any) {
         console.error(`Failed to upload file ${documentPath}: ${err?.message}`);
-      } finally {
-        callback();
       }
     }, concurrency); // Number of concurrent workers
 
@@ -113,10 +110,7 @@ class OpenAIVectorStore implements VectorStore {
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       documentPaths.forEach((documentPath, index) => {
-        workers.push(documentPath, (err) => {
-          if (err) {
-            console.error(`Error processing file ${documentPath}: ${err.message}`);
-          }
+        workers.push(documentPath, () => {
           if (progressCb) {
             progressCb(Math.round(index * progressCoefficient));
           }

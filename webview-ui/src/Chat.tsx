@@ -50,12 +50,7 @@ const Chat: React.FunctionComponent<{
               // Sync has started
               setSyncProgress(0);
             }
-
-            if (syncProgress >= message.data.progress) {
-              return;
-            }
-
-            setSyncProgress(message.data.progress);
+            setSyncProgress((prev) => (prev < message.data.progress ? message.data.progress : prev));
             break;
         }
       }),
