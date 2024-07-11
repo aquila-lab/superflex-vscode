@@ -64,18 +64,8 @@ export class ChatAPI {
             return false;
           }
 
-          await this.initialize(openWorkspace.name);
-
-          const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
-          const documentsUri: string[] = await findFiles(
-            workspaceFolderPath,
-            SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
-            ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
-          );
-
-          await this._vectorStore?.syncFiles(documentsUri, (progress) => {
-            sendEventMessageCb(newEventMessage("sync_progress", { progress }));
-          });
+          await this.initializeAssistant(openWorkspace.name);
+          await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
           this._initialized.fire();
           return true;
@@ -110,7 +100,7 @@ export class ChatAPI {
     return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
   }
 
-  private async initialize(workspaceName: string): Promise<void> {
+  private async initializeAssistant(workspaceName: string): Promise<void> {
     const rawSettings = ElementAICache.get(SETTINGS_FILE);
     if (rawSettings) {
       const settings = JSON.parse(rawSettings) as Settings;
@@ -128,6 +118,22 @@ export class ChatAPI {
       SETTINGS_FILE,
       JSON.stringify({ vectorStoreID: this._vectorStore.id, assistantID: this._assistant.id } as Settings)
     );
+  }
+
+  private async syncProjectFiles(
+    openWorkspace: vscode.WorkspaceFolder,
+    sendEventMessageCb: (msg: EventMessage) => void
+  ): Promise<void> {
+    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
+    const documentsUri: string[] = await findFiles(
+      workspaceFolderPath,
+      SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
+      ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
+    );
+
+    await this._vectorStore?.syncFiles(documentsUri, (progress) => {
+      sendEventMessageCb(newEventMessage("sync_progress", { progress }));
+    });
   }
 
   private enqueueWord(word: string) {

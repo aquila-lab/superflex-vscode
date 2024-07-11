@@ -59,6 +59,8 @@ const Chat: React.FunctionComponent<{
 
   useEffect(() => {
     // If we are here that means we are authenticated and have active subscription or token
+
+    // Event "initialized" is used to notify the extension that the chat webview is ready
     vscodeAPI.postMessage(newEventMessage('initialized'));
   }, [vscodeAPI]);
 
