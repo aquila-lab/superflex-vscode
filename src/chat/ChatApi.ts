@@ -26,9 +26,10 @@ type ProcessMessageRequest = {
 export class ChatAPI {
   private _aiProvider: AIProvider;
   private _ready = new vscode.EventEmitter<void>();
-  private _initialized = new vscode.EventEmitter<void>();
+  private _isInitialized = false;
   private _initializedMutex = new Mutex();
   private _chatEventRegistry = new EventRegistry();
+  private _isSyncProjectRunning = false;
   private _queue = asyncQ.queue(async (word: string, callback) => {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
@@ -67,11 +68,30 @@ export class ChatAPI {
           await this.initializeAssistant(openWorkspace.name);
           await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
-          this._initialized.fire();
+          this._isInitialized = true;
           return true;
         } finally {
           release();
         }
+      })
+      .registerEvent<void, void>("sync_project", async (_, sendEventMessageCb) => {
+        if (!this._isInitialized) {
+          return;
+        }
+
+        // Prevent multiple sync project requests from running concurrently
+        if (this._isSyncProjectRunning) {
+          return;
+        }
+        this._isSyncProjectRunning = true;
+
+        const openWorkspace = getOpenWorkspace();
+        if (!openWorkspace) {
+          return;
+        }
+        await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
+
+        this._isSyncProjectRunning = false;
       })
       .registerEvent<ProcessMessageRequest, void>("process_message", async (req, sendEventMessageCb) => {});
   }
@@ -79,12 +99,6 @@ export class ChatAPI {
   onReady(): Promise<void> {
     return new Promise((resolve) => {
       this._ready.event(resolve);
-    });
-  }
-
-  onInitialized(): Promise<void> {
-    return new Promise((resolve) => {
-      this._initialized.event(resolve);
     });
   }
 

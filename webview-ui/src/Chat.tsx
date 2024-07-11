@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Markdown from 'markdown-to-jsx';
 import ProgressBar from '@ramonak/react-progress-bar';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -17,6 +17,8 @@ type Message = {
 const Chat: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
 }> = ({ vscodeAPI }) => {
+  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -57,11 +59,27 @@ const Chat: React.FunctionComponent<{
     [vscodeAPI, messages]
   );
 
+  // If we are here that means we are authenticated and have active subscription or token
   useEffect(() => {
-    // If we are here that means we are authenticated and have active subscription or token
-
-    // Event "initialized" is used to notify the extension that the chat webview is ready
+    // Event "initialized" is used to notify the extension that the webview is ready
     vscodeAPI.postMessage(newEventMessage('initialized'));
+
+    // Clear the previous interval if it exists
+    if (syncIntervalRef.current) {
+      clearInterval(syncIntervalRef.current);
+    }
+
+    // Sync user project on every 5 minutes
+    syncIntervalRef.current = setInterval(() => {
+      vscodeAPI.postMessage(newEventMessage('sync_project'));
+    }, 5 * 60 * 1000);
+
+    // Cleanup function to clear the interval when the component unmounts or before the effect runs again
+    return () => {
+      if (syncIntervalRef.current) {
+        clearInterval(syncIntervalRef.current);
+      }
+    };
   }, [vscodeAPI]);
 
   const handleSend = () => {
