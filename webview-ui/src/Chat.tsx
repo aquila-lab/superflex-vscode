@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import Markdown from 'markdown-to-jsx';
 import ProgressBar from '@ramonak/react-progress-bar';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -21,7 +22,7 @@ const Chat: React.FunctionComponent<{
 
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
+      id: uuidv4(),
       text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
       sender: 'bot'
     }
@@ -29,23 +30,15 @@ const Chat: React.FunctionComponent<{
   const [input, setInput] = useState('');
   const [syncProgress, setSyncProgress] = useState(0);
   const [streamResponse, setStreamResponse] = useState('');
+  const [messageProcessing, setMessageProcessing] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(
     () =>
       vscodeAPI.onMessage((message) => {
         switch (message.command) {
-          case 'new_message':
-            setMessages([
-              ...messages,
-              {
-                id: message.id,
-                text: 'Starting to process your message...',
-                sender: 'bot'
-              }
-            ]);
-            break;
-          case 'message_processing':
-            setStreamResponse((prev) => prev + message.data);
+          case 'initialized':
+            setInitialized(message.data);
             break;
           case 'sync_progress':
             if (message.data.progress === 0) {
@@ -53,6 +46,29 @@ const Chat: React.FunctionComponent<{
               setSyncProgress(0);
             }
             setSyncProgress((prev) => (prev < message.data.progress ? message.data.progress : prev));
+            break;
+          case 'message_processing':
+            setStreamResponse((prev) => prev + message.data);
+            break;
+          case 'new_message': // Will be triggered when AI assistant finish processing the message
+            setStreamResponse('');
+            setMessageProcessing(false);
+
+            if (!message.data.length) {
+              return;
+            }
+
+            for (const msg of message.data) {
+              setMessages([
+                ...messages,
+                {
+                  id: msg.id,
+                  text: msg.content,
+                  sender: 'bot'
+                }
+              ]);
+            }
+
             break;
         }
       }),
@@ -82,29 +98,30 @@ const Chat: React.FunctionComponent<{
     };
   }, [vscodeAPI]);
 
-  const handleSend = () => {
+  const handleSend = (): void => {
     if (input.trim()) {
-      setMessages([...messages, { id: `${Date.now()}`, text: input, sender: 'user' }]);
-
-      vscodeAPI.postMessage(newEventMessage('process_message', { message: input }));
+      setMessages([...messages, { id: uuidv4(), text: input, sender: 'user' }]);
+      vscodeAPI.postMessage(newEventMessage('new_message', { text: input }));
+      setMessageProcessing(true);
     }
 
     setInput('');
   };
 
-  const handleImageUpload = (file: File) => {
+  const handleImageUpload = (file: File): void => {
     setMessages([
       ...messages,
       {
-        id: `${Date.now()}`,
+        id: uuidv4(),
         text: 'Processing image...',
         imageUrl: URL.createObjectURL(file),
         sender: 'bot'
       }
     ]);
-
-    vscodeAPI.postMessage(newEventMessage('process_message', { imageUrl: (file as any).path }));
+    vscodeAPI.postMessage(newEventMessage('new_message', { imageUrl: (file as any).path }));
   };
+
+  const syncInProgress = syncProgress !== 100;
 
   return (
     <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">
@@ -134,7 +151,7 @@ const Chat: React.FunctionComponent<{
         )}
       </div>
 
-      <div className={syncProgress === 100 ? 'hidden' : 'flex flex-col items-center gap-1 mb-4 w-full'}>
+      <div className={syncInProgress ? 'flex flex-col items-center gap-1 mb-4 w-full' : 'hidden'}>
         <p className="text-xs text-neutral-300">Syncing...</p>
 
         <div className="flex-1 w-full">
@@ -159,6 +176,7 @@ const Chat: React.FunctionComponent<{
         />
 
         <FilePicker
+          disabled={messageProcessing || syncInProgress || initialized}
           accept="image/*"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -168,7 +186,9 @@ const Chat: React.FunctionComponent<{
           }}
         />
 
-        <Button onClick={handleSend}>Send</Button>
+        <Button disabled={messageProcessing || syncInProgress || initialized} onClick={handleSend}>
+          Send
+        </Button>
       </div>
     </div>
   );

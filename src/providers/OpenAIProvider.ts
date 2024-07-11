@@ -185,27 +185,29 @@ class OpenAIAssistant implements Assistant {
     });
   }
 
-  async sendMessage(message: MessageContent, streamResponse?: (event: TextDelta) => void): Promise<Message[]> {
+  async sendMessage(messages: MessageContent[], streamResponse?: (event: TextDelta) => void): Promise<Message[]> {
     const content: OpenAI.Beta.Threads.Messages.MessageContentPartParam[] = [];
-    if (message.type === "text") {
-      content.push({
-        type: "text",
-        text: message.text,
-      });
-    }
-    if (message.type === "image") {
-      const imageFile = await this._openai.files.create({
-        purpose: "vision",
-        file: fs.createReadStream(message.imageUrl),
-      });
+    for (const message of messages) {
+      if (message.type === "text") {
+        content.push({
+          type: "text",
+          text: message.text,
+        });
+      }
+      if (message.type === "image") {
+        const imageFile = await this._openai.files.create({
+          purpose: "vision",
+          file: fs.createReadStream(message.imageUrl),
+        });
 
-      content.push({
-        type: "image_file",
-        image_file: {
-          file_id: imageFile.id,
-          detail: "auto",
-        },
-      });
+        content.push({
+          type: "image_file",
+          image_file: {
+            file_id: imageFile.id,
+            detail: "auto",
+          },
+        });
+      }
     }
 
     // If there is no active thread, create a new one
@@ -234,9 +236,13 @@ class OpenAIAssistant implements Assistant {
     return final.map((msg) => {
       return {
         id: msg.id,
-        content: msg.content,
+        content: msg.content
+          .map((part) => {
+            return part.type === "text" ? part.text.value : "";
+          })
+          .join(""), // Combine all text parts into a single string
         createdAt: new Date(msg.created_at).getTime(),
-      } as unknown as Message;
+      } as Message;
     });
   }
 }

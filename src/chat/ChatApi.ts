@@ -7,7 +7,7 @@ import { EventMessage, newEventMessage } from "../protocol";
 import OpenAIProvider from "../providers/OpenAIProvider";
 import { ElementAICache } from "../cache/ElementAICache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
-import { AIProvider, Assistant, VectorStore } from "../providers/AIProvider";
+import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
 
@@ -18,8 +18,8 @@ type Settings = {
   assistantID: string;
 };
 
-type ProcessMessageRequest = {
-  message?: string;
+type NewMessageRequest = {
+  text?: string;
   imageUrl?: string;
 };
 
@@ -30,17 +30,6 @@ export class ChatAPI {
   private _initializedMutex = new Mutex();
   private _chatEventRegistry = new EventRegistry();
   private _isSyncProjectRunning = false;
-  private _queue = asyncQ.queue(async (word: string, callback) => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      vscode.window.showInformationMessage("No active editor found!");
-      callback();
-      return;
-    }
-
-    await this.writeWord(editor, word);
-    callback();
-  }, 1); // Ensure tasks are processed one at a time
 
   private _vectorStore?: VectorStore;
   private _assistant?: Assistant;
@@ -93,7 +82,27 @@ export class ChatAPI {
 
         this._isSyncProjectRunning = false;
       })
-      .registerEvent<ProcessMessageRequest, void>("process_message", async (req, sendEventMessageCb) => {});
+      .registerEvent<NewMessageRequest, Message[]>("new_message", async (req, sendEventMessageCb) => {
+        if (!this._isInitialized || !this._assistant) {
+          return [];
+        }
+
+        const messagesReq: MessageContent[] = [];
+        if (req.imageUrl) {
+          messagesReq.push({ type: "image", imageUrl: req.imageUrl });
+        }
+        if (req.text) {
+          messagesReq.push({ type: "text", text: req.text });
+        }
+
+        // Do not send empty messages
+        if (messagesReq.length === 0) {
+          return [];
+        }
+
+        const messages = await this._assistant.sendMessage(messagesReq);
+        return messages;
+      });
   }
 
   onReady(): Promise<void> {
@@ -149,6 +158,18 @@ export class ChatAPI {
       sendEventMessageCb(newEventMessage("sync_progress", { progress }));
     });
   }
+
+  private _queue = asyncQ.queue(async (word: string, callback) => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showInformationMessage("No active editor found!");
+      callback();
+      return;
+    }
+
+    await this.writeWord(editor, word);
+    callback();
+  }, 1); // Ensure tasks are processed one at a time
 
   private enqueueWord(word: string) {
     this._queue.push(word);
