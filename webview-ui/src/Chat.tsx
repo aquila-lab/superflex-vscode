@@ -33,47 +33,45 @@ const Chat: React.FunctionComponent<{
   const [messageProcessing, setMessageProcessing] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
-  useEffect(
-    () =>
-      vscodeAPI.onMessage((message) => {
-        switch (message.command) {
-          case 'initialized':
-            setInitialized(message.data);
-            break;
-          case 'sync_progress':
-            if (message.data.progress === 0) {
-              // Sync has started
-              setSyncProgress(0);
-            }
-            setSyncProgress((prev) => (prev < message.data.progress ? message.data.progress : prev));
-            break;
-          case 'message_processing':
-            setStreamResponse((prev) => prev + message.data);
-            break;
-          case 'new_message': // Will be triggered when AI assistant finish processing the message
-            setStreamResponse('');
-            setMessageProcessing(false);
+  useEffect(() => {
+    vscodeAPI.onMessage((message) => {
+      switch (message.command) {
+        case 'initialized':
+          setInitialized(message.data);
+          break;
+        case 'sync_progress':
+          if (message.data.progress === 0) {
+            // Sync has started
+            setSyncProgress(0);
+          }
+          setSyncProgress((prev) => (prev < message.data.progress ? message.data.progress : prev));
+          break;
+        case 'message_processing':
+          setStreamResponse((prev) => prev + message.data);
+          break;
+        case 'new_message': // Will be triggered when AI assistant finish processing the message
+          setStreamResponse('');
+          setMessageProcessing(false);
 
-            if (!message.data.length) {
-              return;
-            }
+          if (!message.data.length) {
+            return;
+          }
 
-            for (const msg of message.data) {
-              setMessages([
-                ...messages,
-                {
-                  id: msg.id,
-                  text: msg.content,
-                  sender: 'bot'
-                }
-              ]);
-            }
+          for (const msg of message.data) {
+            setMessages([
+              ...messages,
+              {
+                id: msg.id,
+                text: msg.content,
+                sender: 'bot'
+              }
+            ]);
+          }
 
-            break;
-        }
-      }),
-    [vscodeAPI, messages]
-  );
+          break;
+      }
+    });
+  }, [vscodeAPI]);
 
   // If we are here that means we are authenticated and have active subscription or token
   useEffect(() => {
