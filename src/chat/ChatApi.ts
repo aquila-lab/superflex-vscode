@@ -100,7 +100,9 @@ export class ChatAPI {
           return [];
         }
 
-        const messages = await this._assistant.sendMessage(messagesReq);
+        const messages = await this._assistant.sendMessage(messagesReq, (event) => {
+          sendEventMessageCb(newEventMessage("message_processing", event.value));
+        });
         return messages;
       });
   }
