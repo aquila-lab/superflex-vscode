@@ -83,7 +83,11 @@ class OpenAIVectorStore implements VectorStore {
 
       try {
         if (cachedFile) {
-          await this._openai.files.del(cachedFile.fileID);
+          try {
+            await this._openai.files.del(cachedFile.fileID);
+          } catch (err) {
+            // Ignore
+          }
         }
 
         const file = await this._openai.files.create({
@@ -119,7 +123,7 @@ class OpenAIVectorStore implements VectorStore {
 
       // Resolve the promise when all tasks are finished
       workers.drain(() => {
-        console.log("All files have been processed.");
+        console.info("Syncing files completed successfully.");
         resolve();
       });
 
@@ -148,6 +152,10 @@ class OpenAIVectorStore implements VectorStore {
         await this._openai.files.del(cachedFile.fileID);
         filePathToIDMap.delete(relativeFilepath);
       } catch (err: any) {
+        if (err?.status === 404) {
+          filePathToIDMap.delete(relativeFilepath);
+          return;
+        }
         console.error(`Failed to delete file ${relativeFilepath}: ${err?.message}`);
       }
     }
@@ -237,6 +245,10 @@ export default class OpenAIProvider implements AIProvider {
   private _openai?: OpenAI;
 
   init(): void {
+    if (this._openai) {
+      return;
+    }
+
     this._openai = new OpenAI();
   }
 

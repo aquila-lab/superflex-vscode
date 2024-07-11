@@ -1,5 +1,6 @@
 import asyncQ from "async";
 import * as vscode from "vscode";
+import { Mutex } from "async-mutex";
 
 import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
@@ -26,6 +27,7 @@ export class ChatAPI {
   private _aiProvider: AIProvider;
   private _ready = new vscode.EventEmitter<void>();
   private _initialized = new vscode.EventEmitter<void>();
+  private _initializedMutex = new Mutex();
   private _chatEventRegistry = new EventRegistry();
   private _queue = asyncQ.queue(async (word: string, callback) => {
     const editor = vscode.window.activeTextEditor;
@@ -50,30 +52,36 @@ export class ChatAPI {
         this._ready.fire();
       })
       .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
-        if (this._aiProvider instanceof OpenAIProvider) {
-          this._aiProvider.init();
+        const release = await this._initializedMutex.acquire();
+
+        try {
+          if (this._aiProvider instanceof OpenAIProvider) {
+            this._aiProvider.init();
+          }
+
+          const openWorkspace = getOpenWorkspace();
+          if (!openWorkspace) {
+            return false;
+          }
+
+          await this.initialize(openWorkspace.name);
+
+          const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
+          const documentsUri: string[] = await findFiles(
+            workspaceFolderPath,
+            SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
+            ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
+          );
+
+          await this._vectorStore?.syncFiles(documentsUri, (progress) => {
+            sendEventMessageCb(newEventMessage("sync_progress", { progress }));
+          });
+
+          this._initialized.fire();
+          return true;
+        } finally {
+          release();
         }
-
-        const openWorkspace = getOpenWorkspace();
-        if (!openWorkspace) {
-          return false;
-        }
-
-        await this.initialize(openWorkspace.name);
-
-        const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
-        const documentsUri: string[] = await findFiles(
-          workspaceFolderPath,
-          SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
-          ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
-        );
-
-        await this._vectorStore?.syncFiles(documentsUri, (progress) => {
-          sendEventMessageCb(newEventMessage("sync_progress", { progress }));
-        });
-
-        this._initialized.fire();
-        return true;
       })
       .registerEvent<ProcessMessageRequest, void>("process_message", async (req, sendEventMessageCb) => {});
   }

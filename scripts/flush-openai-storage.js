@@ -8,7 +8,7 @@ async function flushStorage() {
   const files = await openai.files.list();
 
   for (const file of files.data) {
-    console.log(`Deleting ${file.id}`);
+    console.info(`Deleting ${file.id}`);
     openai.files.del(file.id);
   }
 }
