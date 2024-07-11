@@ -160,41 +160,4 @@ export class ChatAPI {
       sendEventMessageCb(newEventMessage("sync_progress", { progress }));
     });
   }
-
-  private _queue = asyncQ.queue(async (word: string, callback) => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      vscode.window.showInformationMessage("No active editor found!");
-      callback();
-      return;
-    }
-
-    await this.writeWord(editor, word);
-    callback();
-  }, 1); // Ensure tasks are processed one at a time
-
-  private enqueueWord(word: string) {
-    this._queue.push(word);
-  }
-
-  private async clearEditorContent(editor: vscode.TextEditor) {
-    const document = editor.document;
-    const fullRange = new vscode.Range(document.positionAt(0), document.positionAt(document.getText().length));
-
-    await editor.edit((editBuilder) => {
-      editBuilder.delete(fullRange);
-    });
-    const startPosition = new vscode.Position(0, 0);
-    editor.selection = new vscode.Selection(startPosition, startPosition);
-  }
-
-  private async writeWord(editor: vscode.TextEditor, word: string) {
-    const currentPosition = editor.selection.active;
-    await editor.edit((editBuilder) => {
-      editBuilder.insert(currentPosition, word);
-    });
-
-    const newPosition = editor.document.positionAt(editor.document.getText().length);
-    editor.selection = new vscode.Selection(newPosition, newPosition);
-  }
 }
