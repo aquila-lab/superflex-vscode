@@ -34,7 +34,7 @@ const Chat: React.FunctionComponent<{
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    vscodeAPI.onMessage((message) => {
+    return vscodeAPI.onMessage((message) => {
       switch (message.command) {
         case 'initialized':
           setInitialized(message.data);
@@ -58,8 +58,8 @@ const Chat: React.FunctionComponent<{
           }
 
           for (const msg of message.data) {
-            setMessages([
-              ...messages,
+            setMessages((prev) => [
+              ...prev,
               {
                 id: msg.id,
                 text: msg.content,
@@ -98,7 +98,7 @@ const Chat: React.FunctionComponent<{
 
   const handleSend = (): void => {
     if (input.trim()) {
-      setMessages([...messages, { id: uuidv4(), text: input, sender: 'user' }]);
+      setMessages((prev) => [...prev, { id: uuidv4(), text: input, sender: 'user' }]);
       vscodeAPI.postMessage(newEventMessage('new_message', { text: input }));
       setMessageProcessing(true);
     }
@@ -107,8 +107,8 @@ const Chat: React.FunctionComponent<{
   };
 
   const handleImageUpload = (file: File): void => {
-    setMessages([
-      ...messages,
+    setMessages((prev) => [
+      ...prev,
       {
         id: uuidv4(),
         text: 'Processing image...',
@@ -117,9 +117,11 @@ const Chat: React.FunctionComponent<{
       }
     ]);
     vscodeAPI.postMessage(newEventMessage('new_message', { imageUrl: (file as any).path }));
+    setMessageProcessing(true);
   };
 
   const syncInProgress = syncProgress !== 100;
+  const disableIteractions = messageProcessing || syncInProgress || !initialized;
 
   return (
     <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">
@@ -164,17 +166,24 @@ const Chat: React.FunctionComponent<{
       </div>
 
       <div className="flex items-center gap-1">
-        <TextareaAutosize
-          autoFocus
-          value={input}
-          placeholder="Ask ElementAI or type / for commands"
-          className="flex-1 p-2 bg-neutral-800 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[2rem] max-h-[15rem]"
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-        />
+        <div className="flex-1 w-full">
+          <TextareaAutosize
+            autoFocus
+            value={input}
+            placeholder="Ask ElementAI or type / for commands"
+            className="p-2 bg-neutral-700 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[2rem] max-h-[15rem] resize-none w-full"
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (!disableIteractions && e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+        </div>
 
         <FilePicker
-          disabled={messageProcessing || syncInProgress || initialized}
+          disabled={disableIteractions}
           accept="image/*"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -184,7 +193,7 @@ const Chat: React.FunctionComponent<{
           }}
         />
 
-        <Button disabled={messageProcessing || syncInProgress || initialized} onClick={handleSend}>
+        <Button disabled={disableIteractions} onClick={handleSend}>
           Send
         </Button>
       </div>

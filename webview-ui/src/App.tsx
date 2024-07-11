@@ -13,7 +13,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
   const [view, setView] = useState<View>('login');
 
   useEffect(() => {
-    vscodeAPI.onMessage((message) => {
+    return vscodeAPI.onMessage((message) => {
       switch (message.command) {
         case 'show_login_view':
           setView('login');
