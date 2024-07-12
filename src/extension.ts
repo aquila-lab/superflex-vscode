@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import * as vscode from "vscode";
 
 import { ChatAPI } from "./chat/ChatApi";
@@ -22,6 +20,7 @@ type AppState = {
 };
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+  vscode.window.showInformationMessage("Element AI extension is now active!");
   const aiProvider = new OpenAIProvider();
   const chatApi = new ChatAPI(aiProvider);
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);

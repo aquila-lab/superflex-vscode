@@ -57,7 +57,7 @@
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "vsce:prepublish": "npm run build",
-    "vsce:package": "npm run vsce:prepublish && vsce package --no-dependencies --no-yarn",
+    "vsce:package": "npm run vsce:prepublish && vsce package --no-yarn",
     "vsce:publish": "vsce publish"
   },
   "contributes": {
@@ -170,7 +170,6 @@
     "async-mutex": "^0.5.0",
     "axios": "^1.7.2",
     "crypto": "^1.0.1",
-    "dotenv": "^16.4.5",
     "fast-glob": "^3.3.2",
     "openai": "^4.52.1",
     "uuidv4": "^6.2.13"
