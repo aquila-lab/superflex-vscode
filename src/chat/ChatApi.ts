@@ -1,10 +1,8 @@
-import asyncQ from "async";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
 import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
-import OpenAIProvider from "../providers/OpenAIProvider";
 import { ElementAICache } from "../cache/ElementAICache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";

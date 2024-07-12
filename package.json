@@ -57,7 +57,7 @@
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "vsce:prepublish": "npm run build",
-    "vsce:package": "npm run vsce:prepublish && vsce package --no-yarn",
+    "vsce:package": "npm run vsce:prepublish && vsce package",
     "vsce:publish": "vsce publish"
   },
   "contributes": {
