@@ -1,10 +1,11 @@
 {
   "name": "element-ai",
-  "displayName": "ElementAI",
+  "publisher": "AquilaLab",
+  "displayName": "Element AI",
   "description": "AI pair programmer for frontend engineers",
   "icon": "small_logo.png",
   "version": "0.0.1",
-  "author": "Riphal <bjankovic998@gmail.com> (https://twitter.com/_riphal_)",
+  "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -48,16 +49,15 @@
   ],
   "main": "./out/extension.js",
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "build": "npm --prefix webview-ui/ run build && tsc -p ./",
+    "pretest": "npm run build && npm run lint",
     "test": "vscode-test",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "vsce:package": "vsce package",
+    "vsce:prepublish": "npm run build",
+    "vsce:package": "npm run vsce:prepublish && vsce package --no-dependencies --no-yarn",
     "vsce:publish": "vsce publish"
   },
   "contributes": {
