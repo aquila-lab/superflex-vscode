@@ -69,6 +69,8 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
             command: message.command,
             error: (err as Error).message,
           } as EventMessage);
+
+          vscode.window.showErrorMessage((err as Error).message);
         }
       },
       undefined,

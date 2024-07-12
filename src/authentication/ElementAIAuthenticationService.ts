@@ -67,14 +67,32 @@ export default class ElementAIAuthenticationService {
       const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
       const token = await selfHostedProvider.getToken();
       if (!token) {
-        vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", false);
-        this._webviewProvider.sendEventMessage(newEventMessage("show_enter_token_view"));
+        this.removeToken();
+        return;
+      }
+
+      try {
+        this._aiProvider.init();
+      } catch (err) {
+        this.removeToken();
+        vscode.window.showErrorMessage((err as Error).message);
         return;
       }
     }
 
     this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
     vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", true);
+  }
+
+  removeToken(): void {
+    if (this._aiProvider.discriminator !== "self-hosted-ai-provider") {
+      return;
+    }
+
+    const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
+    selfHostedProvider.removeToken();
+    vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", false);
+    this._webviewProvider.sendEventMessage(newEventMessage("show_enter_token_view"));
   }
 
   private async setAuthHeader(token: string, logoutAction: any): Promise<void> {

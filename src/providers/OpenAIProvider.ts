@@ -364,4 +364,12 @@ export default class OpenAIProvider implements SelfHostedAIProvider {
     settings.openaiApiKey = token;
     ElementAICache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
   }
+
+  removeToken(): void {
+    const rawSettings = ElementAICache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
+    const settings = rawSettings ? (JSON.parse(rawSettings) as GlobalSettings) : {};
+
+    delete settings.openaiApiKey;
+    ElementAICache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
+  }
 }

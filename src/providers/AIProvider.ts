@@ -95,6 +95,11 @@ interface Discriminator {
 
 export interface AIProvider extends Discriminator {
   /**
+   * Initialize the provider.
+   */
+  init(): void;
+
+  /**
    * Retrieve vector store by ID.
    *
    * @param id - The ID of the vector store to retrieve.
@@ -141,4 +146,9 @@ export interface SelfHostedAIProvider extends AIProvider {
    * @param token - The token to set.
    */
   setToken(token: string): void;
+
+  /**
+   * Remove the token from the provider.
+   */
+  removeToken(): void;
 }
