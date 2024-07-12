@@ -60,8 +60,10 @@
     "prettier:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
+    "package": "npm run check-types && node esbuild.js --production",
     "vscode:prepublish": "npm --prefix webview-ui/ run build && npm run package",
-    "package": "npm run check-types && node esbuild.js --production"
+    "vsce:package": "vsce package --no-dependencies --no-yarn",
+    "vsce:publish": "vsce publish"
   },
   "contributes": {
     "menus": {
