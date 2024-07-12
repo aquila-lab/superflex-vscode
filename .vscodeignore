@@ -1,6 +1,6 @@
 **
-!out/
-!out/extension.js
+!dist/
+!dist/extension.js
 !package.json
 !LICENSE
 !README.md

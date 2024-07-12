@@ -47,18 +47,21 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "scripts": {
-    "build": "npm --prefix webview-ui/ run build && tsc -p ./",
+    "compile": "npm run check-types && node esbuild.js",
+    "check-types": "tsc --noEmit",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "pretest": "npm run build && npm run lint",
     "test": "vscode-test",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "vsce:prepublish": "npm run build",
-    "vsce:package": "npm run vsce:prepublish && vsce package",
-    "vsce:publish": "vsce publish"
+    "vscode:prepublish": "npm --prefix webview-ui/ run build && npm run package",
+    "package": "npm run check-types && node esbuild.js --production"
   },
   "contributes": {
     "menus": {
@@ -161,7 +164,9 @@
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.23.0",
     "eslint": "^8.57.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^5.4.5"
   },
   "dependencies": {
