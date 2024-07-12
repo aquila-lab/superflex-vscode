@@ -89,7 +89,11 @@ export interface Assistant {
   sendMessage(messages: MessageContent[], streamResponse?: (event: TextDelta) => void): Promise<Message[]>;
 }
 
-export interface AIProvider {
+interface Discriminator {
+  discriminator: "ai-provider" | "self-hosted-ai-provider";
+}
+
+export interface AIProvider extends Discriminator {
   /**
    * Retrieve vector store by ID.
    *
@@ -121,4 +125,20 @@ export interface AIProvider {
    * @returns The assistant instance.
    */
   createAssistant(vectorStore?: VectorStore): Promise<Assistant>;
+}
+
+export interface SelfHostedAIProvider extends AIProvider {
+  /**
+   * Check if the provider has a valid token and returns it.
+   *
+   * @returns The token if it exists, otherwise null.
+   */
+  getToken(): string | null;
+
+  /**
+   * Set the token for the provider.
+   *
+   * @param token - The token to set.
+   */
+  setToken(token: string): void;
 }

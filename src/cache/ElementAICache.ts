@@ -3,6 +3,12 @@ import path from "path";
 
 import { decodeUriAndRemoveFilePrefix } from "../common/utils";
 
+export const GLOBAL_SETTINGS_FILE_NAME = "settings.json";
+
+export type GlobalSettings = {
+  openaiApiKey?: string;
+};
+
 export type CachedFileObject = {
   originalPath: string;
   cachedPath: string;
@@ -18,6 +24,7 @@ export type CacheFileOptions = {
 class ElementAICacheClass {
   workspaceFolderPath: string | undefined;
   storagePath: string | undefined;
+  globalStoragePath: string | undefined;
 
   setWorkspaceFolderPath(workspaceFolderPath: string | undefined): void {
     if (workspaceFolderPath) {
@@ -37,6 +44,18 @@ class ElementAICacheClass {
     }
 
     this.storagePath = storagePath;
+  }
+
+  setGlobalStoragePath(globalStoragePath: string | undefined): void {
+    if (globalStoragePath) {
+      globalStoragePath = decodeUriAndRemoveFilePrefix(globalStoragePath);
+
+      if (!fs.existsSync(globalStoragePath)) {
+        fs.mkdirSync(globalStoragePath, { recursive: true });
+      }
+    }
+
+    this.globalStoragePath = globalStoragePath;
   }
 
   /**
@@ -72,6 +91,41 @@ class ElementAICacheClass {
 
     const writeBuffer = Buffer.from(data);
     fs.writeFileSync(path.join(this.storagePath, filename), writeBuffer);
+  }
+
+  /**
+   * Get the file from the global cache.
+   *
+   * @param filename The name of the file to get.
+   * @returns The data of the file.
+   */
+  getGlobal(filename: string): string | undefined {
+    if (!this.globalStoragePath) {
+      throw new Error("Global storage path is not set");
+    }
+
+    const file = path.join(this.globalStoragePath, filename);
+    if (!fs.existsSync(file)) {
+      return undefined;
+    }
+
+    const readBuffer = fs.readFileSync(file);
+    return readBuffer.toString();
+  }
+
+  /**
+   * Set the file in the global cache. If the file already exists, it will be overwritten.
+   *
+   * @param filename The name of the file to set.
+   * @param data The data to set.
+   */
+  setGlobal(filename: string, data: string): void {
+    if (!this.globalStoragePath) {
+      throw new Error("Global storage path is not set");
+    }
+
+    const writeBuffer = Buffer.from(data);
+    fs.writeFileSync(path.join(this.globalStoragePath, filename), writeBuffer);
   }
 
   cacheFilesSync(filePaths: string[], options?: CacheFileOptions): CachedFileObject[] {

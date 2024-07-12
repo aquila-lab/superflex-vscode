@@ -25,7 +25,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const aiProvider = new OpenAIProvider();
   const chatApi = new ChatAPI(aiProvider);
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
-  const authService = new ElementAIAuthenticationService(chatWebviewProvider);
+  const authService = new ElementAIAuthenticationService(chatWebviewProvider, aiProvider);
 
   const appState: AppState = {
     aiProvider: aiProvider,
@@ -50,6 +50,7 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
 
 function registerElementAICache(context: vscode.ExtensionContext): void {
   ElementAICache.setStoragePath(context.storageUri?.toString());
+  ElementAICache.setGlobalStoragePath(context.globalStorageUri.toString());
 
   const openWorkspace = getOpenWorkspace();
   if (openWorkspace) {

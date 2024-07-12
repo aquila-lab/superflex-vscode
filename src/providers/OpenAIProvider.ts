@@ -3,9 +3,17 @@ import path from "path";
 import asyncQ from "async";
 import OpenAI from "openai";
 
-import { CachedFileObject, ElementAICache } from "../cache/ElementAICache";
+import { ElementAICache, GLOBAL_SETTINGS_FILE_NAME, GlobalSettings, CachedFileObject } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
-import { AIProvider, Assistant, Message, MessageContent, TextDelta, VectorStore } from "./AIProvider";
+import {
+  AIProvider,
+  Assistant,
+  Message,
+  MessageContent,
+  SelfHostedAIProvider,
+  TextDelta,
+  VectorStore,
+} from "./AIProvider";
 import { jsonToMap, mapToJson } from "../common/utils";
 
 const FILE_ID_MAP_NAME = "open-ai-file-id-map.json";
@@ -256,8 +264,14 @@ class OpenAIAssistant implements Assistant {
   }
 }
 
-export default class OpenAIProvider implements AIProvider {
+export default class OpenAIProvider implements SelfHostedAIProvider {
+  discriminator: "ai-provider" | "self-hosted-ai-provider";
+
   private _openai?: OpenAI;
+
+  constructor() {
+    this.discriminator = "self-hosted-ai-provider";
+  }
 
   init(): void {
     if (this._openai) {
@@ -328,5 +342,26 @@ export default class OpenAIProvider implements AIProvider {
     const assistant = await this._openai.beta.assistants.create(createParams);
 
     return new OpenAIAssistant(assistant.id, this._openai);
+  }
+
+  getToken(): string | null {
+    const rawSettings = ElementAICache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
+    const settings = rawSettings ? (JSON.parse(rawSettings) as GlobalSettings) : {};
+    if (!settings.openaiApiKey) {
+      return null;
+    }
+
+    // DO NOT DELETE: This line is used to set the OpenAI API key in the environment
+    process.env["OPENAI_API_KEY"] = settings.openaiApiKey;
+
+    return settings.openaiApiKey;
+  }
+
+  setToken(token: string): void {
+    const rawSettings = ElementAICache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
+    const settings = rawSettings ? (JSON.parse(rawSettings) as GlobalSettings) : {};
+
+    settings.openaiApiKey = token;
+    ElementAICache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
   }
 }

@@ -5,32 +5,30 @@ import { ApiProvider } from "../api";
 import { newEventMessage } from "../protocol";
 import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 import ChatViewProvider from "../chat/ChatViewProvider";
+import { AIProvider, SelfHostedAIProvider } from "../providers/AIProvider";
 
 export default class ElementAIAuthenticationService {
   private _webviewProvider: ChatViewProvider;
+  private _aiProvider: AIProvider;
 
-  constructor(webviewProvider: ChatViewProvider) {
+  constructor(webviewProvider: ChatViewProvider, aiProvider: AIProvider) {
     this._webviewProvider = webviewProvider;
+    this._aiProvider = aiProvider;
   }
 
   /**
    * Command to sign in the user.
-   * @param provider
-   * @returns
    */
   async signIn(provider: AuthenticationProvider): Promise<void> {
     const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: true });
 
     this.setAuthHeader(session.accessToken, () => this.signOut(provider));
-    this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
 
     vscode.window.showInformationMessage(`Signed in as ${session.account.label} 🎉`);
   }
 
   /**
    * Command to sign out the user.
-   * @param
-   * @returns
    */
   async signOut(provider: AuthenticationProvider): Promise<void> {
     const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: false });
@@ -49,8 +47,6 @@ export default class ElementAIAuthenticationService {
 
   /**
    * We need to authenticate the user on extension activation to ensure that the user is authenticated before making any API calls.
-   * @param provider
-   * @returns
    */
   async authenticate(provider: AuthenticationProvider, accessToken?: string): Promise<void> {
     if (!accessToken) {
@@ -63,8 +59,18 @@ export default class ElementAIAuthenticationService {
     }
 
     this.setAuthHeader(accessToken, () => this.signOut(provider));
-    this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
 
+    if (this._aiProvider.discriminator === "self-hosted-ai-provider") {
+      const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
+      const token = await selfHostedProvider.getToken();
+      if (!token) {
+        vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", false);
+        this._webviewProvider.sendEventMessage(newEventMessage("show_enter_token_view"));
+        return;
+      }
+    }
+
+    this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
     vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", true);
   }
 
