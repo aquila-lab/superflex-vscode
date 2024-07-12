@@ -43,6 +43,7 @@ export default class ElementAIAuthenticationService {
 
     this._webviewProvider.sendEventMessage(newEventMessage("show_login_view"));
 
+    vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", false);
     vscode.window.showInformationMessage("Signed out!");
   }
 
@@ -63,6 +64,8 @@ export default class ElementAIAuthenticationService {
 
     this.setAuthHeader(accessToken, () => this.signOut(provider));
     this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
+
+    vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", true);
   }
 
   private async setAuthHeader(token: string, logoutAction: any): Promise<void> {

@@ -66,17 +66,17 @@
         {
           "command": "elementai.chat.new-thread",
           "group": "navigation",
-          "when": "view == elementai.chat && elementai.chat.initialized == true"
+          "when": "view == elementai.chat && elementai.chat.authenticated"
         },
         {
           "command": "elementai.project.sync",
           "group": "navigation",
-          "when": "view == elementai.chat && elementai.chat.initialized == true"
+          "when": "view == elementai.chat && elementai.chat.authenticated"
         },
         {
           "command": "elementai.auth.signout",
           "group": "navigation",
-          "when": "view == elementai.chat && elementai.chat.initialized == true"
+          "when": "view == elementai.chat && elementai.chat.authenticated"
         }
       ]
     },
@@ -135,11 +135,13 @@
       },
       {
         "command": "elementai.chat.new-thread",
+        "category": "Element AI",
         "title": "New Chat Thread",
         "icon": "$(plus)"
       },
       {
         "command": "elementai.project.sync",
+        "category": "Element AI",
         "title": "Project Sync",
         "icon": "$(refresh)"
       }

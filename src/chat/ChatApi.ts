@@ -44,8 +44,6 @@ export class ChatAPI {
       .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
         const release = await this._initializedMutex.acquire();
 
-        void vscode.commands.executeCommand("setContext", "elementai.chat.initialized", true);
-
         try {
           if (this._aiProvider instanceof OpenAIProvider) {
             this._aiProvider.init();
