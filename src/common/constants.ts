@@ -8,8 +8,8 @@ export const ApiErrorTypes = {
 };
 
 export const IS_PROD = process.env.NODE_ENV === "production";
-export const APP_BASE_URL = process.env.APP_BASE_URL ?? "http://localhost:3000/";
-export const API_BASE_URL = process.env.API_BASE_URL ?? "http://localhost:8000/api/v1";
+export const APP_BASE_URL = process.env.APP_BASE_URL ?? "https://dashboard.sprout-hr.com/element-ai";
+export const API_BASE_URL = process.env.API_BASE_URL ?? "https://api.sprout-hr.com/api/v1";
 
 export const BRAND_NAME = "elementai";
 

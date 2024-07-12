@@ -153,7 +153,7 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
         this._pendingStates.push(stateID);
 
         const searchParams = new URLSearchParams([["state", encodeURIComponent(callbackUri.toString(true))]]);
-        const uri = Uri.parse(`${APP_BASE_URL}/element-ai/login?${searchParams.toString()}`);
+        const uri = Uri.parse(`${APP_BASE_URL}/login?${searchParams.toString()}`);
 
         remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
 
