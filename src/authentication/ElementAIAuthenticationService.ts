@@ -72,11 +72,14 @@ export default class ElementAIAuthenticationService {
       }
 
       try {
-        this._aiProvider.init();
-      } catch (err) {
-        this.removeToken();
+        await this._aiProvider.init(true);
+      } catch (err: any) {
+        if (err?.status === 401) {
+          this.removeToken();
+          vscode.window.showErrorMessage((err as Error).message);
+          return;
+        }
         vscode.window.showErrorMessage((err as Error).message);
-        return;
       }
     }
 

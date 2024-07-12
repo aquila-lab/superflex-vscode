@@ -96,8 +96,10 @@ interface Discriminator {
 export interface AIProvider extends Discriminator {
   /**
    * Initialize the provider.
+   *
+   * @param force - Optional parameter to force initialization.
    */
-  init(): void;
+  init(force?: boolean): Promise<void>;
 
   /**
    * Retrieve vector store by ID.

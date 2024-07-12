@@ -71,6 +71,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
 
             <input
               type="text"
+              value={token}
               className="p-2 rounded-md bg-neutral-800 text-neutral-300 w-full"
               placeholder="Paste your token here"
               onChange={(e) => setToken(e.target.value)}

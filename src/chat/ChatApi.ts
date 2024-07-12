@@ -45,7 +45,7 @@ export class ChatAPI {
         const release = await this._initializedMutex.acquire();
 
         try {
-          this._aiProvider.init();
+          await this._aiProvider.init();
 
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {

@@ -273,12 +273,14 @@ export default class OpenAIProvider implements SelfHostedAIProvider {
     this.discriminator = "self-hosted-ai-provider";
   }
 
-  init(): void {
-    if (this._openai) {
+  async init(force?: boolean): Promise<void> {
+    if (!force && this._openai) {
       return;
     }
 
-    this._openai = new OpenAI();
+    const openai = new OpenAI();
+    await openai.files.list();
+    this._openai = openai;
   }
 
   async retrieveVectorStore(id: string): Promise<VectorStore> {
