@@ -8,8 +8,8 @@ import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import { AUTH_PROVIDER_ID } from "./common/constants";
 import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
 import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
-import { ElementAICache } from "./cache/ElementAICache";
-import { AIProvider } from "./providers/AIProvider";
+import { ElementAICache, GLOBAL_SETTINGS_FILE_NAME, GlobalSettings } from "./cache/ElementAICache";
+import { AIProvider, SelfHostedAIProvider } from "./providers/AIProvider";
 import OpenAIProvider from "./providers/OpenAIProvider";
 import { getOpenWorkspace } from "./common/utils";
 
@@ -68,6 +68,13 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 
   state.chatApi.registerEvent("login_clicked", async () => {
     await state.authService.signIn(state.authProvider);
+  });
+  state.chatApi.registerEvent<{ token: string }, void>("token_entered", async (req) => {
+    if (state.aiProvider.discriminator === "self-hosted-ai-provider") {
+      const selfHostedProvider = state.aiProvider as SelfHostedAIProvider;
+      selfHostedProvider.setToken(req.token);
+    }
+    await state.authService.authenticateToken();
   });
 
   state.authService.authenticate(state.authProvider);

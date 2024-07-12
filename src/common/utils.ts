@@ -13,6 +13,9 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
   } else if (uri && uri.includes("file://")) {
     uri = uri.replace("file://", "");
   }
+  if (uri && uri.includes("vscode-userdata:")) {
+    uri = uri.replace("vscode-userdata:", "");
+  }
 
   if (uri) {
     uri = decodeURIComponent(uri);

@@ -59,7 +59,10 @@ export default class ElementAIAuthenticationService {
     }
 
     this.setAuthHeader(accessToken, () => this.signOut(provider));
+    await this.authenticateToken();
+  }
 
+  async authenticateToken(): Promise<void> {
     if (this._aiProvider.discriminator === "self-hosted-ai-provider") {
       const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
       const token = await selfHostedProvider.getToken();

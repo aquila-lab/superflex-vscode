@@ -7,16 +7,20 @@ import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
 import { Button } from './components';
 
-type View = 'chat' | 'login' | 'no_open_project';
+type View = 'chat' | 'login' | 'enter_token' | 'no_open_project';
 
 const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI }) => {
   const [view, setView] = useState<View>('login');
+  const [token, setToken] = useState('');
 
   useEffect(() => {
     return vscodeAPI.onMessage((message) => {
       switch (message.command) {
         case 'show_login_view':
           setView('login');
+          break;
+        case 'show_enter_token_view':
+          setView('enter_token');
           break;
         case 'show_chat_view':
           setView('chat');
@@ -45,6 +49,35 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
           <div className="flex flex-col justify-center items-center h-full vscode-dark text-white px-3 pb-4">
             <h1 className="text-2xl font-bold mb-4">Welcome to Element AI!</h1>
             <Button onClick={() => vscodeAPI.postMessage(newEventMessage('login_clicked'))}>Sign in</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'enter_token') {
+    return (
+      <div className="App h-full">
+        <div id="AppContent" className="h-full">
+          <div className="flex flex-col justify-center items-center h-full vscode-dark text-white px-3 pb-4">
+            <h1 className="text-2xl font-bold mb-4">Enter your token</h1>
+            <p className="text-center">
+              To use Element AI, you need to enter your OpenAI API token. You can create a new API key by visiting
+              <a href="https://platform.openai.com/api-keys">https://platform.openai.com/api-keys</a>
+            </p>
+            <input
+              type="text"
+              className="mt-4 w-full p-2 rounded-md bg-neutral-800 text-neutral-300"
+              placeholder="Paste your token here"
+              onChange={(e) => setToken(e.target.value)}
+            />
+            <Button
+              onClick={() => {
+                vscodeAPI.postMessage(newEventMessage('token_entered', { token: token }));
+                setToken('');
+              }}>
+              Submit
+            </Button>
           </div>
         </div>
       </div>
