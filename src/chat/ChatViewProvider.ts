@@ -13,6 +13,17 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        "elementai.chat.new-thread",
+        () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_new_thread"))
+      ),
+      vscode.commands.registerCommand(
+        "elementai.project.sync",
+        () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_sync_project"))
+      )
+    );
   }
 
   private init() {
@@ -80,10 +91,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
     void this._chatWebview?.postMessage(newEventMessage("focus-input"));
-  }
-
-  clearAllConversations() {
-    void this._chatWebview?.postMessage(newEventMessage("clear-all-conversations"));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {

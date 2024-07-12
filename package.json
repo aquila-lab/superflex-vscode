@@ -61,6 +61,25 @@
     "vsce:publish": "vsce publish"
   },
   "contributes": {
+    "menus": {
+      "view/title": [
+        {
+          "command": "elementai.chat.new-thread",
+          "group": "navigation",
+          "when": "view == elementai.chat && elementai.chat.initialized == true"
+        },
+        {
+          "command": "elementai.project.sync",
+          "group": "navigation",
+          "when": "view == elementai.chat && elementai.chat.initialized == true"
+        },
+        {
+          "command": "elementai.auth.signout",
+          "group": "navigation",
+          "when": "view == elementai.chat && elementai.chat.initialized == true"
+        }
+      ]
+    },
     "submenus": [
       {
         "id": "elementai.chat.submenu",
@@ -110,15 +129,19 @@
         "icon": "$(sign-out)"
       },
       {
-        "command": "elementai.chat.clear-all-conversations",
-        "category": "Element AI",
-        "title": "Clear all chat conversations",
-        "when": "elementai.chat.ready"
-      },
-      {
         "command": "elementai.chat.focus-input",
         "category": "Element AI",
         "title": "Focus chat input"
+      },
+      {
+        "command": "elementai.chat.new-thread",
+        "title": "New Chat Thread",
+        "icon": "$(plus)"
+      },
+      {
+        "command": "elementai.project.sync",
+        "title": "Project Sync",
+        "icon": "$(refresh)"
       }
     ]
   },

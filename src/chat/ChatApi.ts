@@ -44,6 +44,8 @@ export class ChatAPI {
       .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
         const release = await this._initializedMutex.acquire();
 
+        void vscode.commands.executeCommand("setContext", "elementai.chat.initialized", true);
+
         try {
           if (this._aiProvider instanceof OpenAIProvider) {
             this._aiProvider.init();
@@ -64,12 +66,8 @@ export class ChatAPI {
         }
       })
       .registerEvent<void, void>("sync_project", async (_, sendEventMessageCb) => {
-        if (!this._isInitialized) {
-          return;
-        }
-
         // Prevent multiple sync project requests from running concurrently
-        if (this._isSyncProjectRunning) {
+        if (!this._isInitialized || this._isSyncProjectRunning) {
           return;
         }
         this._isSyncProjectRunning = true;
@@ -81,6 +79,12 @@ export class ChatAPI {
         await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
         this._isSyncProjectRunning = false;
+      })
+      .registerEvent<void, void>("new_thread", async () => {
+        if (!this._isInitialized || !this._assistant) {
+          return;
+        }
+        await this._assistant.createNewThread();
       })
       .registerEvent<NewMessageRequest, Message[]>("new_message", async (req, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {

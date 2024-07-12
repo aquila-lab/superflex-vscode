@@ -15,18 +15,20 @@ type Message = {
   imageUrl?: string;
 };
 
+const defaultMessages: Message[] = [
+  {
+    id: uuidv4(),
+    text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
+    sender: 'bot'
+  }
+];
+
 const Chat: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
 }> = ({ vscodeAPI }) => {
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: uuidv4(),
-      text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
-      sender: 'bot'
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(defaultMessages);
   const [input, setInput] = useState('');
   const [syncProgress, setSyncProgress] = useState(0);
   const [streamResponse, setStreamResponse] = useState('');
@@ -38,6 +40,9 @@ const Chat: React.FunctionComponent<{
       switch (message.command) {
         case 'initialized':
           setInitialized(message.data);
+          break;
+        case 'cmd_sync_project':
+          vscodeAPI.postMessage(newEventMessage('sync_project'));
           break;
         case 'sync_progress':
           if (message.data.progress === 0) {
@@ -53,6 +58,10 @@ const Chat: React.FunctionComponent<{
           setStreamResponse('');
           setMessageProcessing(false);
 
+          if (message.error) {
+            console.error(`Error processing 'new_message': ${message.error}`);
+            return;
+          }
           if (!message.data.length) {
             return;
           }
@@ -68,6 +77,10 @@ const Chat: React.FunctionComponent<{
             ]);
           }
 
+          break;
+        case 'cmd_new_thread':
+          setMessages(defaultMessages);
+          vscodeAPI.postMessage(newEventMessage('new_thread'));
           break;
       }
     });

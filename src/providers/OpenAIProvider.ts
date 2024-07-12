@@ -167,6 +167,7 @@ class OpenAIAssistant implements Assistant {
 
   private _openai: OpenAI;
   private _thread?: OpenAI.Beta.Threads.Thread;
+  private _numMessages = 0;
 
   constructor(id: string, openai: OpenAI) {
     this.id = id;
@@ -174,6 +175,10 @@ class OpenAIAssistant implements Assistant {
   }
 
   async createNewThread(): Promise<void> {
+    if (this._thread && this._numMessages === 0) {
+      return;
+    }
+
     this._thread = await this._openai.beta.threads.create({
       messages: [
         {
@@ -183,6 +188,8 @@ class OpenAIAssistant implements Assistant {
         },
       ],
     });
+
+    this._numMessages = 0;
   }
 
   async sendMessage(messages: MessageContent[], streamResponse?: (event: TextDelta) => void): Promise<Message[]> {
@@ -217,6 +224,8 @@ class OpenAIAssistant implements Assistant {
     if (!this._thread) {
       throw new Error("Imposible case: thread is not created");
     }
+
+    this._numMessages += content.length;
 
     await this._openai.beta.threads.messages.create(this._thread.id, {
       role: "user",
