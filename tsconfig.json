@@ -8,5 +8,5 @@
 		"strict": true,
 		"sourceMap": true
 	},
-	"exclude": ["node_modules", ".vscode-test", "./dist", "webview-ui", ".eslintrc.json"]
+	"exclude": ["node_modules", ".vscode-test", "./dist", "webview-ui-21", ".eslintrc.json"]
 }

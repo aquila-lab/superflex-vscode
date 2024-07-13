@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 
 import { ChatAPI } from "./ChatApi";
-import { createWebviewHTMLTemplate } from "../webview/webviewTemplates";
 import { EventMessage, newEventMessage } from "../protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -95,33 +94,39 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void this._chatWebview?.postMessage(newEventMessage("focus-input"));
   }
 
-  resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
+  async resolveWebviewView(webviewView: vscode.WebviewView): Promise<void> {
     const localWebviewView = webviewView;
     this._chatWebviewView = localWebviewView;
     this._chatWebview = localWebviewView.webview;
+
     localWebviewView.webview.options = {
+      // Enable JavaScript in the webview
       enableScripts: true,
+      // Restrict the webview to only load resources from the `webview-ui/dist` directory
+      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist")],
       enableCommandUris: true,
     };
 
     this.init();
 
-    return this.setWebviewHtml(localWebviewView);
+    await this.setWebviewHtml(localWebviewView);
   }
 
-  setWebviewHtml(webviewView: vscode.WebviewView): void {
-    let scriptSrc = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "index.js")
-    );
+  async setWebviewHtml(view: vscode.WebviewView): Promise<void> {
+    const webviewPath = vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist");
+    // Create Webview using vscode/index.html
+    const root = vscode.Uri.joinPath(webviewPath, "index.html");
+    const bytes = await vscode.workspace.fs.readFile(root);
+    const decoded = new TextDecoder("utf-8").decode(bytes);
+    const resources = view.webview.asWebviewUri(webviewPath);
 
-    let cssSrc = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "index.css")
-    );
+    // This replace variables from the webview-ui/dist/index.html with webview info
+    // 1. Update URIs to load styles and scripts into webview (eg. path that starts with ./)
+    // 2. Update URIs for content security policy to only allow specific scripts to be run
+    view.webview.html = decoded
+      .replaceAll("./", `${resources.toString()}/`)
+      .replaceAll("{cspSource}", view.webview.cspSource);
 
-    const codiconsUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "node_modules", "@vscode/codicons", "dist", "codicon.css")
-    );
-
-    webviewView.webview.html = createWebviewHTMLTemplate(scriptSrc, cssSrc, codiconsUri);
+    console.log(view.webview.html);
   }
 }
