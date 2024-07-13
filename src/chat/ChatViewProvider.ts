@@ -124,21 +124,18 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "index.js")
     );
 
-    const nonce = getNonce();
-
     webview.html = `
       <!DOCTYPE html>
       <html lang="en" style="margin: 0; padding: 0; min-width: 100%; min-height: 100%">
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
           <title>Element AI</title>
         </head>
         <body style="margin: 0; padding: 0; min-width: 100%; min-height: 100%">
           <div id="root"></div>
-          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+          <script type="module" src="${scriptUri}"></script>
         </body>
       </html>
     `;
