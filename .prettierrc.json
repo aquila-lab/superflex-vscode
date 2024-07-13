@@ -10,5 +10,6 @@
   "bracketSameLine": false,
   "arrowParens": "always",
   "proseWrap": "never",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "printWidth": 120
 }

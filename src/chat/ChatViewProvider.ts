@@ -1,49 +1,76 @@
 import * as vscode from "vscode";
 
-import { ChatAPI } from "./ChatApi";
-import { createWebviewTemplate } from "../webview/webviewTemplates";
+import { getNonce } from "../common/utils";
 import { EventMessage, newEventMessage } from "../protocol";
+import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
-  private chatWebviewView?: vscode.WebviewView;
+  private _extensionUri: vscode.Uri;
+  private _eventMessagesQueue: EventMessage[] = [];
 
-  private chatWebview?: vscode.Webview;
+  private _chatWebviewView?: vscode.WebviewView;
+  private _chatWebview?: vscode.Webview;
 
-  private extensionUri: vscode.Uri;
+  constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
+    this._extensionUri = context.extensionUri;
 
-  constructor(
-    private context: vscode.ExtensionContext,
-    private chatApi: ChatAPI
-  ) {
-    this.extensionUri = context.extensionUri;
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        "elementai.chat.new-thread",
+        () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_new_thread"))
+      ),
+      vscode.commands.registerCommand(
+        "elementai.project.sync",
+        () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_sync_project"))
+      )
+    );
   }
 
   private init() {
-    if (!this.chatWebview) {
+    if (!this._chatWebview) {
       return;
     }
 
-    this.chatApi.setWebview(this.chatWebview);
-
-    this.chatWebview.onDidReceiveMessage(
+    this._chatWebview.onDidReceiveMessage(
       async (message: EventMessage) => {
+        // When webview is ready consume all queued messages
+        if (message.command === "ready") {
+          while (this._eventMessagesQueue.length) {
+            const msg = this._eventMessagesQueue.shift();
+            void this._chatWebview?.postMessage(msg);
+          }
+        }
+
         try {
           const payload = await this.chatApi.handleEvent(
             message.command,
-            message.data
+            message.data,
+            this.sendEventMessage.bind(this)
           );
-          void this.chatWebview?.postMessage({
+
+          // Uncomment the following line to see the event messages in the console, used for debugging
+          // console.log({ id: message.id, command: message.command, data: JSON.stringify(payload) });
+          if (payload === undefined) {
+            return;
+          }
+
+          void this.sendEventMessage({
             id: message.id,
             command: message.command,
             data: payload,
           } as EventMessage);
-        } catch (e) {
-          console.error(`failed to handle event. message: ${message.data}`);
-          void this.chatWebview?.postMessage({
+        } catch (err) {
+          console.error(
+            `Failed to handle event. message: ${JSON.stringify(message)}, error: ${(err as Error).message}`
+          );
+
+          void this.sendEventMessage({
             id: message.id,
             command: message.command,
-            error: (e as Error).message,
+            error: (err as Error).message,
           } as EventMessage);
+
+          vscode.window.showErrorMessage((err as Error).message);
         }
       },
       undefined,
@@ -51,56 +78,69 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     );
   }
 
+  sendEventMessage(msg: EventMessage): void {
+    // If the webview is not ready, queue the message
+    if (!this._chatWebview) {
+      this._eventMessagesQueue.push(msg);
+      return;
+    }
+
+    void this._chatWebview.postMessage(msg);
+  }
+
   async focusChatInput() {
     void vscode.commands.executeCommand("workbench.view.extension.elementai");
     await this.chatApi.onReady();
-    void this.chatWebviewView?.show(true);
-    void this.chatWebview?.postMessage(newEventMessage("focus-input"));
+    void this._chatWebviewView?.show(true);
+    void this._chatWebview?.postMessage(newEventMessage("focus-input"));
   }
 
-  clearAllConversations() {
-    void this.chatWebview?.postMessage(
-      newEventMessage("clear-all-conversations")
-    );
-  }
-
-  resolveWebviewView(webviewView: vscode.WebviewView): void | Thenable<void> {
+  resolveWebviewView(webviewView: vscode.WebviewView): void {
     const localWebviewView = webviewView;
-    this.chatWebviewView = localWebviewView;
-    this.chatWebview = localWebviewView.webview;
+    this._chatWebviewView = localWebviewView;
+    this._chatWebview = localWebviewView.webview;
+
     localWebviewView.webview.options = {
+      // Enable JavaScript in the webview
       enableScripts: true,
+      // Restrict the webview to only load resources from the `dist` and `webview-ui/dist` directories
+      localResourceRoots: [
+        vscode.Uri.joinPath(this._extensionUri, "dist"),
+        vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist"),
+      ],
       enableCommandUris: true,
     };
 
     this.init();
 
-    return this.setWebviewHtml(localWebviewView);
+    this.setWebviewHtml(localWebviewView.webview);
   }
 
-  setWebviewHtml(webviewView: vscode.WebviewView): void {
-    let scriptSrc = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "webview-ui", "dist", "index.js")
+  setWebviewHtml(webview: vscode.Webview): void {
+    const stylesUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "index.css")
+    );
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "index.js")
     );
 
-    let cssSrc = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(this.extensionUri, "webview-ui", "dist", "index.css")
-    );
+    const nonce = getNonce();
 
-    const codiconsUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.extensionUri,
-        "node_modules",
-        "@vscode/codicons",
-        "dist",
-        "codicon.css"
-      )
-    );
-
-    webviewView.webview.html = createWebviewTemplate(
-      scriptSrc,
-      cssSrc,
-      codiconsUri
-    );
+    webview.html = `
+      <!DOCTYPE html>
+      <html lang="en" style="margin: 0; padding: 0; min-width: 100%; min-height: 100%">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
+          <link rel="stylesheet" type="text/css" href="${stylesUri}" />
+          <title>Element AI</title>
+        </head>
+        <body style="margin: 0; padding: 0; min-width: 100%; min-height: 100%">
+          <div id="root"></div>
+          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+        </body>
+      </html>
+    `;
   }
 }

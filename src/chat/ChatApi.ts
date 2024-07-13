@@ -1,231 +1,161 @@
-import fs from "fs";
-import OpenAI from "openai";
 import * as vscode from "vscode";
-import async from "async";
+import { Mutex } from "async-mutex";
 
-import { EventRegistry } from "./EventRegistry";
+import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
+import { ElementAICache } from "../cache/ElementAICache";
+import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
+import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
+import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
+import { EventRegistry, Handler } from "./EventRegistry";
 
-type ProcessMessageRequest = {
-  message?: string;
+const SETTINGS_FILE = "settings.json";
+
+type Settings = {
+  vectorStoreID: string;
+  assistantID: string;
+};
+
+type NewMessageRequest = {
+  text?: string;
   imageUrl?: string;
 };
 
-type APIService = {
-  openai: OpenAI;
-};
-
-const codeBlockStartRegex = /```([A-Za-z]*)?\n/;
-const codeBlockRegex = /```([A-Za-z]*)?\n([\s\S]*?)```/;
-
 export class ChatAPI {
-  private ready = new vscode.EventEmitter<void>();
-  private thread?: OpenAI.Beta.Threads.Thread;
-  private queue = async.queue(async (word: string, callback) => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      vscode.window.showInformationMessage("No active editor found!");
-      callback();
-      return;
-    }
+  private _aiProvider: AIProvider;
+  private _ready = new vscode.EventEmitter<void>();
+  private _isInitialized = false;
+  private _initializedMutex = new Mutex();
+  private _chatEventRegistry = new EventRegistry();
+  private _isSyncProjectRunning = false;
 
-    await this.writeWord(editor, word);
-    callback();
-  }, 1); // Ensure tasks are processed one at a time
+  private _vectorStore?: VectorStore;
+  private _assistant?: Assistant;
 
-  private chatEventRegistry = new EventRegistry();
-  private openai: OpenAI;
-  private assistant?: OpenAI.Beta.Assistants.Assistant;
-  private vectorStore?: OpenAI.Beta.VectorStores.VectorStore;
-  private webview?: vscode.Webview;
+  constructor(aiProvider: AIProvider) {
+    this._aiProvider = aiProvider;
 
-  constructor(context: vscode.ExtensionContext, service: APIService) {
-    this.openai = service.openai;
-
-    this.chatEventRegistry
-      .registerEvent<void, void>("ready", async () => {
-        this.ready.fire();
+    this._chatEventRegistry
+      .registerEvent<void, void>("ready", () => {
+        this._ready.fire();
       })
-      .registerEvent<ProcessMessageRequest, void>(
-        "process_message",
-        async (req) => {
-          if (!this.assistant) {
-            console.error("IMPOSSIBLE STATE: Assistant not set");
-            return;
+      .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
+        const release = await this._initializedMutex.acquire();
+
+        try {
+          await this._aiProvider.init();
+
+          const openWorkspace = getOpenWorkspace();
+          if (!openWorkspace) {
+            return false;
           }
 
-          if (!this.thread) {
-            this.thread = await service.openai.beta.threads.create({
-              messages: [
-                {
-                  role: "assistant",
-                  content:
-                    "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
-                },
-              ],
-            });
-          }
+          await this.initializeAssistant(openWorkspace.name);
+          await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
-          const messages = await this.addMessage(req);
-          console.log("messages", JSON.stringify(messages));
+          this._isInitialized = true;
+          return true;
+        } finally {
+          release();
         }
-      );
-  }
-
-  async addMessage(
-    message: ProcessMessageRequest
-  ): Promise<OpenAI.Beta.Threads.Message[]> {
-    if (!this.assistant) {
-      throw new Error("Assistant not initialized");
-    }
-    if (!this.vectorStore) {
-      throw new Error("VectorStore not initialized");
-    }
-    if (!this.thread) {
-      throw new Error("Thread not initialized");
-    }
-
-    const content: OpenAI.Beta.Threads.Messages.MessageContentPartParam[] = [];
-    if (message.message) {
-      content.push({
-        type: "text",
-        text: message.message,
-      });
-    }
-    if (message.imageUrl) {
-      const imageFile = await this.openai.files.create({
-        purpose: "vision",
-        file: fs.createReadStream(message.imageUrl),
-      });
-
-      content.push({
-        type: "image_file",
-        image_file: {
-          file_id: imageFile.id,
-          detail: "auto",
-        },
-      });
-    }
-
-    await this.openai.beta.threads.messages.create(this.thread.id, {
-      role: "user",
-      content,
-    });
-
-    const newMessageEvent = newEventMessage("new_message");
-    void this.webview?.postMessage(newMessageEvent);
-
-    const stream = this.openai.beta.threads.runs.stream(this.thread.id, {
-      assistant_id: this.assistant.id,
-      tools: [{ type: "file_search", file_search: { max_num_results: 50 } }],
-    });
-
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-      throw new Error("No active text editor");
-    }
-    await this.clearEditorContent(editor);
-
-    let writeIntoFile = false;
-    let matchString = "";
-    let disableWrite = false;
-
-    stream
-      .on("textDelta", (event) => {
-        if (!this.webview) {
+      })
+      .registerEvent<void, void>("sync_project", async (_, sendEventMessageCb) => {
+        // Prevent multiple sync project requests from running concurrently
+        if (!this._isInitialized || this._isSyncProjectRunning) {
           return;
         }
+        this._isSyncProjectRunning = true;
 
-        matchString += event.value;
-        if (
-          !disableWrite &&
-          writeIntoFile &&
-          matchString.match(codeBlockRegex)
-        ) {
-          writeIntoFile = false;
-          disableWrite = true;
-          matchString = "";
+        const openWorkspace = getOpenWorkspace();
+        if (!openWorkspace) {
+          return;
         }
+        await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
-        if (writeIntoFile && !disableWrite) {
-          this.enqueueWord(event.value || "");
-        }
-
-        if (
-          !disableWrite &&
-          !writeIntoFile &&
-          matchString.match(codeBlockStartRegex)
-        ) {
-          writeIntoFile = true;
-        }
-
-        void this.webview?.postMessage({
-          id: newMessageEvent.id,
-          command: "message_processing",
-          data: event.value,
-        } as EventMessage);
+        this._isSyncProjectRunning = false;
       })
-      .on("end", () => {
-        const currentRun = stream.currentRun();
-        console.log("assistent.currentRun <<<", JSON.stringify(currentRun));
+      .registerEvent<void, void>("new_thread", async () => {
+        if (!this._isInitialized || !this._assistant) {
+          return;
+        }
+        await this._assistant.createNewThread();
+      })
+      .registerEvent<NewMessageRequest, Message[]>("new_message", async (req, sendEventMessageCb) => {
+        if (!this._isInitialized || !this._assistant) {
+          return [];
+        }
+
+        const messagesReq: MessageContent[] = [];
+        if (req.imageUrl) {
+          messagesReq.push({ type: "image", imageUrl: req.imageUrl });
+        }
+        if (req.text) {
+          messagesReq.push({ type: "text", text: req.text });
+        }
+
+        // Do not send empty messages
+        if (messagesReq.length === 0) {
+          return [];
+        }
+
+        const messages = await this._assistant.sendMessage(messagesReq, (event) => {
+          sendEventMessageCb(newEventMessage("message_processing", event.value));
+        });
+        return messages;
       });
-
-    const final = await stream.finalMessages();
-    return final;
   }
 
-  private enqueueWord(word: string) {
-    this.queue.push(word);
-  }
-
-  public onReady(): Promise<void> {
+  onReady(): Promise<void> {
     return new Promise((resolve) => {
-      this.ready.event(resolve);
+      this._ready.event(resolve);
     });
   }
 
-  public setAssistant(
-    assistant: OpenAI.Beta.Assistants.Assistant,
-    vectorStore: OpenAI.Beta.VectorStores.VectorStore
-  ): void {
-    this.assistant = assistant;
-    this.vectorStore = vectorStore;
+  registerEvent<Req, Res>(command: string, handler: Handler<Req, Res>): void {
+    this._chatEventRegistry.registerEvent<Req, Res>(command, handler);
   }
 
-  public setWebview(webview: vscode.Webview): void {
-    this.webview = webview;
-  }
-
-  private async clearEditorContent(editor: vscode.TextEditor) {
-    const document = editor.document;
-    const fullRange = new vscode.Range(
-      document.positionAt(0),
-      document.positionAt(document.getText().length)
-    );
-
-    await editor.edit((editBuilder) => {
-      editBuilder.delete(fullRange);
-    });
-    const startPosition = new vscode.Position(0, 0);
-    editor.selection = new vscode.Selection(startPosition, startPosition);
-  }
-
-  private async writeWord(editor: vscode.TextEditor, word: string) {
-    const currentPosition = editor.selection.active;
-    await editor.edit((editBuilder) => {
-      editBuilder.insert(currentPosition, word);
-    });
-
-    const newPosition = editor.document.positionAt(
-      editor.document.getText().length
-    );
-    editor.selection = new vscode.Selection(newPosition, newPosition);
-  }
-
-  async handleEvent<Req, Res>(
+  handleEvent<Req, Res>(
     event: string,
-    requestPayload: Req
+    requestPayload: Req,
+    sendEventMessageCb: (msg: EventMessage) => void
   ): Promise<Res> {
-    return this.chatEventRegistry.handleEvent(event, requestPayload);
+    return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
+  }
+
+  private async initializeAssistant(workspaceName: string): Promise<void> {
+    const rawSettings = ElementAICache.get(SETTINGS_FILE);
+    if (rawSettings) {
+      const settings = JSON.parse(rawSettings) as Settings;
+      if (settings.vectorStoreID && settings.assistantID) {
+        this._vectorStore = await this._aiProvider.retrieveVectorStore(settings.vectorStoreID);
+        this._assistant = await this._aiProvider.retrieveAssistant(settings.assistantID);
+        return;
+      }
+    }
+
+    this._vectorStore = await this._aiProvider.createVectorStore(workspaceName);
+    this._assistant = await this._aiProvider.createAssistant(this._vectorStore);
+
+    ElementAICache.set(
+      SETTINGS_FILE,
+      JSON.stringify({ vectorStoreID: this._vectorStore.id, assistantID: this._assistant.id } as Settings)
+    );
+  }
+
+  private async syncProjectFiles(
+    openWorkspace: vscode.WorkspaceFolder,
+    sendEventMessageCb: (msg: EventMessage) => void
+  ): Promise<void> {
+    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
+    const documentsUri: string[] = await findFiles(
+      workspaceFolderPath,
+      SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
+      ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
+    );
+
+    await this._vectorStore?.syncFiles(documentsUri, (progress) => {
+      sendEventMessageCb(newEventMessage("sync_progress", { progress }));
+    });
   }
 }

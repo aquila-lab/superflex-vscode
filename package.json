@@ -1,10 +1,11 @@
 {
   "name": "element-ai",
-  "displayName": "ElementAI",
+  "publisher": "element-ai",
+  "displayName": "Element AI",
   "description": "AI pair programmer for frontend engineers",
   "icon": "small_logo.png",
   "version": "0.0.1",
-  "author": "Riphal <bjankovic998@gmail.com> (https://twitter.com/_riphal_)",
+  "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -46,21 +47,44 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "compile": "npm run check-types && node esbuild.js",
+    "check-types": "tsc --noEmit",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "pretest": "npm run build && npm run lint",
     "test": "vscode-test",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "vsce:package": "vsce package",
+    "package": "npm run check-types && node esbuild.js --production",
+    "vscode:prepublish": "npm --prefix webview-ui/ run build && npm run package",
+    "vsce:package": "vsce package --no-dependencies --no-yarn",
     "vsce:publish": "vsce publish"
   },
   "contributes": {
+    "menus": {
+      "view/title": [
+        {
+          "command": "elementai.chat.new-thread",
+          "group": "navigation",
+          "when": "view == elementai.chat && elementai.chat.authenticated"
+        },
+        {
+          "command": "elementai.project.sync",
+          "group": "navigation",
+          "when": "view == elementai.chat && elementai.chat.authenticated"
+        },
+        {
+          "command": "elementai.auth.signout",
+          "group": "navigation",
+          "when": "view == elementai.chat && elementai.chat.authenticated"
+        }
+      ]
+    },
     "submenus": [
       {
         "id": "elementai.chat.submenu",
@@ -99,13 +123,37 @@
     },
     "commands": [
       {
-        "command": "elementai.chat.clear-all-conversations",
-        "title": "Element AI: Clear all chat conversations",
-        "when": "elementai.chat.ready"
+        "command": "elementai.auth.signin",
+        "category": "Element AI",
+        "title": "Sign In"
+      },
+      {
+        "command": "elementai.auth.signout",
+        "category": "Element AI",
+        "title": "Sign Out",
+        "icon": "$(sign-out)"
       },
       {
         "command": "elementai.chat.focus-input",
-        "title": "Element AI: Focus chat input"
+        "category": "Element AI",
+        "title": "Focus chat input"
+      },
+      {
+        "command": "elementai.chat.new-thread",
+        "category": "Element AI",
+        "title": "New Chat Thread",
+        "icon": "$(plus)"
+      },
+      {
+        "command": "elementai.project.sync",
+        "category": "Element AI",
+        "title": "Project Sync",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "elementai.auth.remove-openai-api-key",
+        "category": "Element AI",
+        "title": "Remove OpenAI API Key"
       }
     ]
   },
@@ -118,13 +166,17 @@
     "@typescript-eslint/parser": "^7.11.0",
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.23.0",
     "eslint": "^8.57.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^5.4.5"
   },
   "dependencies": {
     "@vscode/codicons": "^0.0.36",
     "async": "^3.2.5",
-    "dotenv": "^16.4.5",
+    "async-mutex": "^0.5.0",
+    "axios": "^1.7.2",
+    "crypto": "^1.0.1",
     "fast-glob": "^3.3.2",
     "openai": "^4.52.1",
     "uuidv4": "^6.2.13"
