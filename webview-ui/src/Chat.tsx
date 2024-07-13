@@ -5,8 +5,8 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscodeApi';
-import { Button, FilePicker } from './components';
 import { newEventMessage } from './api/protocol';
+import { Button, FilePicker } from './components';
 
 type Message = {
   id: string;
