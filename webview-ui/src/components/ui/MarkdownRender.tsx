@@ -39,7 +39,7 @@ interface MarkdownRenderProps {
 export default function MarkdownRender({ mdString }: MarkdownRenderProps) {
   return (
     <ReactMarkdown
-      className="prose prose-sm"
+      className="prose prose-sm text-sm"
       components={{
         code({ inline, className, ...props }: any) {
           const hasLang = /language-(\w+)/.exec(className || '');
@@ -77,7 +77,7 @@ export default function MarkdownRender({ mdString }: MarkdownRenderProps) {
                     await new Promise((resolve) => setTimeout(resolve, 500));
                     setCopyTip(`Copy code`);
                   }}>
-                  <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer hover:text-blue-600" />
+                  <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-400" />
                 </CopyToClipboard>
               </button>
               <pre className="p-0 m-0 rounded-md" {...pre}></pre>

@@ -14,40 +14,10 @@ type Message = {
   imageUrl?: string;
 };
 
-const test = `
-# Element AI for VS Code
-
-Welcome to the [**Element AI**](https://elementai.dev/) extension for Visual Studio Code! This extension is designed to assist frontend engineers by converting visual sketches and design elements into clean, maintainable HTML and CSS code. Element AI leverages AI to understand design patterns, code styles, and existing components in your codebase to ensure consistency and efficiency.
-
-## Features
-
-- **Chat Functionality**: Interact with Element AI directly within VSCode to upload images or describe UI components.
-- **Image Analysis**: Upload images of UI components, whether they are screenshots of Figma designs, web pages, or handwritten sketches. Element AI will analyze the image and generate the corresponding code.
-- **Text-Based Requests**: Describe your UI components through text and Element AI will generate the necessary code.
-- **Code Consistency**: Adheres to your project's coding style, design patterns, and reuses existing components to ensure consistent and maintainable code.
-
-\`\`\`tsx
-import ReactMarkdown from "react-markdown";
-
-interface MarkdownRenderProps {
-  mdString: string;
-}
-
-export default function MarkdownRender({ mdString }: MarkdownRenderProps) {
-  return <ReactMarkdown>{mdString}</ReactMarkdown>;
-}
-\`\`\`
-`;
-
 const defaultMessages: Message[] = [
   {
     id: uuidv4(),
     text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
-    sender: 'bot'
-  },
-  {
-    id: uuidv4(),
-    text: test,
     sender: 'bot'
   }
 ];
