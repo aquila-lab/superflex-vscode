@@ -6,19 +6,18 @@ import FilePicker from './FilePicker';
 
 interface InputAndExecuteToolbarProps {
   input: string;
+  disabled?: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSendClicked: () => void;
   onFileSelected: (file: File) => void;
-
-  disabled?: boolean;
 }
 
 const InputAndExecuteToolbar = ({
   input,
+  disabled,
   onInputChange,
   onSendClicked,
-  onFileSelected,
-  disabled
+  onFileSelected
 }: InputAndExecuteToolbarProps): JSX.Element => {
   return (
     <div className="flex flex-row items-end min-h-10 bg-neutral-800 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
