@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressBar from '@ramonak/react-progress-bar';
-import TextareaAutosize from 'react-textarea-autosize';
 
 import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
-import { Button, FilePicker, MarkdownRender } from './components';
+import { InputAndExecuteToolbar, MarkdownRender } from './components';
 
 type Message = {
   id: string;
@@ -177,38 +176,13 @@ const Chat: React.FunctionComponent<{
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
-        <div className="flex-1 w-full">
-          <TextareaAutosize
-            autoFocus
-            value={input}
-            placeholder="Ask ElementAI or type / for commands"
-            className="p-2 bg-neutral-700 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[2rem] max-h-[15rem] resize-none w-full"
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (!disableIteractions && e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-          />
-        </div>
-
-        <FilePicker
-          disabled={disableIteractions}
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-
-            handleImageUpload(file);
-          }}
-        />
-
-        <Button disabled={disableIteractions} onClick={handleSend}>
-          Send
-        </Button>
-      </div>
+      <InputAndExecuteToolbar
+        input={input}
+        disabled={disableIteractions}
+        onInputChange={(e) => setInput(e.target.value)}
+        onFileSelected={handleImageUpload}
+        onSendClicked={handleSend}
+      />
     </div>
   );
 };
