@@ -4,7 +4,7 @@
   "displayName": "Element AI",
   "description": "AI pair programmer for frontend engineers",
   "icon": "small_logo.png",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "repository": {
