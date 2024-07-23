@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import * as vscode from "vscode";
 
 import { decodeUriAndRemoveFilePrefix } from "../common/utils";
 
@@ -26,33 +27,27 @@ class ElementAICacheClass {
   storagePath: string | undefined;
   globalStoragePath: string | undefined;
 
-  setWorkspaceFolderPath(workspaceFolderPath: string | undefined): void {
-    if (workspaceFolderPath) {
-      workspaceFolderPath = decodeUriAndRemoveFilePrefix(workspaceFolderPath);
-    }
-
-    this.workspaceFolderPath = workspaceFolderPath;
+  setWorkspaceFolderPath(workspaceFolderPath: vscode.Uri): void {
+    this.workspaceFolderPath = decodeUriAndRemoveFilePrefix(workspaceFolderPath.path);
   }
 
-  setStoragePath(storagePath: string | undefined): void {
-    if (storagePath) {
-      storagePath = decodeUriAndRemoveFilePrefix(storagePath);
+  setStoragePath(storageUri: vscode.Uri | undefined): void {
+    if (!storageUri) {
+      return;
+    }
 
-      if (!fs.existsSync(storagePath)) {
-        fs.mkdirSync(storagePath, { recursive: true });
-      }
+    const storagePath = decodeUriAndRemoveFilePrefix(storageUri.path);
+    if (!fs.existsSync(storagePath)) {
+      fs.mkdirSync(storagePath, { recursive: true });
     }
 
     this.storagePath = storagePath;
   }
 
-  setGlobalStoragePath(globalStoragePath: string | undefined): void {
-    if (globalStoragePath) {
-      globalStoragePath = decodeUriAndRemoveFilePrefix(globalStoragePath);
-
-      if (!fs.existsSync(globalStoragePath)) {
-        fs.mkdirSync(globalStoragePath, { recursive: true });
-      }
+  setGlobalStoragePath(globalStorageUri: vscode.Uri): void {
+    const globalStoragePath = decodeUriAndRemoveFilePrefix(globalStorageUri.path);
+    if (!fs.existsSync(globalStoragePath)) {
+      fs.mkdirSync(globalStoragePath, { recursive: true });
     }
 
     this.globalStoragePath = globalStoragePath;

@@ -47,12 +47,12 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
 }
 
 function registerElementAICache(context: vscode.ExtensionContext): void {
-  ElementAICache.setStoragePath(context.storageUri?.toString());
-  ElementAICache.setGlobalStoragePath(context.globalStorageUri.toString());
+  ElementAICache.setStoragePath(context.storageUri);
+  ElementAICache.setGlobalStoragePath(context.globalStorageUri);
 
   const openWorkspace = getOpenWorkspace();
   if (openWorkspace) {
-    ElementAICache.setWorkspaceFolderPath(openWorkspace.uri.toString());
+    ElementAICache.setWorkspaceFolderPath(openWorkspace.uri);
   }
 }
 

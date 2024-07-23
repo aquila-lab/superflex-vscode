@@ -147,7 +147,7 @@ export class ChatAPI {
     openWorkspace: vscode.WorkspaceFolder,
     sendEventMessageCb: (msg: EventMessage) => void
   ): Promise<void> {
-    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.toString());
+    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
     const documentsUri: string[] = await findFiles(
       workspaceFolderPath,
       SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
