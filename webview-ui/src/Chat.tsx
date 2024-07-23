@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressBar from '@ramonak/react-progress-bar';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
 import { InputAndExecuteToolbar, MarkdownRender } from './components';
+import { FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from './utils/constants';
 
 type Message = {
   id: string;
@@ -107,7 +108,7 @@ const Chat: React.FunctionComponent<{
     };
   }, [vscodeAPI]);
 
-  const handleSend = (): void => {
+  function handleSend(): void {
     if (input.trim()) {
       setMessages((prev) => [...prev, { id: uuidv4(), text: input, sender: 'user' }]);
       vscodeAPI.postMessage(newEventMessage('new_message', { text: input }));
@@ -115,9 +116,9 @@ const Chat: React.FunctionComponent<{
     }
 
     setInput('');
-  };
+  }
 
-  const handleImageUpload = (file: File): void => {
+  function handleImageUpload(file: File): void {
     setMessages((prev) => [
       ...prev,
       {
@@ -129,11 +130,22 @@ const Chat: React.FunctionComponent<{
     ]);
     vscodeAPI.postMessage(newEventMessage('new_message', { imageUrl: (file as any).path }));
     setMessageProcessing(true);
-  };
+  }
 
-  const handleFigmaButtonClicked = (): void => {
+  async function handleFigmaButtonClicked(): Promise<void> {
     // TODO: Implement Figma button click handler
-  };
+    const searchParams = new URLSearchParams([
+      ['client_id', FIGMA_OAUTH_CLIENT_ID],
+      ['redirect_uri', FIGMA_OAUTH_CALLBACK_URL],
+      ['scope', 'TBD'],
+      ['state', 'TBD'],
+      ['response_type', 'code']
+    ]);
+
+    // We cannot use vscode lib here
+    const uri = vscode.Uri.parse(`https://www.figma.com/oauth?${searchParams.toString()}`);
+    await vscode.env.openExternal(uri);
+  }
 
   const syncInProgress = syncProgress !== 100;
   const disableIteractions = messageProcessing || syncInProgress || !initialized;

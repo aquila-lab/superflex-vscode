@@ -1,9 +1,11 @@
+import path from "path";
 import * as vscode from "vscode";
+import { fork, ChildProcess } from "child_process";
 
 import { ChatAPI } from "./chat/ChatApi";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
-import { API_BASE_URL, APP_BASE_URL, AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, IS_PROD } from "./common/constants";
+import { AUTH_PROVIDER_ID } from "./common/constants";
 import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
 import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
 import { ElementAICache } from "./cache/ElementAICache";
@@ -18,6 +20,8 @@ type AppState = {
   authProvider: ElementAIAuthenticationProvider;
   chatViewProvider: ChatViewProvider;
 };
+
+let server: ChildProcess;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const aiProvider = new OpenAIProvider();
@@ -37,7 +41,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // before considering Element AI ready to operate.
   void backgroundInit(context, appState);
 
+  void startWebServer();
+
   return Promise.resolve();
+}
+
+function startWebServer(): void {
+  // Fork a new process to run the web server
+  server = fork(path.join(__dirname, "server.js"));
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
@@ -80,4 +91,8 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  if (server) {
+    server.send({ cmd: "stop" });
+  }
+}
