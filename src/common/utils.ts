@@ -9,7 +9,6 @@ function lowercaseDriveLetter(uri: string) {
 }
 
 export function decodeUriAndRemoveFilePrefix(uri: string): string {
-  console.log("Element AI Logs >>> Full URI: ", uri);
   if (runningOnWindows() && uri && uri.includes("file:///")) {
     uri = uri.replace("file:///", "");
   } else if (uri && uri.includes("file://")) {
@@ -26,13 +25,10 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
   uri = uri.replace(/\\/g, "/");
   uri = lowercaseDriveLetter(uri);
 
-  console.log("Element AI Logs >>> lowercaseDriveLetter URI: ", uri);
-
+  // Remove leading slash on Windows
   if (runningOnWindows() && uri.startsWith("/")) {
     uri = uri.replace("/", "");
   }
-
-  console.log("Element AI Logs >>> Decoded URI: ", uri);
 
   return path.normalize(uri);
 }
