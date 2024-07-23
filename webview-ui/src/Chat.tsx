@@ -131,6 +131,10 @@ const Chat: React.FunctionComponent<{
     setMessageProcessing(true);
   };
 
+  const handleFigmaButtonClicked = (): void => {
+    // TODO: Implement Figma button click handler
+  };
+
   const syncInProgress = syncProgress !== 100;
   const disableIteractions = messageProcessing || syncInProgress || !initialized;
 
@@ -182,6 +186,7 @@ const Chat: React.FunctionComponent<{
         onInputChange={(e) => setInput(e.target.value)}
         onFileSelected={handleImageUpload}
         onSendClicked={handleSend}
+        onFigmaButtonClicked={handleFigmaButtonClicked}
       />
     </div>
   );

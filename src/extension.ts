@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { ChatAPI } from "./chat/ChatApi";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
-import { AUTH_PROVIDER_ID } from "./common/constants";
+import { API_BASE_URL, APP_BASE_URL, AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, IS_PROD } from "./common/constants";
 import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
 import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
 import { ElementAICache } from "./cache/ElementAICache";
