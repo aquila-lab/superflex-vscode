@@ -1,7 +1,12 @@
+import path from "path";
 import * as vscode from "vscode";
 import * as crypto from "crypto";
 
 import { runningOnWindows } from "./operatingSystem";
+
+function lowercaseDriveLetter(uri: string) {
+  return uri.replace(/^\/?\w+:/, (match) => match.toLowerCase());
+}
 
 export function decodeUriAndRemoveFilePrefix(uri: string): string {
   if (runningOnWindows() && uri && uri.includes("file:///")) {
@@ -17,7 +22,9 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
     uri = decodeURIComponent(uri);
   }
 
-  return uri;
+  uri = uri.replace(/\\/g, "/");
+
+  return path.normalize(lowercaseDriveLetter(uri));
 }
 
 export function toBase64UrlEncoding(buffer: Buffer) {

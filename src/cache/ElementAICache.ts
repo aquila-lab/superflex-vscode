@@ -137,7 +137,7 @@ class ElementAICacheClass {
     for (const filePath of filePaths) {
       const documentPath = path.join(
         cacheFolder,
-        `${filePath.replace(this.workspaceFolderPath, "")}${options?.ext ?? ""}`
+        `${path.relative(this.workspaceFolderPath, filePath)}${options?.ext ?? ""}`
       );
       if (!fs.existsSync(path.dirname(documentPath))) {
         fs.mkdirSync(path.dirname(documentPath), { recursive: true });
