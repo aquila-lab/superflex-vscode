@@ -4,10 +4,6 @@ import * as crypto from "crypto";
 
 import { runningOnWindows } from "./operatingSystem";
 
-function lowercaseDriveLetter(uri: string) {
-  return uri.replace(/^\/?\w+:/, (match) => match.toLowerCase());
-}
-
 export function decodeUriAndRemoveFilePrefix(uri: string): string {
   if (runningOnWindows() && uri && uri.includes("file:///")) {
     uri = uri.replace("file:///", "");
@@ -24,7 +20,7 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
 
   uri = uri.replace(/\\/g, "/");
 
-  return path.normalize(lowercaseDriveLetter(uri));
+  return path.normalize(uri);
 }
 
 export function toBase64UrlEncoding(buffer: Buffer) {
