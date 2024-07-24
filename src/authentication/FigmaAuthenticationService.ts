@@ -23,28 +23,15 @@ export default class FigmaAuthenticationService {
 
     vscode.window.showInformationMessage(`Connected Figma account <${session.account.label}> to Element AI! 🎉`);
 
-    return {
+    const figmaTokenInfo: FigmaTokenInformation = {
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
       expiresIn: session.expiresIn,
     };
-  }
 
-  /**
-   * Get the current active session. If no session is found, return undefined.
-   */
-  async getSession(): Promise<FigmaTokenInformation | undefined> {
-    const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, []);
-    if (!session) {
-      return undefined;
-    }
+    this._webviewProvider.sendEventMessage(newEventMessage("figma_oauth_connect", figmaTokenInfo));
 
-    const figmaSession = session as FigmaAuthenticationSession;
-    return {
-      accessToken: figmaSession.accessToken,
-      refreshToken: figmaSession.refreshToken,
-      expiresIn: figmaSession.expiresIn,
-    };
+    return figmaTokenInfo;
   }
 
   /**

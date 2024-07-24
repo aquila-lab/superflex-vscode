@@ -4,10 +4,10 @@ import { Mutex } from "async-mutex";
 import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
 import { ElementAICache } from "../cache/ElementAICache";
-import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
+import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
-import { FigmaTokenInformation } from "../authentication/FigmaAuthenticationProvider";
+import { FigmaAuthenticationSession, FigmaTokenInformation } from "../authentication/FigmaAuthenticationProvider";
 import { EventRegistry, Handler } from "./EventRegistry";
 
 const SETTINGS_FILE = "settings.json";
@@ -61,10 +61,16 @@ export class ChatAPI {
 
           this._isInitialized = true;
 
-          return {
-            isInitialized: true,
-            figmaOAuth: undefined,
-          };
+          const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, []);
+          if (session) {
+            const figmaSession = session as FigmaAuthenticationSession;
+            return {
+              isInitialized: true,
+              figmaOAuth: figmaSession,
+            };
+          }
+
+          return { isInitialized: true };
         } finally {
           release();
         }

@@ -7,7 +7,7 @@ import { AUTH_PROVIDER_ID } from "./common/constants";
 import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
 import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
-import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
+import FigmaAuthenticationProvider, { FigmaTokenInformation } from "./authentication/FigmaAuthenticationProvider";
 import { ElementAICache } from "./cache/ElementAICache";
 import { AIProvider, SelfHostedAIProvider } from "./providers/AIProvider";
 import OpenAIProvider from "./providers/OpenAIProvider";
@@ -88,6 +88,9 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
       selfHostedProvider.setToken(req.token);
     }
     await state.authService.authenticateToken();
+  });
+  state.chatApi.registerEvent<void, FigmaTokenInformation>("figma_oauth_connect", async () => {
+    return await state.figmaAuthService.connect();
   });
 
   state.authService.authenticate(state.authProvider);

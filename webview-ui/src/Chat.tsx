@@ -50,6 +50,12 @@ const Chat: React.FunctionComponent<{
         case 'initialized':
           setInitState(message.data);
           break;
+        case 'figma_oauth_connect':
+          setInitState((prev) => ({ ...prev, figmaOAuth: message.data }));
+          break;
+        case 'figma_oauth_disconnect':
+          setInitState((prev) => ({ ...prev, figmaOAuth: undefined }));
+          break;
         case 'cmd_sync_project':
           vscodeAPI.postMessage(newEventMessage('sync_project'));
           break;
