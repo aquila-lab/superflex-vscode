@@ -26,7 +26,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
           setView('chat');
           break;
         case 'initialized':
-          if (!message.data) {
+          if (!message.data.isInitialized) {
             setView('no_open_project');
             return;
           }

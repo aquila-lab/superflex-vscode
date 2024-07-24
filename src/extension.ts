@@ -1,6 +1,4 @@
-import path from "path";
 import * as vscode from "vscode";
-import { fork, ChildProcess } from "child_process";
 
 import { ChatAPI } from "./chat/ChatApi";
 import ChatViewProvider from "./chat/ChatViewProvider";
@@ -8,6 +6,8 @@ import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import { AUTH_PROVIDER_ID } from "./common/constants";
 import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
 import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
+import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
+import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
 import { ElementAICache } from "./cache/ElementAICache";
 import { AIProvider, SelfHostedAIProvider } from "./providers/AIProvider";
 import OpenAIProvider from "./providers/OpenAIProvider";
@@ -18,10 +18,10 @@ type AppState = {
   chatApi: ChatAPI;
   authService: ElementAIAuthenticationService;
   authProvider: ElementAIAuthenticationProvider;
+  figmaAuthService: FigmaAuthenticationService;
+  figmaAuthProvider: FigmaAuthenticationProvider;
   chatViewProvider: ChatViewProvider;
 };
-
-let server: ChildProcess;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const aiProvider = new OpenAIProvider();
@@ -34,6 +34,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     chatApi: chatApi,
     authService: authService,
     authProvider: new ElementAIAuthenticationProvider(context, authService),
+    figmaAuthService: new FigmaAuthenticationService(chatWebviewProvider),
+    figmaAuthProvider: new FigmaAuthenticationProvider(context),
     chatViewProvider: chatWebviewProvider,
   };
 
@@ -41,14 +43,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   // before considering Element AI ready to operate.
   void backgroundInit(context, appState);
 
-  void startWebServer();
-
   return Promise.resolve();
-}
-
-function startWebServer(): void {
-  // Fork a new process to run the web server
-  server = fork(path.join(__dirname, "server.js"));
 }
 
 async function backgroundInit(context: vscode.ExtensionContext, appState: AppState) {
@@ -69,11 +64,19 @@ function registerElementAICache(context: vscode.ExtensionContext): void {
 
 async function registerAuthenticationProviders(context: vscode.ExtensionContext, state: AppState): Promise<void> {
   context.subscriptions.push(state.authProvider);
+  context.subscriptions.push(state.figmaAuthProvider);
 
   context.subscriptions.push(
+    // Element AI Auth commands
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => state.authService.signIn(state.authProvider)),
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => state.authService.signOut(state.authProvider)),
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.remove-openai-api-key`, () => state.authService.removeToken())
+    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.remove-openai-api-key`, () => state.authService.removeToken()),
+
+    // Figma Auth commands
+    vscode.commands.registerCommand("elementai.figma.connect", () => state.figmaAuthService.connect()),
+    vscode.commands.registerCommand("elementai.figma.disconnect", () =>
+      state.figmaAuthService.disconnect(state.figmaAuthProvider)
+    )
   );
 
   state.chatApi.registerEvent("login_clicked", async () => {
@@ -91,8 +94,4 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {
-  if (server) {
-    server.send({ cmd: "stop" });
-  }
-}
+export function deactivate() {}

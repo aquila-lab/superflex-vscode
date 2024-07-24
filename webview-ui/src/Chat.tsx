@@ -5,7 +5,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
 import { InputAndExecuteToolbar, MarkdownRender } from './components';
-import { FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from './utils/constants';
+
+type OAuthData = {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+};
+
+type InitState = {
+  isInitialized: boolean;
+  figmaOAuth?: OAuthData;
+};
 
 type Message = {
   id: string;
@@ -32,13 +42,13 @@ const Chat: React.FunctionComponent<{
   const [syncProgress, setSyncProgress] = useState(0);
   const [streamResponse, setStreamResponse] = useState('');
   const [messageProcessing, setMessageProcessing] = useState(false);
-  const [initialized, setInitialized] = useState(false);
+  const [initState, setInitState] = useState<InitState>({ isInitialized: false });
 
   useEffect(() => {
     return vscodeAPI.onMessage((message) => {
       switch (message.command) {
         case 'initialized':
-          setInitialized(message.data);
+          setInitState(message.data);
           break;
         case 'cmd_sync_project':
           vscodeAPI.postMessage(newEventMessage('sync_project'));
@@ -133,22 +143,15 @@ const Chat: React.FunctionComponent<{
   }
 
   async function handleFigmaButtonClicked(): Promise<void> {
+    if (!initState.figmaOAuth) {
+      vscodeAPI.postMessage(newEventMessage('figma_oauth_connect'));
+      return;
+    }
     // TODO: Implement Figma button click handler
-    const searchParams = new URLSearchParams([
-      ['client_id', FIGMA_OAUTH_CLIENT_ID],
-      ['redirect_uri', FIGMA_OAUTH_CALLBACK_URL],
-      ['scope', 'TBD'],
-      ['state', 'TBD'],
-      ['response_type', 'code']
-    ]);
-
-    // We cannot use vscode lib here
-    const uri = vscode.Uri.parse(`https://www.figma.com/oauth?${searchParams.toString()}`);
-    await vscode.env.openExternal(uri);
   }
 
   const syncInProgress = syncProgress !== 100;
-  const disableIteractions = messageProcessing || syncInProgress || !initialized;
+  const disableIteractions = messageProcessing || syncInProgress || !initState.isInitialized;
 
   return (
     <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">

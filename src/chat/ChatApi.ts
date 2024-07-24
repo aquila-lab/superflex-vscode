@@ -7,6 +7,7 @@ import { ElementAICache } from "../cache/ElementAICache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
+import { FigmaTokenInformation } from "../authentication/FigmaAuthenticationProvider";
 import { EventRegistry, Handler } from "./EventRegistry";
 
 const SETTINGS_FILE = "settings.json";
@@ -14,6 +15,11 @@ const SETTINGS_FILE = "settings.json";
 type Settings = {
   vectorStoreID: string;
   assistantID: string;
+};
+
+type InitState = {
+  isInitialized: boolean;
+  figmaOAuth?: FigmaTokenInformation;
 };
 
 type NewMessageRequest = {
@@ -39,7 +45,7 @@ export class ChatAPI {
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
       })
-      .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
+      .registerEvent<void, InitState>("initialized", async (_, sendEventMessageCb) => {
         const release = await this._initializedMutex.acquire();
 
         try {
@@ -47,14 +53,18 @@ export class ChatAPI {
 
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {
-            return false;
+            return { isInitialized: false };
           }
 
           await this.initializeAssistant(openWorkspace.name);
           await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
           this._isInitialized = true;
-          return true;
+
+          return {
+            isInitialized: true,
+            figmaOAuth: undefined,
+          };
         } finally {
           release();
         }

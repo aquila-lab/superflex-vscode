@@ -139,6 +139,16 @@
         "icon": "$(sign-out)"
       },
       {
+        "command": "elementai.figma.connect",
+        "category": "Element AI",
+        "title": "Connect Figma Account"
+      },
+      {
+        "command": "elementai.figma.disconnect",
+        "category": "Element AI",
+        "title": "Disconnect Figma Account"
+      },
+      {
         "command": "elementai.chat.focus-input",
         "category": "Element AI",
         "title": "Focus chat input"
@@ -183,7 +193,6 @@
     "async-mutex": "^0.5.0",
     "axios": "^1.7.2",
     "crypto": "^1.0.1",
-    "express": "^4.19.2",
     "fast-glob": "^3.3.2",
     "openai": "^4.52.1",
     "uuidv4": "^6.2.13"
