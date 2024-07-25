@@ -18,17 +18,12 @@ import { UserData } from "../core/User.model";
 import { FIGMA_AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
+import { FigmaTokenInformation } from "../core/Figma.model";
 
 const AUTH_PROVIDER_LABEL = "Figma Authentication";
 const SESSIONS_SECRET_KEY = `${FIGMA_AUTH_PROVIDER_ID}.sessions`;
 
 let remoteOutput = window.createOutputChannel(FIGMA_AUTH_PROVIDER_ID);
-
-export type FigmaTokenInformation = {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-};
 
 export interface FigmaAuthenticationSession extends AuthenticationSession {
   refreshToken: string;
@@ -79,7 +74,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
         throw new Error("Element AI - (Figma): Connecting Figma account failed!");
       }
 
-      const userinfo: UserData = await api.getFigmaUserInfo(accessToken);
+      const userinfo: UserData = await api.getFigmaUserInfo();
 
       const session: FigmaAuthenticationSession = {
         id: uuidv4(),

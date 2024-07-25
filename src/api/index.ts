@@ -1,4 +1,5 @@
 export { ApiProvider } from "./api";
+export { FigmaApiProvider } from "./figmaApi";
 export { ApiError } from "./error";
 export { HttpStatusCode } from "./constants";
 

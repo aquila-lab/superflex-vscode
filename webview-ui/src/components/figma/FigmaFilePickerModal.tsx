@@ -16,7 +16,10 @@ const FigmaFilePickerModal = ({ open, onClose }: FigmaFilePickerModalProps): JSX
           type="text"
           placeholder="https://www.figma.com/design/GAo9lY4bI..."
           className="w-full p-2 bg-neutral-700 text-white rounded-md focus:outline-none"
-          onChange={(e) => console.log(e.target.value)}
+          onChange={(e) => {
+            // TODO(boris): Implement me!
+            console.log(e.target.value);
+          }}
         />
 
         <Button onClick={() => {}} className="w-full">

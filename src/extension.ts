@@ -7,11 +7,12 @@ import { AUTH_PROVIDER_ID } from "./common/constants";
 import ElementAIAuthenticationProvider from "./authentication/ElementAIAuthenticationProvider";
 import ElementAIAuthenticationService from "./authentication/ElementAIAuthenticationService";
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
-import FigmaAuthenticationProvider, { FigmaTokenInformation } from "./authentication/FigmaAuthenticationProvider";
+import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
 import { ElementAICache } from "./cache/ElementAICache";
 import { AIProvider, SelfHostedAIProvider } from "./providers/AIProvider";
 import OpenAIProvider from "./providers/OpenAIProvider";
 import { getOpenWorkspace } from "./common/utils";
+import { FigmaTokenInformation } from "./core/Figma.model";
 
 type AppState = {
   aiProvider: AIProvider;
@@ -28,14 +29,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const chatApi = new ChatAPI(aiProvider);
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
   const authService = new ElementAIAuthenticationService(chatWebviewProvider, aiProvider);
+  const figmaAuthProvider = new FigmaAuthenticationProvider(context);
 
   const appState: AppState = {
     aiProvider: aiProvider,
     chatApi: chatApi,
     authService: authService,
     authProvider: new ElementAIAuthenticationProvider(context, authService),
-    figmaAuthService: new FigmaAuthenticationService(chatWebviewProvider),
-    figmaAuthProvider: new FigmaAuthenticationProvider(context),
+    figmaAuthService: new FigmaAuthenticationService(chatWebviewProvider, figmaAuthProvider),
+    figmaAuthProvider: figmaAuthProvider,
     chatViewProvider: chatWebviewProvider,
   };
 
@@ -94,6 +96,7 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
   });
 
   state.authService.authenticate(state.authProvider);
+  state.figmaAuthService.authenticate(state.figmaAuthProvider);
 }
 
 // This method is called when your extension is deactivated

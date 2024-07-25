@@ -7,8 +7,10 @@ import { ElementAICache } from "../cache/ElementAICache";
 import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
-import { FigmaAuthenticationSession, FigmaTokenInformation } from "../authentication/FigmaAuthenticationProvider";
+import { FigmaAuthenticationSession } from "../authentication/FigmaAuthenticationProvider";
 import { EventRegistry, Handler } from "./EventRegistry";
+import { FigmaTokenInformation } from "../core/Figma.model";
+import { FigmaApiProvider } from "../api";
 
 const SETTINGS_FILE = "settings.json";
 

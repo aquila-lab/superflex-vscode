@@ -1,16 +1,26 @@
+import axios from "axios";
 import * as vscode from "vscode";
-import { AuthenticationProvider } from "vscode";
 
 import { newEventMessage } from "../protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
+import { FigmaTokenInformation } from "../core/Figma.model";
 import ChatViewProvider from "../chat/ChatViewProvider";
-import { FigmaAuthenticationSession, FigmaTokenInformation } from "./FigmaAuthenticationProvider";
+import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
+import { FigmaApiProvider, figmaRefreshAccessToken } from "../api";
 
 export default class FigmaAuthenticationService {
   private _webviewProvider: ChatViewProvider;
+  private _figmaAuthenticationProvider: FigmaAuthenticationProvider;
 
-  constructor(webviewProvider: ChatViewProvider) {
+  constructor(webviewProvider: ChatViewProvider, figmaAuthenticationProvider: FigmaAuthenticationProvider) {
     this._webviewProvider = webviewProvider;
+    this._figmaAuthenticationProvider = figmaAuthenticationProvider;
+
+    figmaAuthenticationProvider.onDidChangeSessions(async (e) => {
+      if (e.added && e.added.length > 0) {
+        await this.authenticate(figmaAuthenticationProvider, e.added[0] as FigmaAuthenticationSession);
+      }
+    });
   }
 
   /**
@@ -37,15 +47,65 @@ export default class FigmaAuthenticationService {
   /**
    * Command to disconnect figma account from Element AI.
    */
-  async disconnect(provider: AuthenticationProvider): Promise<void> {
+  async disconnect(provider: vscode.AuthenticationProvider): Promise<void> {
     const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, [], { createIfNone: false });
     if (session) {
       await provider.removeSession(session.id);
     }
 
+    FigmaApiProvider.setHeader("Authorization", null);
+    FigmaApiProvider.removeResponseInterceptor();
+
     this._webviewProvider.sendEventMessage(newEventMessage("figma_oauth_disconnect"));
 
     vscode.commands.executeCommand("setContext", "elementai.figma.authenticated", false);
     vscode.window.showInformationMessage("Disconnected Figma account from Element AI!");
+  }
+
+  /**
+   * We need to authenticate the user on extension activation to ensure that the user is authenticated before making any API calls.
+   */
+  async authenticate(provider: vscode.AuthenticationProvider, session?: FigmaAuthenticationSession): Promise<void> {
+    if (!session) {
+      const rawSession = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, [], { createIfNone: false });
+      if (!rawSession) {
+        return;
+      }
+
+      session = rawSession as FigmaAuthenticationSession;
+    }
+
+    this.setAuthHeader(session, () => this.disconnect(provider));
+  }
+
+  private async setAuthHeader(session: FigmaAuthenticationSession, disconnect: () => void): Promise<void> {
+    try {
+      FigmaApiProvider.setHeader("Authorization", `Bearer ${session.accessToken}`);
+      FigmaApiProvider.addRefreshTokenInterceptor(async (err) => {
+        if (err?.response?.status === 401) {
+          try {
+            const newTokenInfo = await figmaRefreshAccessToken({ refreshToken: session.refreshToken });
+            if (newTokenInfo) {
+              this._figmaAuthenticationProvider.updateSession(session.id, newTokenInfo);
+              FigmaApiProvider.setHeader("Authorization", `Bearer ${newTokenInfo.accessToken}`);
+            }
+
+            // TODO(boris): Test does this work?
+            const originalRequest = err.config;
+            originalRequest.headers["Authorization"] = `Bearer ${newTokenInfo.accessToken}`;
+            return axios(originalRequest);
+          } catch (err) {
+            disconnect();
+            return Promise.reject(err);
+          }
+        }
+
+        return Promise.reject(err);
+      });
+
+      return Promise.resolve();
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 }
