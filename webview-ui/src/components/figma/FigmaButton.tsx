@@ -15,6 +15,7 @@ const FigmaButton = ({ onClick, disabled }: FigmaButtonProps): JSX.Element => {
         }`}>
         <button
           type="button"
+          disabled={disabled}
           className={`p-1.5 ${disabled ? 'text-neutral-500' : 'cursor-pointer text-neutral-400'}`}
           onClick={onClick}>
           <span className="sr-only">Figma</span>

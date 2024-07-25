@@ -104,6 +104,35 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
     }
   }
 
+  public async updateSession(sessionId: string, tokenInfo: FigmaTokenInformation): Promise<FigmaAuthenticationSession> {
+    const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
+    if (!allSessions) {
+      throw new Error("Session not found");
+    }
+
+    let sessions = JSON.parse(allSessions) as FigmaAuthenticationSession[];
+    const sessionIdx = sessions.findIndex((s) => s.id === sessionId);
+    if (sessionIdx === -1) {
+      throw new Error("Session not found");
+    }
+
+    const session = sessions[sessionIdx];
+    sessions.splice(sessionIdx, 1);
+
+    const updatedSession: FigmaAuthenticationSession = {
+      ...session,
+      accessToken: tokenInfo.accessToken,
+      refreshToken: tokenInfo.refreshToken,
+      expiresIn: tokenInfo.expiresIn,
+    };
+
+    await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify([updatedSession]));
+
+    this._sessionChangeEmitter.fire({ added: [], removed: [], changed: [updatedSession] });
+
+    return updatedSession;
+  }
+
   public async removeSession(sessionId: string): Promise<void> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (allSessions) {

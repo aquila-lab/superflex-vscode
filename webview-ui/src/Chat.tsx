@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
-import { InputAndExecuteToolbar, MarkdownRender } from './components';
+import { InputAndExecuteToolbar, MarkdownRender, FigmaFilePickerModal } from './components';
 
 type OAuthData = {
   accessToken: string;
@@ -43,6 +43,7 @@ const Chat: React.FunctionComponent<{
   const [streamResponse, setStreamResponse] = useState('');
   const [messageProcessing, setMessageProcessing] = useState(false);
   const [initState, setInitState] = useState<InitState>({ isInitialized: false });
+  const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message) => {
@@ -153,63 +154,68 @@ const Chat: React.FunctionComponent<{
       vscodeAPI.postMessage(newEventMessage('figma_oauth_connect'));
       return;
     }
-    // TODO: Implement Figma button click handler
+
+    setOpenFigmaFilePickerModal(true);
   }
 
   const syncInProgress = syncProgress !== 100;
   const disableIteractions = messageProcessing || syncInProgress || !initState.isInitialized;
 
   return (
-    <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">
-      <div className="flex-1 flex flex-col justify-start overflow-y-auto mb-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`py-4 px-2 border-b border-neutral-700 text-left ${
-              message.sender === 'user' ? 'bg-neutral-800' : undefined
-            }`}>
-            <p className="text-sm font-medium text-neutral-300 mb-2">
-              {message.sender === 'user' ? 'You' : 'Element AI'}
-            </p>
+    <>
+      <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">
+        <div className="flex-1 flex flex-col justify-start overflow-y-auto mb-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`py-4 px-2 border-b border-neutral-700 text-left ${
+                message.sender === 'user' ? 'bg-neutral-800' : undefined
+              }`}>
+              <p className="text-sm font-medium text-neutral-300 mb-2">
+                {message.sender === 'user' ? 'You' : 'Element AI'}
+              </p>
 
-            <MarkdownRender mdString={message.text} />
+              <MarkdownRender mdString={message.text} />
 
-            {message.imageUrl && <img alt="preview image" className="mt-2" src={message.imageUrl} />}
-          </div>
-        ))}
+              {message.imageUrl && <img alt="preview image" className="mt-2" src={message.imageUrl} />}
+            </div>
+          ))}
 
-        {streamResponse && (
-          <div className={`py-4 px-2 border-b border-neutral-700 text-left`}>
-            <p className="text-sm font-medium text-neutral-300 mb-2">Element AI</p>
+          {streamResponse && (
+            <div className={`py-4 px-2 border-b border-neutral-700 text-left`}>
+              <p className="text-sm font-medium text-neutral-300 mb-2">Element AI</p>
 
-            <MarkdownRender mdString={streamResponse} />
-          </div>
-        )}
-      </div>
-
-      <div className={syncInProgress ? 'flex flex-col items-center gap-1 mb-4 w-full' : 'hidden'}>
-        <p className="text-xs text-neutral-300">Syncing...</p>
-
-        <div className="flex-1 w-full">
-          <ProgressBar
-            animateOnRender={true}
-            completed={syncProgress}
-            bgColor="#2563eb"
-            height="6px"
-            isLabelVisible={false}
-          />
+              <MarkdownRender mdString={streamResponse} />
+            </div>
+          )}
         </div>
+
+        <div className={syncInProgress ? 'flex flex-col items-center gap-1 mb-4 w-full' : 'hidden'}>
+          <p className="text-xs text-neutral-300">Syncing...</p>
+
+          <div className="flex-1 w-full">
+            <ProgressBar
+              animateOnRender={true}
+              completed={syncProgress}
+              bgColor="#2563eb"
+              height="6px"
+              isLabelVisible={false}
+            />
+          </div>
+        </div>
+
+        <InputAndExecuteToolbar
+          input={input}
+          disabled={disableIteractions}
+          onInputChange={(e) => setInput(e.target.value)}
+          onFileSelected={handleImageUpload}
+          onSendClicked={handleSend}
+          onFigmaButtonClicked={handleFigmaButtonClicked}
+        />
       </div>
 
-      <InputAndExecuteToolbar
-        input={input}
-        disabled={disableIteractions}
-        onInputChange={(e) => setInput(e.target.value)}
-        onFileSelected={handleImageUpload}
-        onSendClicked={handleSend}
-        onFigmaButtonClicked={handleFigmaButtonClicked}
-      />
-    </div>
+      <FigmaFilePickerModal open={openFigmaFilePickerModal} onClose={() => setOpenFigmaFilePickerModal(false)} />
+    </>
   );
 };
 
