@@ -74,6 +74,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
         throw new Error("Element AI - (Figma): Connecting Figma account failed!");
       }
 
+      api.FigmaApiProvider.setHeader("Authorization", `Bearer ${accessToken}`);
       const userinfo: UserData = await api.getFigmaUserInfo();
 
       const session: FigmaAuthenticationSession = {
