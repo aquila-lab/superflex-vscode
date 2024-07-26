@@ -10,7 +10,6 @@ import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils"
 import { FigmaAuthenticationSession } from "../authentication/FigmaAuthenticationProvider";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { FigmaTokenInformation } from "../core/Figma.model";
-import { FigmaApiProvider } from "../api";
 
 const SETTINGS_FILE = "settings.json";
 

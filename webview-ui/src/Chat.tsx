@@ -113,9 +113,12 @@ const Chat: React.FunctionComponent<{
     }
 
     // Sync user project on every 5 minutes
-    syncIntervalRef.current = setInterval(() => {
-      vscodeAPI.postMessage(newEventMessage('sync_project'));
-    }, 5 * 60 * 1000);
+    syncIntervalRef.current = setInterval(
+      () => {
+        vscodeAPI.postMessage(newEventMessage('sync_project'));
+      },
+      5 * 60 * 1000
+    );
 
     // Cleanup function to clear the interval when the component unmounts or before the effect runs again
     return () => {
@@ -156,6 +159,10 @@ const Chat: React.FunctionComponent<{
     }
 
     setOpenFigmaFilePickerModal(true);
+  }
+
+  async function handleFigmaFileSelected(figmaSelectionLink: string): Promise<void> {
+    // TODO: Handle figma file selection
   }
 
   const syncInProgress = syncProgress !== 100;
@@ -214,7 +221,11 @@ const Chat: React.FunctionComponent<{
         />
       </div>
 
-      <FigmaFilePickerModal open={openFigmaFilePickerModal} onClose={() => setOpenFigmaFilePickerModal(false)} />
+      <FigmaFilePickerModal
+        open={openFigmaFilePickerModal}
+        onClose={() => setOpenFigmaFilePickerModal(false)}
+        onSubmit={handleFigmaFileSelected}
+      />
     </>
   );
 };

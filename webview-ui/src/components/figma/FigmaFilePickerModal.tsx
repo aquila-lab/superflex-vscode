@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Modal from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -6,23 +6,30 @@ import { Button } from '../ui/Button';
 interface FigmaFilePickerModalProps {
   open: boolean;
   onClose: () => void;
+  onSubmit: (figmaSelectionLink: string) => Promise<void>;
 }
 
-const FigmaFilePickerModal = ({ open, onClose }: FigmaFilePickerModalProps): JSX.Element => {
+const FigmaFilePickerModal = ({ open, onClose, onSubmit }: FigmaFilePickerModalProps): JSX.Element => {
+  const [figmaSelectionLink, setFigmaSelectionLink] = useState('');
+
+  async function handleSubmit() {
+    await onSubmit(figmaSelectionLink);
+    setFigmaSelectionLink('');
+    onClose();
+  }
+
   return (
     <Modal isOpen={open} onClose={onClose} title="Enter the link of Figma selection">
       <div className="flex flex-col gap-2">
         <input
           type="text"
+          value={figmaSelectionLink}
           placeholder="https://www.figma.com/design/GAo9lY4bI..."
           className="w-full p-2 bg-neutral-700 text-white rounded-md focus:outline-none"
-          onChange={(e) => {
-            // TODO(boris): Implement me!
-            console.log(e.target.value);
-          }}
+          onChange={(e) => setFigmaSelectionLink(e.target.value)}
         />
 
-        <Button onClick={() => {}} className="w-full">
+        <Button onClick={handleSubmit} className="w-full">
           Submit
         </Button>
 

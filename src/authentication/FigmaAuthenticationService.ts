@@ -90,10 +90,10 @@ export default class FigmaAuthenticationService {
               FigmaApiProvider.setHeader("Authorization", `Bearer ${newTokenInfo.accessToken}`);
             }
 
-            // TODO(boris): Test does this work?
             const originalRequest = err.config;
             originalRequest.headers["Authorization"] = `Bearer ${newTokenInfo.accessToken}`;
-            return axios(originalRequest);
+            const res = await axios(originalRequest);
+            return Promise.resolve(res);
           } catch (err) {
             disconnect();
             return Promise.reject(err);

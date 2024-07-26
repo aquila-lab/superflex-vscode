@@ -10,7 +10,7 @@ const FigmaApi = axios.create({
 class FigmaApiProviderClass {
   responseInterceptor: any = null;
 
-  addResponseInterceptor(interceptor: any, errorHandler: (err: any) => Promise<void>): void {
+  addResponseInterceptor(interceptor: any, errorHandler: (err: any) => Promise<any>): void {
     if (this.responseInterceptor !== null) {
       this.removeResponseInterceptor();
     }
@@ -27,7 +27,7 @@ class FigmaApiProviderClass {
     FigmaApi.defaults.headers.common[key] = value;
   }
 
-  addRefreshTokenInterceptor(errorHandler: (err: any) => Promise<void>): void {
+  addRefreshTokenInterceptor(errorHandler: (err: any) => Promise<any>): void {
     this.addResponseInterceptor((response: any) => {
       return response;
     }, errorHandler);
