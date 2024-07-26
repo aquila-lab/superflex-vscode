@@ -27,7 +27,7 @@ const InputAndExecuteToolbar = ({
       <TextareaAutosize
         autoFocus
         value={input}
-        placeholder="Ask ElementAI or type / for commands"
+        placeholder="Describe your UI component..."
         className="flex-1 p-2 pt-2.5 w-full min-h-10 max-h-[15rem] bg-neutral-800 text-white rounded-l-md resize-none focus:outline-none"
         onChange={onInputChange}
         onKeyDown={(e) => {
