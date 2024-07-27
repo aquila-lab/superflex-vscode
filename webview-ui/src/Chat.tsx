@@ -7,15 +7,9 @@ import { newEventMessage } from './api/protocol';
 import { InputAndExecuteToolbar, MarkdownRender, FigmaFilePickerModal } from './components';
 import { extractFigmaSelectionUrl } from './utils/utils';
 
-type OAuthData = {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-};
-
 type InitState = {
   isInitialized: boolean;
-  figmaOAuth?: OAuthData;
+  figmaAuthenticated: boolean;
 };
 
 type Message = {
@@ -43,7 +37,7 @@ const Chat: React.FunctionComponent<{
   const [syncProgress, setSyncProgress] = useState(0);
   const [streamResponse, setStreamResponse] = useState('');
   const [messageProcessing, setMessageProcessing] = useState(false);
-  const [initState, setInitState] = useState<InitState>({ isInitialized: false });
+  const [initState, setInitState] = useState<InitState>({ isInitialized: false, figmaAuthenticated: false });
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
 
   useEffect(() => {
@@ -53,10 +47,10 @@ const Chat: React.FunctionComponent<{
           setInitState(message.data);
           break;
         case 'figma_oauth_connect':
-          setInitState((prev) => ({ ...prev, figmaOAuth: message.data }));
+          setInitState((prev) => ({ ...prev, figmaAuthenticated: message.data }));
           break;
         case 'figma_oauth_disconnect':
-          setInitState((prev) => ({ ...prev, figmaOAuth: undefined }));
+          setInitState((prev) => ({ ...prev, figmaAuthenticated: false }));
           break;
         case 'cmd_sync_project':
           vscodeAPI.postMessage(newEventMessage('sync_project'));
@@ -71,7 +65,8 @@ const Chat: React.FunctionComponent<{
         case 'message_processing':
           setStreamResponse((prev) => prev + message.data);
           break;
-        case 'new_message': // Will be triggered when AI assistant finish processing the message
+        // Will be triggered when AI assistant finish processing the message
+        case 'new_message':
           setStreamResponse('');
           setMessageProcessing(false);
 
@@ -93,7 +88,10 @@ const Chat: React.FunctionComponent<{
               }
             ]);
           }
-
+          break;
+        // Different from 'new_message', this will be triggered when extension wants to simply add a message to the chat
+        case 'add_message':
+          setMessages((prev) => [...prev, message.data]);
           break;
         case 'cmd_new_thread':
           setMessages(defaultMessages);
@@ -154,7 +152,7 @@ const Chat: React.FunctionComponent<{
   }
 
   async function handleFigmaButtonClicked(): Promise<void> {
-    if (!initState.figmaOAuth) {
+    if (!initState.figmaAuthenticated) {
       vscodeAPI.postMessage(newEventMessage('figma_oauth_connect'));
       return;
     }

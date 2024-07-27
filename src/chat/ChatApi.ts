@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
+import { v4 as uuidv4 } from "uuid";
 
 import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
@@ -7,9 +8,8 @@ import { ElementAICache } from "../cache/ElementAICache";
 import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
-import { FigmaAuthenticationSession } from "../authentication/FigmaAuthenticationProvider";
 import { EventRegistry, Handler } from "./EventRegistry";
-import { FigmaTokenInformation } from "../core/Figma.model";
+import { getFigmaSelectionImageUrl } from "../api";
 
 const SETTINGS_FILE = "settings.json";
 
@@ -20,11 +20,22 @@ type Settings = {
 
 type InitState = {
   isInitialized: boolean;
-  figmaOAuth?: FigmaTokenInformation;
+  figmaAuthenticated: boolean;
 };
 
 type NewMessageRequest = {
   text?: string;
+  imageUrl?: string;
+  figma?: {
+    fileID: string;
+    nodeID: string;
+  };
+};
+
+type ChatMessage = {
+  id: string;
+  text: string;
+  sender: "user" | "bot";
   imageUrl?: string;
 };
 
@@ -50,11 +61,13 @@ export class ChatAPI {
         const release = await this._initializedMutex.acquire();
 
         try {
+          let figmaAuthenticated = false;
+
           await this._aiProvider.init();
 
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {
-            return { isInitialized: false };
+            return { isInitialized: false, figmaAuthenticated };
           }
 
           await this.initializeAssistant(openWorkspace.name);
@@ -63,15 +76,11 @@ export class ChatAPI {
           this._isInitialized = true;
 
           const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, []);
-          if (session) {
-            const figmaSession = session as FigmaAuthenticationSession;
-            return {
-              isInitialized: true,
-              figmaOAuth: figmaSession,
-            };
+          if (session && session.accessToken) {
+            figmaAuthenticated = true;
           }
 
-          return { isInitialized: true };
+          return { isInitialized: true, figmaAuthenticated };
         } finally {
           release();
         }
@@ -103,11 +112,25 @@ export class ChatAPI {
         }
 
         const messagesReq: MessageContent[] = [];
+        if (req.text) {
+          messagesReq.push({ type: "text", text: req.text });
+        }
         if (req.imageUrl) {
           messagesReq.push({ type: "image", imageUrl: req.imageUrl });
         }
-        if (req.text) {
-          messagesReq.push({ type: "text", text: req.text });
+        if (req.figma) {
+          const imageUrl = await getFigmaSelectionImageUrl(req.figma);
+
+          sendEventMessageCb(
+            newEventMessage("add_message", {
+              id: uuidv4(),
+              text: "Processing figma file...",
+              sender: "bot",
+              imageUrl,
+            } as ChatMessage)
+          );
+
+          // messagesReq.push({ type: "figma", content: req.figma });
         }
 
         // Do not send empty messages

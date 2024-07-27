@@ -33,4 +33,22 @@ async function getFigmaUserInfo(): Promise<UserData> {
   }
 }
 
-export { figmaRefreshAccessToken, getFigmaUserInfo };
+type GetFigmaSelectionImageUrlArgs = {
+  fileID: string;
+  nodeID: string;
+};
+
+async function getFigmaSelectionImageUrl({ fileID, nodeID }: GetFigmaSelectionImageUrlArgs): Promise<string> {
+  try {
+    const { data } = await FigmaApi.get(`/images/${fileID}?ids=${nodeID}`);
+    if (data.err) {
+      return Promise.reject(parseError(data.err));
+    }
+
+    return Promise.resolve(data.images[nodeID.replace("-", ":")] ?? data.images[nodeID]);
+  } catch (err) {
+    return Promise.reject(parseError(err));
+  }
+}
+
+export { figmaRefreshAccessToken, getFigmaUserInfo, getFigmaSelectionImageUrl };

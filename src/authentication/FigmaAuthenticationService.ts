@@ -39,7 +39,7 @@ export default class FigmaAuthenticationService {
       expiresIn: session.expiresIn,
     };
 
-    this._webviewProvider.sendEventMessage(newEventMessage("figma_oauth_connect", figmaTokenInfo));
+    this._webviewProvider.sendEventMessage(newEventMessage("figma_oauth_connect", true));
 
     return figmaTokenInfo;
   }

@@ -40,7 +40,16 @@ export type ImageContent = {
   imageUrl: string;
 };
 
-export type MessageContent = TextContent | ImageContent;
+export type FigmaFileContent = {
+  /**
+   * Always `figma`.
+   */
+  type: "figma";
+
+  content: any;
+};
+
+export type MessageContent = TextContent | ImageContent | FigmaFileContent;
 
 export type Message = {
   /**
