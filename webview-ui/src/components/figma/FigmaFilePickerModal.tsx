@@ -6,14 +6,17 @@ import { Button } from '../ui/Button';
 interface FigmaFilePickerModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (figmaSelectionLink: string) => Promise<void>;
+  onSubmit: (figmaSelectionLink: string) => Promise<boolean>;
 }
 
 const FigmaFilePickerModal = ({ open, onClose, onSubmit }: FigmaFilePickerModalProps): JSX.Element => {
   const [figmaSelectionLink, setFigmaSelectionLink] = useState('');
 
   async function handleSubmit() {
-    await onSubmit(figmaSelectionLink);
+    const success = await onSubmit(figmaSelectionLink);
+    if (!success) {
+      return;
+    }
     setFigmaSelectionLink('');
     onClose();
   }

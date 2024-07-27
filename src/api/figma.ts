@@ -1,5 +1,3 @@
-import axios from "axios";
-
 import User, { UserData } from "../core/User.model";
 import { FigmaTokenInformation } from "../core/Figma.model";
 import { PublicApi } from "./api";

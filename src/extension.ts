@@ -52,6 +52,10 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   registerElementAICache(context);
   registerAuthenticationProviders(context, appState);
   registerChatWidgetWebview(context, appState.chatViewProvider);
+
+  appState.chatApi.registerEvent<string, void>("error_message", (errMsg) => {
+    vscode.window.showErrorMessage(errMsg);
+  });
 }
 
 function registerElementAICache(context: vscode.ExtensionContext): void {

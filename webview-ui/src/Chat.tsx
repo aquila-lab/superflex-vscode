@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { VSCodeWrapper } from './api/vscodeApi';
 import { newEventMessage } from './api/protocol';
 import { InputAndExecuteToolbar, MarkdownRender, FigmaFilePickerModal } from './components';
+import { extractFigmaSelectionUrl } from './utils/utils';
 
 type OAuthData = {
   accessToken: string;
@@ -161,8 +162,38 @@ const Chat: React.FunctionComponent<{
     setOpenFigmaFilePickerModal(true);
   }
 
-  async function handleFigmaFileSelected(figmaSelectionLink: string): Promise<void> {
-    // TODO: Handle figma file selection
+  /**
+   *
+   * @param figmaSelectionLink Figma selection link. Example: https://www.figma.com/design/GAo9lY4bIk8j2UBUwU33l9/Wireframing-in-Figma?node-id=0-761&t=1QgxKWtCMVPD6cci-4
+   */
+  async function handleFigmaFileSelected(figmaSelectionLink: string): Promise<boolean> {
+    if (!figmaSelectionLink) {
+      vscodeAPI.postMessage(
+        newEventMessage('error_message', 'Invalid link: Please provide a valid Figma selection link.')
+      );
+      return false;
+    }
+
+    const figmaData = extractFigmaSelectionUrl(figmaSelectionLink);
+    if (!figmaData) {
+      vscodeAPI.postMessage(
+        newEventMessage('error_message', 'Invalid link: Please provide a valid Figma selection link.')
+      );
+      return false;
+    }
+
+    vscodeAPI.postMessage(
+      newEventMessage('new_message', {
+        figma: {
+          fileID: figmaData.fileID,
+          nodeID: figmaData.nodeID
+        }
+      })
+    );
+
+    setMessageProcessing(true);
+
+    return true;
   }
 
   const syncInProgress = syncProgress !== 100;
