@@ -1,13 +1,17 @@
+import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
+import { v4 as uuidv4 } from "uuid";
 
 import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
 import { ElementAICache } from "../cache/ElementAICache";
-import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
+import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
+import { downloadImage, getFigmaSelectionFileNodes, getFigmaSelectionImageUrl } from "../api";
+import { parseFigmaResponse } from "../core/Figma.model";
 
 const SETTINGS_FILE = "settings.json";
 
@@ -16,8 +20,24 @@ type Settings = {
   assistantID: string;
 };
 
+type InitState = {
+  isInitialized: boolean;
+  figmaAuthenticated: boolean;
+};
+
 type NewMessageRequest = {
   text?: string;
+  imageUrl?: string;
+  figma?: {
+    fileID: string;
+    nodeID: string;
+  };
+};
+
+type ChatMessage = {
+  id: string;
+  text: string;
+  sender: "user" | "bot";
   imageUrl?: string;
 };
 
@@ -39,22 +59,30 @@ export class ChatAPI {
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
       })
-      .registerEvent<void, boolean>("initialized", async (_, sendEventMessageCb) => {
+      .registerEvent<void, InitState>("initialized", async (_, sendEventMessageCb) => {
         const release = await this._initializedMutex.acquire();
 
         try {
+          let figmaAuthenticated = false;
+
           await this._aiProvider.init();
 
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {
-            return false;
+            return { isInitialized: false, figmaAuthenticated };
           }
 
           await this.initializeAssistant(openWorkspace.name);
           await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
 
           this._isInitialized = true;
-          return true;
+
+          const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, []);
+          if (session && session.accessToken) {
+            figmaAuthenticated = true;
+          }
+
+          return { isInitialized: true, figmaAuthenticated };
         } finally {
           release();
         }
@@ -86,11 +114,55 @@ export class ChatAPI {
         }
 
         const messagesReq: MessageContent[] = [];
-        if (req.imageUrl) {
-          messagesReq.push({ type: "image", imageUrl: req.imageUrl });
-        }
         if (req.text) {
           messagesReq.push({ type: "text", text: req.text });
+        }
+        if (req.imageUrl) {
+          messagesReq.push({ type: "image_file", imageUrl: req.imageUrl });
+        }
+        if (req.figma) {
+          const imageUrl = await getFigmaSelectionImageUrl(req.figma);
+
+          sendEventMessageCb(
+            newEventMessage("add_message", {
+              id: uuidv4(),
+              text: "Processing figma file...",
+              sender: "bot",
+              imageUrl,
+            } as ChatMessage)
+          );
+
+          if (ElementAICache.storagePath) {
+            const imageUrlSegments = imageUrl.split("/");
+            const imageFilePath = path.join(
+              ElementAICache.storagePath,
+              `${imageUrlSegments[imageUrlSegments.length - 1]}.png`
+            );
+            await downloadImage(imageUrl, imageFilePath);
+            messagesReq.push({ type: "image_file", imageUrl: imageFilePath });
+          }
+
+          const fileNodes = await getFigmaSelectionFileNodes(req.figma);
+
+          messagesReq.push({
+            type: "figma",
+            content: `
+Convert this Figma JSON object into production ready code following assistent instructions.
+
+## Figma JSON
+${JSON.stringify(parseFigmaResponse(fileNodes))}
+## constraints
+- Analyze the provided image to get better understending of the design we are trying to achieve
+- When it comes to styling, use the provided figma json object there you can find all the necessary information
+- Do not omit any details in JSX
+- Do not write anything besides code
+- If a layer contains more than 1 same name child layers, define it with ul tag and create array of appropriate dummy data within React component and use map method to render in JSX
+- Avoid using absolute positioning in CSS focus on flexbox and grid
+- Do not forget to follow instructions from the assistant
+- Generate the component code following the repository's coding style, design patterns, and reusing existing components.
+- Strong focus on readability existing compoenents 
+`,
+          });
         }
 
         // Do not send empty messages

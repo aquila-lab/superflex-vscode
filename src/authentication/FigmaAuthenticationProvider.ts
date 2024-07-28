@@ -15,38 +15,38 @@ import {
 
 import * as api from "../api";
 import { UserData } from "../core/User.model";
-import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
+import { FIGMA_AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
-import AuthService from "./ElementAIAuthenticationService";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
+import { FigmaTokenInformation } from "../core/Figma.model";
 
-const AUTH_PROVIDER_LABEL = "Element AI Authentication";
-const SESSIONS_SECRET_KEY = `${AUTH_PROVIDER_ID}.sessions`;
+const AUTH_PROVIDER_LABEL = "Figma Authentication";
+const SESSIONS_SECRET_KEY = `${FIGMA_AUTH_PROVIDER_ID}.sessions`;
 
-let remoteOutput = window.createOutputChannel(AUTH_PROVIDER_ID);
+let remoteOutput = window.createOutputChannel(FIGMA_AUTH_PROVIDER_ID);
 
-interface TokenInformation {
-  accessToken: string;
+export interface FigmaAuthenticationSession extends AuthenticationSession {
+  refreshToken: string;
+  expiresIn: number;
 }
 
-export default class ElementAIAuthenticationProvider implements AuthenticationProvider, Disposable {
+export default class FigmaAuthenticationProvider implements AuthenticationProvider, Disposable {
   private _disposable: Disposable;
   private _pendingStates: string[] = [];
   private _uriHandler: UriEventHandler;
   private _sessionChangeEmitter = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
-  private _codeExchangePromises = new Map<string, { promise: Promise<TokenInformation>; cancel: EventEmitter<void> }>();
-  private _authService: AuthService;
+  private _codeExchangePromises = new Map<
+    string,
+    { promise: Promise<FigmaTokenInformation>; cancel: EventEmitter<void> }
+  >();
 
-  constructor(private readonly context: ExtensionContext, authService: AuthService) {
-    this._authService = authService;
-    this._uriHandler = uriEventHandler;
-
+  constructor(private readonly context: ExtensionContext) {
     this._disposable = Disposable.from(
-      authentication.registerAuthenticationProvider(AUTH_PROVIDER_ID, AUTH_PROVIDER_LABEL, this, {
+      authentication.registerAuthenticationProvider(FIGMA_AUTH_PROVIDER_ID, AUTH_PROVIDER_LABEL, this, {
         supportsMultipleAccounts: false,
-      }),
-      window.registerUriHandler(this._uriHandler) // Register the URI handler
+      })
     );
+    this._uriHandler = uriEventHandler;
   }
 
   get onDidChangeSessions() {
@@ -59,28 +59,29 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
     return `${env.uriScheme}://${publisher}.${name}`;
   }
 
-  public async getSessions(): Promise<readonly AuthenticationSession[]> {
+  public async getSessions(): Promise<readonly FigmaAuthenticationSession[]> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (!allSessions) {
       return [];
     }
-    return JSON.parse(allSessions) as AuthenticationSession[];
+    return JSON.parse(allSessions) as FigmaAuthenticationSession[];
   }
 
-  public async createSession(): Promise<AuthenticationSession> {
+  public async createSession(): Promise<FigmaAuthenticationSession> {
     try {
-      const { accessToken } = await this.login();
+      const { accessToken, refreshToken, expiresIn } = await this.login();
       if (!accessToken) {
-        throw new Error("Element AI - Auth login failure");
+        throw new Error("Element AI - (Figma): Connecting Figma account failed!");
       }
 
-      this._authService.authenticate(this, accessToken);
+      api.FigmaApiProvider.setHeader("Authorization", `Bearer ${accessToken}`);
+      const userinfo: UserData = await api.getFigmaUserInfo();
 
-      const userinfo: UserData = await api.getUserInfo();
-
-      const session: AuthenticationSession = {
+      const session: FigmaAuthenticationSession = {
         id: uuidv4(),
         accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresIn: expiresIn,
         account: {
           id: userinfo.id,
           label: userinfo.email,
@@ -94,15 +95,44 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
 
       return session;
     } catch (err) {
-      window.showErrorMessage(`Sign in failed: ${err}`);
+      window.showErrorMessage(`Element AI - (Figma): Connecting Figma account failed: ${err}`);
       throw err;
     }
+  }
+
+  public async updateSession(sessionId: string, tokenInfo: FigmaTokenInformation): Promise<FigmaAuthenticationSession> {
+    const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
+    if (!allSessions) {
+      throw new Error("Session not found");
+    }
+
+    let sessions = JSON.parse(allSessions) as FigmaAuthenticationSession[];
+    const sessionIdx = sessions.findIndex((s) => s.id === sessionId);
+    if (sessionIdx === -1) {
+      throw new Error("Session not found");
+    }
+
+    const session = sessions[sessionIdx];
+    sessions.splice(sessionIdx, 1);
+
+    const updatedSession: FigmaAuthenticationSession = {
+      ...session,
+      accessToken: tokenInfo.accessToken,
+      refreshToken: tokenInfo.refreshToken,
+      expiresIn: tokenInfo.expiresIn,
+    };
+
+    await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify([updatedSession]));
+
+    this._sessionChangeEmitter.fire({ added: [], removed: [], changed: [updatedSession] });
+
+    return updatedSession;
   }
 
   public async removeSession(sessionId: string): Promise<void> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (allSessions) {
-      let sessions = JSON.parse(allSessions) as AuthenticationSession[];
+      let sessions = JSON.parse(allSessions) as FigmaAuthenticationSession[];
       const sessionIdx = sessions.findIndex((s) => s.id === sessionId);
       const session = sessions[sessionIdx];
       sessions.splice(sessionIdx, 1);
@@ -119,11 +149,11 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
     this._disposable.dispose();
   }
 
-  private async login(): Promise<TokenInformation> {
-    return await window.withProgress<TokenInformation>(
+  private async login(): Promise<FigmaTokenInformation> {
+    return await window.withProgress<FigmaTokenInformation>(
       {
         location: ProgressLocation.Notification,
-        title: "Signing in to Element AI...",
+        title: "Connecting Element AI with Figma account...",
         cancellable: true,
       },
       async (_, token) => {
@@ -147,8 +177,15 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
 
         this._pendingStates.push(stateID);
 
-        const searchParams = new URLSearchParams([["state", encodeURIComponent(callbackUri.toString(true))]]);
-        const uri = Uri.parse(`${APP_BASE_URL}/login?${searchParams.toString()}`);
+        const searchParams = new URLSearchParams([
+          ["client_id", FIGMA_OAUTH_CLIENT_ID],
+          ["redirect_uri", FIGMA_OAUTH_CALLBACK_URL],
+          ["scope", "files:read,file_variables:read,file_dev_resources:read"],
+          ["state", encodeURIComponent(callbackUri.toString(true))],
+          ["response_type", "code"],
+        ]);
+
+        const uri = Uri.parse(`https://www.figma.com/oauth?${searchParams.toString()}`);
 
         remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
 
@@ -178,17 +215,19 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
   }
 
   /**
-   * Handle the redirect to VS Code (after sign in from Element AI Auth page)
+   * Handle the redirect to VS Code (after sign in from Figma Auth page)
    */
-  private handleUri: () => PromiseAdapter<Uri, TokenInformation> = () => async (uri, resolve, reject) => {
+  private handleUri: () => PromiseAdapter<Uri, FigmaTokenInformation> = () => async (uri, resolve, reject) => {
     const query = new URLSearchParams(uri.query);
     const accessToken = query.get("access_token");
+    const refreshToken = query.get("refresh_token");
+    const expiresIn = query.get("expires_in");
 
-    if (!accessToken) {
+    if (!accessToken || !refreshToken || !expiresIn) {
       reject(new Error("No access token"));
       return;
     }
 
-    resolve({ accessToken });
+    resolve({ accessToken, refreshToken, expiresIn: parseInt(expiresIn) });
   };
 }

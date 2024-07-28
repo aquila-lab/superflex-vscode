@@ -209,7 +209,7 @@ class OpenAIAssistant implements Assistant {
           text: message.text,
         });
       }
-      if (message.type === "image") {
+      if (message.type === "image_file") {
         const imageFile = await this._openai.files.create({
           purpose: "vision",
           file: fs.createReadStream(message.imageUrl),
@@ -221,6 +221,21 @@ class OpenAIAssistant implements Assistant {
             file_id: imageFile.id,
             detail: "auto",
           },
+        });
+      }
+      if (message.type === "image_url") {
+        content.push({
+          type: "image_url",
+          image_url: {
+            url: message.imageUrl,
+            detail: "auto",
+          },
+        });
+      }
+      if (message.type === "figma") {
+        content.push({
+          type: "text",
+          text: message.content,
         });
       }
     }

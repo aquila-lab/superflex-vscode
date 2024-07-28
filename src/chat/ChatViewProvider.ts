@@ -123,6 +123,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "index.js")
     );
+    const figmaCopySelectionExampleImage = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "figma-copy-selection-example.png")
+    );
 
     webview.html = `
       <!DOCTYPE html>
@@ -132,6 +135,15 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
           <title>Element AI</title>
+
+          <style>
+            .figma-copy-selection-example {
+              background-image: url("${figmaCopySelectionExampleImage}");
+              background-size: contain;
+              background-repeat: no-repeat;
+              background-position: center;
+            }
+          </style>
         </head>
         <body style="margin: 0; padding: 0; min-width: 100%; min-height: 100%">
           <div id="root"></div>
