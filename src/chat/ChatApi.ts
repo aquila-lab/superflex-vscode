@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
@@ -134,9 +135,13 @@ export class ChatAPI {
 
           if (ElementAICache.storagePath) {
             const imageUrlSegments = imageUrl.split("/");
-            const imageFilePath = path.join(
-              ElementAICache.storagePath,
-              `${imageUrlSegments[imageUrlSegments.length - 1]}.png`
+            const imageFileDir = decodeUriAndRemoveFilePrefix(path.join(ElementAICache.storagePath, "images"));
+            if (!fs.existsSync(imageFileDir)) {
+              fs.mkdirSync(imageFileDir, { recursive: true });
+            }
+
+            const imageFilePath = decodeUriAndRemoveFilePrefix(
+              path.join(imageFileDir, `${imageUrlSegments[imageUrlSegments.length - 1]}.png`)
             );
             await downloadImage(imageUrl, imageFilePath);
             messagesReq.push({ type: "image_file", imageUrl: imageFilePath });
