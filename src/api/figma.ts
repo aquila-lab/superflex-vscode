@@ -51,4 +51,28 @@ async function getFigmaSelectionImageUrl({ fileID, nodeID }: GetFigmaSelectionIm
   }
 }
 
-export { figmaRefreshAccessToken, getFigmaUserInfo, getFigmaSelectionImageUrl };
+async function getFigmaSelectionFile({ fileID, nodeID }: GetFigmaSelectionImageUrlArgs): Promise<any> {
+  try {
+    const { data } = await FigmaApi.get(`/files/${fileID}?ids=${nodeID}`);
+    return Promise.resolve(data);
+  } catch (err) {
+    return Promise.reject(parseError(err));
+  }
+}
+
+async function getFigmaSelectionFileNodes({ fileID, nodeID }: GetFigmaSelectionImageUrlArgs): Promise<any> {
+  try {
+    const { data } = await FigmaApi.get(`/files/${fileID}/nodes?ids=${nodeID}`);
+    return Promise.resolve(data);
+  } catch (err) {
+    return Promise.reject(parseError(err));
+  }
+}
+
+export {
+  figmaRefreshAccessToken,
+  getFigmaUserInfo,
+  getFigmaSelectionImageUrl,
+  getFigmaSelectionFile,
+  getFigmaSelectionFileNodes,
+};

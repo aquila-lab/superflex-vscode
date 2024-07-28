@@ -28,11 +28,23 @@ export type TextContent = {
   text: string;
 };
 
-export type ImageContent = {
+export type ImageFileContent = {
+  /**
+   * Always `image_file`.
+   */
+  type: "image_file";
+
+  /**
+   * The URL of the image, must be a supported image types: jpeg, jpg, png, gif, webp.
+   */
+  imageUrl: string;
+};
+
+export type ImageUrlContent = {
   /**
    * Always `image`.
    */
-  type: "image";
+  type: "image_url";
 
   /**
    * The URL of the image, must be a supported image types: jpeg, jpg, png, gif, webp.
@@ -49,7 +61,7 @@ export type FigmaFileContent = {
   content: any;
 };
 
-export type MessageContent = TextContent | ImageContent | FigmaFileContent;
+export type MessageContent = TextContent | ImageFileContent | ImageUrlContent | FigmaFileContent;
 
 export type Message = {
   /**

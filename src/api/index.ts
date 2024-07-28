@@ -5,3 +5,4 @@ export { HttpStatusCode } from "./constants";
 
 export * from "./user";
 export * from "./figma";
+export * from "./utils";
