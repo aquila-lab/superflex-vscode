@@ -121,6 +121,11 @@ class OpenAIVectorStore implements VectorStore {
     progressCb?: (current: number) => void
   ): Promise<void> {
     return new Promise<void>((resolve, reject) => {
+      if (documentPaths.length === 0) {
+        resolve();
+        return;
+      }
+
       documentPaths.forEach((documentPath, index) => {
         workers.push(documentPath, () => {
           if (progressCb) {

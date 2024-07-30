@@ -231,6 +231,12 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
       ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
     );
 
+    if (documentsUri.length === 0) {
+      vscode.window.showWarningMessage(
+        `No supported files found in the workspace.\nSupported file extensions are: ${SUPPORTED_FILE_EXTENSIONS}`
+      );
+    }
+
     await this._vectorStore?.syncFiles(documentsUri, (progress) => {
       sendEventMessageCb(newEventMessage("sync_progress", { progress }));
     });
