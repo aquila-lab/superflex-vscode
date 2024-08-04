@@ -5,15 +5,7 @@ import OpenAI from "openai";
 
 import { ElementAICache, GLOBAL_SETTINGS_FILE_NAME, GlobalSettings, CachedFileObject } from "../cache/ElementAICache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
-import {
-  AIProvider,
-  Assistant,
-  Message,
-  MessageContent,
-  SelfHostedAIProvider,
-  TextDelta,
-  VectorStore,
-} from "./AIProvider";
+import { Assistant, Message, MessageContent, SelfHostedAIProvider, TextDelta, VectorStore } from "./AIProvider";
 import { jsonToMap, mapToJson } from "../common/utils";
 
 const FILE_ID_MAP_NAME = "open-ai-file-id-map.json";

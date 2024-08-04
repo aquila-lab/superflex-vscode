@@ -82,7 +82,7 @@ export default class FigmaAuthenticationService {
     try {
       FigmaApiProvider.setHeader("Authorization", `Bearer ${session.accessToken}`);
       FigmaApiProvider.addRefreshTokenInterceptor(async (err) => {
-        if (err?.response?.status === 401) {
+        if (err?.response?.status === 401 || err?.response?.status === 403) {
           try {
             const newTokenInfo = await figmaRefreshAccessToken({ refreshToken: session.refreshToken });
             if (newTokenInfo) {
