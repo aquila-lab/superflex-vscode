@@ -208,7 +208,7 @@ const Chat: React.FunctionComponent<{
                 message.sender === 'user' ? 'bg-neutral-800' : undefined
               }`}>
               <p className="text-sm font-medium text-neutral-300 mb-2">
-                {message.sender === 'user' ? 'You' : 'Element AI'}
+                {message.sender === 'user' ? 'You' : 'Superflex'}
               </p>
 
               <MarkdownRender mdString={message.text} />
@@ -219,7 +219,7 @@ const Chat: React.FunctionComponent<{
 
           {streamResponse && (
             <div className={`py-4 px-2 border-b border-neutral-700 text-left`}>
-              <p className="text-sm font-medium text-neutral-300 mb-2">Element AI</p>
+              <p className="text-sm font-medium text-neutral-300 mb-2">Superflex</p>
 
               <MarkdownRender mdString={streamResponse} />
             </div>

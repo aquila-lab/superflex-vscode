@@ -47,7 +47,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
       <div className="App h-full">
         <div id="AppContent" className="h-full">
           <div className="flex flex-col justify-center items-center h-full vscode-dark text-white px-5 pb-4">
-            <h3 className="text-2xl font-bold mb-4">Welcome to Element AI!</h3>
+            <h3 className="text-2xl font-bold mb-4">Welcome to Superflex!</h3>
             <Button onClick={() => vscodeAPI.postMessage(newEventMessage('login_clicked'))}>Sign in</Button>
           </div>
         </div>
@@ -63,7 +63,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
             <h3 className="text-2xl font-bold">Enter your token</h3>
 
             <p className="text-center">
-              To use Element AI, you need to enter your OpenAI API token. You can create a new API key by visiting:{' '}
+              To use Superflex, you need to enter your OpenAI API token. You can create a new API key by visiting:{' '}
               <a className="text-blue-400" href="https://platform.openai.com/api-keys">
                 https://platform.openai.com/api-keys
               </a>
@@ -96,7 +96,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
           <div className="flex flex-col justify-center items-center h-full vscode-dark text-white px-5 pb-4">
             <h3 className="text-2xl font-bold mb-4">No open project</h3>
             <p className="text-center">
-              Please open a project to start using Element AI. If you have already opened a project, and still see this.
+              Please open a project to start using Superflex. If you have already opened a project, and still see this.
               Please restart Visual Studio Code.
             </p>
           </div>

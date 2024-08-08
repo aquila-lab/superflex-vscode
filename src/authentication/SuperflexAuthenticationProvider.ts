@@ -17,10 +17,10 @@ import * as api from "../api";
 import { UserData } from "../core/User.model";
 import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
-import AuthService from "./ElementAIAuthenticationService";
+import AuthService from "./SuperflexAuthenticationService";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
 
-const AUTH_PROVIDER_LABEL = "Element AI Authentication";
+const AUTH_PROVIDER_LABEL = "Superflex Authentication";
 const SESSIONS_SECRET_KEY = `${AUTH_PROVIDER_ID}.sessions`;
 
 let remoteOutput = window.createOutputChannel(AUTH_PROVIDER_ID);
@@ -29,7 +29,7 @@ interface TokenInformation {
   accessToken: string;
 }
 
-export default class ElementAIAuthenticationProvider implements AuthenticationProvider, Disposable {
+export default class SuperflexAuthenticationProvider implements AuthenticationProvider, Disposable {
   private _disposable: Disposable;
   private _pendingStates: string[] = [];
   private _uriHandler: UriEventHandler;
@@ -71,7 +71,7 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
     try {
       const { accessToken } = await this.login();
       if (!accessToken) {
-        throw new Error("Element AI - Auth login failure");
+        throw new Error("Superflex - Auth login failure");
       }
 
       this._authService.authenticate(this, accessToken);
@@ -123,7 +123,7 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
     return await window.withProgress<TokenInformation>(
       {
         location: ProgressLocation.Notification,
-        title: "Signing in to Element AI...",
+        title: "Signing in to Superflex...",
         cancellable: true,
       },
       async (_, token) => {
@@ -178,7 +178,7 @@ export default class ElementAIAuthenticationProvider implements AuthenticationPr
   }
 
   /**
-   * Handle the redirect to VS Code (after sign in from Element AI Auth page)
+   * Handle the redirect to VS Code (after sign in from Superflex Auth page)
    */
   private handleUri: () => PromiseAdapter<Uri, TokenInformation> = () => async (uri, resolve, reject) => {
     const query = new URLSearchParams(uri.query);

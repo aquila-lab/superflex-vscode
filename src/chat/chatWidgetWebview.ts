@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 
 import ChatViewProvider from "./ChatViewProvider";
 
-const VIEW_ID = "elementai.chat";
+const VIEW_ID = "superflex.chat";
 
 export default function registerChatWidgetWebview(
   context: vscode.ExtensionContext,
@@ -34,7 +34,7 @@ function registerWebview(context: vscode.ExtensionContext, chatProvider: ChatVie
 
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand("elementai.chat.focus-input", () => {
+    vscode.commands.registerCommand("superflex.chat.focus-input", () => {
       void chatProvider.focusChatInput();
     })
   );
@@ -43,9 +43,9 @@ function registerWebview(context: vscode.ExtensionContext, chatProvider: ChatVie
 }
 
 function setChatWebview(webviewName: "chat" | "loading") {
-  void vscode.commands.executeCommand("setContext", "elementai.chat.webview", webviewName);
+  void vscode.commands.executeCommand("setContext", "superflex.chat.webview", webviewName);
 }
 
 function setChatReady(ready: boolean) {
-  void vscode.commands.executeCommand("setContext", "elementai.chat.ready", ready);
+  void vscode.commands.executeCommand("setContext", "superflex.chat.ready", ready);
 }

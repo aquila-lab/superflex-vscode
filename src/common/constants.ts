@@ -13,7 +13,7 @@ export const API_BASE_URL = process.env.API_BASE_URL ?? "https://api.superflex.a
 export const FIGMA_OAUTH_CLIENT_ID = "ZnoCj0vPEwDoLR0jimrfMX";
 export const FIGMA_OAUTH_CALLBACK_URL = `${API_BASE_URL}/auth/figma-callback`;
 
-export const BRAND_NAME = "elementai";
+export const BRAND_NAME = "superflex";
 
 export const AUTH_PROVIDER_ID = `${BRAND_NAME}.auth`;
 export const FIGMA_AUTH_PROVIDER_ID = `${AUTH_PROVIDER_ID}.figma`;

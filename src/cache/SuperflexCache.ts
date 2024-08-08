@@ -22,7 +22,7 @@ export type CacheFileOptions = {
   ext: string;
 };
 
-class ElementAICacheClass {
+class SuperflexCacheClass {
   workspaceFolderPath: string | undefined;
   storagePath: string | undefined;
   globalStoragePath: string | undefined;
@@ -165,6 +165,6 @@ class ElementAICacheClass {
   }
 }
 
-const ElementAICache = new ElementAICacheClass();
+const SuperflexCache = new SuperflexCacheClass();
 
-export { ElementAICache };
+export { SuperflexCache };

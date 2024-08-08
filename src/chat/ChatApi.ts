@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
-import { ElementAICache } from "../cache/ElementAICache";
+import { SuperflexCache } from "../cache/SuperflexCache";
 import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
@@ -133,9 +133,9 @@ export class ChatAPI {
             } as ChatMessage)
           );
 
-          if (ElementAICache.storagePath) {
+          if (SuperflexCache.storagePath) {
             const imageUrlSegments = imageUrl.split("/");
-            const imageFileDir = decodeUriAndRemoveFilePrefix(path.join(ElementAICache.storagePath, "images"));
+            const imageFileDir = decodeUriAndRemoveFilePrefix(path.join(SuperflexCache.storagePath, "images"));
             if (!fs.existsSync(imageFileDir)) {
               fs.mkdirSync(imageFileDir, { recursive: true });
             }
@@ -201,7 +201,7 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
   }
 
   private async initializeAssistant(workspaceName: string): Promise<void> {
-    const rawSettings = ElementAICache.get(SETTINGS_FILE);
+    const rawSettings = SuperflexCache.get(SETTINGS_FILE);
     if (rawSettings) {
       const settings = JSON.parse(rawSettings) as Settings;
       if (settings.vectorStoreID && settings.assistantID) {
@@ -214,7 +214,7 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
     this._vectorStore = await this._aiProvider.createVectorStore(workspaceName);
     this._assistant = await this._aiProvider.createAssistant(this._vectorStore);
 
-    ElementAICache.set(
+    SuperflexCache.set(
       SETTINGS_FILE,
       JSON.stringify({ vectorStoreID: this._vectorStore.id, assistantID: this._assistant.id } as Settings)
     );

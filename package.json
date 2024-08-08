@@ -1,19 +1,19 @@
 {
-  "name": "element-ai",
-  "publisher": "element-ai",
-  "displayName": "Element AI",
-  "description": "AI pair programmer for frontend engineers",
+  "name": "superflex",
+  "publisher": "superflex-ai",
+  "displayName": "Superflex: Your Frontend AI Pair Programmer",
+  "description": "Never code alone again. Superflex is your AI pair programmer that helps you code faster and better.",
   "icon": "small_logo.png",
-  "version": "0.1.2",
+  "version": "0.0.1",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AquilaLab/element-ai-vscode"
+    "url": "https://github.com/aquila-lab/superflex-vscode"
   },
   "bugs": {
-    "url": "https://github.com/AquilaLab/element-ai-vscode/issues",
-    "email": "bjankovic998@gmail.com"
+    "url": "https://github.com/aquila-lab/superflex-vscode/issues",
+    "email": "boris@superflex.ai"
   },
   "categories": [
     "Programming Languages",
@@ -24,6 +24,7 @@
     "Other"
   ],
   "keywords": [
+    "superflex",
     "javascript",
     "typescript",
     "autocomplete",
@@ -34,17 +35,24 @@
     "react",
     "figma",
     "sketch",
+    "screenshot",
     "refactor",
+    "tailwind",
     "components",
     "ui components",
     "image to code",
     "figma to code",
     "sketch to code",
     "design to code",
+    "screenshot to code",
     "frontend tools",
     "code completion",
     "code generation",
-    "generate components"
+    "generate components",
+    "copilot",
+    "github copilot",
+    "cody",
+    "tabnine"
   ],
   "engines": {
     "vscode": "^1.90.0"
@@ -74,100 +82,100 @@
     "menus": {
       "view/title": [
         {
-          "command": "elementai.chat.new-thread",
+          "command": "superflex.chat.new-thread",
           "group": "navigation",
-          "when": "view == elementai.chat && elementai.chat.authenticated"
+          "when": "view == superflex.chat && superflex.chat.authenticated"
         },
         {
-          "command": "elementai.project.sync",
+          "command": "superflex.project.sync",
           "group": "navigation",
-          "when": "view == elementai.chat && elementai.chat.authenticated"
+          "when": "view == superflex.chat && superflex.chat.authenticated"
         },
         {
-          "command": "elementai.auth.signout",
+          "command": "superflex.auth.signout",
           "group": "navigation",
-          "when": "view == elementai.chat && elementai.chat.authenticated"
+          "when": "view == superflex.chat && superflex.chat.authenticated"
         }
       ]
     },
     "submenus": [
       {
-        "id": "elementai.chat.submenu",
-        "label": "Element AI"
+        "id": "superflex.chat.submenu",
+        "label": "Superflex"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "elementai",
-          "title": "Element AI",
+          "id": "superflex",
+          "title": "Superflex",
           "icon": "small_logo.png"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "elementai.loading",
+        "view": "superflex.loading",
         "contents": "Loading please wait..."
       }
     ],
     "views": {
-      "elementai": [
+      "superflex": [
         {
           "type": "webview",
-          "id": "elementai.chat",
+          "id": "superflex.chat",
           "name": "Chat",
-          "when": "elementai.chat.webview == 'chat'"
+          "when": "superflex.chat.webview == 'chat'"
         },
         {
-          "id": "elementai.loading",
+          "id": "superflex.loading",
           "name": "Loading",
-          "when": "elementai.chat.webview == 'loading'"
+          "when": "superflex.chat.webview == 'loading'"
         }
       ]
     },
     "commands": [
       {
-        "command": "elementai.auth.signin",
-        "category": "Element AI",
+        "command": "superflex.auth.signin",
+        "category": "Superflex",
         "title": "Sign In"
       },
       {
-        "command": "elementai.auth.signout",
-        "category": "Element AI",
+        "command": "superflex.auth.signout",
+        "category": "Superflex",
         "title": "Sign Out",
         "icon": "$(sign-out)"
       },
       {
-        "command": "elementai.figma.connect",
-        "category": "Element AI",
+        "command": "superflex.figma.connect",
+        "category": "Superflex",
         "title": "Connect Figma Account"
       },
       {
-        "command": "elementai.figma.disconnect",
-        "category": "Element AI",
+        "command": "superflex.figma.disconnect",
+        "category": "Superflex",
         "title": "Disconnect Figma Account"
       },
       {
-        "command": "elementai.chat.focus-input",
-        "category": "Element AI",
+        "command": "superflex.chat.focus-input",
+        "category": "Superflex",
         "title": "Focus chat input"
       },
       {
-        "command": "elementai.chat.new-thread",
-        "category": "Element AI",
+        "command": "superflex.chat.new-thread",
+        "category": "Superflex",
         "title": "New Chat Thread",
         "icon": "$(plus)"
       },
       {
-        "command": "elementai.project.sync",
-        "category": "Element AI",
+        "command": "superflex.project.sync",
+        "category": "Superflex",
         "title": "Project Sync",
         "icon": "$(refresh)"
       },
       {
-        "command": "elementai.auth.remove-openai-api-key",
-        "category": "Element AI",
+        "command": "superflex.auth.remove-openai-api-key",
+        "category": "Superflex",
         "title": "Remove OpenAI API Key"
       }
     ]

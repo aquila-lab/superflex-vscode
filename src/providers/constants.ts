@@ -1,4 +1,4 @@
-export const ASSISTANT_NAME = "ElementAI UI Assistant";
+export const ASSISTANT_NAME = "Superflex UI Assistant";
 
 export const ASSISTANT_DESCRIPTION = `You are an expert frontend development assistant. You help developers by converting visual sketches and design elements into clean, maintainable code. You understand design patterns, code styles, and existing components in the codebase to ensure consistency and efficiency. Additionally, you provide suggestions and improvements based on best practices in frontend development.`;
 

@@ -71,7 +71,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
     try {
       const { accessToken, refreshToken, expiresIn } = await this.login();
       if (!accessToken) {
-        throw new Error("Element AI - (Figma): Connecting Figma account failed!");
+        throw new Error("Superflex - (Figma): Connecting Figma account failed!");
       }
 
       api.FigmaApiProvider.setHeader("Authorization", `Bearer ${accessToken}`);
@@ -95,7 +95,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
 
       return session;
     } catch (err) {
-      window.showErrorMessage(`Element AI - (Figma): Connecting Figma account failed: ${err}`);
+      window.showErrorMessage(`Superflex - (Figma): Connecting Figma account failed: ${err}`);
       throw err;
     }
   }
@@ -153,7 +153,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
     return await window.withProgress<FigmaTokenInformation>(
       {
         location: ProgressLocation.Notification,
-        title: "Connecting Element AI with Figma account...",
+        title: "Connecting Superflex with Figma account...",
         cancellable: true,
       },
       async (_, token) => {

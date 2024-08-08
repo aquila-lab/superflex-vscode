@@ -16,11 +16,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
-        "elementai.chat.new-thread",
+        "superflex.chat.new-thread",
         () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_new_thread"))
       ),
       vscode.commands.registerCommand(
-        "elementai.project.sync",
+        "superflex.project.sync",
         () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_sync_project"))
       )
     );
@@ -89,7 +89,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   async focusChatInput() {
-    void vscode.commands.executeCommand("workbench.view.extension.elementai");
+    void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
     void this._chatWebview?.postMessage(newEventMessage("focus-input"));
@@ -134,7 +134,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
-          <title>Element AI</title>
+          <title>Superflex</title>
 
           <style>
             .figma-copy-selection-example {

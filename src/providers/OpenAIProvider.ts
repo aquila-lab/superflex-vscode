@@ -3,7 +3,7 @@ import path from "path";
 import asyncQ from "async";
 import OpenAI from "openai";
 
-import { ElementAICache, GLOBAL_SETTINGS_FILE_NAME, GlobalSettings, CachedFileObject } from "../cache/ElementAICache";
+import { SuperflexCache, GLOBAL_SETTINGS_FILE_NAME, GlobalSettings, CachedFileObject } from "../cache/SuperflexCache";
 import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
 import { Assistant, Message, MessageContent, SelfHostedAIProvider, TextDelta, VectorStore } from "./AIProvider";
 import { jsonToMap, mapToJson } from "../common/utils";
@@ -31,7 +31,7 @@ class OpenAIVectorStore implements VectorStore {
   }
 
   async syncFiles(filePaths: string[], progressCb?: (current: number) => void): Promise<void> {
-    if (!ElementAICache.storagePath) {
+    if (!SuperflexCache.storagePath) {
       throw new Error("Storage path is not set");
     }
 
@@ -39,13 +39,13 @@ class OpenAIVectorStore implements VectorStore {
       progressCb(0);
     }
 
-    const storagePath = ElementAICache.storagePath;
-    const cachedFilePathToIDMap = ElementAICache.get(FILE_ID_MAP_NAME);
+    const storagePath = SuperflexCache.storagePath;
+    const cachedFilePathToIDMap = SuperflexCache.get(FILE_ID_MAP_NAME);
     const filePathToIDMap: Map<string, CachedFile> = cachedFilePathToIDMap
       ? jsonToMap<CachedFile>(cachedFilePathToIDMap, cachedFileReviver)
       : new Map<string, CachedFile>();
 
-    const documentPaths = ElementAICache.cacheFilesSync(filePaths, { ext: ".txt" });
+    const documentPaths = SuperflexCache.cacheFilesSync(filePaths, { ext: ".txt" });
     const progressCoefficient = 98 / documentPaths.length;
 
     const workers = this.createSyncWorkers(filePathToIDMap, storagePath, 10);
@@ -57,8 +57,8 @@ class OpenAIVectorStore implements VectorStore {
 
     await this.cleanUpFiles(filePathToIDMap, documentPaths, storagePath);
 
-    ElementAICache.set(FILE_ID_MAP_NAME, mapToJson(filePathToIDMap));
-    ElementAICache.removeCachedFilesSync();
+    SuperflexCache.set(FILE_ID_MAP_NAME, mapToJson(filePathToIDMap));
+    SuperflexCache.removeCachedFilesSync();
 
     if (progressCb) {
       progressCb(100);
@@ -359,7 +359,7 @@ export default class OpenAIProvider implements SelfHostedAIProvider {
   }
 
   getToken(): string | null {
-    const rawSettings = ElementAICache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
+    const rawSettings = SuperflexCache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
     const settings = rawSettings ? (JSON.parse(rawSettings) as GlobalSettings) : {};
     if (!settings.openaiApiKey) {
       return null;
@@ -372,18 +372,18 @@ export default class OpenAIProvider implements SelfHostedAIProvider {
   }
 
   setToken(token: string): void {
-    const rawSettings = ElementAICache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
+    const rawSettings = SuperflexCache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
     const settings = rawSettings ? (JSON.parse(rawSettings) as GlobalSettings) : {};
 
     settings.openaiApiKey = token;
-    ElementAICache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
+    SuperflexCache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
   }
 
   removeToken(): void {
-    const rawSettings = ElementAICache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
+    const rawSettings = SuperflexCache.getGlobal(GLOBAL_SETTINGS_FILE_NAME);
     const settings = rawSettings ? (JSON.parse(rawSettings) as GlobalSettings) : {};
 
     delete settings.openaiApiKey;
-    ElementAICache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
+    SuperflexCache.setGlobal(GLOBAL_SETTINGS_FILE_NAME, JSON.stringify(settings));
   }
 }

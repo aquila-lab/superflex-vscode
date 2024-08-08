@@ -7,7 +7,7 @@ import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 import ChatViewProvider from "../chat/ChatViewProvider";
 import { AIProvider, SelfHostedAIProvider } from "../providers/AIProvider";
 
-export default class ElementAIAuthenticationService {
+export default class SuperflexAuthenticationService {
   private _webviewProvider: ChatViewProvider;
   private _aiProvider: AIProvider;
 
@@ -41,7 +41,7 @@ export default class ElementAIAuthenticationService {
 
     this._webviewProvider.sendEventMessage(newEventMessage("show_login_view"));
 
-    vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", false);
+    vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", false);
     vscode.window.showInformationMessage("Signed out!");
   }
 
@@ -84,7 +84,7 @@ export default class ElementAIAuthenticationService {
     }
 
     this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
-    vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", true);
+    vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", true);
   }
 
   removeToken(): void {
@@ -94,7 +94,7 @@ export default class ElementAIAuthenticationService {
 
     const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
     selfHostedProvider.removeToken();
-    vscode.commands.executeCommand("setContext", "elementai.chat.authenticated", false);
+    vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", false);
     this._webviewProvider.sendEventMessage(newEventMessage("show_enter_token_view"));
   }
 

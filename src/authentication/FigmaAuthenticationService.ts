@@ -24,14 +24,14 @@ export default class FigmaAuthenticationService {
   }
 
   /**
-   * Command to connect figma account to Element AI.
+   * Command to connect figma account to Superflex.
    */
   async connect(): Promise<FigmaTokenInformation> {
     const session = (await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, [], {
       createIfNone: true,
     })) as FigmaAuthenticationSession;
 
-    vscode.window.showInformationMessage(`Connected Figma account <${session.account.label}> to Element AI! 🎉`);
+    vscode.window.showInformationMessage(`Connected Figma account <${session.account.label}> to Superflex! 🎉`);
 
     const figmaTokenInfo: FigmaTokenInformation = {
       accessToken: session.accessToken,
@@ -45,7 +45,7 @@ export default class FigmaAuthenticationService {
   }
 
   /**
-   * Command to disconnect figma account from Element AI.
+   * Command to disconnect figma account from Superflex.
    */
   async disconnect(provider: vscode.AuthenticationProvider): Promise<void> {
     const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, [], { createIfNone: false });
@@ -58,8 +58,8 @@ export default class FigmaAuthenticationService {
 
     this._webviewProvider.sendEventMessage(newEventMessage("figma_oauth_disconnect"));
 
-    vscode.commands.executeCommand("setContext", "elementai.figma.authenticated", false);
-    vscode.window.showInformationMessage("Disconnected Figma account from Element AI!");
+    vscode.commands.executeCommand("setContext", "superflex.figma.authenticated", false);
+    vscode.window.showInformationMessage("Disconnected Figma account from Superflex!");
   }
 
   /**
