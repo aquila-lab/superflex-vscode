@@ -27,7 +27,6 @@ let remoteOutput = window.createOutputChannel(FIGMA_AUTH_PROVIDER_ID);
 
 export interface FigmaAuthenticationSession extends AuthenticationSession {
   refreshToken: string;
-  expiresIn: number;
 }
 
 export default class FigmaAuthenticationProvider implements AuthenticationProvider, Disposable {
@@ -69,7 +68,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
 
   public async createSession(): Promise<FigmaAuthenticationSession> {
     try {
-      const { accessToken, refreshToken, expiresIn } = await this.login();
+      const { accessToken, refreshToken } = await this.login();
       if (!accessToken) {
         throw new Error("Superflex - (Figma): Connecting Figma account failed!");
       }
@@ -81,7 +80,6 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
         id: uuidv4(),
         accessToken: accessToken,
         refreshToken: refreshToken,
-        expiresIn: expiresIn,
         account: {
           id: userinfo.id,
           label: userinfo.email,
@@ -119,7 +117,6 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
       ...session,
       accessToken: tokenInfo.accessToken,
       refreshToken: tokenInfo.refreshToken,
-      expiresIn: tokenInfo.expiresIn,
     };
 
     await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify([updatedSession]));
@@ -221,13 +218,12 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
     const query = new URLSearchParams(uri.query);
     const accessToken = query.get("access_token");
     const refreshToken = query.get("refresh_token");
-    const expiresIn = query.get("expires_in");
 
-    if (!accessToken || !refreshToken || !expiresIn) {
+    if (!accessToken || !refreshToken) {
       reject(new Error("No access token"));
       return;
     }
 
-    resolve({ accessToken, refreshToken, expiresIn: parseInt(expiresIn) });
+    resolve({ accessToken, refreshToken });
   };
 }

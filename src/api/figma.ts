@@ -17,7 +17,6 @@ async function figmaRefreshAccessToken({ refreshToken }: FigmaRefreshAccessToken
     return Promise.resolve({
       accessToken: res.data.access_token,
       refreshToken: res.data.refresh_token,
-      expiresIn: res.data.expires_in,
     });
   } catch (err) {
     return Promise.reject(parseError(err));
