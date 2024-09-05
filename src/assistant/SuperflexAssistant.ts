@@ -12,19 +12,19 @@ import { createFilesMapName } from "./common";
 const ASSISTENT_NAME = "Superflex";
 
 export default class SuperflexAssistant implements Assistant {
-  readonly projectRootPath: string;
+  readonly rootPath: string;
   readonly owner: string;
   readonly repo: string;
 
-  constructor(projectRootPath: string, owner: string, repo: string) {
-    if (!fs.existsSync(projectRootPath)) {
+  constructor(rootPath: string, owner: string, repo: string) {
+    if (!fs.existsSync(rootPath)) {
       throw new Error("Root path does not exist");
     }
-    if (!fs.lstatSync(projectRootPath).isDirectory()) {
+    if (!fs.lstatSync(rootPath).isDirectory()) {
       throw new Error("Root path is not a directory");
     }
 
-    this.projectRootPath = projectRootPath;
+    this.rootPath = rootPath;
     this.owner = owner;
     this.repo = repo;
   }
