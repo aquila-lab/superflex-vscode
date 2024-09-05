@@ -168,11 +168,6 @@
         "category": "Superflex",
         "title": "Project Sync",
         "icon": "$(refresh)"
-      },
-      {
-        "command": "superflex.auth.remove-openai-api-key",
-        "category": "Superflex",
-        "title": "Remove OpenAI API Key"
       }
     ]
   },
@@ -198,7 +193,6 @@
     "axios": "^1.7.7",
     "crypto": "^1.0.1",
     "fast-glob": "^3.3.2",
-    "openai": "^4.52.1",
     "uuidv4": "^6.2.13"
   }
 }
