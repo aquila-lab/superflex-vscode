@@ -7,6 +7,9 @@ import { Thread } from "../core/Thread.model";
 import { SuperflexCache } from "../cache/SuperflexCache";
 import { Message, MessageReqest, TextDelta } from "../core/Message.model";
 import { Assistant } from "./Assistant";
+import { createFilesMapName } from "./common";
+
+const ASSISTENT_NAME = "Superflex";
 
 export default class SuperflexAssistant implements Assistant {
   readonly projectRootPath: string;
@@ -26,25 +29,11 @@ export default class SuperflexAssistant implements Assistant {
     this.repo = repo;
   }
 
-  /**
-   * Create a new chat thread.
-   *
-   * @param title - Optional parameter to specify the title of the thread.
-   * @returns A promise that resolves with the created thread.
-   */
   async createThread(title?: string): Promise<Thread> {
     const thread = await api.createThread({ owner: this.owner, repo: this.repo, title });
     return thread;
   }
 
-  /**
-   * Send a message in a chat thread. If there is no active thread, a new thread will be created.
-   *
-   * @param threadID - The ID of the thread to send the message to.
-   * @param messages - The messages to send to the assistant.
-   * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
-   * @returns A promise that resolves with the response message.
-   */
   async sendMessage(
     threadID: string,
     messages: MessageReqest[],
@@ -63,14 +52,6 @@ export default class SuperflexAssistant implements Assistant {
     return message;
   }
 
-  /**
-   * Sync files parse and upload small bites of project files to the vector store.
-   * NOTE: If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
-   * NOTE: The files that are uploaded but missing from the filePaths input will be removed.
-   *
-   * @param progressCb - Optional parameter to specify a callback function that will be called periodically with the current progress of syncing the files. "current" is value between 0 and 100.
-   * @returns A promise that resolves with the uploaded files.
-   */
   async syncFiles(progressCb?: (current: number) => void): Promise<void> {
     if (!SuperflexCache.storagePath) {
       throw new Error("Storage path is not set");
@@ -81,7 +62,7 @@ export default class SuperflexAssistant implements Assistant {
     }
 
     const storagePath = SuperflexCache.storagePath;
-    const cachedFilePathToIDMap = SuperflexCache.get(FILE_ID_MAP_NAME);
+    const cachedFilePathToIDMap = SuperflexCache.get(createFilesMapName(ASSISTENT_NAME));
     const filePathToIDMap: Map<string, CachedFile> = cachedFilePathToIDMap
       ? jsonToMap<CachedFile>(cachedFilePathToIDMap, cachedFileReviver)
       : new Map<string, CachedFile>();
