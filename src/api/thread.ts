@@ -17,6 +17,17 @@ async function createThread({ owner, repo, title }: CreateThreadArgs): Promise<T
   }
 }
 
+export type GetThreadsArgs = RepoArgs;
+
+async function getThreads({ owner, repo }: GetThreadsArgs): Promise<ThreadData[]> {
+  try {
+    const { data } = await Api.get(`/repos/${owner}/${repo}/threads`);
+    return Promise.resolve(data.threads.map(Thread.buildThreadDataFromResponse));
+  } catch (err) {
+    return Promise.reject(parseError(err));
+  }
+}
+
 export type GetThreadArgs = RepoArgs & {
   threadID: string;
 };
@@ -61,4 +72,4 @@ async function threadRun({ owner, repo, threadID, messages }: ThreadRunArgs): Pr
   }
 }
 
-export { createThread, getThread, deleteThread, threadRun };
+export { createThread, getThreads, getThread, deleteThread, threadRun };
