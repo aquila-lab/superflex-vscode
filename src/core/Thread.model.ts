@@ -1,44 +1,22 @@
-import Message, { MessageData } from "./Message.model";
+import { buildMessageFromResponse, Message } from "./Message.model";
 
-export interface ThreadData {
+export type Thread = {
   /** @type {Generics.UUID} */
   id: string;
+
   title: string;
+  messages: Message[];
+
   updatedAt: Date;
   createdAt: Date;
+};
 
-  messages: MessageData[];
+export function buildThreadFromResponse(res: any): Thread {
+  return {
+    id: res.id,
+    title: res.title,
+    updatedAt: new Date(res.updated_at),
+    createdAt: new Date(res.created_at),
+    messages: (res.messages ?? []).map((msg: any) => buildMessageFromResponse(msg)),
+  };
 }
-
-class Thread implements ThreadData {
-  id: string;
-  title: string;
-  updatedAt: Date;
-  createdAt: Date;
-
-  messages: MessageData[] = [];
-
-  constructor(data: ThreadData) {
-    this.id = data.id;
-    this.title = data.title;
-    this.updatedAt = data.updatedAt;
-    this.createdAt = data.createdAt;
-    this.messages = data.messages ?? [];
-  }
-
-  static buildThreadDataFromResponse(response: any): ThreadData {
-    const messages: MessageData[] = (response.messages ?? []).map((msg: any) =>
-      Message.buildMessageDataFromResponse(msg)
-    );
-
-    return {
-      id: response.id,
-      title: response.title,
-      updatedAt: new Date(response.updated_at),
-      createdAt: new Date(response.created_at),
-      messages,
-    };
-  }
-}
-
-export default Thread;

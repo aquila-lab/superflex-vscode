@@ -9,8 +9,8 @@ import SuperflexAuthenticationService from "./authentication/SuperflexAuthentica
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
 import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
 import { SuperflexCache } from "./cache/SuperflexCache";
-import { AIProvider, SelfHostedAIProvider } from "./providers/AIProvider";
-import OpenAIProvider from "./providers/OpenAIProvider";
+import { AIProvider, SelfHostedAIProvider } from "./assistant/AIProvider";
+import OpenAIProvider from "./assistant/OpenAIProvider";
 import { getOpenWorkspace } from "./common/utils";
 import { FigmaTokenInformation } from "./core/Figma.model";
 

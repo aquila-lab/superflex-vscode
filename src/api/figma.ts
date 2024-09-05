@@ -1,5 +1,5 @@
-import User, { UserData } from "../core/User.model";
 import { FigmaTokenInformation } from "../core/Figma.model";
+import { buildUserFromResponse, User } from "../core/User.model";
 import { PublicApi } from "./api";
 import { FigmaApi } from "./figmaApi";
 import { parseError } from "./error";
@@ -23,10 +23,10 @@ async function figmaRefreshAccessToken({ refreshToken }: FigmaRefreshAccessToken
   }
 }
 
-async function getFigmaUserInfo(): Promise<UserData> {
+async function getFigmaUserInfo(): Promise<User> {
   try {
     const { data } = await FigmaApi.get("/me");
-    return Promise.resolve(User.buildUserDataFromResponse(data));
+    return Promise.resolve(buildUserFromResponse(data));
   } catch (err) {
     return Promise.reject(parseError(err));
   }

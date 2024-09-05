@@ -1,24 +1,12 @@
-export interface UserData {
+export type User = {
   /** @type {Generics.UUID} */
   id: string;
   email: string;
+};
+
+export function buildUserFromResponse(res: any): User {
+  return {
+    id: res.id,
+    email: res.email,
+  };
 }
-
-class User implements UserData {
-  id: string;
-  email: string;
-
-  constructor(data: UserData) {
-    this.id = data.id;
-    this.email = data.email;
-  }
-
-  static buildUserDataFromResponse(response: any): UserData {
-    return {
-      id: response.id,
-      email: response.email,
-    };
-  }
-}
-
-export default User;

@@ -8,48 +8,37 @@ export enum MessageType {
   Image = "image",
 }
 
-export interface MessageData {
+export type TextDelta = {
+  value: string;
+};
+
+export type MessageReqest = {
+  type: MessageType;
+  content: string;
+};
+
+export type Message = {
   /** @type {Generics.UUID} */
   id: string;
   /** @type {Generics.UUID} */
   threadID: string;
+
   role: Role;
   type: MessageType;
   content: string;
+
   updatedAt: Date;
   createdAt: Date;
+};
+
+export function buildMessageFromResponse(res: any): Message {
+  return {
+    id: res.id,
+    threadID: res.thread_id,
+    role: res.role,
+    type: res.type,
+    content: res.content,
+    updatedAt: new Date(res.updated_at),
+    createdAt: new Date(res.created_at),
+  };
 }
-
-class Message implements MessageData {
-  id: string;
-  threadID: string;
-  role: Role;
-  type: MessageType;
-  content: string;
-  updatedAt: Date;
-  createdAt: Date;
-
-  constructor(data: MessageData) {
-    this.id = data.id;
-    this.threadID = data.threadID;
-    this.role = data.role;
-    this.type = data.type;
-    this.content = data.content;
-    this.updatedAt = data.updatedAt;
-    this.createdAt = data.createdAt;
-  }
-
-  static buildMessageDataFromResponse(response: any): MessageData {
-    return {
-      id: response.id,
-      threadID: response.thread_id,
-      role: response.role,
-      type: response.type,
-      content: response.content,
-      updatedAt: new Date(response.updated_at),
-      createdAt: new Date(response.created_at),
-    };
-  }
-}
-
-export default Message;

@@ -1,17 +1,17 @@
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
 import { parseError } from "./error";
-import Thread, { ThreadData } from "../core/Thread.model";
-import Message, { MessageData, MessageType } from "../core/Message.model";
+import { buildThreadFromResponse, Thread } from "../core/Thread.model";
+import { buildMessageFromResponse, Message, MessageReqest } from "../core/Message.model";
 
 export type CreateThreadArgs = RepoArgs & {
   title?: string;
 };
 
-async function createThread({ owner, repo, title }: CreateThreadArgs): Promise<ThreadData> {
+async function createThread({ owner, repo, title }: CreateThreadArgs): Promise<Thread> {
   try {
     const { data } = await Api.post(`/repos/${owner}/${repo}/threads`, { title });
-    return Promise.resolve(Thread.buildThreadDataFromResponse(data));
+    return Promise.resolve(buildThreadFromResponse(data));
   } catch (err) {
     return Promise.reject(parseError(err));
   }
@@ -19,10 +19,10 @@ async function createThread({ owner, repo, title }: CreateThreadArgs): Promise<T
 
 export type GetThreadsArgs = RepoArgs;
 
-async function getThreads({ owner, repo }: GetThreadsArgs): Promise<ThreadData[]> {
+async function getThreads({ owner, repo }: GetThreadsArgs): Promise<Thread[]> {
   try {
     const { data } = await Api.get(`/repos/${owner}/${repo}/threads`);
-    return Promise.resolve(data.threads.map(Thread.buildThreadDataFromResponse));
+    return Promise.resolve(data.threads.map(buildThreadFromResponse));
   } catch (err) {
     return Promise.reject(parseError(err));
   }
@@ -32,10 +32,10 @@ export type GetThreadArgs = RepoArgs & {
   threadID: string;
 };
 
-async function getThread({ owner, repo, threadID }: GetThreadArgs): Promise<ThreadData> {
+async function getThread({ owner, repo, threadID }: GetThreadArgs): Promise<Thread> {
   try {
     const { data } = await Api.get(`/repos/${owner}/${repo}/threads/${threadID}`);
-    return Promise.resolve(Thread.buildThreadDataFromResponse(data));
+    return Promise.resolve(buildThreadFromResponse(data));
   } catch (err) {
     return Promise.reject(parseError(err));
   }
@@ -50,14 +50,11 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
   }
 }
 
-export type ThreadRunArgs = GetThreadArgs & {
-  messages: {
-    type: MessageType;
-    content: string;
-  }[];
+export type SendThreadMessageArgs = GetThreadArgs & {
+  messages: MessageReqest[];
 };
 
-async function threadRun({ owner, repo, threadID, messages }: ThreadRunArgs): Promise<MessageData> {
+async function sendThreadMessage({ owner, repo, threadID, messages }: SendThreadMessageArgs): Promise<Message> {
   try {
     const { data } = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
       messages: messages.map((msg) => ({
@@ -66,10 +63,10 @@ async function threadRun({ owner, repo, threadID, messages }: ThreadRunArgs): Pr
       })),
     });
 
-    return Promise.resolve(Message.buildMessageDataFromResponse(data));
+    return Promise.resolve(buildMessageFromResponse(data));
   } catch (err) {
     return Promise.reject(parseError(err));
   }
 }
 
-export { createThread, getThreads, getThread, deleteThread, threadRun };
+export { createThread, getThreads, getThread, deleteThread, sendThreadMessage };

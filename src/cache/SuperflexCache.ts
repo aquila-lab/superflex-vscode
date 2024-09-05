@@ -4,24 +4,6 @@ import * as vscode from "vscode";
 
 import { decodeUriAndRemoveFilePrefix } from "../common/utils";
 
-export const GLOBAL_SETTINGS_FILE_NAME = "settings.json";
-
-export type GlobalSettings = {
-  openaiApiKey?: string;
-};
-
-export type CachedFileObject = {
-  originalPath: string;
-  cachedPath: string;
-};
-
-export type CacheFileOptions = {
-  /**
-   * The file extension to use for the cached files.
-   */
-  ext: string;
-};
-
 class SuperflexCacheClass {
   workspaceFolderPath: string | undefined;
   storagePath: string | undefined;
@@ -121,47 +103,6 @@ class SuperflexCacheClass {
 
     const writeBuffer = Buffer.from(data);
     fs.writeFileSync(path.join(this.globalStoragePath, filename), writeBuffer);
-  }
-
-  cacheFilesSync(filePaths: string[], options?: CacheFileOptions): CachedFileObject[] {
-    if (!this.workspaceFolderPath || !this.storagePath) {
-      throw new Error("Workspace folder path or storage path is not set");
-    }
-
-    const cacheFolder = path.join(this.storagePath, "files");
-    if (!fs.existsSync(cacheFolder)) {
-      fs.mkdirSync(cacheFolder, { recursive: true });
-    }
-
-    const cacheFiles: CachedFileObject[] = [];
-    for (const filePath of filePaths) {
-      const documentPath = path.join(
-        cacheFolder,
-        `${path.relative(this.workspaceFolderPath, filePath)}${options?.ext ?? ""}`
-      );
-      if (!fs.existsSync(path.dirname(documentPath))) {
-        fs.mkdirSync(path.dirname(documentPath), { recursive: true });
-      }
-
-      fs.copyFileSync(filePath, documentPath);
-      cacheFiles.push({
-        originalPath: filePath,
-        cachedPath: documentPath,
-      });
-    }
-
-    return cacheFiles;
-  }
-
-  removeCachedFilesSync(): void {
-    if (!this.storagePath) {
-      throw new Error("Storage path is not set");
-    }
-
-    const cachedFilesFolder = path.join(this.storagePath, "files");
-    if (fs.existsSync(cachedFilesFolder)) {
-      fs.rmSync(cachedFilesFolder, { recursive: true });
-    }
   }
 }
 

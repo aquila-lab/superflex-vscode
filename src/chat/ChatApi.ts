@@ -8,7 +8,7 @@ import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
 import { SuperflexCache } from "../cache/SuperflexCache";
 import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
-import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../providers/AIProvider";
+import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../assistant/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { downloadImage, getFigmaSelectionFileNodes, getFigmaSelectionImageUrl } from "../api";

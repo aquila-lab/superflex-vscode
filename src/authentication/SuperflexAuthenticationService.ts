@@ -5,7 +5,7 @@ import { ApiProvider } from "../api";
 import { newEventMessage } from "../protocol";
 import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 import ChatViewProvider from "../chat/ChatViewProvider";
-import { AIProvider, SelfHostedAIProvider } from "../providers/AIProvider";
+import { AIProvider, SelfHostedAIProvider } from "../assistant/AIProvider";
 
 export default class SuperflexAuthenticationService {
   private _webviewProvider: ChatViewProvider;

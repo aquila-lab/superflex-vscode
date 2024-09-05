@@ -4,8 +4,6 @@ import asyncQ from "async";
 import OpenAI from "openai";
 
 import { SuperflexCache, GLOBAL_SETTINGS_FILE_NAME, GlobalSettings, CachedFileObject } from "../cache/SuperflexCache";
-import { ASSISTANT_DESCRIPTION, ASSISTANT_INSTRUCTIONS, ASSISTANT_NAME } from "./constants";
-import { Assistant, Message, MessageContent, SelfHostedAIProvider, TextDelta, VectorStore } from "./AIProvider";
 import { jsonToMap, mapToJson } from "../common/utils";
 
 const FILE_ID_MAP_NAME = "open-ai-file-id-map.json";
@@ -20,7 +18,7 @@ function cachedFileReviver(key: string, value: any): CachedFile {
   return { ...value };
 }
 
-class OpenAIVectorStore implements VectorStore {
+class OpenAIVectorStore {
   id: string;
 
   private _openai: OpenAI;
@@ -167,7 +165,7 @@ class OpenAIVectorStore implements VectorStore {
   }
 }
 
-class OpenAIAssistant implements Assistant {
+class OpenAIAssistant {
   id: string;
 
   private _openai: OpenAI;
@@ -276,7 +274,7 @@ class OpenAIAssistant implements Assistant {
   }
 }
 
-export default class OpenAIProvider implements SelfHostedAIProvider {
+export default class OpenAIProvider {
   discriminator: "ai-provider" | "self-hosted-ai-provider";
 
   private _openai?: OpenAI;
