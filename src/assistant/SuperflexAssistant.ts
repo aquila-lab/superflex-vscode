@@ -4,10 +4,11 @@ import asyncQ from "async";
 
 import * as api from "../api";
 import { Thread } from "../core/Thread.model";
-import { Message, MessageReqest, TextDelta } from "../core/Message.model";
 import { SuperflexCache } from "../cache/SuperflexCache";
+import { Message, MessageReqest, TextDelta } from "../core/Message.model";
+import { Assistant } from "./Assistant";
 
-export default class SuperflexAssistant {
+export default class SuperflexAssistant implements Assistant {
   readonly projectRootPath: string;
   readonly owner: string;
   readonly repo: string;
