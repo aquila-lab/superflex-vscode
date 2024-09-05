@@ -14,7 +14,7 @@ import {
 } from "vscode";
 
 import * as api from "../api";
-import { UserData } from "../core/User.model";
+import { User } from "../core/User.model";
 import { FIGMA_AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
@@ -74,15 +74,15 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
       }
 
       api.FigmaApiProvider.setHeader("Authorization", `Bearer ${accessToken}`);
-      const userinfo: UserData = await api.getFigmaUserInfo();
+      const user: User = await api.getFigmaUserInfo();
 
       const session: FigmaAuthenticationSession = {
         id: uuidv4(),
         accessToken: accessToken,
         refreshToken: refreshToken,
         account: {
-          id: userinfo.id,
-          label: userinfo.email,
+          id: user.id,
+          label: user.email,
         },
         scopes: [],
       };

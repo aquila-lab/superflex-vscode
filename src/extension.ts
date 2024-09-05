@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   const aiProvider = new OpenAIProvider();
   const chatApi = new ChatAPI(aiProvider);
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
-  const authService = new SuperflexAuthenticationService(chatWebviewProvider, aiProvider);
+  const authService = new SuperflexAuthenticationService(chatWebviewProvider);
   const figmaAuthProvider = new FigmaAuthenticationProvider(context);
 
   const appState: AppState = {
@@ -76,7 +76,6 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
     // Superflex Auth commands
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => state.authService.signIn(state.authProvider)),
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => state.authService.signOut(state.authProvider)),
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.remove-openai-api-key`, () => state.authService.removeToken()),
 
     // Figma Auth commands
     vscode.commands.registerCommand("superflex.figma.connect", () => state.figmaAuthService.connect()),
@@ -87,13 +86,6 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 
   state.chatApi.registerEvent("login_clicked", async () => {
     await state.authService.signIn(state.authProvider);
-  });
-  state.chatApi.registerEvent<{ token: string }, void>("token_entered", async (req) => {
-    if (state.aiProvider.discriminator === "self-hosted-ai-provider") {
-      const selfHostedProvider = state.aiProvider as SelfHostedAIProvider;
-      selfHostedProvider.setToken(req.token);
-    }
-    await state.authService.authenticateToken();
   });
   state.chatApi.registerEvent<void, FigmaTokenInformation>("figma_oauth_connect", async () => {
     return await state.figmaAuthService.connect();

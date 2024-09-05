@@ -14,7 +14,7 @@ import {
 } from "vscode";
 
 import * as api from "../api";
-import { UserData } from "../core/User.model";
+import { User } from "../core/User.model";
 import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import AuthService from "./SuperflexAuthenticationService";
@@ -76,14 +76,14 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
 
       this._authService.authenticate(this, accessToken);
 
-      const userinfo: UserData = await api.getUserInfo();
+      const user: User = await api.getUserInfo();
 
       const session: AuthenticationSession = {
         id: uuidv4(),
         accessToken: accessToken,
         account: {
-          id: userinfo.id,
-          label: userinfo.email,
+          id: user.id,
+          label: user.email,
         },
         scopes: [],
       };
