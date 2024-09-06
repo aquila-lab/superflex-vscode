@@ -4,22 +4,16 @@ import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 import { v4 as uuidv4 } from "uuid";
 
-import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
 import { SuperflexCache } from "../cache/SuperflexCache";
-import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
+import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { downloadImage, getFigmaSelectionFileNodes, getFigmaSelectionImageUrl } from "../api";
 import { parseFigmaResponse } from "../core/Figma.model";
 import { Assistant } from "../assistant";
-
-const SETTINGS_FILE = "settings.json";
-
-type Settings = {
-  vectorStoreID: string;
-  assistantID: string;
-};
+import SuperflexAssistant from "../assistant/SuperflexAssistant";
+import MockAssistant from "../assistant/MockAssistant";
 
 type InitState = {
   isInitialized: boolean;
@@ -51,6 +45,8 @@ export class ChatAPI {
   private _isSyncProjectRunning = false;
 
   constructor() {
+    this._assistant = new MockAssistant();
+
     this._chatEventRegistry
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
@@ -61,15 +57,14 @@ export class ChatAPI {
         try {
           let figmaAuthenticated = false;
 
-          await this._aiProvider.init();
-
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {
             return { isInitialized: false, figmaAuthenticated };
           }
 
-          await this.initializeAssistant(openWorkspace.name);
-          await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
+          const workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
+          this._assistant = new SuperflexAssistant(workspaceDirPath, "local", openWorkspace.name);
+          await this.syncProjectFiles(sendEventMessageCb);
 
           this._isInitialized = true;
 
@@ -90,11 +85,7 @@ export class ChatAPI {
         }
         this._isSyncProjectRunning = true;
 
-        const openWorkspace = getOpenWorkspace();
-        if (!openWorkspace) {
-          return;
-        }
-        await this.syncProjectFiles(openWorkspace, sendEventMessageCb);
+        await this.syncProjectFiles(sendEventMessageCb);
 
         this._isSyncProjectRunning = false;
       })
@@ -102,7 +93,7 @@ export class ChatAPI {
         if (!this._isInitialized || !this._assistant) {
           return;
         }
-        await this._assistant.createNewThread();
+        await this._assistant.createThread();
       })
       .registerEvent<NewMessageRequest, Message[]>("new_message", async (req, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
@@ -195,45 +186,16 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
     return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
   }
 
-  private async initializeAssistant(workspaceName: string): Promise<void> {
-    const rawSettings = SuperflexCache.get(SETTINGS_FILE);
-    if (rawSettings) {
-      const settings = JSON.parse(rawSettings) as Settings;
-      if (settings.vectorStoreID && settings.assistantID) {
-        this._vectorStore = await this._aiProvider.retrieveVectorStore(settings.vectorStoreID);
-        this._assistant = await this._aiProvider.retrieveAssistant(settings.assistantID);
-        return;
+  private async syncProjectFiles(sendEventMessageCb: (msg: EventMessage) => void): Promise<void> {
+    try {
+      await this._assistant.syncFiles((progress) => {
+        sendEventMessageCb(newEventMessage("sync_progress", { progress }));
+      });
+    } catch (err: any) {
+      if (err?.message && err.message.startsWith("No supported files found in the workspace")) {
+        vscode.window.showWarningMessage(err.message);
       }
+      console.error(err);
     }
-
-    this._vectorStore = await this._aiProvider.createVectorStore(workspaceName);
-    this._assistant = await this._aiProvider.createAssistant(this._vectorStore);
-
-    SuperflexCache.set(
-      SETTINGS_FILE,
-      JSON.stringify({ vectorStoreID: this._vectorStore.id, assistantID: this._assistant.id } as Settings)
-    );
-  }
-
-  private async syncProjectFiles(
-    openWorkspace: vscode.WorkspaceFolder,
-    sendEventMessageCb: (msg: EventMessage) => void
-  ): Promise<void> {
-    const workspaceFolderPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
-    const documentsUri: string[] = await findFiles(
-      workspaceFolderPath,
-      SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
-      ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
-    );
-
-    if (documentsUri.length === 0) {
-      vscode.window.showWarningMessage(
-        `No supported files found in the workspace.\nSupported file extensions are: ${SUPPORTED_FILE_EXTENSIONS}`
-      );
-    }
-
-    await this._vectorStore?.syncFiles(documentsUri, (progress) => {
-      sendEventMessageCb(newEventMessage("sync_progress", { progress }));
-    });
   }
 }
