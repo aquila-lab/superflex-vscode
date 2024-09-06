@@ -1,21 +1,18 @@
 import * as vscode from "vscode";
 
 import { ChatAPI } from "./chat/ChatApi";
-import ChatViewProvider from "./chat/ChatViewProvider";
-import registerChatWidgetWebview from "./chat/chatWidgetWebview";
+import { getOpenWorkspace } from "./common/utils";
 import { AUTH_PROVIDER_ID } from "./common/constants";
-import SuperflexAuthenticationProvider from "./authentication/SuperflexAuthenticationProvider";
-import SuperflexAuthenticationService from "./authentication/SuperflexAuthenticationService";
+import ChatViewProvider from "./chat/ChatViewProvider";
+import { SuperflexCache } from "./cache/SuperflexCache";
+import { FigmaTokenInformation } from "./core/Figma.model";
+import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
 import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
-import { SuperflexCache } from "./cache/SuperflexCache";
-import { AIProvider, SelfHostedAIProvider } from "./assistant/AIProvider";
-import OpenAIProvider from "./assistant/OpenAIProvider";
-import { getOpenWorkspace } from "./common/utils";
-import { FigmaTokenInformation } from "./core/Figma.model";
+import SuperflexAuthenticationService from "./authentication/SuperflexAuthenticationService";
+import SuperflexAuthenticationProvider from "./authentication/SuperflexAuthenticationProvider";
 
 type AppState = {
-  aiProvider: AIProvider;
   chatApi: ChatAPI;
   authService: SuperflexAuthenticationService;
   authProvider: SuperflexAuthenticationProvider;
@@ -25,14 +22,12 @@ type AppState = {
 };
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  const aiProvider = new OpenAIProvider();
-  const chatApi = new ChatAPI(aiProvider);
+  const chatApi = new ChatAPI();
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
   const authService = new SuperflexAuthenticationService(chatWebviewProvider);
   const figmaAuthProvider = new FigmaAuthenticationProvider(context);
 
   const appState: AppState = {
-    aiProvider: aiProvider,
     chatApi: chatApi,
     authService: authService,
     authProvider: new SuperflexAuthenticationProvider(context, authService),

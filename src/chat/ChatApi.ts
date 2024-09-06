@@ -8,11 +8,11 @@ import { findFiles } from "../scanner";
 import { EventMessage, newEventMessage } from "../protocol";
 import { SuperflexCache } from "../cache/SuperflexCache";
 import { FIGMA_AUTH_PROVIDER_ID, SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
-import { AIProvider, Assistant, Message, MessageContent, VectorStore } from "../assistant/AIProvider";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { downloadImage, getFigmaSelectionFileNodes, getFigmaSelectionImageUrl } from "../api";
 import { parseFigmaResponse } from "../core/Figma.model";
+import { Assistant } from "../assistant";
 
 const SETTINGS_FILE = "settings.json";
 
@@ -43,19 +43,14 @@ type ChatMessage = {
 };
 
 export class ChatAPI {
-  private _aiProvider: AIProvider;
+  private _assistant: Assistant;
   private _ready = new vscode.EventEmitter<void>();
   private _isInitialized = false;
   private _initializedMutex = new Mutex();
   private _chatEventRegistry = new EventRegistry();
   private _isSyncProjectRunning = false;
 
-  private _vectorStore?: VectorStore;
-  private _assistant?: Assistant;
-
-  constructor(aiProvider: AIProvider) {
-    this._aiProvider = aiProvider;
-
+  constructor() {
     this._chatEventRegistry
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
