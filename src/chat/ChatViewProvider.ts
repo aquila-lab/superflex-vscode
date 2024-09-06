@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 
-import { getNonce } from "../common/utils";
-import { EventMessage, newEventMessage } from "../protocol";
+import { EventMessage, newEventMessage } from "../../shared/protocol";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {

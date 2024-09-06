@@ -1,4 +1,4 @@
-import { MessageReqest, Message, Thread } from "shared/model";
+import { MessageReqest, Message, Thread } from "../../shared/model";
 
 import { Api } from "./api";
 import { RepoArgs } from "./repo";

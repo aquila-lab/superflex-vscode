@@ -1,4 +1,4 @@
-import { User } from "shared/model";
+import { User } from "../../shared/model";
 import { FigmaTokenInformation } from "../model/Figma.model";
 import { PublicApi } from "./api";
 import { FigmaApi } from "./figmaApi";

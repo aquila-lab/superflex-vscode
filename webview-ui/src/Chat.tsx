@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import ProgressBar from '@ramonak/react-progress-bar';
 import React, { useEffect, useRef, useState } from 'react';
 
+import { newEventMessage } from '../../shared/protocol';
 import { VSCodeWrapper } from './api/vscodeApi';
-import { newEventMessage } from './api/protocol';
 import { InputAndExecuteToolbar, MarkdownRender, FigmaFilePickerModal } from './components';
 import { extractFigmaSelectionUrl } from './utils/utils';
 

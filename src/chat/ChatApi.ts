@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { Message, MessageReqest, MessageType, Thread } from "shared/model";
-import { EventMessage, newEventMessage } from "../protocol";
+import { Message, MessageReqest, MessageType, Thread } from "../../shared/model";
+import { EventMessage, newEventMessage } from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";

@@ -2,8 +2,8 @@ import './App.css';
 
 import React, { useEffect, useState } from 'react';
 
+import { newEventMessage } from '../../shared/protocol';
 import { VSCodeWrapper } from './api/vscodeApi';
-import { newEventMessage } from './api/protocol';
 import { Button } from './components';
 import Chat from './Chat';
 
@@ -11,7 +11,6 @@ type View = 'chat' | 'login' | 'no_open_project';
 
 const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI }) => {
   const [view, setView] = useState<View>('login');
-  const [token, setToken] = useState('');
 
   useEffect(() => {
     return vscodeAPI.onMessage((message) => {

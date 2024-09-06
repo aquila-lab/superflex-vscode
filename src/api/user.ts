@@ -1,4 +1,4 @@
-import { User } from "shared/model";
+import { User } from "../../shared/model";
 
 import { Api } from "./api";
 import { parseError } from "./error";

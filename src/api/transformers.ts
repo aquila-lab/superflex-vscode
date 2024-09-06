@@ -1,4 +1,4 @@
-import { User, Message, Thread } from "shared/model";
+import { User, Message, Thread } from "../../shared/model";
 
 export function buildUserFromResponse(res: any): User {
   return {

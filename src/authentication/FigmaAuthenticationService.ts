@@ -1,12 +1,12 @@
 import axios from "axios";
 import * as vscode from "vscode";
 
-import { newEventMessage } from "../protocol";
-import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { FigmaTokenInformation } from "../model/Figma.model";
+import { newEventMessage } from "../../shared/protocol";
 import ChatViewProvider from "../chat/ChatViewProvider";
-import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
+import { FigmaTokenInformation } from "../model/Figma.model";
+import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { FigmaApiProvider, figmaRefreshAccessToken } from "../api";
+import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
 
 export default class FigmaAuthenticationService {
   private _webviewProvider: ChatViewProvider;

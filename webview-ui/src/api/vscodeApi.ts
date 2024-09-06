@@ -1,4 +1,4 @@
-import { EventMessage } from './protocol';
+import { EventMessage } from '../../../shared/protocol';
 
 declare const acquireVsCodeApi: () => VSCodeApi;
 

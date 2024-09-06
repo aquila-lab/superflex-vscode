@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { AuthenticationProvider } from "vscode";
 
 import { ApiProvider } from "../api";
-import { newEventMessage } from "../protocol";
+import { newEventMessage } from "../../shared/protocol";
 import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 import ChatViewProvider from "../chat/ChatViewProvider";
 
