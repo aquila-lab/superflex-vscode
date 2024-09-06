@@ -12,7 +12,7 @@ import { Message, MessageReqest, TextDelta } from "../core/Message.model";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
 
-const ASSISTENT_NAME = "Superflex";
+const ASSISTENT_NAME = "superflex";
 
 export default class SuperflexAssistant implements Assistant {
   readonly workspaceDirPath: string;
