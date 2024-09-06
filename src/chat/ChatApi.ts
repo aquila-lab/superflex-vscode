@@ -8,6 +8,7 @@ import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl } from "../api";
 import { extractFigmaSelectionUrl } from "../core/Figma.model";
 import { Assistant } from "../assistant";
+import { Thread } from "../core/Thread.model";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
 import { Message, MessageReqest, MessageType } from "../core/Message.model";
 
@@ -26,6 +27,7 @@ export class ChatAPI {
   private _initializedMutex = new Mutex();
   private _chatEventRegistry = new EventRegistry();
   private _isSyncProjectRunning = false;
+  private _thread?: Thread;
 
   constructor() {
     this._chatEventRegistry
@@ -86,6 +88,7 @@ export class ChatAPI {
         if (!this._isInitialized || this._isSyncProjectRunning) {
           return;
         }
+
         this._isSyncProjectRunning = true;
 
         await this.syncProjectFiles(sendEventMessageCb);
@@ -105,7 +108,8 @@ export class ChatAPI {
         if (!this._isInitialized || !this._assistant) {
           return;
         }
-        await this._assistant.createThread();
+
+        this._thread = await this._assistant.createThread();
       })
 
       /**
@@ -146,7 +150,13 @@ export class ChatAPI {
           return null;
         }
 
-        const assistantMessage = await this._assistant.sendMessage("", messages, (event) => {
+        let thread = this._thread;
+        if (!thread) {
+          thread = await this._assistant.createThread();
+          this._thread = thread;
+        }
+
+        const assistantMessage = await this._assistant.sendMessage(thread.id, messages, (event) => {
           sendEventMessageCb(newEventMessage("message_processing", event.value));
         });
 
