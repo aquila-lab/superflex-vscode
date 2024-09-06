@@ -20,22 +20,6 @@ type InitState = {
   figmaAuthenticated: boolean;
 };
 
-type NewMessageRequest = {
-  text?: string;
-  imageUrl?: string;
-  figma?: {
-    fileID: string;
-    nodeID: string;
-  };
-};
-
-type ChatMessage = {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
-  imageUrl?: string;
-};
-
 export class ChatAPI {
   private _assistant: Assistant;
   private _ready = new vscode.EventEmitter<void>();
@@ -48,9 +32,20 @@ export class ChatAPI {
     this._assistant = new MockAssistant();
 
     this._chatEventRegistry
+      /**
+       * Event (ready): This event is fired when the webview is ready to receive events.
+       */
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
       })
+      /**
+       * Event (initialized): This event is fired when the webview Chat page is initialized.
+       * It is used to sync the project files with the webview.
+       *
+       * @param sendEventMessageCb - Callback function to send event messages to the webview.
+       * @returns A promise that resolves with the initialized state.
+       * @throws An error if the project files cannot be synced.
+       */
       .registerEvent<void, InitState>("initialized", async (_, sendEventMessageCb) => {
         const release = await this._initializedMutex.acquire();
 
@@ -78,6 +73,15 @@ export class ChatAPI {
           release();
         }
       })
+      /**
+       * Event (sync_project): This event is fired when the user clicks the "Sync Project" button in the webview.
+       * Additionally, it is periodically triggered from the webview to ensure project files remain synchronized.
+       * It is used to sync the project files with AI code assistant.
+       *
+       * @param sendEventMessageCb - Callback function to send event messages to the webview.
+       * @returns A promise that resolves when the project files are synced.
+       * @throws An error if the project files cannot be synced.
+       */
       .registerEvent<void, void>("sync_project", async (_, sendEventMessageCb) => {
         // Prevent multiple sync project requests from running concurrently
         if (!this._isInitialized || this._isSyncProjectRunning) {
@@ -89,6 +93,14 @@ export class ChatAPI {
 
         this._isSyncProjectRunning = false;
       })
+      /**
+       * Event (new_thread): This event is fired when the user clicks the "New Chat" button in the webview.
+       * It is used to create a new chat thread with AI code assistant.
+       *
+       * @param sendEventMessageCb - Callback function to send event messages to the webview.
+       * @returns A promise that resolves when the new chat thread is created.
+       * @throws An error if the new chat thread cannot be created.
+       */
       .registerEvent<void, void>("new_thread", async () => {
         if (!this._isInitialized || !this._assistant) {
           return;
