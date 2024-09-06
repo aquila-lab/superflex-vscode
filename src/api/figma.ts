@@ -1,8 +1,9 @@
+import { User } from "shared/model";
 import { FigmaTokenInformation } from "../model/Figma.model";
-import { buildUserFromResponse, User } from "../model/User.model";
 import { PublicApi } from "./api";
 import { FigmaApi } from "./figmaApi";
 import { parseError } from "./error";
+import { buildUserFromResponse } from "./transformers";
 
 type FigmaRefreshAccessTokenArgs = {
   refreshToken: string;

@@ -13,8 +13,8 @@ import {
   ProgressLocation,
 } from "vscode";
 
+import { User } from "shared/model";
 import * as api from "../api";
-import { User } from "../model/User.model";
 import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import AuthService from "./SuperflexAuthenticationService";

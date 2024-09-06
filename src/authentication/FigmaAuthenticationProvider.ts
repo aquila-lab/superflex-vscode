@@ -13,8 +13,8 @@ import {
   ProgressLocation,
 } from "vscode";
 
+import { User } from "shared/model";
 import * as api from "../api";
-import { User } from "../model/User.model";
 import { FIGMA_AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
