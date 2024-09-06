@@ -1,19 +1,15 @@
-import fs from "fs";
-import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
-import { v4 as uuidv4 } from "uuid";
 
 import { EventMessage, newEventMessage } from "../protocol";
-import { SuperflexCache } from "../cache/SuperflexCache";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
-import { downloadImage, getFigmaSelectionFileNodes, getFigmaSelectionImageUrl } from "../api";
-import { parseFigmaResponse } from "../core/Figma.model";
+import { getFigmaSelectionImageUrl } from "../api";
+import { extractFigmaSelectionUrl } from "../core/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
-import MockAssistant from "../assistant/MockAssistant";
+import { Message, MessageReqest, MessageType } from "../core/Message.model";
 
 type InitState = {
   isInitialized: boolean;
@@ -24,7 +20,7 @@ type InitState = {
  * ChatAPI class for interacting with the chat service.
  */
 export class ChatAPI {
-  private _assistant: Assistant;
+  private _assistant?: Assistant;
   private _ready = new vscode.EventEmitter<void>();
   private _isInitialized = false;
   private _initializedMutex = new Mutex();
@@ -32,8 +28,6 @@ export class ChatAPI {
   private _isSyncProjectRunning = false;
 
   constructor() {
-    this._assistant = new MockAssistant();
-
     this._chatEventRegistry
       /**
        * Event (ready): This event is fired when the webview is ready to receive events.
@@ -41,6 +35,7 @@ export class ChatAPI {
       .registerEvent<void, void>("ready", () => {
         this._ready.fire();
       })
+
       /**
        * Event (initialized): This event is fired when the webview Chat page is initialized.
        * It is used to sync the project files with the webview.
@@ -76,6 +71,7 @@ export class ChatAPI {
           release();
         }
       })
+
       /**
        * Event (sync_project): This event is fired when the user clicks the "Sync Project" button in the webview.
        * Additionally, it is periodically triggered from the webview to ensure project files remain synchronized.
@@ -96,6 +92,7 @@ export class ChatAPI {
 
         this._isSyncProjectRunning = false;
       })
+
       /**
        * Event (new_thread): This event is fired when the user clicks the "New Chat" button in the webview.
        * It is used to create a new chat thread with AI code assistant.
@@ -110,76 +107,50 @@ export class ChatAPI {
         }
         await this._assistant.createThread();
       })
-      .registerEvent<NewMessageRequest, Message[]>("new_message", async (req, sendEventMessageCb) => {
+
+      /**
+       * Event (new_message): This event is fired when the user sends a message in the webview Chat.
+       * It is used to send a message to the AI code assistant, and return the assistant's message response.
+       *
+       * @param messages - Array of messages to send.
+       * @param sendEventMessageCb - Callback function to send event messages to the webview.
+       * @returns A promise that resolves with the assistant's message response.
+       * @throws An error if the message cannot be sent or processed.
+       */
+      .registerEvent<MessageReqest[], Message | null>("new_message", async (messages, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
-          return [];
+          return null;
         }
 
-        const messagesReq: MessageContent[] = [];
-        if (req.text) {
-          messagesReq.push({ type: "text", text: req.text });
-        }
-        if (req.imageUrl) {
-          messagesReq.push({ type: "image_file", imageUrl: req.imageUrl });
-        }
-        if (req.figma) {
-          const imageUrl = await getFigmaSelectionImageUrl(req.figma);
+        messages = await Promise.all(
+          messages.map(async (msg) => {
+            if (msg.type === MessageType.Figma) {
+              const figma = extractFigmaSelectionUrl(msg.content);
+              if (!figma) {
+                throw new Error("Invalid Figma Selection URL");
+              }
 
-          sendEventMessageCb(
-            newEventMessage("add_message", {
-              id: uuidv4(),
-              text: "Processing figma file...",
-              sender: "bot",
-              imageUrl,
-            } as ChatMessage)
-          );
-
-          if (SuperflexCache.storagePath) {
-            const imageUrlSegments = imageUrl.split("/");
-            const imageFileDir = decodeUriAndRemoveFilePrefix(path.join(SuperflexCache.storagePath, "images"));
-            if (!fs.existsSync(imageFileDir)) {
-              fs.mkdirSync(imageFileDir, { recursive: true });
+              const imageUrl = await getFigmaSelectionImageUrl(figma);
+              return {
+                ...msg,
+                content: imageUrl,
+              };
             }
 
-            const imageFilePath = decodeUriAndRemoveFilePrefix(
-              path.join(imageFileDir, `${imageUrlSegments[imageUrlSegments.length - 1]}.png`)
-            );
-            await downloadImage(imageUrl, imageFilePath);
-            messagesReq.push({ type: "image_file", imageUrl: imageFilePath });
-          }
-
-          const fileNodes = await getFigmaSelectionFileNodes(req.figma);
-
-          messagesReq.push({
-            type: "figma",
-            content: `
-Convert this Figma JSON object into production ready code following assistent instructions.
-
-## Figma JSON
-${JSON.stringify(parseFigmaResponse(fileNodes))}
-## constraints
-- Analyze the provided image to get better understending of the design we are trying to achieve
-- When it comes to styling, use the provided figma json object there you can find all the necessary information
-- Do not omit any details in JSX
-- Do not write anything besides code
-- If a layer contains more than 1 same name child layers, define it with ul tag and create array of appropriate dummy data within React component and use map method to render in JSX
-- Avoid using absolute positioning in CSS focus on flexbox and grid
-- Do not forget to follow instructions from the assistant
-- Generate the component code following the repository's coding style, design patterns, and reusing existing components.
-- Strong focus on readability existing compoenents 
-`,
-          });
-        }
+            return msg;
+          })
+        );
 
         // Do not send empty messages
-        if (messagesReq.length === 0) {
-          return [];
+        if (messages.length === 0) {
+          return null;
         }
 
-        const messages = await this._assistant.sendMessage(messagesReq, (event) => {
+        const assistantMessage = await this._assistant.sendMessage("", messages, (event) => {
           sendEventMessageCb(newEventMessage("message_processing", event.value));
         });
-        return messages;
+
+        return assistantMessage;
       });
   }
 
@@ -225,6 +196,10 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
    * @return {Promise<void>} A promise that resolves when the synchronization is complete.
    */
   private async syncProjectFiles(sendEventMessageCb: (msg: EventMessage) => void): Promise<void> {
+    if (!this._isInitialized || !this._assistant) {
+      return;
+    }
+
     try {
       await this._assistant.syncFiles((progress) => {
         sendEventMessageCb(newEventMessage("sync_progress", { progress }));

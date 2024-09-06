@@ -6,6 +6,7 @@ export enum Role {
 export enum MessageType {
   Text = "text",
   Image = "image",
+  Figma = "figma",
 }
 
 export type TextDelta = {

@@ -147,6 +147,8 @@ const Chat: React.FunctionComponent<{
         sender: 'bot'
       }
     ]);
+
+    // TODO(boris): Send bytes instead of file path
     vscodeAPI.postMessage(newEventMessage('new_message', { imageUrl: (file as any).path }));
     setMessageProcessing(true);
   }
