@@ -3,8 +3,11 @@ import path from "path";
 import asyncQ from "async";
 
 import * as api from "../api";
+import { jsonToMap } from "../common/utils";
 import { Thread } from "../core/Thread.model";
+import { findWorkspaceFiles } from "../scanner";
 import { SuperflexCache } from "../cache/SuperflexCache";
+import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { Message, MessageReqest, TextDelta } from "../core/Message.model";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
@@ -12,19 +15,19 @@ import { createFilesMapName } from "./common";
 const ASSISTENT_NAME = "Superflex";
 
 export default class SuperflexAssistant implements Assistant {
-  readonly rootPath: string;
+  readonly workspaceDirPath: string;
   readonly owner: string;
   readonly repo: string;
 
-  constructor(rootPath: string, owner: string, repo: string) {
-    if (!fs.existsSync(rootPath)) {
-      throw new Error("Root path does not exist");
+  constructor(workspaceDirPath: string, owner: string, repo: string) {
+    if (!fs.existsSync(workspaceDirPath)) {
+      throw new Error("Workspace path does not exist");
     }
-    if (!fs.lstatSync(rootPath).isDirectory()) {
-      throw new Error("Root path is not a directory");
+    if (!fs.lstatSync(workspaceDirPath).isDirectory()) {
+      throw new Error("Workspace path is not a directory");
     }
 
-    this.rootPath = rootPath;
+    this.workspaceDirPath = workspaceDirPath;
     this.owner = owner;
     this.repo = repo;
   }
@@ -61,14 +64,22 @@ export default class SuperflexAssistant implements Assistant {
       progressCb(0);
     }
 
-    const storagePath = SuperflexCache.storagePath;
-    const cachedFilePathToIDMap = SuperflexCache.get(createFilesMapName(ASSISTENT_NAME));
-    const filePathToIDMap: Map<string, CachedFile> = cachedFilePathToIDMap
-      ? jsonToMap<CachedFile>(cachedFilePathToIDMap, cachedFileReviver)
-      : new Map<string, CachedFile>();
+    const documentsUri: string[] = await findWorkspaceFiles(this.workspaceDirPath);
+    if (documentsUri.length === 0) {
+      throw Error(
+        `No supported files found in the workspace.\nSupported file extensions are: ${SUPPORTED_FILE_EXTENSIONS}`
+      );
+    }
+
+    const rawCachedFilesMap = SuperflexCache.get(createFilesMapName(ASSISTENT_NAME));
+    const cachedFilesMap: Map<string, number> = rawCachedFilesMap
+      ? jsonToMap<number>(rawCachedFilesMap)
+      : new Map<string, number>();
 
     const documentPaths = SuperflexCache.cacheFilesSync(filePaths, { ext: ".txt" });
     const progressCoefficient = 98 / documentPaths.length;
+
+    const storagePath = SuperflexCache.storagePath;
 
     const workers = this.createSyncWorkers(filePathToIDMap, storagePath, 10);
     await this.processFiles(workers, documentPaths, progressCoefficient, progressCb);
