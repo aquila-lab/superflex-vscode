@@ -20,6 +20,9 @@ type InitState = {
   figmaAuthenticated: boolean;
 };
 
+/**
+ * ChatAPI class for interacting with the chat service.
+ */
 export class ChatAPI {
   private _assistant: Assistant;
   private _ready = new vscode.EventEmitter<void>();
@@ -180,16 +183,33 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
       });
   }
 
+  /**
+   * Returns a Promise that resolves when the ChatAPI is ready.
+   */
   onReady(): Promise<void> {
     return new Promise((resolve) => {
       this._ready.event(resolve);
     });
   }
 
+  /**
+   * Registers a new event handler for the specified command.
+   *
+   * @param {string} command - The command for which to register the event handler.
+   * @param {Handler<Req, Res>} handler - The event handler to register.
+   */
   registerEvent<Req, Res>(command: string, handler: Handler<Req, Res>): void {
     this._chatEventRegistry.registerEvent<Req, Res>(command, handler);
   }
 
+  /**
+   * Handles a chat event by delegating to the registered event handler.
+   *
+   * @param {string} event - The name of the event to handle.
+   * @param {Req} requestPayload - The payload of the event request.
+   * @param {(msg: EventMessage) => void} sendEventMessageCb - A callback to send event messages to webview.
+   * @return {Promise<Res>} A promise that resolves to the result of the event handler.
+   */
   handleEvent<Req, Res>(
     event: string,
     requestPayload: Req,
@@ -198,6 +218,12 @@ ${JSON.stringify(parseFigmaResponse(fileNodes))}
     return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
   }
 
+  /**
+   * Synchronizes project files with the assistant.
+   *
+   * @param {(msg: EventMessage) => void} sendEventMessageCb - A callback to send event messages to webview.
+   * @return {Promise<void>} A promise that resolves when the synchronization is complete.
+   */
   private async syncProjectFiles(sendEventMessageCb: (msg: EventMessage) => void): Promise<void> {
     try {
       await this._assistant.syncFiles((progress) => {
