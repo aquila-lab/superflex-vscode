@@ -3,7 +3,7 @@ import path from "path";
 import asyncQ from "async";
 
 import * as api from "../api";
-import { jsonToMap } from "../common/utils";
+import { jsonToMap, mapToJson } from "../common/utils";
 import { Thread } from "../core/Thread.model";
 import { findWorkspaceFiles } from "../scanner";
 import { SuperflexCache } from "../cache/SuperflexCache";
@@ -18,6 +18,7 @@ export default class SuperflexAssistant implements Assistant {
   readonly workspaceDirPath: string;
   readonly owner: string;
   readonly repo: string;
+  readonly cacheFileName: string;
 
   constructor(workspaceDirPath: string, owner: string, repo: string) {
     if (!fs.existsSync(workspaceDirPath)) {
@@ -30,6 +31,7 @@ export default class SuperflexAssistant implements Assistant {
     this.workspaceDirPath = workspaceDirPath;
     this.owner = owner;
     this.repo = repo;
+    this.cacheFileName = createFilesMapName(ASSISTENT_NAME);
   }
 
   async createThread(title?: string): Promise<Thread> {
@@ -64,75 +66,55 @@ export default class SuperflexAssistant implements Assistant {
       progressCb(0);
     }
 
-    const documentsUri: string[] = await findWorkspaceFiles(this.workspaceDirPath);
-    if (documentsUri.length === 0) {
+    const documentPaths: string[] = await findWorkspaceFiles(this.workspaceDirPath);
+    if (documentPaths.length === 0) {
       throw Error(
         `No supported files found in the workspace.\nSupported file extensions are: ${SUPPORTED_FILE_EXTENSIONS}`
       );
     }
 
-    const rawCachedFilesMap = SuperflexCache.get(createFilesMapName(ASSISTENT_NAME));
+    const rawCachedFilesMap = SuperflexCache.get(this.cacheFileName);
     const cachedFilesMap: Map<string, number> = rawCachedFilesMap
       ? jsonToMap<number>(rawCachedFilesMap)
       : new Map<string, number>();
 
-    const documentPaths = SuperflexCache.cacheFilesSync(filePaths, { ext: ".txt" });
+    const storagePath = SuperflexCache.storagePath;
     const progressCoefficient = 98 / documentPaths.length;
 
-    const storagePath = SuperflexCache.storagePath;
-
-    const workers = this.createSyncWorkers(filePathToIDMap, storagePath, 10);
-    await this.processFiles(workers, documentPaths, progressCoefficient, progressCb);
+    const workers = this.createSyncWorkers(cachedFilesMap, 10);
+    await this.processFiles(workers, cachedFilesMap, documentPaths, progressCoefficient, progressCb);
 
     if (progressCb) {
       progressCb(99);
     }
 
-    await this.cleanUpFiles(filePathToIDMap, documentPaths, storagePath);
-
-    SuperflexCache.set(FILE_ID_MAP_NAME, mapToJson(filePathToIDMap));
-    SuperflexCache.removeCachedFilesSync();
+    await this.cleanUpFiles(cachedFilesMap, documentPaths);
+    SuperflexCache.set(this.cacheFileName, mapToJson(cachedFilesMap));
 
     if (progressCb) {
       progressCb(100);
     }
   }
 
-  private createSyncWorkers(
-    filePathToIDMap: Map<string, CachedFile>,
-    storagePath: string,
-    concurrency: number
-  ): asyncQ.QueueObject<CachedFileObject> {
-    const workers = asyncQ.queue(async (documentPath: CachedFileObject) => {
-      const fileStat = fs.statSync(documentPath.originalPath);
-
-      const relativeFilepath = path.relative(storagePath, documentPath.cachedPath);
-      const cachedFile = filePathToIDMap.get(relativeFilepath);
-
-      // Skip uploading the file if it has not been modified since the last upload
-      if (cachedFile && fileStat.mtime.getTime() <= cachedFile.createdAt) {
-        return;
-      }
+  private createSyncWorkers(cachedFilesMap: Map<string, number>, concurrency: number): asyncQ.QueueObject<string[]> {
+    const workers = asyncQ.queue(async (documentPaths: string[]) => {
+      const files = documentPaths.map((documentPath) => {
+        const relativePath = path.relative(this.workspaceDirPath, documentPath);
+        return {
+          relativePath,
+          source: fs.readFileSync(documentPath).toString(),
+          modifiedTime: fs.statSync(documentPath).mtime.getTime(),
+        };
+      });
 
       try {
-        if (cachedFile) {
-          try {
-            await this._openai.files.del(cachedFile.fileID);
-          } catch (err) {
-            // Ignore
-          }
+        await api.uploadFiles({ owner: this.owner, repo: this.repo, files });
+
+        for (const file of files) {
+          cachedFilesMap.set(file.relativePath, file.modifiedTime);
         }
-
-        const file = await this._openai.files.create({
-          file: fs.createReadStream(documentPath.cachedPath),
-          purpose: "assistants",
-        });
-
-        await this._openai.beta.vectorStores.files.createAndPoll(this.id, { file_id: file.id });
-
-        filePathToIDMap.set(relativeFilepath, { fileID: file.id, createdAt: fileStat.mtime.getTime() });
       } catch (err: any) {
-        console.error(`Failed to upload file ${documentPath}: ${err?.message}`);
+        console.error(`Failed to upload files: ${err?.message}`);
       }
     }, concurrency); // Number of concurrent workers
 
@@ -140,8 +122,9 @@ export default class SuperflexAssistant implements Assistant {
   }
 
   private processFiles(
-    workers: asyncQ.QueueObject<CachedFileObject>,
-    documentPaths: CachedFileObject[],
+    workers: asyncQ.QueueObject<string[]>,
+    cachedFilesMap: Map<string, number>,
+    documentPaths: string[],
     progressCoefficient: number,
     progressCb?: (current: number) => void
   ): Promise<void> {
@@ -151,17 +134,48 @@ export default class SuperflexAssistant implements Assistant {
         return;
       }
 
-      documentPaths.forEach((documentPath, index) => {
-        workers.push(documentPath, () => {
+      const maxFilesPerRequest = 50;
+      let filesToUpload: string[] = [];
+      for (let i = 0; i < documentPaths.length; i++) {
+        const documentPath = documentPaths[i];
+        const relativePath = path.relative(this.workspaceDirPath, documentPath);
+
+        const fileStat = fs.statSync(documentPath);
+        const cachedFileLastModifiedAt = cachedFilesMap.get(relativePath);
+
+        // Skip uploading the file if it has not been modified since the last upload
+        if (cachedFileLastModifiedAt && fileStat.mtime.getTime() <= cachedFileLastModifiedAt) {
+          continue;
+        }
+
+        filesToUpload.push(documentPath);
+
+        // Upload the files in batches of maxFilesPerRequest
+        if (filesToUpload.length >= maxFilesPerRequest) {
+          workers.push(filesToUpload, () => {
+            if (progressCb) {
+              progressCb(Math.round(i * progressCoefficient));
+            }
+          });
+
+          filesToUpload = [];
+        }
+      }
+
+      // Upload the remaining files
+      if (filesToUpload.length > 0) {
+        workers.push(filesToUpload, () => {
           if (progressCb) {
-            progressCb(Math.round(index * progressCoefficient));
+            progressCb(Math.round(documentPaths.length * progressCoefficient));
           }
         });
-      });
+
+        filesToUpload = [];
+      }
 
       // Resolve the promise when all tasks are finished
       workers.drain(() => {
-        console.info("Syncing files completed successfully.");
+        console.info("Indexing workspace project completed successfully.");
         resolve();
       });
 
@@ -173,29 +187,27 @@ export default class SuperflexAssistant implements Assistant {
     });
   }
 
-  private async cleanUpFiles(
-    filePathToIDMap: Map<string, CachedFile>,
-    documentPaths: CachedFileObject[],
-    storagePath: string
-  ): Promise<void> {
-    for (const [relativeFilepath, cachedFile] of filePathToIDMap) {
+  private async cleanUpFiles(cachedFilesMap: Map<string, number>, documentPaths: string[]): Promise<void> {
+    const removeFiles: string[] = [];
+    cachedFilesMap.forEach((_, relativePath) => {
       const exists = documentPaths.find(
-        (documentPath) => path.relative(storagePath, documentPath.cachedPath) === relativeFilepath
+        (documentPath) => path.relative(this.workspaceDirPath, documentPath) === relativePath
       );
       if (exists) {
-        continue;
+        return;
       }
 
-      try {
-        await this._openai.files.del(cachedFile.fileID);
-        filePathToIDMap.delete(relativeFilepath);
-      } catch (err: any) {
-        if (err?.status === 404) {
-          filePathToIDMap.delete(relativeFilepath);
-          return;
-        }
-        console.error(`Failed to delete file ${relativeFilepath}: ${err?.message}`);
+      removeFiles.push(relativePath);
+    });
+
+    try {
+      await api.removeFiles({ owner: this.owner, repo: this.repo, files: removeFiles });
+
+      for (const relativePath of removeFiles) {
+        cachedFilesMap.delete(relativePath);
       }
+    } catch (err: any) {
+      console.error(`Failed to delete files: ${err?.message}`);
     }
   }
 }
