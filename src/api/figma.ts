@@ -1,5 +1,5 @@
-import { FigmaTokenInformation } from "../core/Figma.model";
-import { buildUserFromResponse, User } from "../core/User.model";
+import { FigmaTokenInformation } from "../model/Figma.model";
+import { buildUserFromResponse, User } from "../model/User.model";
 import { PublicApi } from "./api";
 import { FigmaApi } from "./figmaApi";
 import { parseError } from "./error";

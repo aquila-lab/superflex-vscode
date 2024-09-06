@@ -31,15 +31,3 @@ export type Message = {
   updatedAt: Date;
   createdAt: Date;
 };
-
-export function buildMessageFromResponse(res: any): Message {
-  return {
-    id: res.id,
-    threadID: res.thread_id,
-    role: res.role,
-    type: res.type,
-    content: res.content,
-    updatedAt: new Date(res.updated_at),
-    createdAt: new Date(res.created_at),
-  };
-}

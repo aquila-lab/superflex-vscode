@@ -1,8 +1,9 @@
+import { MessageReqest, Message, Thread } from "shared/model";
+
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
 import { parseError } from "./error";
-import { buildThreadFromResponse, Thread } from "../core/Thread.model";
-import { buildMessageFromResponse, Message, MessageReqest } from "../core/Message.model";
+import { buildMessageFromResponse, buildThreadFromResponse } from "./transformers";
 
 export type CreateThreadArgs = RepoArgs & {
   title?: string;

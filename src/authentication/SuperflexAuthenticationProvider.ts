@@ -14,7 +14,7 @@ import {
 } from "vscode";
 
 import * as api from "../api";
-import { User } from "../core/User.model";
+import { User } from "../model/User.model";
 import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import AuthService from "./SuperflexAuthenticationService";

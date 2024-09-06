@@ -1,6 +1,8 @@
+import { User } from "shared/model";
+
 import { Api } from "./api";
 import { parseError } from "./error";
-import { buildUserFromResponse, User } from "../core/User.model";
+import { buildUserFromResponse } from "./transformers";
 
 async function getUserInfo(): Promise<User> {
   try {

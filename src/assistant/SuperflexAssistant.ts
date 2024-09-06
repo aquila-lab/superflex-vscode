@@ -2,13 +2,12 @@ import fs from "fs";
 import path from "path";
 import asyncQ from "async";
 
+import { Message, MessageReqest, TextDelta, Thread } from "shared/model";
 import * as api from "../api";
 import { jsonToMap, mapToJson } from "../common/utils";
-import { Thread } from "../core/Thread.model";
 import { findWorkspaceFiles } from "../scanner";
 import { SuperflexCache } from "../cache/SuperflexCache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
-import { Message, MessageReqest, TextDelta } from "../core/Message.model";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
 

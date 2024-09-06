@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 import { newEventMessage } from "../protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { FigmaTokenInformation } from "../core/Figma.model";
+import { FigmaTokenInformation } from "../model/Figma.model";
 import ChatViewProvider from "../chat/ChatViewProvider";
 import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
 import { FigmaApiProvider, figmaRefreshAccessToken } from "../api";

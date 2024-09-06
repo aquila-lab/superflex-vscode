@@ -5,7 +5,7 @@ import { getOpenWorkspace } from "./common/utils";
 import { AUTH_PROVIDER_ID } from "./common/constants";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import { SuperflexCache } from "./cache/SuperflexCache";
-import { FigmaTokenInformation } from "./core/Figma.model";
+import { FigmaTokenInformation } from "./model/Figma.model";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
 import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";

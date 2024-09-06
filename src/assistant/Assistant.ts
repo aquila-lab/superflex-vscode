@@ -1,5 +1,4 @@
-import { Thread } from "../core/Thread.model";
-import { Message, MessageReqest, TextDelta } from "../core/Message.model";
+import { Message, MessageReqest, TextDelta, Thread } from "shared/model";
 
 export interface Assistant {
   /**

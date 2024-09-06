@@ -14,11 +14,11 @@ import {
 } from "vscode";
 
 import * as api from "../api";
-import { User } from "../core/User.model";
+import { User } from "../model/User.model";
 import { FIGMA_AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
-import { FigmaTokenInformation } from "../core/Figma.model";
+import { FigmaTokenInformation } from "../model/Figma.model";
 
 const AUTH_PROVIDER_LABEL = "Figma Authentication";
 const SESSIONS_SECRET_KEY = `${FIGMA_AUTH_PROVIDER_ID}.sessions`;

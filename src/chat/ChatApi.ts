@@ -1,16 +1,15 @@
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
+import { Message, MessageReqest, MessageType, Thread } from "shared/model";
 import { EventMessage, newEventMessage } from "../protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl } from "../api";
-import { extractFigmaSelectionUrl } from "../core/Figma.model";
+import { extractFigmaSelectionUrl } from "../model/Figma.model";
 import { Assistant } from "../assistant";
-import { Thread } from "../core/Thread.model";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
-import { Message, MessageReqest, MessageType } from "../core/Message.model";
 
 type InitState = {
   isInitialized: boolean;
