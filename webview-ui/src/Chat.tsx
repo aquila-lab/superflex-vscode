@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressBar from '@ramonak/react-progress-bar';
 import React, { useEffect, useRef, useState } from 'react';
@@ -164,7 +162,7 @@ const Chat: React.FunctionComponent<{
     setMessageProcessing(true);
   }
 
-  async function handleFigmaButtonClicked(): Promise<void> {
+  function handleFigmaButtonClicked(): void {
     if (!initState.figmaAuthenticated) {
       vscodeAPI.postMessage(newEventMessage('figma_oauth_connect'));
       return;
@@ -216,7 +214,7 @@ const Chat: React.FunctionComponent<{
                 {message.role === Role.User ? 'You' : 'Superflex'}
               </p>
 
-              <MarkdownRender mdString={message.content} />
+              {message.type === MessageType.Text && <MarkdownRender mdString={message.content} />}
 
               {message.type === MessageType.Image && <img alt="preview image" className="mt-2" src={message.content} />}
             </div>
@@ -265,15 +263,3 @@ const Chat: React.FunctionComponent<{
 };
 
 export default Chat;
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-
-  return btoa(binary);
-}

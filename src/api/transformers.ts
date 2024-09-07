@@ -4,6 +4,7 @@ export function buildUserFromResponse(res: any): User {
   return {
     id: res.id,
     email: res.email,
+    username: res.username,
   };
 }
 
