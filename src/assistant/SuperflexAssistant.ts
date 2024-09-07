@@ -77,7 +77,6 @@ export default class SuperflexAssistant implements Assistant {
       ? jsonToMap<number>(rawCachedFilesMap)
       : new Map<string, number>();
 
-    const storagePath = SuperflexCache.storagePath;
     const progressCoefficient = 98 / documentPaths.length;
 
     const workers = this.createSyncWorkers(cachedFilesMap, 10);
@@ -133,7 +132,8 @@ export default class SuperflexAssistant implements Assistant {
         return;
       }
 
-      const maxFilesPerRequest = 50;
+      const maxFilesPerRequest = 1;
+      let workersCount = 0;
       let filesToUpload: string[] = [];
       for (let i = 0; i < documentPaths.length; i++) {
         const documentPath = documentPaths[i];
@@ -151,7 +151,8 @@ export default class SuperflexAssistant implements Assistant {
 
         // Upload the files in batches of maxFilesPerRequest
         if (filesToUpload.length >= maxFilesPerRequest) {
-          workers.push(filesToUpload, () => {
+          workersCount++;
+          workers.push([filesToUpload], () => {
             if (progressCb) {
               progressCb(Math.round(i * progressCoefficient));
             }
@@ -163,13 +164,19 @@ export default class SuperflexAssistant implements Assistant {
 
       // Upload the remaining files
       if (filesToUpload.length > 0) {
-        workers.push(filesToUpload, () => {
+        workersCount++;
+        workers.push([filesToUpload], () => {
           if (progressCb) {
             progressCb(Math.round(documentPaths.length * progressCoefficient));
           }
         });
 
         filesToUpload = [];
+      }
+
+      if (workersCount === 0) {
+        resolve();
+        return;
       }
 
       // Resolve the promise when all tasks are finished

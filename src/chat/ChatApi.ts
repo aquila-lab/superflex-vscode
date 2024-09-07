@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
@@ -127,6 +129,16 @@ export class ChatAPI {
 
         messages = await Promise.all(
           messages.map(async (msg) => {
+            if (msg.type === MessageType.Image) {
+              // Read the image file
+              const imageData = fs.readFileSync(path.resolve(msg.content));
+              const base64Image = Buffer.from(imageData).toString("base64");
+
+              return {
+                ...msg,
+                content: base64Image,
+              };
+            }
             if (msg.type === MessageType.Figma) {
               const figma = extractFigmaSelectionUrl(msg.content);
               if (!figma) {
@@ -205,7 +217,7 @@ export class ChatAPI {
    * @return {Promise<void>} A promise that resolves when the synchronization is complete.
    */
   private async syncProjectFiles(sendEventMessageCb: (msg: EventMessage) => void): Promise<void> {
-    if (!this._isInitialized || !this._assistant) {
+    if (!this._assistant) {
       return;
     }
 

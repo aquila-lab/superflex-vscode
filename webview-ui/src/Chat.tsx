@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressBar from '@ramonak/react-progress-bar';
 import React, { useEffect, useRef, useState } from 'react';
@@ -155,7 +156,7 @@ const Chat: React.FunctionComponent<{
       newEventMessage('new_message', [
         {
           type: MessageType.Image,
-          content: fs.readFileSync(URL.createObjectURL(file)).toString()
+          content: (file as any).path
         }
       ] as MessageReqest[])
     );
@@ -264,3 +265,15 @@ const Chat: React.FunctionComponent<{
 };
 
 export default Chat;
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  return btoa(binary);
+}
