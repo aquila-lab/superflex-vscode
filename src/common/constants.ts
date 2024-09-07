@@ -19,16 +19,4 @@ export const AUTH_PROVIDER_ID = `${BRAND_NAME}.auth`;
 export const FIGMA_AUTH_PROVIDER_ID = `${AUTH_PROVIDER_ID}.figma`;
 
 // file extensions that are supported by the extension
-export const SUPPORTED_FILE_EXTENSIONS = [
-  ".html",
-  ".htm",
-  ".css",
-  ".scss",
-  ".jsx",
-  ".tsx",
-  ".vue",
-  ".svelte",
-  ".sass",
-  ".less",
-  ".styl",
-];
+export const SUPPORTED_FILE_EXTENSIONS = [".htm", ".html", ".css", ".scss", ".js", ".ts", ".jsx", ".tsx", ".vue"];

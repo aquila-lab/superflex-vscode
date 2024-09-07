@@ -1,0 +1,35 @@
+import { Message, MessageReqest, TextDelta, Thread } from "../../shared/model";
+
+export interface Assistant {
+  /**
+   * Create a new chat thread.
+   *
+   * @param title - Optional parameter to specify the title of the thread.
+   * @returns A promise that resolves with the created thread.
+   */
+  createThread(title?: string): Promise<Thread>;
+
+  /**
+   * Send a message in a chat thread. If there is no active thread, a new thread will be created.
+   *
+   * @param threadID - The ID of the thread to send the message to.
+   * @param messages - The messages to send to the assistant.
+   * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
+   * @returns A promise that resolves with the response message.
+   */
+  sendMessage(
+    threadID: string,
+    messages: MessageReqest[],
+    streamResponse?: (event: TextDelta) => void
+  ): Promise<Message>;
+
+  /**
+   * Sync files parse and upload small bites of project files to the vector store.
+   * NOTE: If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
+   * NOTE: The files that are uploaded but missing from the filePaths input will be removed.
+   *
+   * @param progressCb - Optional parameter to specify a callback function that will be called periodically with the current progress of syncing the files. "current" is value between 0 and 100.
+   * @returns A promise that resolves with the uploaded files.
+   */
+  syncFiles(progressCb?: (current: number) => void): Promise<void>;
+}

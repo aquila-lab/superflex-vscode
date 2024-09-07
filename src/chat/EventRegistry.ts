@@ -1,4 +1,4 @@
-import { EventMessage } from "../protocol";
+import { EventMessage } from "../../shared/protocol";
 
 export type Handler<RequestPayload = unknown, ResponsePayload = unknown> = (
   payload: RequestPayload,

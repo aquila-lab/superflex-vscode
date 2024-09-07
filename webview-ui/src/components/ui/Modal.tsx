@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -10,8 +10,6 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
-  const cancelButtonRef = useRef(null);
-
   return (
     <Dialog open={isOpen} as="div" className="relative z-20 focus:outline-none" onClose={onClose}>
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">

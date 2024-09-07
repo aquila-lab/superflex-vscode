@@ -1,12 +1,20 @@
 {
-	"compilerOptions": {
-		"module": "Node16",
-		"target": "ES2022",
-		"lib": ["ES2022"],
-		"outDir": "dist",
-		"rootDir": "src",
-		"strict": true,
-		"sourceMap": true
-	},
-	"exclude": ["node_modules", ".vscode-test", "./dist", "webview-ui", ".eslintrc.json"]
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2022",
+    "strict": true,
+    "allowJs": false,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "noImplicitThis": false,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "strictFunctionTypes": false,
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "baseUrl": "."
+  },
+  "include": ["src/**/*", "shared/**/*"],
+  "exclude": ["node_modules", "webview-ui"]
 }

@@ -1,21 +1,18 @@
 import * as vscode from "vscode";
 
 import { ChatAPI } from "./chat/ChatApi";
-import ChatViewProvider from "./chat/ChatViewProvider";
-import registerChatWidgetWebview from "./chat/chatWidgetWebview";
+import { getOpenWorkspace } from "./common/utils";
 import { AUTH_PROVIDER_ID } from "./common/constants";
-import SuperflexAuthenticationProvider from "./authentication/SuperflexAuthenticationProvider";
-import SuperflexAuthenticationService from "./authentication/SuperflexAuthenticationService";
+import ChatViewProvider from "./chat/ChatViewProvider";
+import { SuperflexCache } from "./cache/SuperflexCache";
+import { FigmaTokenInformation } from "./model/Figma.model";
+import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
 import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
-import { SuperflexCache } from "./cache/SuperflexCache";
-import { AIProvider, SelfHostedAIProvider } from "./providers/AIProvider";
-import OpenAIProvider from "./providers/OpenAIProvider";
-import { getOpenWorkspace } from "./common/utils";
-import { FigmaTokenInformation } from "./core/Figma.model";
+import SuperflexAuthenticationService from "./authentication/SuperflexAuthenticationService";
+import SuperflexAuthenticationProvider from "./authentication/SuperflexAuthenticationProvider";
 
 type AppState = {
-  aiProvider: AIProvider;
   chatApi: ChatAPI;
   authService: SuperflexAuthenticationService;
   authProvider: SuperflexAuthenticationProvider;
@@ -25,14 +22,12 @@ type AppState = {
 };
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  const aiProvider = new OpenAIProvider();
-  const chatApi = new ChatAPI(aiProvider);
+  const chatApi = new ChatAPI();
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
-  const authService = new SuperflexAuthenticationService(chatWebviewProvider, aiProvider);
+  const authService = new SuperflexAuthenticationService(chatWebviewProvider);
   const figmaAuthProvider = new FigmaAuthenticationProvider(context);
 
   const appState: AppState = {
-    aiProvider: aiProvider,
     chatApi: chatApi,
     authService: authService,
     authProvider: new SuperflexAuthenticationProvider(context, authService),
@@ -76,7 +71,6 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
     // Superflex Auth commands
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signin`, () => state.authService.signIn(state.authProvider)),
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => state.authService.signOut(state.authProvider)),
-    vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.remove-openai-api-key`, () => state.authService.removeToken()),
 
     // Figma Auth commands
     vscode.commands.registerCommand("superflex.figma.connect", () => state.figmaAuthService.connect()),
@@ -87,13 +81,6 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 
   state.chatApi.registerEvent("login_clicked", async () => {
     await state.authService.signIn(state.authProvider);
-  });
-  state.chatApi.registerEvent<{ token: string }, void>("token_entered", async (req) => {
-    if (state.aiProvider.discriminator === "self-hosted-ai-provider") {
-      const selfHostedProvider = state.aiProvider as SelfHostedAIProvider;
-      selfHostedProvider.setToken(req.token);
-    }
-    await state.authService.authenticateToken();
   });
   state.chatApi.registerEvent<void, FigmaTokenInformation>("figma_oauth_connect", async () => {
     return await state.figmaAuthService.connect();

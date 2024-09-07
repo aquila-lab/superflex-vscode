@@ -2,18 +2,15 @@ import * as vscode from "vscode";
 import { AuthenticationProvider } from "vscode";
 
 import { ApiProvider } from "../api";
-import { newEventMessage } from "../protocol";
+import { newEventMessage } from "../../shared/protocol";
 import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 import ChatViewProvider from "../chat/ChatViewProvider";
-import { AIProvider, SelfHostedAIProvider } from "../providers/AIProvider";
 
 export default class SuperflexAuthenticationService {
   private _webviewProvider: ChatViewProvider;
-  private _aiProvider: AIProvider;
 
-  constructor(webviewProvider: ChatViewProvider, aiProvider: AIProvider) {
+  constructor(webviewProvider: ChatViewProvider) {
     this._webviewProvider = webviewProvider;
-    this._aiProvider = aiProvider;
   }
 
   /**
@@ -59,43 +56,9 @@ export default class SuperflexAuthenticationService {
     }
 
     this.setAuthHeader(accessToken, () => this.signOut(provider));
-    await this.authenticateToken();
-  }
-
-  async authenticateToken(): Promise<void> {
-    if (this._aiProvider.discriminator === "self-hosted-ai-provider") {
-      const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
-      const token = await selfHostedProvider.getToken();
-      if (!token) {
-        this.removeToken();
-        return;
-      }
-
-      try {
-        await this._aiProvider.init(true);
-      } catch (err: any) {
-        if (err?.status === 401) {
-          this.removeToken();
-          vscode.window.showErrorMessage((err as Error).message);
-          return;
-        }
-        vscode.window.showErrorMessage((err as Error).message);
-      }
-    }
 
     this._webviewProvider.sendEventMessage(newEventMessage("show_chat_view"));
     vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", true);
-  }
-
-  removeToken(): void {
-    if (this._aiProvider.discriminator !== "self-hosted-ai-provider") {
-      return;
-    }
-
-    const selfHostedProvider = this._aiProvider as SelfHostedAIProvider;
-    selfHostedProvider.removeToken();
-    vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", false);
-    this._webviewProvider.sendEventMessage(newEventMessage("show_enter_token_view"));
   }
 
   private async setAuthHeader(token: string, logoutAction: any): Promise<void> {
