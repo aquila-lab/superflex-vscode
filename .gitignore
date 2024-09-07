@@ -9,7 +9,6 @@ binaries/*
 !binaries/downloadBinaries.sh
 
 registration_key
-auth
 sig
 
 .env
