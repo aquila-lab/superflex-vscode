@@ -8,4 +8,3 @@ export * from "./files";
 export * from "./repo";
 export * from "./thread";
 export * from "./user";
-export * from "./utils";
