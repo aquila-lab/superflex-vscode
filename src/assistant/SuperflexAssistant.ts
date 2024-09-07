@@ -111,10 +111,11 @@ export default class SuperflexAssistant implements Assistant {
         for (const file of files) {
           cachedFilesMap.set(file.relativePath, file.modifiedTime);
         }
+        SuperflexCache.set(this.cacheFileName, mapToJson(cachedFilesMap));
       } catch (err: any) {
         console.error(`Failed to upload files: ${err?.message}`);
       }
-    }, concurrency); // Number of concurrent workers
+    }, concurrency);
 
     return workers;
   }
