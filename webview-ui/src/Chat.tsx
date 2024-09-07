@@ -1,29 +1,32 @@
+import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import ProgressBar from '@ramonak/react-progress-bar';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { newEventMessage } from '../../shared/protocol';
+import { Message, MessageReqest, MessageType, Role } from '../../shared/model';
 import { VSCodeWrapper } from './api/vscodeApi';
 import { InputAndExecuteToolbar, MarkdownRender, FigmaFilePickerModal } from './components';
-import { extractFigmaSelectionUrl } from './utils/utils';
 
 type InitState = {
   isInitialized: boolean;
   figmaAuthenticated: boolean;
 };
 
-type Message = {
+type ChatMessage = {
   id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  imageUrl?: string;
+  role: Role;
+  type: MessageType;
+  content: string;
 };
 
-const defaultMessages: Message[] = [
+const defaultMessages: ChatMessage[] = [
   {
     id: uuidv4(),
-    text: "Welcome, I'm your Copilot and I'm here to help you get things done faster.\n\nI'm powered by AI, so surprises and mistakes are possible. Make sure to verify any generated code or suggestions, and share feedback so that we can learn and improve.",
-    sender: 'bot'
+    role: Role.Assistant,
+    type: MessageType.Text,
+    content:
+      "Welcome to Superflex! I'm your AI Assistant, and I'm here to help you get things done faster than ever.\n\nI’m powered by advanced AI, and while I strive for perfection, double-checking my output is always a good idea. Remember that your feedback helps me get even better, so let’s create something amazing together!"
   }
 ];
 
@@ -32,7 +35,7 @@ const Chat: React.FunctionComponent<{
 }> = ({ vscodeAPI }) => {
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [messages, setMessages] = useState<Message[]>(defaultMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>(defaultMessages);
   const [input, setInput] = useState('');
   const [syncProgress, setSyncProgress] = useState(0);
   const [streamResponse, setStreamResponse] = useState('');
@@ -74,20 +77,12 @@ const Chat: React.FunctionComponent<{
             console.error(`Error processing 'new_message': ${message.error}`);
             return;
           }
-          if (!message.data.length) {
+          if (!message.data) {
             return;
           }
 
-          for (const msg of message.data) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: msg.id,
-                text: msg.content,
-                sender: 'bot'
-              }
-            ]);
-          }
+          setMessages((prev) => [...prev, message.data as Message]);
+
           break;
         // Different from 'new_message', this will be triggered when extension wants to simply add a message to the chat
         case 'add_message':
@@ -127,10 +122,12 @@ const Chat: React.FunctionComponent<{
     };
   }, [vscodeAPI]);
 
-  function handleSend(): void {
+  function handleTextMessageSend(): void {
     if (input.trim()) {
-      setMessages((prev) => [...prev, { id: uuidv4(), text: input, sender: 'user' }]);
-      vscodeAPI.postMessage(newEventMessage('new_message', { text: input }));
+      const newMessage: ChatMessage = { id: uuidv4(), role: Role.User, type: MessageType.Text, content: input };
+      setMessages((prev) => [...prev, newMessage]);
+
+      vscodeAPI.postMessage(newEventMessage('new_message', [newMessage] as MessageReqest[]));
       setMessageProcessing(true);
     }
 
@@ -142,14 +139,27 @@ const Chat: React.FunctionComponent<{
       ...prev,
       {
         id: uuidv4(),
-        text: 'Processing image...',
-        imageUrl: URL.createObjectURL(file),
-        sender: 'bot'
+        role: Role.User,
+        type: MessageType.Image,
+        content: URL.createObjectURL(file)
+      },
+      {
+        id: uuidv4(),
+        role: Role.User,
+        type: MessageType.Text,
+        content: 'Processing image...'
       }
     ]);
 
-    // TODO(boris): Send bytes instead of file path
-    vscodeAPI.postMessage(newEventMessage('new_message', { imageUrl: (file as any).path }));
+    vscodeAPI.postMessage(
+      newEventMessage('new_message', [
+        {
+          type: MessageType.Image,
+          content: fs.readFileSync(URL.createObjectURL(file)).toString()
+        }
+      ] as MessageReqest[])
+    );
+
     setMessageProcessing(true);
   }
 
@@ -174,21 +184,13 @@ const Chat: React.FunctionComponent<{
       return false;
     }
 
-    const figmaData = extractFigmaSelectionUrl(figmaSelectionLink);
-    if (!figmaData) {
-      vscodeAPI.postMessage(
-        newEventMessage('error_message', 'Invalid link: Please provide a valid Figma selection link.')
-      );
-      return false;
-    }
-
     vscodeAPI.postMessage(
-      newEventMessage('new_message', {
-        figma: {
-          fileID: figmaData.fileID,
-          nodeID: figmaData.nodeID
+      newEventMessage('new_message', [
+        {
+          type: MessageType.Figma,
+          content: figmaSelectionLink
         }
-      })
+      ] as MessageReqest[])
     );
 
     setMessageProcessing(true);
@@ -207,15 +209,15 @@ const Chat: React.FunctionComponent<{
             <div
               key={message.id}
               className={`py-4 px-2 border-b border-neutral-700 text-left ${
-                message.sender === 'user' ? 'bg-neutral-800' : undefined
+                message.role === Role.User ? 'bg-neutral-800' : undefined
               }`}>
               <p className="text-sm font-medium text-neutral-300 mb-2">
-                {message.sender === 'user' ? 'You' : 'Superflex'}
+                {message.role === Role.User ? 'You' : 'Superflex'}
               </p>
 
-              <MarkdownRender mdString={message.text} />
+              <MarkdownRender mdString={message.content} />
 
-              {message.imageUrl && <img alt="preview image" className="mt-2" src={message.imageUrl} />}
+              {message.type === MessageType.Image && <img alt="preview image" className="mt-2" src={message.content} />}
             </div>
           ))}
 
@@ -247,7 +249,7 @@ const Chat: React.FunctionComponent<{
           disabled={disableIteractions}
           onInputChange={(e) => setInput(e.target.value)}
           onFileSelected={handleImageUpload}
-          onSendClicked={handleSend}
+          onSendClicked={handleTextMessageSend}
           onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>
