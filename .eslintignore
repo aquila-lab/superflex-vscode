@@ -1,10 +1,16 @@
-# don't ever lint node_modules
-node_modules
+# Ignore node_modules and build output directories
+node_modules/
+dist/
+out/
 
-# don't lint build output (make sure it's set to your correct build folder name)
-dist
-out
+# Ignore TypeScript declaration files
+**/*.d.ts
 
-# don't lint nyc coverage output
-coverage
-.eslintrc.json
+# Ignore specific files that might not need linting
+package-lock.json
+yarn.lock
+
+.eslintrc.js
+tailwind.config.js
+postcss.config.js
+vite.config.ts

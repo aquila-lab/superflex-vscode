@@ -58,7 +58,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
     return `${env.uriScheme}://${publisher}.${name}`;
   }
 
-  public async getSessions(): Promise<readonly FigmaAuthenticationSession[]> {
+  public async getSessions(): Promise<FigmaAuthenticationSession[]> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (!allSessions) {
       return [];

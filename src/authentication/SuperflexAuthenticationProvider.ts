@@ -11,6 +11,7 @@ import {
   env,
   Uri,
   ProgressLocation,
+  AuthenticationProviderSessionOptions,
 } from "vscode";
 
 import { User } from "../../shared/model";
@@ -59,7 +60,7 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
     return `${env.uriScheme}://${publisher}.${name}`;
   }
 
-  public async getSessions(): Promise<readonly AuthenticationSession[]> {
+  public async getSessions(): Promise<AuthenticationSession[]> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (!allSessions) {
       return [];
@@ -99,7 +100,7 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
     }
   }
 
-  public async removeSession(sessionId: string): Promise<void> {
+  async removeSession(sessionId: string): Promise<void> {
     const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
     if (allSessions) {
       let sessions = JSON.parse(allSessions) as AuthenticationSession[];
@@ -115,7 +116,7 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
     }
   }
 
-  public async dispose() {
+  async dispose() {
     this._disposable.dispose();
   }
 

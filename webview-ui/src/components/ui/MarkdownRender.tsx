@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
@@ -16,7 +18,6 @@ import stylus from 'react-syntax-highlighter/dist/cjs/languages/prism/stylus';
 import bash from 'react-syntax-highlighter/dist/cjs/languages/prism/bash';
 import markdown from 'react-syntax-highlighter/dist/cjs/languages/prism/markdown';
 import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json';
-import { useState } from 'react';
 
 SyntaxHighlighter.registerLanguage('tsx', tsx);
 SyntaxHighlighter.registerLanguage('jsx', jsx);
@@ -36,7 +37,7 @@ interface MarkdownRenderProps {
   mdString: string;
 }
 
-export default function MarkdownRender({ mdString }: MarkdownRenderProps) {
+export default function MarkdownRender({ mdString }: MarkdownRenderProps): JSX.Element {
   return (
     <ReactMarkdown
       className="prose prose-sm text-sm"
