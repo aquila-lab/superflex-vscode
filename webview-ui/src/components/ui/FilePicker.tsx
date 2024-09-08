@@ -1,26 +1,32 @@
 import React from 'react';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 
+import { cn } from '../../common/utils';
+
 interface FilePickerProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   accept?: string;
   disabled?: boolean;
 }
 
-const FilePicker: React.FunctionComponent<FilePickerProps> = ({ onChange, accept, disabled }) => {
+const FilePicker: React.FC<FilePickerProps> = ({ onChange, accept, disabled }) => {
   return (
     <div className="flex flex-col justify-center h-10">
       <div
-        className={`flex-initial flex flex-col justify-center items-center rounded-md ${
-          !disabled && 'hover:bg-neutral-700'
-        }`}>
+        className={cn(
+          'flex-initial flex flex-col justify-center items-center rounded-md',
+          !disabled && 'hover:bg-muted'
+        )}>
         <label
           htmlFor="chat-file-picker"
-          className={`p-1.5 ${disabled ? 'text-neutral-500' : 'cursor-pointer text-neutral-400'}`}>
+          className={cn(
+            'p-1.5',
+            disabled ? 'text-muted cursor-not-allowed' : 'cursor-pointer text-muted-foreground hover:text-foreground'
+          )}>
           <PaperClipIcon className="size-5" />
         </label>
         <input
-          hidden={true}
+          hidden
           type="file"
           name="chat-file-picker"
           id="chat-file-picker"
