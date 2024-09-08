@@ -15,7 +15,7 @@ const PopoverContent = React.forwardRef<
   return (
     <>
       {/* Use a portal that's in the same DOM tree to make focus handling easier. */}
-      <div ref={portalRef} className="empty:tw-hidden" />
+      <div ref={portalRef} className="empty:hidden" />
       {portalRef.current && (
         <PopoverPrimitive.Portal container={portalRef.current}>
           <PopoverPrimitive.Content
@@ -23,7 +23,7 @@ const PopoverContent = React.forwardRef<
             align={align}
             sideOffset={sideOffset}
             className={cn(
-              'tw-z-50 tw-w-72 tw-rounded-md tw-border tw-border-ring tw-bg-popover tw-p-4 tw-text-popover-foreground tw-shadow-md tw-outline-none',
+              'z-50 w-72 rounded-md border border-ring bg-popover p-4 text-popover-foreground shadow-md outline-none',
               className
             )}
             {...props}
@@ -33,6 +33,7 @@ const PopoverContent = React.forwardRef<
     </>
   );
 });
+
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 export { Popover, PopoverTrigger, PopoverContent };

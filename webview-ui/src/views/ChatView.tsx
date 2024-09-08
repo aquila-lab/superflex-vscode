@@ -5,7 +5,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { newEventMessage } from '../../../shared/protocol';
 import { Message, MessageReqest, MessageType, Role } from '../../../shared/model';
 import { VSCodeWrapper } from '../api/vscodeApi';
-import { InputAndExecuteToolbar, MarkdownRender, FigmaFilePickerModal } from '../components';
+import { MarkdownRender } from '../components/ui/MarkdownRender';
+import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
+import { InputAndExecuteToolbar } from '../components/ui/InputAndExecuteToolbar';
 
 type InitState = {
   isInitialized: boolean;

@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { newEventMessage } from '../../../shared/protocol';
-import { Button } from '../components';
 import { VSCodeWrapper } from '../api/vscodeApi';
+import { Button } from '../components/ui/Button';
 
 type LoginViewProps = {
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;

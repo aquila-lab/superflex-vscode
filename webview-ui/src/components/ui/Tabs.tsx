@@ -13,7 +13,7 @@ const TabContainer = React.forwardRef<
   React.ElementRef<typeof Tabs.Content>,
   React.ComponentPropsWithoutRef<typeof Tabs.Content>
 >(({ className, ...props }, ref) => {
-  return <Tabs.Content ref={ref} {...props} className="tw-h-full tw-flex tw-flex-col tw-overflow-auto tw-gap-4" />;
+  return <Tabs.Content ref={ref} {...props} className="h-full flex flex-col overflow-auto gap-4" />;
 });
 
 TabContainer.displayName = 'TabContainer';

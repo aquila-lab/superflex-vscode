@@ -24,7 +24,7 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof FormUI.Label>,
   React.ComponentPropsWithoutRef<typeof FormUI.Label>
 >(({ className, title, ...props }, ref) => (
-  <FormUI.Label className={cn('tw-text-muted-foreground', className)} {...props}>
+  <FormUI.Label className={cn('text-muted-foreground', className)} {...props}>
     {title ?? props.children}
   </FormUI.Label>
 ));
