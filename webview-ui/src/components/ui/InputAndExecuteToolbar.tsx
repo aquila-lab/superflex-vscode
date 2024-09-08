@@ -1,9 +1,10 @@
 import React from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
 import { PaperPlaneIcon } from '@radix-ui/react-icons';
 
+import { cn } from '../../common/utils';
 import { FigmaButton } from '../figma/FigmaButton';
 import { FilePicker } from './FilePicker';
+import { TextareaAutosize } from './TextareaAutosize';
 
 interface InputAndExecuteToolbarProps {
   input: string;
@@ -23,12 +24,12 @@ const InputAndExecuteToolbar: React.FunctionComponent<InputAndExecuteToolbarProp
   onFigmaButtonClicked
 }) => {
   return (
-    <div className="flex flex-row items-end min-h-10 bg-neutral-800 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+    <div className="flex flex-row items-end min-h-10 bg-muted rounded-md border border-border focus:outline-none">
       <TextareaAutosize
         autoFocus
         value={input}
         placeholder="Describe your UI component..."
-        className="flex-1 p-2 pt-2.5 w-full min-h-10 max-h-[15rem] bg-neutral-800 text-white rounded-l-md resize-none focus:outline-none"
+        className="flex-1 p-2 pt-2.5 min-h-10 max-h-[15rem] rounded-l-md border-0"
         onChange={onInputChange}
         onKeyDown={(e) => {
           if (!disabled && e.key === 'Enter' && !e.shiftKey) {
@@ -55,7 +56,10 @@ const InputAndExecuteToolbar: React.FunctionComponent<InputAndExecuteToolbarProp
         <button
           type="button"
           disabled={disabled}
-          className={`p-1.5 rounded-md ${disabled ? 'text-neutral-500' : 'text-neutral-400 hover:bg-neutral-700'}`}
+          className={cn(
+            'p-1.5 text-muted-foreground',
+            disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
+          )}
           onClick={onSendClicked}>
           <span className="sr-only">Send</span>
           <PaperPlaneIcon className="size-5" aria-hidden="true" />

@@ -41,11 +41,12 @@ const FigmaFilePickerModal: React.FunctionComponent<FigmaFilePickerModalProps> =
             Submit
           </Button>
 
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-muted-foreground">
             {'You can copy the link from the Figma selection by right-clicking on the selection and selecting '}
             <span className="font-medium">{'"Copy/Paste as" → "Copy link to selection"'}</span>
           </p>
 
+          {/* DO NOT REMOVE THIS DIV: it's used to display the image of Figma selection example */}
           <div className="flex-1 h-full w-full min-h-[11rem] figma-copy-selection-example rounded-md overflow-hidden"></div>
         </div>
       </DialogContent>
