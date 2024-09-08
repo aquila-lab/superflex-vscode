@@ -40,7 +40,7 @@ interface MarkdownRenderProps {
 const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString }) => {
   return (
     <ReactMarkdown
-      className="prose prose-sm text-sm"
+      className="prose prose-sm text-sm dark:prose-invert"
       components={{
         code({ inline, className, ...props }: any) {
           const hasLang = /language-(\w+)/.exec(className || '');
@@ -52,7 +52,7 @@ const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString
               className="text-md mockup-code scrollbar-thin scrollbar-track-base-content/5 scrollbar-thumb-base-content/40 scrollbar-track-rounded-md scrollbar-thumb-rounded"
               showLineNumbers={true}
               useInlineStyles={true}
-              customStyle={{ margin: '0px', paddingLeft: '8px' }}>
+              customStyle={{ margin: '0px', paddingLeft: '0px' }}>
               {String(props.children).replace(/\n$/, '')}
             </SyntaxHighlighter>
           ) : (
@@ -64,13 +64,8 @@ const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString
           const [copyTip, setCopyTip] = useState('Copy code');
 
           return (
-            <div className="relative overflow-x-hidden">
-              <button
-                style={{
-                  right: 0
-                }}
-                className="tooltip tooltip-left absolute z-40 mr-3 mt-3"
-                data-tip={copyTip}>
+            <div className="relative overflow-x-auto">
+              <button className="absolute top-3 right-3 z-10 tooltip tooltip-left" data-tip={copyTip}>
                 <CopyToClipboard
                   text={codeChunk}
                   onCopy={async () => {
@@ -78,7 +73,7 @@ const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString
                     await new Promise((resolve) => setTimeout(resolve, 500));
                     setCopyTip(`Copy code`);
                   }}>
-                  <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer text-gray-500 hover:text-gray-400" />
+                  <DocumentDuplicateIcon className="h-5 w-5 text-muted-foreground hover:text-foreground" />
                 </CopyToClipboard>
               </button>
               <pre className="p-0 m-0 rounded-md" {...pre}></pre>

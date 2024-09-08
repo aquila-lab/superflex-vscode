@@ -7,7 +7,7 @@ import { Message, MessageReqest, MessageType, Role } from '../../../shared/model
 import { VSCodeWrapper } from '../api/vscodeApi';
 import { MarkdownRender } from '../components/ui/MarkdownRender';
 import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
-import { InputAndExecuteToolbar } from '../components/ui/InputAndExecuteToolbar';
+import { ChatInputBox } from '../components/chat/ChatInputBox';
 
 type InitState = {
   isInitialized: boolean;
@@ -245,7 +245,7 @@ const Chat: React.FunctionComponent<{
           </div>
         </div>
 
-        <InputAndExecuteToolbar
+        <ChatInputBox
           input={input}
           disabled={disableIteractions}
           onInputChange={(e) => setInput(e.target.value)}

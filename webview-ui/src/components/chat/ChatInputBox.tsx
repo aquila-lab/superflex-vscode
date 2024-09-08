@@ -3,10 +3,10 @@ import { PaperPlaneIcon } from '@radix-ui/react-icons';
 
 import { cn } from '../../common/utils';
 import { FigmaButton } from '../figma/FigmaButton';
-import { FilePicker } from './FilePicker';
-import { TextareaAutosize } from './TextareaAutosize';
+import { FilePicker } from '../ui/FilePicker';
+import { TextareaAutosize } from '../ui/TextareaAutosize';
 
-interface InputAndExecuteToolbarProps {
+interface ChatInputBoxProps {
   input: string;
   disabled?: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -15,7 +15,7 @@ interface InputAndExecuteToolbarProps {
   onFigmaButtonClicked: () => void;
 }
 
-const InputAndExecuteToolbar: React.FunctionComponent<InputAndExecuteToolbarProps> = ({
+const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   input,
   disabled,
   onInputChange,
@@ -69,4 +69,4 @@ const InputAndExecuteToolbar: React.FunctionComponent<InputAndExecuteToolbarProp
   );
 };
 
-export { InputAndExecuteToolbar };
+export { ChatInputBox };
