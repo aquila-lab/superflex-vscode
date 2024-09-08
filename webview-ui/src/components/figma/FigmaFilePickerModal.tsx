@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import Modal from '../ui/Modal';
+import Modal from '../ui/Dialog';
 import { Button } from '../ui/Button';
 
 interface FigmaFilePickerModalProps {
@@ -9,7 +9,7 @@ interface FigmaFilePickerModalProps {
   onSubmit: (figmaSelectionLink: string) => Promise<boolean>;
 }
 
-const FigmaFilePickerModal = ({ open, onClose, onSubmit }: FigmaFilePickerModalProps): JSX.Element => {
+const FigmaFilePickerModal: React.FunctionComponent<FigmaFilePickerModalProps> = ({ open, onClose, onSubmit }) => {
   const [figmaSelectionLink, setFigmaSelectionLink] = useState('');
 
   async function handleSubmit(): Promise<void> {
@@ -48,4 +48,4 @@ const FigmaFilePickerModal = ({ open, onClose, onSubmit }: FigmaFilePickerModalP
   );
 };
 
-export default FigmaFilePickerModal;
+export { FigmaFilePickerModal };

@@ -1,5 +1,5 @@
 export * from './ui/Button';
-export { default as Modal } from './ui/Modal';
+export { default as Modal } from './ui/Dialog';
 export { default as FilePicker } from './ui/FilePicker';
 export { default as MarkdownRender } from './ui/MarkdownRender';
 export { default as InputAndExecuteToolbar } from './ui/InputAndExecuteToolbar';

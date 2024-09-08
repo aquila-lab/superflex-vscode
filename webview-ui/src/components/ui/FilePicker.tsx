@@ -33,4 +33,4 @@ const FilePicker: React.FunctionComponent<FilePickerProps> = ({ onChange, accept
   );
 };
 
-export default FilePicker;
+export { FilePicker };

@@ -30,6 +30,7 @@ module.exports = {
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/consistent-type-definitions': 'off',
     '@typescript-eslint/no-confusing-void-expression': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
     'react/prop-types': 'off',
     'no-useless-return': 'off',
     'no-extra-boolean-cast': 'off'

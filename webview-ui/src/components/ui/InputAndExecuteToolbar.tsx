@@ -1,9 +1,9 @@
 import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { PaperPlaneIcon } from '@radix-ui/react-icons';
 
-import FilePicker from './FilePicker';
-import FigmaButton from '../figma/FigmaButton';
+import { FigmaButton } from '../figma/FigmaButton';
+import { FilePicker } from './FilePicker';
 
 interface InputAndExecuteToolbarProps {
   input: string;
@@ -14,14 +14,14 @@ interface InputAndExecuteToolbarProps {
   onFigmaButtonClicked: () => void;
 }
 
-const InputAndExecuteToolbar = ({
+const InputAndExecuteToolbar: React.FunctionComponent<InputAndExecuteToolbarProps> = ({
   input,
   disabled,
   onInputChange,
   onSendClicked,
   onFileSelected,
   onFigmaButtonClicked
-}: InputAndExecuteToolbarProps): JSX.Element => {
+}) => {
   return (
     <div className="flex flex-row items-end min-h-10 bg-neutral-800 text-white rounded-md border border-neutral-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
       <TextareaAutosize
@@ -58,11 +58,11 @@ const InputAndExecuteToolbar = ({
           className={`p-1.5 rounded-md ${disabled ? 'text-neutral-500' : 'text-neutral-400 hover:bg-neutral-700'}`}
           onClick={onSendClicked}>
           <span className="sr-only">Send</span>
-          <PaperAirplaneIcon className="size-5" aria-hidden="true" />
+          <PaperPlaneIcon className="size-5" aria-hidden="true" />
         </button>
       </div>
     </div>
   );
 };
 
-export default InputAndExecuteToolbar;
+export { InputAndExecuteToolbar };

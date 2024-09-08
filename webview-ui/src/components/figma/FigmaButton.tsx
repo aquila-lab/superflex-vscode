@@ -6,7 +6,7 @@ interface FigmaButtonProps {
   disabled?: boolean;
 }
 
-const FigmaButton = ({ onClick, disabled }: FigmaButtonProps): JSX.Element => {
+const FigmaButton: React.FunctionComponent<FigmaButtonProps> = ({ onClick, disabled }) => {
   return (
     <div className="flex flex-col justify-center h-10">
       <div
@@ -26,4 +26,4 @@ const FigmaButton = ({ onClick, disabled }: FigmaButtonProps): JSX.Element => {
   );
 };
 
-export default FigmaButton;
+export { FigmaButton };

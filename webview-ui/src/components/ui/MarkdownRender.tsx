@@ -37,7 +37,7 @@ interface MarkdownRenderProps {
   mdString: string;
 }
 
-export default function MarkdownRender({ mdString }: MarkdownRenderProps): JSX.Element {
+const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString }) => {
   return (
     <ReactMarkdown
       className="prose prose-sm text-sm"
@@ -89,4 +89,6 @@ export default function MarkdownRender({ mdString }: MarkdownRenderProps): JSX.E
       {mdString}
     </ReactMarkdown>
   );
-}
+};
+
+export { MarkdownRender };

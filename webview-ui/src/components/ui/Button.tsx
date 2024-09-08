@@ -1,26 +1,35 @@
-import * as React from 'react';
+import React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-
+import { type VariantProps, cva } from 'class-variance-authority';
 import { cn } from '../../common/utils';
 
+const roundedIconStyles = 'tw-flex tw-items-center tw-justify-center !tw-rounded-full !tw-p-2 tw-border';
+
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  'tw-inline-flex tw-items-center tw-justify-center tw-whitespace-nowrap tw-rounded-md focus-visible:tw-border-ring focus-visible:tw-outline-none disabled:tw-pointer-events-none disabled:tw-opacity-50 tw-gap-3 tw-transition tw-duration-75 tw-cursor-pointer',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-        outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline'
+        default:
+          'tw-bg-button-background tw-text-button-foreground hover:tw-bg-button-background-hover focus-visible:tw-bg-primary-hover',
+        outline: 'tw-border tw-border-border tw-bg-background hover:tw-bg-muted hover:tw-text-foreground',
+        secondary:
+          'tw-bg-button-secondary-background tw-text-button-secondary-foreground hover:tw-bg-button-secondary-background-hover disabled:tw-opacity-75',
+        ghost: 'hover:tw-bg-muted-transparent',
+        text: 'tw-text-foreground tw-bg-transparent tw-items-end tw-border-none tw-transition-all tw-items-center tw-px-0 tw-w-full tw-text-left',
+        link: 'tw-text-link tw-underline-offset-4 hover:tw-underline hover:tw-text-link-hover',
+        primaryRoundedIcon: `${roundedIconStyles} tw-border tw-border-button-border tw-bg-button-background tw-text-button-foreground hover:tw-bg-button-background-hover disabled:tw-bg-current-25 disabled:tw-text-current`,
+        outlineRoundedIcon: `${roundedIconStyles} tw-border tw-border-border`,
+        ghostRoundedIcon: `${roundedIconStyles} tw-border-transparent`
       },
+
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 rounded-md px-8',
-        icon: 'h-9 w-9'
+        default: 'tw-px-4 tw-py-2',
+        xs: 'tw-rounded-sm tw-px-2 tw-text-xs',
+        sm: 'tw-rounded-md tw-px-2 tw-py-[.1rem]',
+        lg: 'tw-rounded-md tw-px-8',
+        icon: 'tw-rounded-lg tw-w-[1.375rem] tw-h-[1.375rem]', // Match VS Code’s 22px icon buttons
+        none: 'tw-p-0'
       }
     },
     defaultVariants: {
@@ -30,9 +39,7 @@ const buttonVariants = cva(
   }
 );
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
