@@ -1,0 +1,632 @@
+/* stylelint-disable comment-empty-line-before */
+
+html[data-ide='VisualStudio'] {
+  /* --vscode-actionBar-toggledBackground: var(); */
+  /* --vscode-activityBar-background: var(); */
+  /* --vscode-activityBar-border: var(); */
+  /* --vscode-activityBar-foreground: var(); */
+  /* --vscode-activityBar-inactiveForeground: var(); */
+  /* --vscode-activityBarBadge-background: var(); */
+  /* --vscode-activityBarBadge-foreground: var(); */
+  /* --vscode-activityBarTop-activeBorder: var(); */
+  /* --vscode-activityBarTop-dropBorder: var(); */
+  /* --vscode-activityBarTop-foreground: var(); */
+  /* --vscode-activityBarTop-inactiveForeground: var(); */
+  --vscode-badge-background: var(--visualstudio-smarttaghoverfill);
+  --vscode-badge-foreground: var(--visualstudio-smarttaghovertext);
+  /* --vscode-banner-iconForeground: var(); */
+  /* --vscode-breadcrumb-activeSelectionForeground: var(); */
+  /* --vscode-breadcrumb-background: var(); */
+  /* --vscode-breadcrumb-focusForeground: var(); */
+  /* --vscode-breadcrumb-foreground: var(); */
+  /* --vscode-breadcrumbPicker-background: var(); */
+  --vscode-button-border: var(--visualstudio-filetabbuttonhoverselectedactiveborder);
+  --vscode-button-background: var(--visualstudio-filetabbackground);
+  --vscode-button-hoverBackground: var(--visualstudio-filetabselectedbackground);
+  --vscode-button-foreground: var(--visualstudio-filetabparenttext);
+  --vscode-button-secondaryHoverBackground: var(--visualstudio-filetabprovisionalhover);
+  --vscode-button-secondaryBackground: var(--visualstudio-filetabbackground);
+  --vscode-button-secondaryForeground: var(--visualstudio-filetabinactivetext);
+  --vscode-button-separator: var(--visualstudio-filetabprimaryseparator);
+  --vscode-charts-blue: var(--visualstudio-vizsurfacesoftbluedark);
+  /* --vscode-charts-foreground: var(); */
+  --vscode-charts-green: var(--visualstudio-vizsurfacegreendark);
+  --vscode-charts-lines: var(--visualstudio-snaplines);
+  --vscode-charts-orange: var(--visualstudio-vizsurfacebrowndark);
+  --vscode-charts-purple: var(--visualstudio-vizsurfaceplumdark);
+  --vscode-charts-red: var(--visualstudio-vizsurfacereddark);
+  --vscode-charts-yellow: var(--visualstudio-vizsurfacegoldlight);
+  /* --vscode-chat-avatarBackground: var(); */
+  /* --vscode-chat-avatarForeground: var(); */
+  /* --vscode-chat-requestBackground: var(); */
+  /* --vscode-chat-requestBorder: var(); */
+  --vscode-chat-slashCommandBackground: var(--visualstudio-editorexpansionlink);
+  --vscode-chat-slashCommandForeground: var(--visualstudio-editorexpansiontext);
+  /* --vscode-checkbox-background: var(); */
+  /* --vscode-checkbox-border: var(); */
+  /* --vscode-checkbox-foreground: var(); */
+  /* --vscode-checkbox-selectBackground: var(); */
+  /* --vscode-checkbox-selectBorder: var(); */
+  /* --vscode-commandCenter-activeBorder: var(); */
+  /* --vscode-commandCenter-activeForeground: var(); */
+  /* --vscode-commandCenter-border: var(); */
+  /* --vscode-commandCenter-debuggingBackground: var(); */
+  /* --vscode-commandCenter-foreground: var(); */
+  /* --vscode-commentsView-resolvedIcon: var(); */
+  /* --vscode-commentsView-unresolvedIcon: var(); */
+  /* --vscode-contrastActiveBorder: var(); */
+  /* --vscode-contrastBorder: var(); */
+  /* --vscode-debugConsole-errorForeground: var(); */
+  /* --vscode-debugConsole-infoForeground: var(); */
+  /* --vscode-debugConsole-sourceForeground: var(); */
+  /* --vscode-debugConsole-warningForeground: var(); */
+  /* --vscode-debugConsoleInputIcon-foreground: var(); */
+  /* --vscode-debugExceptionWidget-background: var(); */
+  /* --vscode-debugExceptionWidget-border: var(); */
+  /* --vscode-debugIcon-breakpointCurrentStackframeForeground: var(); */
+  /* --vscode-debugIcon-breakpointDisabledForeground: var(); */
+  /* --vscode-debugIcon-breakpointForeground: var(); */
+  /* --vscode-debugIcon-breakpointStackframeForeground: var(); */
+  /* --vscode-debugIcon-breakpointUnverifiedForeground: var(); */
+  /* --vscode-debugIcon-continueForeground: var(); */
+  /* --vscode-debugIcon-disconnectForeground: var(); */
+  /* --vscode-debugIcon-pauseForeground: var(); */
+  /* --vscode-debugIcon-restartForeground: var(); */
+  /* --vscode-debugIcon-startForeground: var(); */
+  /* --vscode-debugIcon-stepBackForeground: var(); */
+  /* --vscode-debugIcon-stepIntoForeground: var(); */
+  /* --vscode-debugIcon-stepOutForeground: var(); */
+  /* --vscode-debugIcon-stepOverForeground: var(); */
+  /* --vscode-debugIcon-stopForeground: var(); */
+  /* --vscode-debugTokenExpression-boolean: var(); */
+  /* --vscode-debugTokenExpression-error: var(); */
+  /* --vscode-debugTokenExpression-name: var(); */
+  /* --vscode-debugTokenExpression-number: var(); */
+  /* --vscode-debugTokenExpression-string: var(); */
+  /* --vscode-debugTokenExpression-value: var(); */
+  /* --vscode-debugToolBar-background: var(); */
+  /* --vscode-debugView-exceptionLabelBackground: var(); */
+  /* --vscode-debugView-exceptionLabelForeground: var(); */
+  /* --vscode-debugView-stateLabelBackground: var(); */
+  /* --vscode-debugView-stateLabelForeground: var(); */
+  /* --vscode-debugView-valueChangedHighlight: var(); */
+  /* --vscode-descriptionForeground: var(); */
+  /* --vscode-diffEditor-border: var(); */
+  /* --vscode-diffEditor-insertedTextBorder: var(); */
+  /* --vscode-diffEditor-move-border: var(); */
+  /* --vscode-diffEditor-moveActive-border: var(); */
+  /* --vscode-diffEditor-removedTextBorder: var(); */
+  /* --vscode-diffEditor-unchangedRegionBackground: var(); */
+  /* --vscode-diffEditor-unchangedRegionForeground: var(); */
+  /* --vscode-diffEditor-unchangedRegionShadow: var(); */
+  /* --vscode-disabledForeground: var(); */
+  --vscode-dropdown-background: var(--visualstudio-dropdownbackground);
+  --vscode-dropdown-border: var(--visualstudio-dropdownborder);
+  --vscode-dropdown-foreground: var(--visualstudio-dropdowntext);
+  --vscode-dropdown-listBackground: var(--visualstudio-dropdownmouseoverbackgroundend);
+  --vscode-editor-background: var(--visualstudio-editorexpansionfill);
+  /* --vscode-editor-findMatchBorder: var(); */
+  /* --vscode-editor-findMatchHighlightBorder: var(); */
+  /* --vscode-editor-findRangeHighlightBorder: var(); */
+  /* --vscode-editor-focusedStackFrameHighlightBackground: var(); */
+  --vscode-editor-foreground: var(--visualstudio-toolwindowtext);
+  /* --vscode-editor-hoverHighlightBackground: var(); */
+  /* --vscode-editor-inactiveSelectionBackground: var(); */
+  /* --vscode-editor-inlineValuesBackground: var(); */
+  /* --vscode-editor-inlineValuesForeground: var(); */
+  /* --vscode-editor-lineHighlightBorder: var(); */
+  /* --vscode-editor-linkedEditingBackground: var(); */
+  /* --vscode-editor-rangeHighlightBorder: var(); */
+  /* --vscode-editor-selectionBackground: var(); */
+  /* --vscode-editor-selectionForeground: var(); */
+  /* --vscode-editor-selectionHighlightBorder: var(); */
+  /* --vscode-editor-snippetFinalTabstopHighlightBorder: var(); */
+  /* --vscode-editor-snippetTabstopHighlightBackground: var(); */
+  /* --vscode-editor-stackFrameHighlightBackground: var(); */
+  /* --vscode-editor-symbolHighlightBorder: var(); */
+  /* --vscode-editor-wordHighlightBorder: var(); */
+  /* --vscode-editor-wordHighlightStrongBorder: var(); */
+  /* --vscode-editor-wordHighlightTextBorder: var(); */
+  /* --vscode-editorActiveLineNumber-foreground: var(); */
+  /* --vscode-editorBracketHighlight-foreground1: var(); */
+  /* --vscode-editorBracketHighlight-foreground2: var(); */
+  /* --vscode-editorBracketHighlight-foreground3: var(); */
+  /* --vscode-editorBracketHighlight-foreground4: var(); */
+  /* --vscode-editorBracketHighlight-foreground5: var(); */
+  /* --vscode-editorBracketHighlight-foreground6: var(); */
+  /* --vscode-editorBracketHighlight-unexpectedBracket-foreground: var(); */
+  /* --vscode-editorBracketMatch-background: var(); */
+  /* --vscode-editorBracketMatch-border: var(); */
+  /* --vscode-editorBracketPairGuide-activeBackground1: var(); */
+  /* --vscode-editorBracketPairGuide-activeBackground2: var(); */
+  /* --vscode-editorBracketPairGuide-activeBackground3: var(); */
+  /* --vscode-editorBracketPairGuide-activeBackground4: var(); */
+  /* --vscode-editorBracketPairGuide-activeBackground5: var(); */
+  /* --vscode-editorBracketPairGuide-activeBackground6: var(); */
+  /* --vscode-editorBracketPairGuide-background1: var(); */
+  /* --vscode-editorBracketPairGuide-background2: var(); */
+  /* --vscode-editorBracketPairGuide-background3: var(); */
+  /* --vscode-editorBracketPairGuide-background4: var(); */
+  /* --vscode-editorBracketPairGuide-background5: var(); */
+  /* --vscode-editorBracketPairGuide-background6: var(); */
+  /* --vscode-editorCodeLens-foreground: var(); */
+  /* --vscode-editorCommentsWidget-rangeActiveBackground: var(); */
+  /* --vscode-editorCommentsWidget-rangeBackground: var(); */
+  /* --vscode-editorCommentsWidget-replyInputBackground: var(); */
+  /* --vscode-editorCommentsWidget-resolvedBorder: var(); */
+  /* --vscode-editorCommentsWidget-unresolvedBorder: var(); */
+  /* --vscode-editorCursor-foreground: var(); */
+  /* --vscode-editorError-border: var(); */
+  /* --vscode-editorError-foreground: var(); */
+  /* --vscode-editorGhostText-border: var(); */
+  /* --vscode-editorGroup-border: var(); */
+  /* --vscode-editorGroup-dropIntoPromptBackground: var(); */
+  /* --vscode-editorGroup-dropIntoPromptBorder: var(); */
+  /* --vscode-editorGroup-dropIntoPromptForeground: var(); */
+  /* --vscode-editorGroup-focusedEmptyBorder: var(); */
+  /* --vscode-editorGroupHeader-border: var(); */
+  /* --vscode-editorGroupHeader-noTabsBackground: var(); */
+  /* --vscode-editorGutter-addedBackground: var(); */
+  /* --vscode-editorGutter-background: var(); */
+  /* --vscode-editorGutter-commentGlyphForeground: var(); */
+  /* --vscode-editorGutter-commentRangeForeground: var(); */
+  /* --vscode-editorGutter-commentUnresolvedGlyphForeground: var(); */
+  /* --vscode-editorGutter-deletedBackground: var(); */
+  /* --vscode-editorGutter-foldingControlForeground: var(); */
+  /* --vscode-editorGutter-modifiedBackground: var(); */
+  /* --vscode-editorHint-border: var(); */
+  /* --vscode-editorHoverWidget-background: var(); */
+  /* --vscode-editorHoverWidget-border: var(); */
+  /* --vscode-editorHoverWidget-foreground: var(); */
+  /* --vscode-editorHoverWidget-highlightForeground: var(); */
+  /* --vscode-editorHoverWidget-statusBarBackground: var(); */
+  /* --vscode-editorIndentGuide-activeBackground: var(); */
+  /* --vscode-editorIndentGuide-activeBackground1: var(); */
+  /* --vscode-editorIndentGuide-activeBackground2: var(); */
+  /* --vscode-editorIndentGuide-activeBackground3: var(); */
+  /* --vscode-editorIndentGuide-activeBackground4: var(); */
+  /* --vscode-editorIndentGuide-activeBackground5: var(); */
+  /* --vscode-editorIndentGuide-activeBackground6: var(); */
+  /* --vscode-editorIndentGuide-background: var(); */
+  /* --vscode-editorIndentGuide-background1: var(); */
+  /* --vscode-editorIndentGuide-background2: var(); */
+  /* --vscode-editorIndentGuide-background3: var(); */
+  /* --vscode-editorIndentGuide-background4: var(); */
+  /* --vscode-editorIndentGuide-background5: var(); */
+  /* --vscode-editorIndentGuide-background6: var(); */
+  /* --vscode-editorInfo-border: var(); */
+  /* --vscode-editorInfo-foreground: var(); */
+  /* --vscode-editorInlayHint-background: var(); */
+  /* --vscode-editorInlayHint-foreground: var(); */
+  /* --vscode-editorInlayHint-parameterBackground: var(); */
+  /* --vscode-editorInlayHint-parameterForeground: var(); */
+  /* --vscode-editorInlayHint-typeBackground: var(); */
+  /* --vscode-editorInlayHint-typeForeground: var(); */
+  /* --vscode-editorLightBulb-foreground: var(); */
+  /* --vscode-editorLightBulbAi-foreground: var(); */
+  /* --vscode-editorLightBulbAutoFix-foreground: var(); */
+  /* --vscode-editorLineNumber-activeForeground: var(); */
+  /* --vscode-editorLineNumber-foreground: var(); */
+  /* --vscode-editorLink-activeForeground: var(); */
+  /* --vscode-editorMarkerNavigation-background: var(); */
+  /* --vscode-editorMarkerNavigationError-background: var(); */
+  /* --vscode-editorMarkerNavigationInfo-background: var(); */
+  /* --vscode-editorMarkerNavigationWarning-background: var(); */
+  /* --vscode-editorMarkerNavigationWarning-headerBackground: var(); */
+  /* --vscode-editorMultiCursor-primary-foreground: var(); */
+  /* --vscode-editorMultiCursor-secondary-foreground: var(); */
+  /* --vscode-editorOverviewRuler-addedForeground: var(); */
+  /* --vscode-editorOverviewRuler-border: var(); */
+  /* --vscode-editorOverviewRuler-bracketMatchForeground: var(); */
+  /* --vscode-editorOverviewRuler-commentForeground: var(); */
+  /* --vscode-editorOverviewRuler-commentUnresolvedForeground: var(); */
+  /* --vscode-editorOverviewRuler-commonContentForeground: var(); */
+  /* --vscode-editorOverviewRuler-currentContentForeground: var(); */
+  /* --vscode-editorOverviewRuler-deletedForeground: var(); */
+  /* --vscode-editorOverviewRuler-errorForeground: var(); */
+  /* --vscode-editorOverviewRuler-findMatchForeground: var(); */
+  /* --vscode-editorOverviewRuler-incomingContentForeground: var(); */
+  /* --vscode-editorOverviewRuler-infoForeground: var(); */
+  /* --vscode-editorOverviewRuler-modifiedForeground: var(); */
+  /* --vscode-editorOverviewRuler-rangeHighlightForeground: var(); */
+  /* --vscode-editorOverviewRuler-selectionHighlightForeground: var(); */
+  /* --vscode-editorOverviewRuler-warningForeground: var(); */
+  /* --vscode-editorOverviewRuler-wordHighlightForeground: var(); */
+  /* --vscode-editorOverviewRuler-wordHighlightStrongForeground: var(); */
+  /* --vscode-editorOverviewRuler-wordHighlightTextForeground: var(); */
+  --vscode-editorPane-background: var(--visualstudio-editorexpansionfill);
+  /* --vscode-editorRuler-foreground: var(); */
+  /* --vscode-editorStickyScroll-background: var(); */
+  /* --vscode-editorStickyScroll-border: var(); */
+  /* --vscode-editorSuggestWidget-background: var(); */
+  /* --vscode-editorSuggestWidget-border: var(); */
+  /* --vscode-editorSuggestWidget-focusHighlightForeground: var(); */
+  /* --vscode-editorSuggestWidget-foreground: var(); */
+  /* --vscode-editorSuggestWidget-highlightForeground: var(); */
+  /* --vscode-editorSuggestWidgetStatus-foreground: var(); */
+  /* --vscode-editorUnicodeHighlight-border: var(); */
+  /* --vscode-editorUnnecessaryCode-border: var(); */
+  /* --vscode-editorWarning-border: var(); */
+  /* --vscode-editorWarning-foreground: var(); */
+  /* --vscode-editorWatermark-foreground: var(); */
+  /* --vscode-editorWhitespace-foreground: var(); */
+  /* --vscode-editorWidget-background: var(); */
+  /* --vscode-editorWidget-border: var(); */
+  /* --vscode-editorWidget-foreground: var(); */
+  --vscode-errorForeground: var(--visualstudio-toolwindowvalidationerrortext);
+  /* --vscode-extensionBadge-remoteBackground: var(); */
+  /* --vscode-extensionBadge-remoteForeground: var(); */
+  /* --vscode-extensionButton-separator: var(); */
+  /* --vscode-extensionIcon-preReleaseForeground: var(); */
+  /* --vscode-extensionIcon-starForeground: var(); */
+  /* --vscode-extensionIcon-verifiedForeground: var(); */
+  --vscode-focusBorder: var(--visualstudio-comboboxborder);
+  --vscode-foreground: var(--visualstudio-toolwindowtext);
+  --vscode-icon-foreground: var(--visualstudio-comboboxtext);
+  --vscode-input-background: var(--visualstudio-comboboxbackground);
+  --vscode-input-border: var(--visualstudio-comboboxborder);
+  --vscode-input-foreground: var(--visualstudio-comboboxtext);
+  --vscode-input-placeholderForeground: var(--visualstudio-comboboxitemtextinactive);
+  --vscode-inputOption-activeBackground: var(--visualstudio-startpagebuttonunpinned);
+  --vscode-inputOption-activeBorder: var(--visualstudio-startpagebuttonborder);
+  --vscode-inputOption-activeForeground: var(--visualstudio-startpagebuttontext);
+  --vscode-inputValidation-errorBackground: var(--visualstudio-statusbardebugging);
+  --vscode-inputValidation-errorBorder: var(--visualstudio-statusbardebugging);
+  --vscode-inputValidation-infoBackground: var(--visualstudio-statusbarbuilding);
+  --vscode-inputValidation-infoBorder: var(--visualstudio-statusbarbuilding);
+  /* --vscode-inputValidation-warningBackground: var(); */
+  /* --vscode-inputValidation-warningBorder: var(); */
+  /* --vscode-interactive-activeCodeBorder: var(); */
+  /* --vscode-interactive-inactiveCodeBorder: var(); */
+  --vscode-keybindingLabel-background: var(--visualstudio-helpsearchbackground);
+  --vscode-keybindingLabel-border: var(--visualstudio-helpsearchborder);
+  --vscode-keybindingLabel-bottomBorder: var(--visualstudio-helpsearchfilterborder);
+  --vscode-keybindingLabel-foreground: var(--visualstudio-helpsearchtext);
+  /* --vscode-list-deemphasizedForeground: var(); */
+  /* --vscode-list-filterMatchBorder: var(); */
+  /* --vscode-list-focusHighlightForeground: var(); */
+  /* --vscode-list-focusOutline: var(); */
+  /* --vscode-list-highlightForeground: var(); */
+  /* --vscode-list-hoverBackground: var(); */
+  --vscode-list-invalidItemForeground: var(--visualstudio-toolwindowvalidationerrortext);
+  --vscode-list-inactiveSelectionBackground: var(--visualstudio-sortbackground);
+  --vscode-list-activeSelectionForeground: var(--visualstudio-sorttext);
+  --vscode-list-activeSelectionBackground: var(--visualstudio-sortbackground);
+  /* --vscode-listFilterWidget-background: var(); */
+  /* --vscode-listFilterWidget-noMatchesOutline: var(); */
+  /* --vscode-listFilterWidget-outline: var(); */
+  /* --vscode-menu-background: var(); */
+  /* --vscode-menu-border: var(); */
+  /* --vscode-menu-foreground: var(); */
+  /* --vscode-menu-selectionBorder: var(); */
+  /* --vscode-menu-separatorBackground: var(); */
+  /* --vscode-menubar-selectionBorder: var(); */
+  /* --vscode-menubar-selectionForeground: var(); */
+  /* --vscode-merge-border: var(); */
+  /* --vscode-mergeEditor-change-background: var(); */
+  /* --vscode-mergeEditor-change-word-background: var(); */
+  /* --vscode-mergeEditor-changeBase-background: var(); */
+  /* --vscode-mergeEditor-changeBase-word-background: var(); */
+  /* --vscode-mergeEditor-conflict-handled-minimapOverViewRuler: var(); */
+  /* --vscode-mergeEditor-conflict-handledFocused-border: var(); */
+  /* --vscode-mergeEditor-conflict-handledUnfocused-border: var(); */
+  /* --vscode-mergeEditor-conflict-unhandled-minimapOverViewRuler: var(); */
+  /* --vscode-mergeEditor-conflict-unhandledFocused-border: var(); */
+  /* --vscode-mergeEditor-conflict-unhandledUnfocused-border: var(); */
+  /* --vscode-mergeEditor-conflictingLines-background: var(); */
+  /* --vscode-minimap-errorHighlight: var(); */
+  /* --vscode-minimap-findMatchHighlight: var(); */
+  /* --vscode-minimap-foregroundOpacity: var(); */
+  /* --vscode-minimap-infoHighlight: var(); */
+  /* --vscode-minimap-selectionHighlight: var(); */
+  /* --vscode-minimap-selectionOccurrenceHighlight: var(); */
+  /* --vscode-minimap-warningHighlight: var(); */
+  /* --vscode-minimapGutter-addedBackground: var(); */
+  /* --vscode-minimapGutter-deletedBackground: var(); */
+  /* --vscode-minimapGutter-modifiedBackground: var(); */
+  /* --vscode-minimapSlider-activeBackground: var(); */
+  /* --vscode-minimapSlider-background: var(); */
+  /* --vscode-minimapSlider-hoverBackground: var(); */
+  /* --vscode-multiDiffEditor-border: var(); */
+  /* --vscode-notebook-cellBorderColor: var(); */
+  /* --vscode-notebook-cellInsertionIndicator: var(); */
+  /* --vscode-notebook-cellStatusBarItemHoverBackground: var(); */
+  /* --vscode-notebook-cellToolbarSeparator: var(); */
+  /* --vscode-notebook-focusedCellBorder: var(); */
+  /* --vscode-notebook-focusedEditorBorder: var(); */
+  /* --vscode-notebook-inactiveFocusedCellBorder: var(); */
+  /* --vscode-notebook-inactiveSelectedCellBorder: var(); */
+  /* --vscode-notebook-selectedCellBorder: var(); */
+  /* --vscode-notebookEditorOverviewRuler-runningCellForeground: var(); */
+  /* --vscode-notebookScrollbarSlider-activeBackground: var(); */
+  /* --vscode-notebookScrollbarSlider-background: var(); */
+  /* --vscode-notebookScrollbarSlider-hoverBackground: var(); */
+  /* --vscode-notebookStatusErrorIcon-foreground: var(); */
+  /* --vscode-notebookStatusRunningIcon-foreground: var(); */
+  /* --vscode-notebookStatusSuccessIcon-foreground: var(); */
+  /* --vscode-notificationCenter-border: var(); */
+  /* --vscode-notificationCenterHeader-background: var(); */
+  /* --vscode-notificationLink-foreground: var(); */
+  /* --vscode-notificationToast-border: var(); */
+  /* --vscode-notifications-background: var(); */
+  /* --vscode-notifications-border: var(); */
+  /* --vscode-notifications-foreground: var(); */
+  /* --vscode-notificationsErrorIcon-foreground: var(); */
+  /* --vscode-panel-background: var(); */
+  /* --vscode-panel-border: var(); */
+  /* --vscode-panel-dropBorder: var(); */
+  /* --vscode-panelInput-border: var(); */
+  /* --vscode-panelSection-border: var(); */
+  /* --vscode-panelSectionHeader-border: var(); */
+  /* --vscode-panelStickyScroll-background: var(); */
+  /* --vscode-panelTitle-activeBorder: var(); */
+  /* --vscode-panelTitle-activeForeground: var(); */
+  /* --vscode-panelTitle-inactiveForeground: var(); */
+  /* --vscode-peekView-border: var(); */
+  /* --vscode-peekViewEditor-background: var(); */
+  /* --vscode-peekViewEditor-matchHighlightBorder: var(); */
+  /* --vscode-peekViewEditorGutter-background: var(); */
+  /* --vscode-peekViewEditorStickyScroll-background: var(); */
+  /* --vscode-peekViewResult-background: var(); */
+  /* --vscode-peekViewResult-fileForeground: var(); */
+  /* --vscode-peekViewResult-lineForeground: var(); */
+  /* --vscode-peekViewResult-selectionForeground: var(); */
+  /* --vscode-peekViewTitle-background: var(); */
+  /* --vscode-peekViewTitleDescription-foreground: var(); */
+  /* --vscode-peekViewTitleLabel-foreground: var(); */
+  /* --vscode-pickerGroup-border: var(); */
+  /* --vscode-pickerGroup-foreground: var(); */
+  /* --vscode-ports-iconRunningProcessForeground: var(); */
+  /* --vscode-problemsErrorIcon-foreground: var(); */
+  /* --vscode-problemsInfoIcon-foreground: var(); */
+  /* --vscode-problemsWarningIcon-foreground: var(); */
+  /* --vscode-profileBadge-background: var(); */
+  /* --vscode-profileBadge-foreground: var(); */
+  /* --vscode-progressBar-background: var(); */
+  --vscode-quickInput-background: var(--visualstudio-filetabbackground);
+  --vscode-quickInput-foreground: var(--visualstudio-comboboxtext);
+  --vscode-quickInputTitle-background: var(--visualstudio---visualstudio-filetabselectedbackground);
+  /* --vscode-remoteHub-decorations-addedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-conflictForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-deletedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-ignoredResourceForeground: var(); */
+  /* --vscode-remoteHub-decorations-incomingAddedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-incomingDeletedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-incomingModifiedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-incomingRenamedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-modifiedForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-submoduleForegroundColor: var(); */
+  /* --vscode-remoteHub-decorations-workspaceRepositoriesView-hasUncommittedChangesForegroundColor: var(); */
+  --vscode-scm-historyItemStatisticsBorder: var(--visualstudio-scrollbararrowglyph);
+  --vscode-scrollbar-shadow: var(--visualstudio-scrollbarthumbglyph);
+  --vscode-scrollbarSlider-activeBackground: var(--visualstudio-scrollbarthumbpressedbackground);
+  --vscode-scrollbarSlider-background: var(--visualstudio-scrollbarbackground);
+  --vscode-scrollbarSlider-hoverBackground: var(--visualstudio-scrollbarthumbmouseoverbackground);
+  /* --vscode-search-resultsInfoForeground: var(); */
+  /* --vscode-searchEditor-findMatchBorder: var(); */
+  /* --vscode-searchEditor-textInputBorder: var(); */
+  --vscode-selection-background: var(--visualstudio-ComboBoxSelection);
+  /* --vscode-settings-checkboxBackground: var(); */
+  /* --vscode-settings-checkboxBorder: var(); */
+  /* --vscode-settings-checkboxForeground: var(); */
+  --vscode-settings-dropdownBackground: var(--visualstudio-dropdownbackground);
+  --vscode-settings-dropdownBorder: var(--visualstudio-dropdownborder);
+  --vscode-settings-dropdownForeground: var(--visualstudio-dropdowntext);
+  --vscode-settings-dropdownListBorder: var(--visualstudio-dropdownmouseoverbackground);
+  /* --vscode-settings-focusedRowBorder: var(); */
+  /* --vscode-settings-headerBorder: var(); */
+  /* --vscode-settings-headerForeground: var(); */
+  /* --vscode-settings-modifiedItemIndicator: var(); */
+  /* --vscode-settings-numberInputBackground: var(); */
+  /* --vscode-settings-numberInputBorder: var(); */
+  /* --vscode-settings-numberInputForeground: var(); */
+  /* --vscode-settings-sashBorder: var(); */
+  /* --vscode-settings-settingsHeaderHoverForeground: var(); */
+  /* --vscode-settings-textInputBackground: var(); */
+  /* --vscode-settings-textInputBorder: var(); */
+  /* --vscode-settings-textInputForeground: var(); */
+  --vscode-sideBar-background: var(--visualstudio-toolwindowbackground);
+  --vscode-sideBar-foreground: var(--visualstudio-toolwindowtext);
+  --vscode-sideBar-border: var(--visualstudio-toolwindowborder);
+  /* --vscode-sideBarActivityBarTop-border: var(); */
+  /* --vscode-sideBarSectionHeader-border: var(); */
+  --vscode-sideBarStickyScroll-background: var(--visualstudio-dropdownbackground);
+  --vscode-sideBarTitle-background: var(--visualstudio-dropdownbackground);
+  --vscode-sideBarTitle-foreground: var(--visualstudio-toolwindowtabselectedactivetext);
+  /* --vscode-sideBySideEditor-horizontalBorder: var(); */
+  /* --vscode-sideBySideEditor-verticalBorder: var(); */
+  /* --vscode-simpleFindWidget-sashBorder: var(); */
+  /* --vscode-statusBar-border: var(); */
+  /* --vscode-statusBar-debuggingBackground: var(); */
+  /* --vscode-statusBar-debuggingBorder: var(); */
+  /* --vscode-statusBar-debuggingForeground: var(); */
+  /* --vscode-statusBar-foreground: var(); */
+  /* --vscode-statusBar-noFolderBorder: var(); */
+  /* --vscode-statusBar-noFolderForeground: var(); */
+  /* --vscode-statusBarItem-activeBackground: var(); */
+  /* --vscode-statusBarItem-compactHoverBackground: var(); */
+  /* --vscode-statusBarItem-errorForeground: var(); */
+  /* --vscode-statusBarItem-errorHoverBackground: var(); */
+  /* --vscode-statusBarItem-errorHoverForeground: var(); */
+  /* --vscode-statusBarItem-hoverBackground: var(); */
+  /* --vscode-statusBarItem-hoverForeground: var(); */
+  /* --vscode-statusBarItem-offlineBackground: var(); */
+  /* --vscode-statusBarItem-offlineForeground: var(); */
+  /* --vscode-statusBarItem-offlineHoverBackground: var(); */
+  /* --vscode-statusBarItem-offlineHoverForeground: var(); */
+  /* --vscode-statusBarItem-prominentBackground: var(); */
+  /* --vscode-statusBarItem-prominentForeground: var(); */
+  /* --vscode-statusBarItem-prominentHoverBackground: var(); */
+  /* --vscode-statusBarItem-prominentHoverForeground: var(); */
+  /* --vscode-statusBarItem-remoteBackground: var(); */
+  /* --vscode-statusBarItem-remoteForeground: var(); */
+  /* --vscode-statusBarItem-remoteHoverBackground: var(); */
+  /* --vscode-statusBarItem-remoteHoverForeground: var(); */
+  /* --vscode-statusBarItem-warningForeground: var(); */
+  /* --vscode-statusBarItem-warningHoverBackground: var(); */
+  /* --vscode-statusBarItem-warningHoverForeground: var(); */
+  /* --vscode-symbolIcon-arrayForeground: var(); */
+  /* --vscode-symbolIcon-booleanForeground: var(); */
+  /* --vscode-symbolIcon-classForeground: var(); */
+  /* --vscode-symbolIcon-colorForeground: var(); */
+  /* --vscode-symbolIcon-constantForeground: var(); */
+  /* --vscode-symbolIcon-constructorForeground: var(); */
+  /* --vscode-symbolIcon-enumeratorForeground: var(); */
+  /* --vscode-symbolIcon-enumeratorMemberForeground: var(); */
+  /* --vscode-symbolIcon-eventForeground: var(); */
+  /* --vscode-symbolIcon-fieldForeground: var(); */
+  /* --vscode-symbolIcon-fileForeground: var(); */
+  /* --vscode-symbolIcon-folderForeground: var(); */
+  /* --vscode-symbolIcon-functionForeground: var(); */
+  /* --vscode-symbolIcon-interfaceForeground: var(); */
+  /* --vscode-symbolIcon-keyForeground: var(); */
+  /* --vscode-symbolIcon-keywordForeground: var(); */
+  /* --vscode-symbolIcon-methodForeground: var(); */
+  /* --vscode-symbolIcon-moduleForeground: var(); */
+  /* --vscode-symbolIcon-namespaceForeground: var(); */
+  /* --vscode-symbolIcon-nullForeground: var(); */
+  /* --vscode-symbolIcon-numberForeground: var(); */
+  /* --vscode-symbolIcon-objectForeground: var(); */
+  /* --vscode-symbolIcon-operatorForeground: var(); */
+  /* --vscode-symbolIcon-packageForeground: var(); */
+  /* --vscode-symbolIcon-propertyForeground: var(); */
+  /* --vscode-symbolIcon-referenceForeground: var(); */
+  /* --vscode-symbolIcon-snippetForeground: var(); */
+  /* --vscode-symbolIcon-stringForeground: var(); */
+  /* --vscode-symbolIcon-structForeground: var(); */
+  /* --vscode-symbolIcon-textForeground: var(); */
+  /* --vscode-symbolIcon-typeParameterForeground: var(); */
+  /* --vscode-symbolIcon-unitForeground: var(); */
+  /* --vscode-symbolIcon-variableForeground: var(); */
+  --vscode-tab-activeBackground: var(--visualstudio-filetabactivegrouptitlebackground);
+  --vscode-tab-activeForeground: var(--visualstudio-filetabhottext);
+  --vscode-tab-border: var(--visualstudio-filetabborder);
+  --vscode-tab-dragAndDropBorder: var(--visualstudio-filetabbuttonprovisionalhoverinactiveborder);
+  --vscode-tab-inactiveForeground: var(--visualstudio-filetabinactivetext);
+  --vscode-tab-inactiveModifiedBorder: var(--visualstudio-filetabbuttonhoverinactiveborder);
+  --vscode-tab-lastPinnedBorder: var(--visualstudio-filetabbuttonhoverselectedactiveborder);
+  --vscode-tab-unfocusedActiveBackground: var(--visualstudio-filetabprovisionalhover);
+  --vscode-tab-unfocusedActiveForeground: var(--visualstudio-filetabprovisionalhoverforeground);
+  --vscode-tab-unfocusedActiveModifiedBorder: var(--visualstudio-FileTabProvisionalHoverBorder);
+  --vscode-tab-unfocusedInactiveForeground: var(--visualstudio-filetabprovisionalinactiveforeground);
+  --vscode-tab-unfocusedInactiveModifiedBorder: var(--visualstudio-filetabprovisionalselectedactiveborder);
+  /* --vscode-terminal-ansiBlack: var(); */
+  /* --vscode-terminal-ansiBlue: var(); */
+  /* --vscode-terminal-ansiBrightBlack: var(); */
+  /* --vscode-terminal-ansiBrightBlue: var(); */
+  /* --vscode-terminal-ansiBrightCyan: var(); */
+  /* --vscode-terminal-ansiBrightGreen: var(); */
+  /* --vscode-terminal-ansiBrightMagenta: var(); */
+  /* --vscode-terminal-ansiBrightRed: var(); */
+  /* --vscode-terminal-ansiBrightWhite: var(); */
+  /* --vscode-terminal-ansiBrightYellow: var(); */
+  /* --vscode-terminal-ansiCyan: var(); */
+  /* --vscode-terminal-ansiGreen: var(); */
+  /* --vscode-terminal-ansiMagenta: var(); */
+  /* --vscode-terminal-ansiRed: var(); */
+  /* --vscode-terminal-ansiWhite: var(); */
+  /* --vscode-terminal-ansiYellow: var(); */
+  /* --vscode-terminal-border: var(); */
+  /* --vscode-terminal-findMatchBorder: var(); */
+  /* --vscode-terminal-findMatchHighlightBorder: var(); */
+  /* --vscode-terminal-foreground: var(); */
+  /* --vscode-terminal-hoverHighlightBackground: var(); */
+  /* --vscode-terminal-inactiveSelectionBackground: var(); */
+  /* --vscode-terminal-selectionBackground: var(); */
+  /* --vscode-terminal-selectionForeground: var(); */
+  /* --vscode-terminalCommandDecoration-defaultBackground: var(); */
+  /* --vscode-terminalCommandDecoration-errorBackground: var(); */
+  /* --vscode-terminalCommandDecoration-successBackground: var(); */
+  /* --vscode-terminalOverviewRuler-cursorForeground: var(); */
+  /* --vscode-terminalOverviewRuler-findMatchForeground: var(); */
+  /* --vscode-testing-coverCountBadgeBackground: var(); */
+  /* --vscode-testing-coverCountBadgeForeground: var(); */
+  /* --vscode-testing-coveredBorder: var(); */
+  /* --vscode-testing-coveredGutterBackground: var(); */
+  /* --vscode-testing-iconErrored: var(); */
+  /* --vscode-testing-iconErrored-retired: var(); */
+  /* --vscode-testing-iconFailed: var(); */
+  /* --vscode-testing-iconFailed-retired: var(); */
+  /* --vscode-testing-iconPassed: var(); */
+  /* --vscode-testing-iconPassed-retired: var(); */
+  /* --vscode-testing-iconQueued: var(); */
+  /* --vscode-testing-iconQueued-retired: var(); */
+  /* --vscode-testing-iconSkipped: var(); */
+  /* --vscode-testing-iconSkipped-retired: var(); */
+  /* --vscode-testing-iconUnset: var(); */
+  /* --vscode-testing-iconUnset-retired: var(); */
+  /* --vscode-testing-message-error-decorationForeground: var(); */
+  /* --vscode-testing-message-info-decorationForeground: var(); */
+  /* --vscode-testing-messagePeekBorder: var(); */
+  /* --vscode-testing-peekBorder: var(); */
+  /* --vscode-testing-runAction: var(); */
+  /* --vscode-testing-uncoveredBorder: var(); */
+  /* --vscode-testing-uncoveredGutterBackground: var(); */
+  /* --vscode-textBlockQuote-border: var(); */
+  --vscode-textCodeBlock-background: var(--visualstudio-editorexpansionfill);
+  --vscode-textLink-activeForeground: var(--visualstudio-editorexpansionlink);
+  --vscode-textLink-foreground: var(--visualstudio-editorexpansionlink);
+  /* --vscode-textPreformat-background: var(); */
+  /* --vscode-textPreformat-foreground: var(); */
+  /* --vscode-textSeparator-foreground: var(); */
+  --vscode-titleBar-activeBackground: var(--visualstudio-paneltitlebar);
+  --vscode-titleBar-activeForeground: var(--visualstudio-paneltitlebartext);
+  /* --vscode-titleBar-border: var(); */
+  /* --vscode-toolbar-hoverOutline: var(); */
+  /* --vscode-tree-inactiveIndentGuidesStroke: var(); */
+  /* --vscode-tree-indentGuidesStroke: var(); */
+  /* --vscode-welcomePage-progress-background: var(); */
+  /* --vscode-welcomePage-progress-foreground: var(); */
+  /* --vscode-welcomePage-tileBackground: var(); */
+  /* --vscode-welcomePage-tileBorder: var(); */
+  /* --vscode-widget-border: var(); */
+  --vscode-window-activeBorder: var(--visualstudio-titlebaractiveborder);
+  --vscode-window-inactiveBorder: var(--visualstudio-titlebarinactive);
+  --button-icon-background: var(--visualstudio-filetabbackground);
+  --foreground: var(--visualstudio-toolwindowtext);
+
+  /* Mimic rules injected by VSCode */
+  --visualstudio-font-weight: normal;
+  --vscode-font-family: var(--visualstudio-ui-font-family);
+  --vscode-font-size: var(--visualstudio-ui-font-size);
+  --vscode-font-weight: var(--visualstudio-font-weight);
+  --vscode-editor-font-family: var(--visualstudio-editor-font-family);
+  --vscode-editor-font-size: var(--visualstudio-editor-font-size);
+  --vscode-editor-font-weight: var(--visualstudio-font-weight);
+  --vscode-widget-shadow: var(--visualstudio-buttonshadow);
+
+  /* Mimic rules injected by VSCode */
+  scrollbar-color: var(--vscode-scrollbarSlider-background) var(--vscode-editor-background);
+}
+
+html[data-ide='VisualStudio'] body {
+  overscroll-behavior-x: none;
+  background-color: var(--vscode-sideBar-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  font-size: var(--vscode-font-size);
+  margin: 0 auto;
+  padding: 0;
+}
+
+html[data-ide='VisualStudio'] :matches(img, video) {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+html[data-ide='VisualStudio'] code {
+  font-family: var(--vscode-editor-font-family);
+  font-size: var(--vscode-editor-font-size);
+  color: var(--vscode-textPreformat-foreground);
+  background-color: var(--vscode-textPreformat-background);
+}
+
+html[data-ide='VisualStudio'] pre code {
+  padding: 0;
+}
+
+html[data-ide='VisualStudio'] blockquote {
+  background: var(--vscode-textBlockQuote-background);
+  border-color: var(--vscode-textBlockQuote-border);
+}

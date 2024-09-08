@@ -202,7 +202,7 @@ const Chat: React.FunctionComponent<{
 
   return (
     <>
-      <div className="flex flex-col h-full vscode-dark text-white px-3 pb-4">
+      <div className="flex flex-col h-full px-3 pb-4">
         <div className="flex-1 flex flex-col justify-start overflow-y-auto mb-4">
           {messages.map((message) => (
             <div

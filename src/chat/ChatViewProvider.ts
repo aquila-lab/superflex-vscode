@@ -116,6 +116,20 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   setWebviewHtml(webview: vscode.Webview): void {
+    const theme = vscode.window.activeColorTheme.kind;
+    let themeClassname;
+    switch (theme) {
+      case vscode.ColorThemeKind.Dark:
+        themeClassname = "vscode-dark";
+        break;
+      case vscode.ColorThemeKind.Light:
+        themeClassname = "vscode-light";
+        break;
+      case vscode.ColorThemeKind.HighContrast:
+        themeClassname = "vscode-high-contrast";
+        break;
+    }
+
     const stylesUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "index.css")
     );
@@ -144,7 +158,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
             }
           </style>
         </head>
-        <body style="margin: 0; padding: 0; min-width: 100%; min-height: 100%">
+        <body class="${themeClassname}" data-vscode-theme-kind="${themeClassname}">
           <div id="root"></div>
           <script type="module" src="${scriptUri}"></script>
         </body>
