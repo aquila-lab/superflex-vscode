@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
 
 interface FigmaFilePickerModalProps {
@@ -29,11 +30,10 @@ const FigmaFilePickerModal: React.FunctionComponent<FigmaFilePickerModalProps> =
           <DialogTitle>Enter the link of Figma selection</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-2">
-          <input
+          <Input
             type="text"
             value={figmaSelectionLink}
             placeholder="https://www.figma.com/design/GAo9lY4bI..."
-            className="w-full p-2 bg-neutral-700 text-white rounded-md focus:outline-none"
             onChange={(e) => setFigmaSelectionLink(e.target.value)}
           />
 

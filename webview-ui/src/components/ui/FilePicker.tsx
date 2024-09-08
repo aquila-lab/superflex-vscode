@@ -20,8 +20,8 @@ const FilePicker: React.FC<FilePickerProps> = ({ onChange, accept, disabled }) =
         <label
           htmlFor="chat-file-picker"
           className={cn(
-            'p-1.5',
-            disabled ? 'text-muted cursor-not-allowed' : 'cursor-pointer text-muted-foreground hover:text-foreground'
+            'p-1.5 text-muted-foreground',
+            disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
           )}>
           <PaperClipIcon className="size-5" />
         </label>
