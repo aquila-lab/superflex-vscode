@@ -12,11 +12,12 @@ interface FigmaFilePickerModalProps {
 const FigmaFilePickerModal = ({ open, onClose, onSubmit }: FigmaFilePickerModalProps): JSX.Element => {
   const [figmaSelectionLink, setFigmaSelectionLink] = useState('');
 
-  async function handleSubmit() {
+  async function handleSubmit(): Promise<void> {
     const success = await onSubmit(figmaSelectionLink);
     if (!success) {
       return;
     }
+
     setFigmaSelectionLink('');
     onClose();
   }
@@ -37,8 +38,8 @@ const FigmaFilePickerModal = ({ open, onClose, onSubmit }: FigmaFilePickerModalP
         </Button>
 
         <p className="text-xs text-neutral-400">
-          You can copy the link from the Figma selection by right-clicking on the selection and selecting{' '}
-          <span className="font-medium">"Copy/Paste as" → "Copy link to selection"</span>
+          {'You can copy the link from the Figma selection by right-clicking on the selection and selecting '}
+          <span className="font-medium">{'"Copy/Paste as" → "Copy link to selection"'}</span>
         </p>
 
         <div className="flex-1 h-full w-full min-h-[11rem] figma-copy-selection-example rounded-md overflow-hidden"></div>

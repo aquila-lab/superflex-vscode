@@ -38,7 +38,6 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
   }, [vscodeAPI]);
 
   const SelectedView = views[view];
-
   return (
     <div className="App h-full">
       <div id="AppContent" className="h-full">
