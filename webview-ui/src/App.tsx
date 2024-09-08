@@ -3,11 +3,10 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 
 import { newEventMessage } from '../../shared/protocol';
+import views from './views';
 import { VSCodeWrapper } from './api/vscodeApi';
-import { Button } from './components';
-import Chat from './Chat';
 
-type View = 'chat' | 'login' | 'no_open_project';
+type View = keyof typeof views;
 
 const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI }) => {
   const [view, setView] = useState<View>('login');
@@ -23,7 +22,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
           break;
         case 'initialized':
           if (!message.data.isInitialized) {
-            setView('no_open_project');
+            setView('openProjectPrompt');
             return;
           }
 
@@ -38,39 +37,12 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
     vscodeAPI.postMessage(newEventMessage('ready'));
   }, [vscodeAPI]);
 
-  if (view === 'login') {
-    return (
-      <div className="App h-full">
-        <div id="AppContent" className="h-full">
-          <div className="flex flex-col justify-center items-center h-full vscode-dark text-white px-5 pb-4">
-            <h3 className="text-2xl font-bold mb-4">Welcome to Superflex!</h3>
-            <Button onClick={() => vscodeAPI.postMessage(newEventMessage('login_clicked'))}>Sign in</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (view === 'no_open_project') {
-    return (
-      <div className="App h-full">
-        <div id="AppContent" className="h-full">
-          <div className="flex flex-col justify-center items-center h-full vscode-dark text-white px-5 pb-4">
-            <h3 className="text-2xl font-bold mb-4">No open project</h3>
-            <p className="text-center">
-              Please open a project to start using Superflex. If you have already opened a project, and still see this.
-              Please restart Visual Studio Code.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const SelectedView = views[view];
 
   return (
     <div className="App h-full">
       <div id="AppContent" className="h-full">
-        <Chat vscodeAPI={vscodeAPI} />
+        <SelectedView vscodeAPI={vscodeAPI} />
       </div>
     </div>
   );
