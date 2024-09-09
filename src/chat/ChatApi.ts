@@ -2,8 +2,9 @@ import fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
+import { v4 as uuidv4 } from "uuid";
 
-import { Message, MessageReqest, MessageType, Thread } from "../../shared/model";
+import { MessageReqest, MessageType, Role, Thread } from "../../shared/model";
 import { EventMessage, EventPayloads, EventType, newEventResponse } from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
@@ -12,11 +13,6 @@ import { getFigmaSelectionImageUrl } from "../api";
 import { extractFigmaSelectionUrl } from "../model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
-
-type InitState = {
-  isInitialized: boolean;
-  figmaAuthenticated: boolean;
-};
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -51,11 +47,11 @@ export class ChatAPI {
         const release = await this._initializedMutex.acquire();
 
         try {
-          let figmaAuthenticated = false;
+          let isFigmaAuthenticated = false;
 
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {
-            return { isInitialized: false, figmaAuthenticated };
+            return { isInitialized: false, isFigmaAuthenticated };
           }
 
           const workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
@@ -66,10 +62,10 @@ export class ChatAPI {
 
           const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, []);
           if (session && session.accessToken) {
-            figmaAuthenticated = true;
+            isFigmaAuthenticated = true;
           }
 
-          return { isInitialized: true, figmaAuthenticated };
+          return { isInitialized: true, isFigmaAuthenticated };
         } finally {
           release();
         }
@@ -122,7 +118,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the assistant's message response.
        * @throws An error if the message cannot be sent or processed.
        */
-      .registerEvent(EventType.NEW_MESSAGE, async (messages: MessageReqest[]) => {
+      .registerEvent(EventType.NEW_MESSAGE, async (messages: MessageReqest[], sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
           return null;
         }
@@ -146,6 +142,18 @@ export class ChatAPI {
               }
 
               const imageUrl = await getFigmaSelectionImageUrl(figma);
+              sendEventMessageCb(
+                newEventResponse(EventType.ADD_MESSAGE, {
+                  id: uuidv4(),
+                  threadID: this._thread?.id ?? "",
+                  role: Role.User,
+                  type: MessageType.Image,
+                  content: imageUrl,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                })
+              );
+
               return {
                 ...msg,
                 type: MessageType.Image,
