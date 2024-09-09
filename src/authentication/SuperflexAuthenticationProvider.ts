@@ -11,7 +11,6 @@ import {
   env,
   Uri,
   ProgressLocation,
-  AuthenticationProviderSessionOptions,
 } from "vscode";
 
 import { User } from "../../shared/model";

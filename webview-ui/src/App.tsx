@@ -21,7 +21,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
           break;
         }
         case EventType.INITIALIZED: {
-          const initState = payload as EventPayloads[EventType.INITIALIZED]['response'];
+          const initState = payload as EventPayloads[typeof command]['response'];
 
           if (!initState.isInitialized) {
             setView('openProjectPrompt');

@@ -44,6 +44,8 @@ export interface EventPayloads {
   [EventType.ADD_MESSAGE]: { request: void; response: Message };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
+  [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
+  [EventType.SHOW_CHAT_VIEW]: { request: void; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;
@@ -58,6 +60,13 @@ export interface EventMessage<T extends EventType = EventType> {
 export function newEventRequest<T extends EventType>(
   command: T,
   payload?: EventPayloads[T]["request"]
+): EventMessage<T> {
+  return { id: uuidv4(), command, payload };
+}
+
+export function newEventResponse<T extends EventType>(
+  command: T,
+  payload?: EventPayloads[T]["response"]
 ): EventMessage<T> {
   return { id: uuidv4(), command, payload };
 }

@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import { AuthenticationProvider } from "vscode";
 
+import { EventType, newEventResponse } from "../../shared/protocol";
 import { ApiProvider } from "../api";
-import { newEventRequest } from "../../shared/protocol";
-import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 import ChatViewProvider from "../chat/ChatViewProvider";
+import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 
 export default class SuperflexAuthenticationService {
   private _webviewProvider: ChatViewProvider;
@@ -36,7 +36,7 @@ export default class SuperflexAuthenticationService {
     ApiProvider.setHeader("Authorization", null);
     ApiProvider.removeResponseInterceptor();
 
-    this._webviewProvider.sendEventMessage(newEventRequest("show_login_view"));
+    this._webviewProvider.sendEventMessage(newEventResponse(EventType.SHOW_LOGIN_VIEW));
 
     vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", false);
     vscode.window.showInformationMessage("Signed out!");
@@ -57,7 +57,7 @@ export default class SuperflexAuthenticationService {
 
     this.setAuthHeader(accessToken, () => this.signOut(provider));
 
-    this._webviewProvider.sendEventMessage(newEventRequest("show_chat_view"));
+    this._webviewProvider.sendEventMessage(newEventResponse(EventType.SHOW_CHAT_VIEW));
     vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", true);
   }
 

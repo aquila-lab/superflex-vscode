@@ -44,12 +44,12 @@ const Chat: React.FunctionComponent<{
 
       switch (command) {
         case EventType.INITIALIZED: {
-          const initState = payload as EventPayloads[EventType.INITIALIZED]['response'];
+          const initState = payload as EventPayloads[typeof command]['response'];
           setInitState(initState);
           break;
         }
         case EventType.SYNC_PROJECT_PROGRESS: {
-          const { progress } = payload as EventPayloads[EventType.SYNC_PROJECT_PROGRESS]['response'];
+          const { progress } = payload as EventPayloads[typeof command]['response'];
           if (progress === 0) {
             // Sync has started
             setSyncProgress(0);
@@ -58,7 +58,7 @@ const Chat: React.FunctionComponent<{
           break;
         }
         case EventType.FIGMA_OAUTH_CONNECT: {
-          const figmaAuthenticated = payload as EventPayloads[EventType.FIGMA_OAUTH_CONNECT]['response'];
+          const figmaAuthenticated = payload as EventPayloads[typeof command]['response'];
           setInitState((prev) => ({ ...prev, figmaAuthenticated }));
           break;
         }
@@ -74,7 +74,7 @@ const Chat: React.FunctionComponent<{
             return;
           }
 
-          const newMessage = payload as EventPayloads[EventType.NEW_MESSAGE]['response'];
+          const newMessage = payload as EventPayloads[typeof command]['response'];
           if (!newMessage) {
             return;
           }
@@ -83,7 +83,7 @@ const Chat: React.FunctionComponent<{
           break;
         }
         case EventType.ADD_MESSAGE: {
-          setMessages((prev) => [...prev, payload as EventPayloads[EventType.ADD_MESSAGE]['response']]);
+          setMessages((prev) => [...prev, payload as EventPayloads[typeof command]['response']]);
           break;
         }
         case EventType.CMD_NEW_THREAD: {

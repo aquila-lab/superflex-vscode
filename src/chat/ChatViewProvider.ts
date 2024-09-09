@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { EventMessage, newEventRequest } from "../../shared/protocol";
+import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -16,11 +16,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     context.subscriptions.push(
       vscode.commands.registerCommand(
         "superflex.chat.new-thread",
-        () => this._chatWebview && this.sendEventMessage(newEventRequest("cmd_new_thread"))
+        () => this._chatWebview && this.sendEventMessage(newEventRequest(EventType.CMD_NEW_THREAD))
       ),
       vscode.commands.registerCommand(
         "superflex.project.sync",
-        () => this._chatWebview && this.sendEventMessage(newEventRequest("cmd_sync_project"))
+        () => this._chatWebview && this.sendEventMessage(newEventRequest(EventType.CMD_SYNC_PROJECT))
       )
     );
   }
@@ -31,9 +31,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     this._chatWebview.onDidReceiveMessage(
-      async (message: EventMessage) => {
+      async (message: EventMessage<EventType>) => {
+        const { command, payload } = message;
+
         // When webview is ready consume all queued messages
-        if (message.command === "ready") {
+        if (command === EventType.READY) {
           while (this._eventMessagesQueue.length) {
             const msg = this._eventMessagesQueue.shift();
             void this._chatWebview?.postMessage(msg);
@@ -41,23 +43,22 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         }
 
         try {
-          const payload = await this.chatApi.handleEvent(
-            message.command,
-            message.data,
+          const resonsePayload = await this.chatApi.handleEvent(
+            command,
+            payload as EventPayloads[typeof command]["request"],
             this.sendEventMessage.bind(this)
           );
 
           // Uncomment the following line to see the event messages in the console, used for debugging
           // console.log({ id: message.id, command: message.command, data: JSON.stringify(payload) });
-          if (payload === undefined) {
+          if (resonsePayload === undefined) {
             return;
           }
 
-          void this.sendEventMessage({
-            id: message.id,
-            command: message.command,
-            data: payload,
-          } as EventMessage);
+          const eventResponse = newEventResponse(command, resonsePayload);
+          eventResponse.id = message.id;
+
+          void this.sendEventMessage(eventResponse);
         } catch (err) {
           console.error(
             `Failed to handle event. message: ${JSON.stringify(message)}, error: ${(err as Error).message}`
@@ -91,7 +92,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
-    void this._chatWebview?.postMessage(newEventRequest("focus-input"));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {

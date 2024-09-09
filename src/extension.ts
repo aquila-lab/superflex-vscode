@@ -1,11 +1,11 @@
 import * as vscode from "vscode";
 
+import { EventType } from "../shared/protocol";
 import { ChatAPI } from "./chat/ChatApi";
 import { getOpenWorkspace } from "./common/utils";
 import { AUTH_PROVIDER_ID } from "./common/constants";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import { SuperflexCache } from "./cache/SuperflexCache";
-import { FigmaTokenInformation } from "./model/Figma.model";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
 import FigmaAuthenticationService from "./authentication/FigmaAuthenticationService";
 import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
@@ -47,10 +47,6 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   registerSuperflexCache(context);
   registerAuthenticationProviders(context, appState);
   registerChatWidgetWebview(context, appState.chatViewProvider);
-
-  appState.chatApi.registerEvent<string, void>("error_message", (errMsg) => {
-    vscode.window.showErrorMessage(errMsg);
-  });
 }
 
 function registerSuperflexCache(context: vscode.ExtensionContext): void {
@@ -79,11 +75,12 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
     )
   );
 
-  state.chatApi.registerEvent("login_clicked", async () => {
+  state.chatApi.registerEvent(EventType.LOGIN_CLICKED, async () => {
     await state.authService.signIn(state.authProvider);
   });
-  state.chatApi.registerEvent<void, FigmaTokenInformation>("figma_oauth_connect", async () => {
-    return await state.figmaAuthService.connect();
+  state.chatApi.registerEvent(EventType.FIGMA_OAUTH_CONNECT, async () => {
+    const token = await state.figmaAuthService.connect();
+    return !!token && !!token.accessToken;
   });
 
   state.authService.authenticate(state.authProvider);
