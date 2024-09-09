@@ -1,73 +1,72 @@
 import { v4 as uuidv4 } from 'uuid';
-import ProgressBar from '@ramonak/react-progress-bar';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { MessageType, Role } from '../../../shared/model';
-import { EventMessage, EventPayloads, EventType, InitState, newEventRequest } from '../../../shared/protocol';
+import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
-import { MarkdownRender } from '../components/ui/MarkdownRender';
-import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
+import {
+  addMessages,
+  clearMessages,
+  setInitState,
+  setIsMessageProcessing,
+  setIsProjectSyncing
+} from '../core/chat/chatSlice';
+import { useAppDispatch, useAppSelector } from '../core/store';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
+import { ChatMessageList } from '../components/chat/ChatMessageList';
+import { ProjectSyncProgress } from '../components/chat/ProjectSyncProgress';
+import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
+import { ChatMessage } from '../core/message/ChatMessage.model';
 
-type ChatMessage = {
-  id: string;
-  role: Role;
-  type: MessageType;
-  content: string;
-};
-
-const defaultMessages: ChatMessage[] = [
-  {
-    id: uuidv4(),
-    role: Role.Assistant,
-    type: MessageType.Text,
-    content:
-      "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let’s work together and get things done—tell me what you'd like to build today!"
-  }
-];
-
-const Chat: React.FunctionComponent<{
+const ChatView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
 }> = ({ vscodeAPI }) => {
+  const dispatch = useAppDispatch();
+
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [input, setInput] = useState('');
-  const [syncProgress, setSyncProgress] = useState(0);
-  const [messageProcessing, setMessageProcessing] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>(defaultMessages);
+  const initState = useAppSelector((state) => state.chat.init);
+  const isProjectSyncing = useAppSelector((state) => state.chat.isProjectSyncing);
+  const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
+
+  const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
-  const [initState, setInitState] = useState<InitState>({ isInitialized: false, figmaAuthenticated: false });
 
   useEffect(() => {
-    return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
+    const unsubscribe = vscodeAPI.onMessage((message: EventMessage<EventType>) => {
       const { command, payload, error } = message;
 
       switch (command) {
         case EventType.INITIALIZED: {
           const initState = payload as EventPayloads[typeof command]['response'];
-          setInitState(initState);
+          dispatch(setInitState(initState));
           break;
         }
         case EventType.SYNC_PROJECT_PROGRESS: {
           const { progress } = payload as EventPayloads[typeof command]['response'];
+
           if (progress === 0) {
-            // Sync has started
-            setSyncProgress(0);
+            dispatch(setIsProjectSyncing(true));
+            setProjectSyncProgress(0);
           }
-          setSyncProgress((prev) => (prev < progress ? progress : prev));
+          if (progress === 100) {
+            dispatch(setIsProjectSyncing(false));
+          }
+
+          setProjectSyncProgress((prev) => (prev < progress ? progress : prev));
           break;
         }
         case EventType.FIGMA_OAUTH_CONNECT: {
-          const figmaAuthenticated = payload as EventPayloads[typeof command]['response'];
-          setInitState((prev) => ({ ...prev, figmaAuthenticated }));
+          const isFigmaAuthenticated = payload as EventPayloads[typeof command]['response'];
+          dispatch(setInitState({ isFigmaAuthenticated }));
           break;
         }
         case EventType.FIGMA_OAUTH_DISCONNECT: {
-          setInitState((prev) => ({ ...prev, figmaAuthenticated: false }));
+          dispatch(setInitState({ isFigmaAuthenticated: false }));
           break;
         }
         case EventType.NEW_MESSAGE: {
-          setMessageProcessing(false);
+          dispatch(setIsMessageProcessing(false));
 
           if (error) {
             console.error(`Error processing 'new_message': ${message.error}`);
@@ -79,15 +78,16 @@ const Chat: React.FunctionComponent<{
             return;
           }
 
-          setMessages((prev) => [...prev, newMessage]);
+          dispatch(addMessages([newMessage]));
           break;
         }
         case EventType.ADD_MESSAGE: {
-          setMessages((prev) => [...prev, payload as EventPayloads[typeof command]['response']]);
+          const newMessage = payload as EventPayloads[typeof command]['response'];
+          dispatch(addMessages([newMessage]));
           break;
         }
         case EventType.CMD_NEW_THREAD: {
-          setMessages(defaultMessages);
+          dispatch(clearMessages());
           vscodeAPI.postMessage(newEventRequest(EventType.NEW_THREAD));
           break;
         }
@@ -97,6 +97,8 @@ const Chat: React.FunctionComponent<{
         }
       }
     });
+
+    return () => unsubscribe();
   }, [vscodeAPI]);
 
   // If we are here that means we are authenticated and have active subscription or token
@@ -125,34 +127,24 @@ const Chat: React.FunctionComponent<{
     };
   }, [vscodeAPI]);
 
-  function handleTextMessageSend(): void {
-    if (input.trim()) {
-      const newMessage: ChatMessage = { id: uuidv4(), role: Role.User, type: MessageType.Text, content: input };
-      setMessages((prev) => [...prev, newMessage]);
-
-      vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, [newMessage]));
-      setMessageProcessing(true);
-    }
-
-    setInput('');
-  }
+  const handleTextMessageSend = (content: string) => {
+    const newMessage: ChatMessage = { id: uuidv4(), role: Role.User, type: MessageType.Text, content };
+    dispatch(addMessages([newMessage]));
+    vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, [newMessage]));
+    dispatch(setIsMessageProcessing(true));
+  };
 
   function handleImageUpload(file: File): void {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: uuidv4(),
-        role: Role.User,
-        type: MessageType.Image,
-        content: URL.createObjectURL(file)
-      },
-      {
-        id: uuidv4(),
-        role: Role.User,
-        type: MessageType.Text,
-        content: 'Processing image...'
-      }
-    ]);
+    dispatch(
+      addMessages([
+        {
+          id: uuidv4(),
+          role: Role.User,
+          type: MessageType.Image,
+          content: URL.createObjectURL(file)
+        }
+      ])
+    );
 
     vscodeAPI.postMessage(
       newEventRequest(EventType.NEW_MESSAGE, [
@@ -163,11 +155,11 @@ const Chat: React.FunctionComponent<{
       ])
     );
 
-    setMessageProcessing(true);
+    dispatch(setIsMessageProcessing(true));
   }
 
   function handleFigmaButtonClicked(): void {
-    if (!initState.figmaAuthenticated) {
+    if (!initState.isFigmaAuthenticated) {
       vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_OAUTH_CONNECT));
       return;
     }
@@ -189,55 +181,22 @@ const Chat: React.FunctionComponent<{
       ])
     );
 
-    setMessageProcessing(true);
+    dispatch(setIsMessageProcessing(true));
     return true;
   }
 
-  const syncInProgress = syncProgress !== 100;
-  const disableIteractions = messageProcessing || syncInProgress || !initState.isInitialized;
+  const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
   return (
     <>
       <div className="flex flex-col h-full p-2">
-        <div className="flex-1 flex flex-col justify-start overflow-y-auto mb-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`py-4 px-2 border-b border-neutral-700 text-left ${
-                message.role === Role.User ? 'bg-neutral-800' : undefined
-              }`}>
-              <p className="text-sm font-medium text-neutral-300 mb-2">
-                {message.role === Role.User ? 'You' : 'Superflex'}
-              </p>
-
-              {message.type === MessageType.Text && <MarkdownRender mdString={message.content} />}
-
-              {message.type === MessageType.Image && <img alt="preview image" className="mt-2" src={message.content} />}
-            </div>
-          ))}
-        </div>
-
-        <div className={syncInProgress ? 'flex flex-col items-center gap-1 mb-4 w-full' : 'hidden'}>
-          <p className="text-xs text-neutral-300">Syncing...</p>
-
-          <div className="flex-1 w-full">
-            <ProgressBar
-              animateOnRender={true}
-              completed={syncProgress}
-              bgColor="#2563eb"
-              height="6px"
-              isLabelVisible={false}
-            />
-          </div>
-        </div>
-
+        <ChatMessageList />
+        <ProjectSyncProgress progress={projectSyncProgress} />
         <ChatInputBox
-          input={input}
           disabled={disableIteractions}
-          onInputChange={(e) => setInput(e.target.value)}
+          onFigmaButtonClicked={handleFigmaButtonClicked}
           onFileSelected={handleImageUpload}
           onSendClicked={handleTextMessageSend}
-          onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>
 
@@ -250,4 +209,4 @@ const Chat: React.FunctionComponent<{
   );
 };
 
-export default Chat;
+export default ChatView;

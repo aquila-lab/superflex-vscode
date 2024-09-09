@@ -1,6 +1,6 @@
 export type InitState = {
   isInitialized: boolean;
-  figmaAuthenticated: boolean;
+  isFigmaAuthenticated: boolean;
 };
 
 export type SyncProjectProgressPayload = {

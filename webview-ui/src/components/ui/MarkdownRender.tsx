@@ -19,6 +19,8 @@ import bash from 'react-syntax-highlighter/dist/cjs/languages/prism/bash';
 import markdown from 'react-syntax-highlighter/dist/cjs/languages/prism/markdown';
 import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json';
 
+import { cn } from '../../common/utils';
+
 SyntaxHighlighter.registerLanguage('tsx', tsx);
 SyntaxHighlighter.registerLanguage('jsx', jsx);
 SyntaxHighlighter.registerLanguage('typescript', typescript);
@@ -56,7 +58,7 @@ const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString
               {String(props.children).replace(/\n$/, '')}
             </SyntaxHighlighter>
           ) : (
-            <code className={className} {...props} />
+            <code className={cn('text-sm', className)} {...props} />
           );
         },
         pre: (pre) => {
