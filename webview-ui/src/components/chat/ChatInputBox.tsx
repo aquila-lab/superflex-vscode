@@ -37,7 +37,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         autoFocus
         value={input}
         placeholder="Describe your UI component..."
-        className="flex-1 p-2 pt-2.5 min-h-10 max-h-[15rem] rounded-l-md border-0 overflow-y-hidden"
+        className="flex-1 p-2 pt-2.5 min-h-10 max-h-[15rem] rounded-l-md border-0 scrollbar-hide"
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => {
           if (!disabled && e.key === 'Enter' && !e.shiftKey) {

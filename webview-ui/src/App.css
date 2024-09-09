@@ -8,3 +8,12 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
