@@ -27,7 +27,7 @@ const CommandInput = React.forwardRef<
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        'flex w-full border-solid border border-transparent bg-transparent pt-4 pb-3 px-3 text-md leading-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
+        'flex w-full border-solid border border-transparent bg-transparent pt-4 pb-3 px-3 text-sm leading-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
         className
       )}
       inputMode="search"
@@ -109,7 +109,7 @@ const CommandItem = React.forwardRef<
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        'relative flex cursor-pointer select-none items-center rounded-sm py-3 px-2 text-md outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        'relative flex cursor-pointer select-none items-center rounded-sm py-3 px-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
         className
       )}
       title={tooltip}
@@ -127,7 +127,7 @@ const CommandRow: React.FunctionComponent<
 > = ({ className, ...props }) => (
   <div
     className={cn(
-      'flex flex-wrap select-none items-center gap-x-3 gap-y-1 text-md outline-none [&:not(:last-child)]:border-border [&:not(:last-child)]:border-b [&_[cmdk-item]]:whitespace-nowrap',
+      'flex flex-wrap select-none items-center gap-x-3 gap-y-1 text-sm outline-none [&:not(:last-child)]:border-border [&:not(:last-child)]:border-b [&_[cmdk-item]]:whitespace-nowrap',
       className
     )}
     {...props}

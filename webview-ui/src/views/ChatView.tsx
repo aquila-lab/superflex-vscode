@@ -22,7 +22,7 @@ const defaultMessages: ChatMessage[] = [
     role: Role.Assistant,
     type: MessageType.Text,
     content:
-      "Welcome to Superflex! I'm your AI Assistant, and I'm here to help you get things done faster than ever.\n\nI’m powered by advanced AI, and while I strive for perfection, double-checking my output is always a good idea. Remember that your feedback helps me get even better, so let’s create something amazing together!"
+      "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let’s work together and get things done—tell me what you'd like to build today!"
   }
 ];
 

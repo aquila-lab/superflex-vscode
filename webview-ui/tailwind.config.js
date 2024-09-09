@@ -7,7 +7,8 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        md: ['15px', '22px']
+        sm: ['13px', '19px'],
+        md: ['14px', '20px']
       },
       border: {
         DEFAULT: '1px'
