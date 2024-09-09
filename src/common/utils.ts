@@ -33,14 +33,6 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
   return path.normalize(uri);
 }
 
-export function toBase64UrlEncoding(buffer: Buffer) {
-  return buffer.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
-}
-
-export function sha256(buffer: string | Uint8Array): Buffer {
-  return crypto.createHash("sha256").update(buffer).digest();
-}
-
 export function getOpenWorkspace(): vscode.WorkspaceFolder | undefined {
   const workspaceFolders = vscode.workspace.workspaceFolders || [];
   if (workspaceFolders.length === 0) {
@@ -59,13 +51,4 @@ export function mapToJson<T>(map: Map<string, T>): string {
 export function jsonToMap<T>(jsonStr: string, reviver?: (key: string, value: any) => T): Map<string, T> {
   const entries: [string, T][] = JSON.parse(jsonStr);
   return new Map<string, T>(entries.map(([key, value]) => [key, reviver ? reviver(key, value) : value]));
-}
-
-export function getNonce() {
-  let text = "";
-  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 32; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
 }
