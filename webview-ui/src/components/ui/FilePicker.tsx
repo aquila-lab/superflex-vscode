@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { PaperClipIcon } from '@heroicons/react/24/outline';
 
 import { cn } from '../../common/utils';
@@ -10,6 +10,17 @@ interface FilePickerProps {
 }
 
 const FilePicker: React.FC<FilePickerProps> = ({ onChange, accept, disabled }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event);
+
+    // Reset the file input value after onChange is called
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center h-10">
       <div
@@ -31,8 +42,9 @@ const FilePicker: React.FC<FilePickerProps> = ({ onChange, accept, disabled }) =
           name="chat-file-picker"
           id="chat-file-picker"
           disabled={disabled}
-          onChange={onChange}
+          onChange={handleChange}
           accept={accept}
+          ref={fileInputRef}
         />
       </div>
     </div>

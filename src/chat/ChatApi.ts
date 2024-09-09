@@ -142,13 +142,13 @@ export class ChatAPI {
             if (msg.type === MessageType.Figma) {
               const figma = extractFigmaSelectionUrl(msg.content);
               if (!figma) {
-                vscode.window.showErrorMessage("Invalid figma link: Please provide a valid Figma selection url.");
-                throw new Error("Invalid figma link");
+                throw new Error("Invalid figma link: Please provide a valid Figma selection url.");
               }
 
               const imageUrl = await getFigmaSelectionImageUrl(figma);
               return {
                 ...msg,
+                type: MessageType.Image,
                 content: imageUrl,
               };
             }

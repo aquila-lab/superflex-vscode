@@ -136,6 +136,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "index.js")
     );
+    const superflexLogoUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "logo.png")
+    );
     const figmaCopySelectionExampleImage = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "webview-ui", "dist", "assets", "figma-copy-selection-example.png")
     );
@@ -161,6 +164,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         <body class="${themeClassname}" data-vscode-theme-kind="${themeClassname}">
           <div id="root"></div>
           <script type="module" src="${scriptUri}"></script>
+          <script>
+            window.superflexLogoUri = "${superflexLogoUri.toString()}";
+          </script>
         </body>
       </html>
     `;

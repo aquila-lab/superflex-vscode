@@ -39,3 +39,7 @@ a:hover {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+.logo {
+  background-image: url('./assets/logo.png');
+}
