@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
 import { Message, MessageReqest, MessageType, Thread } from "../../shared/model";
-import { EventMessage, newEventMessage } from "../../shared/protocol";
+import { EventMessage, newEventRequest } from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
@@ -142,7 +142,8 @@ export class ChatAPI {
             if (msg.type === MessageType.Figma) {
               const figma = extractFigmaSelectionUrl(msg.content);
               if (!figma) {
-                throw new Error("Invalid Figma Selection URL");
+                vscode.window.showErrorMessage("Invalid figma link: Please provide a valid Figma selection url.");
+                throw new Error("Invalid figma link");
               }
 
               const imageUrl = await getFigmaSelectionImageUrl(figma);
@@ -168,7 +169,7 @@ export class ChatAPI {
         }
 
         const assistantMessage = await this._assistant.sendMessage(thread.id, messages, (event) => {
-          sendEventMessageCb(newEventMessage("message_processing", event.value));
+          sendEventMessageCb(newEventRequest("message_processing", event.value));
         });
 
         return assistantMessage;
@@ -223,7 +224,7 @@ export class ChatAPI {
 
     try {
       await this._assistant.syncFiles((progress) => {
-        sendEventMessageCb(newEventMessage("sync_progress", { progress }));
+        sendEventMessageCb(newEventRequest("sync_progress", { progress }));
       });
     } catch (err: any) {
       if (err?.message && err.message.startsWith("No supported files found in the workspace")) {

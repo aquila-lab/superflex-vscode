@@ -36,10 +36,10 @@ export function setVSCodeWrapper(value: VSCodeWrapper): void {
 }
 
 export interface GenericVSCodeWrapper<W, E> {
-  postMessage(message: W): void;
-  onMessage(callback: (message: E) => void): () => void;
-  getState(): unknown;
-  setState(newState: unknown): void;
+  postMessage: (message: W) => void;
+  onMessage: (callback: (message: E) => void) => () => void;
+  getState: () => unknown;
+  setState: (newState: unknown) => void;
 }
 
 let genericApi: GenericVSCodeWrapper<any, any>;

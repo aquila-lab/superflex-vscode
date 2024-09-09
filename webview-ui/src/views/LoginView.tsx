@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { newEventMessage } from '../../../shared/protocol';
+import { EventType, newEventRequest } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import { Button } from '../components/ui/Button';
 
@@ -12,7 +12,7 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
   return (
     <div className="flex flex-col justify-center items-center h-full px-5 pb-4">
       <h3 className="text-2xl font-bold mb-4">Welcome to Superflex!</h3>
-      <Button onClick={() => vscodeAPI.postMessage(newEventMessage('login_clicked'))}>Sign in</Button>
+      <Button onClick={() => vscodeAPI.postMessage(newEventRequest(EventType.LOGIN_CLICKED))}>Sign in</Button>
     </div>
   );
 };

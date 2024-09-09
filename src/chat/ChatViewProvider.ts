@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { EventMessage, newEventMessage } from "../../shared/protocol";
+import { EventMessage, newEventRequest } from "../../shared/protocol";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -16,11 +16,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     context.subscriptions.push(
       vscode.commands.registerCommand(
         "superflex.chat.new-thread",
-        () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_new_thread"))
+        () => this._chatWebview && this.sendEventMessage(newEventRequest("cmd_new_thread"))
       ),
       vscode.commands.registerCommand(
         "superflex.project.sync",
-        () => this._chatWebview && this.sendEventMessage(newEventMessage("cmd_sync_project"))
+        () => this._chatWebview && this.sendEventMessage(newEventRequest("cmd_sync_project"))
       )
     );
   }
@@ -91,7 +91,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
-    void this._chatWebview?.postMessage(newEventMessage("focus-input"));
+    void this._chatWebview?.postMessage(newEventRequest("focus-input"));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {

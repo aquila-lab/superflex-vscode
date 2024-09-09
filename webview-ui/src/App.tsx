@@ -2,7 +2,7 @@ import './App.css';
 
 import React, { useEffect, useState } from 'react';
 
-import { newEventMessage } from '../../shared/protocol';
+import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../shared/protocol';
 import views from './views';
 import { VSCodeWrapper } from './api/vscodeApi';
 
@@ -12,29 +12,36 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
   const [view, setView] = useState<View>('login');
 
   useEffect(() => {
-    return vscodeAPI.onMessage((message) => {
-      switch (message.command) {
-        case 'show_login_view':
+    return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
+      const { command, payload } = message;
+
+      switch (command) {
+        case EventType.SHOW_LOGIN_VIEW: {
           setView('login');
           break;
-        case 'show_chat_view':
-          setView('chat');
-          break;
-        case 'initialized':
-          if (!message.data.isInitialized) {
+        }
+        case EventType.INITIALIZED: {
+          const initState = payload as EventPayloads[EventType.INITIALIZED]['response'];
+
+          if (!initState.isInitialized) {
             setView('openProjectPrompt');
             return;
           }
 
           setView('chat');
           break;
+        }
+        case EventType.SHOW_CHAT_VIEW: {
+          setView('chat');
+          break;
+        }
       }
     });
   }, [vscodeAPI]);
 
   useEffect(() => {
     // Notify the extension host that we are ready to receive events
-    vscodeAPI.postMessage(newEventMessage('ready'));
+    vscodeAPI.postMessage(newEventRequest(EventType.READY));
   }, [vscodeAPI]);
 
   const SelectedView = views[view];
