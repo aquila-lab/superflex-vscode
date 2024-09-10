@@ -13,12 +13,12 @@
   },
   "badges": [
     {
-      "url": "https://img.shields.io/github/stars/aquila-lab/superflex-vscode?style=social",
+      "url": "https://img.shields.io/github/stars/aquila-lab/superflex-vscode",
       "description": "Star Superflex on Github",
       "href": "https://github.com/aquila-lab/superflex-vscode"
     },
     {
-      "url": "https://img.shields.io/twitter/follow/Superflex?style=social",
+      "url": "https://img.shields.io/twitter/follow/_riphal_?style=social",
       "description": "Follow Superflex on X",
       "href": "https://x.com/_riphal_"
     },
