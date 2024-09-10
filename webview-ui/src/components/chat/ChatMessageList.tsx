@@ -9,7 +9,7 @@ export const ChatMessageList: React.FC = () => {
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
 
   return (
-    <div className="flex-1 flex flex-col justify-start overflow-y-auto mb-4">
+    <div className="flex-1 flex flex-col justify-start gap-y-2 overflow-y-auto mb-4">
       {messages.map((message) => (
         <ChatMessage key={message.id} message={message} />
       ))}
