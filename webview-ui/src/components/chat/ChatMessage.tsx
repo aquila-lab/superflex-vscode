@@ -18,7 +18,7 @@ interface ChatMessageProps {
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   return (
     <div
-      className={`py-4 px-2 border-b border-border text-left ${message.role === Role.User ? 'bg-muted' : undefined}`}>
+      className={`py-4 px-2 border-b border-border text-left rounded-lg ${message.role === Role.User ? 'bg-muted' : undefined}`}>
       <div className="flex items-center mb-2">
         {message.role !== Role.User && (
           <Avatar className="mr-2 size-5">
