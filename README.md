@@ -13,21 +13,38 @@
 
 Superflex is an AI-powered front-end assistant that you control, transforming ideas into production-ready code effortlessly. It generates features from Figma designs, images, or text prompts while adhering to your code style, design standards, and existing UI components. Superflex accelerates development, enhances code quality, and boosts developer productivity. Build better frontends faster with Superflex, the ultimate AI code companion for Visual Studio Code.
 
-## Features
-
-- **AI-Powered Chat Interface**: Seamlessly integrate Superflex into your workflow with our intuitive in-VSCode chat.
-- **Code Consistency Guarantee**: Superflex doesn't just write code - it learns and adheres to your project's standards, ensuring a cohesive codebase.
-- **Figma-to-Code Integration**: Directly import your Figma designs and let Superflex translate them into production-ready code.
-- **Image-to-Code Conversion**: Upload any UI component image/screenshot and watch as Superflex generates pixel-perfect code instantly.
-- **Sketch-to-Code**: Upload hand-drawn sketches and see them transformed into functional code, following your design system and coding style.
-- **Intelligent Brainstorming**: Leverage our AI to generate innovative ideas and refactor your components and pages for optimal performance and code quality.
-
 ## Get Started in Seconds
+
+Get started with Superflex in seconds:
 
 1. Install Superflex from the [Visual Studio Code Marketplace][vscode-url].
 2. Open your project in VSCode.
 3. Access Superflex through the command palette or sidebar.
-4. Start coding at superhuman speed!
+4. For better accessibility to Superflex and file system at the same time, move Superflex to the secondary sidebar by just drag and dropping it there like in the image below. \
+   ![Superflex Sidebar Setup](./docs/superflex-sidebar-setup.png)
+5. Start coding at superhuman speed!
+
+## Product Overview
+
+Experience the power of Superflex in action:
+
+![Superflex Product Overview](./docs/superflex-product-overview.gif)
+
+## Key Features
+
+- **AI-Powered Chat Interface**: Seamlessly integrate Superflex into your workflow with our intuitive in-VSCode chat.
+
+- **Code Consistency Guarantee**: Superflex doesn't just write code - it learns and adheres to your project's standards, ensuring a cohesive codebase.
+
+- **Figma-to-Code Integration**: Directly import your Figma designs and let Superflex translate them into production-ready code. \
+  ![Figma-to-Code Integration](./docs/superflex-figma-to-code-showcase.gif)
+
+- **Image-to-Code Conversion**: Upload any UI component image/screenshot and watch as Superflex generates pixel-perfect code instantly.
+
+- **Sketch-to-Code**: Upload hand-drawn sketches and see them transformed into functional code, following your design system and coding style. \
+  ![Sketch-to-Code](./docs/superflex-sketch-to-code-showcase.gif)
+
+- **Intelligent Brainstorming**: Leverage our AI to generate innovative ideas and refactor your components and pages for optimal performance and code quality.
 
 ## Dedicated Support
 
