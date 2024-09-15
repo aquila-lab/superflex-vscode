@@ -14,7 +14,7 @@ export const ChatMessageList: React.FC = () => {
         <ChatMessage key={message.id} message={message} />
       ))}
 
-      <div className="mt-3 ml-2">
+      <div className="flex-initial mt-3 ml-2">
         <LoadingDots isLoading={isMessageProcessing} />
       </div>
     </div>
