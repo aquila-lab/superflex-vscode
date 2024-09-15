@@ -46,6 +46,16 @@ Experience the power of Superflex in action:
 
 - **Intelligent Brainstorming**: Leverage our AI to generate innovative ideas and refactor your components and pages for optimal performance and code quality.
 
+## Chat Interface Overview
+
+Superflex provides an intuitive chat interface to streamline your development process:
+
+- **Start new chat thread**: Begin a fresh conversation with Superflex.
+- **Sync project**: Instantly update Superflex with your latest code changes.
+- **Logout**: Sign out of your Superflex session.
+
+  ![Superflex Chat Interface](./docs/superflex-chat-interface.png)
+
 ## Dedicated Support
 
 We're committed to your success:
