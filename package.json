@@ -4,7 +4,7 @@
   "displayName": "Superflex: Your Frontend AI Pair Programmer",
   "description": "Never code alone again. Superflex is your AI frontend pair programmer that helps you code faster and better.",
   "icon": "small_logo.png",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
