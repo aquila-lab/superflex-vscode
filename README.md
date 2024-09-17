@@ -6,8 +6,10 @@
 [vscode-url]: https://marketplace.visualstudio.com/items?itemName=aquilalabs.superflex
 [downloads-shield]: https://img.shields.io/visual-studio-marketplace/d/aquilalabs.superflex?style=social
 [downloads-url]: https://marketplace.visualstudio.com/items?itemName=aquilalabs.superflex
+[youtube-shield]: https://img.shields.io/badge/Demo-Video-red?style=flat&logo=youtube
+[youtube-url]: https://youtu.be/YFcTjJDFsbg?si=WQVteFa4UK9_bynz
 
-[![Github Repo][github-shield]][github-url] [![VSCode Plugin][vscode-shield]][vscode-url] [![Downloads][downloads-shield]][downloads-url] [![Twitter Follow][twitter-shield]][twitter-url]
+[![Github Repo][github-shield]][github-url] [![VSCode Plugin][vscode-shield]][vscode-url] [![Downloads][downloads-shield]][downloads-url] [![Twitter Follow][twitter-shield]][twitter-url] [![Demo Video][youtube-shield]][youtube-url]
 
 # Superflex: The Ultimate AI-Powered Frontend Development Assistant
 
