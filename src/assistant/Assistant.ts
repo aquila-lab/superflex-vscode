@@ -29,7 +29,8 @@ export interface Assistant {
    * NOTE: The files that are uploaded but missing from the filePaths input will be removed.
    *
    * @param progressCb - Optional parameter to specify a callback function that will be called periodically with the current progress of syncing the files. "current" is value between 0 and 100.
+   * @param isFirstTimeSync - Optional parameter to specify if the sync is the first time sync.
    * @returns A promise that resolves with the uploaded files.
    */
-  syncFiles(progressCb?: (current: number) => void): Promise<void>;
+  syncFiles(progressCb?: (current: number, isFirstTimeSync?: boolean) => void): Promise<void>;
 }

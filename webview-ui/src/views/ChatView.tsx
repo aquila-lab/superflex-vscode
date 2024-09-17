@@ -29,6 +29,7 @@ const ChatView: React.FunctionComponent<{
   const isProjectSyncing = useAppSelector((state) => state.chat.isProjectSyncing);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
 
+  const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
 
@@ -43,17 +44,22 @@ const ChatView: React.FunctionComponent<{
           break;
         }
         case EventType.SYNC_PROJECT_PROGRESS: {
-          const { progress } = payload as EventPayloads[typeof command]['response'];
+          const sync = payload as EventPayloads[typeof command]['response'];
 
-          if (progress === 0) {
+          if (sync.progress === 0) {
+            if (sync.isFirstTimeSync !== undefined && sync.isFirstTimeSync !== isFirstTimeSync) {
+              setIsFirstTimeSync(sync.isFirstTimeSync ?? false);
+            }
+
             dispatch(setIsProjectSyncing(true));
             setProjectSyncProgress(0);
           }
-          if (progress === 100) {
+          if (sync.progress === 100) {
             dispatch(setIsProjectSyncing(false));
+            setIsFirstTimeSync(false);
           }
 
-          setProjectSyncProgress((prev) => (prev < progress ? progress : prev));
+          setProjectSyncProgress((prev) => (prev < sync.progress ? sync.progress : prev));
           break;
         }
         case EventType.FIGMA_OAUTH_CONNECT: {
@@ -191,7 +197,7 @@ const ChatView: React.FunctionComponent<{
     <>
       <div className="flex flex-col h-full p-2">
         <ChatMessageList />
-        <ProjectSyncProgress progress={projectSyncProgress} />
+        <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <ChatInputBox
           disabled={disableIteractions}
           onFigmaButtonClicked={handleFigmaButtonClicked}

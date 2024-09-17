@@ -5,4 +5,5 @@ export type InitState = {
 
 export type SyncProjectProgressPayload = {
   progress: number;
+  isFirstTimeSync?: boolean;
 };

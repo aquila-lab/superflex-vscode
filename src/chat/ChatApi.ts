@@ -231,8 +231,8 @@ export class ChatAPI {
     }
 
     try {
-      await this._assistant.syncFiles((progress) => {
-        sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress }));
+      await this._assistant.syncFiles((progress, isFirstTimeSync) => {
+        sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
       });
     } catch (err: any) {
       if (err?.message && err.message.startsWith("No supported files found in the workspace")) {

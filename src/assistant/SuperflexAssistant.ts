@@ -56,13 +56,9 @@ export default class SuperflexAssistant implements Assistant {
     return message;
   }
 
-  async syncFiles(progressCb?: (current: number) => void): Promise<void> {
+  async syncFiles(progressCb?: (current: number, isFirstTimeSync?: boolean) => void): Promise<void> {
     if (!SuperflexCache.storagePath) {
       throw new Error("Storage path is not set");
-    }
-
-    if (progressCb) {
-      progressCb(0);
     }
 
     const documentPaths: string[] = await findWorkspaceFiles(this.workspaceDirPath);
@@ -77,6 +73,10 @@ export default class SuperflexAssistant implements Assistant {
       ? jsonToMap<number>(rawCachedFilesMap)
       : new Map<string, number>();
 
+    if (progressCb) {
+      progressCb(0, !rawCachedFilesMap);
+    }
+
     const progressCoefficient = 98 / documentPaths.length;
 
     const workers = this.createSyncWorkers(cachedFilesMap, 10);
@@ -90,7 +90,7 @@ export default class SuperflexAssistant implements Assistant {
     SuperflexCache.set(this.cacheFileName, mapToJson(cachedFilesMap));
 
     if (progressCb) {
-      progressCb(100);
+      progressCb(100, false);
     }
   }
 
