@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { MessageReqest, MessageType, Role, Thread } from "../../shared/model";
 import { EventMessage, EventPayloads, EventType, newEventResponse } from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
+import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl } from "../api";
 import { extractFigmaSelectionUrl } from "../model/Figma.model";
@@ -55,7 +55,7 @@ export class ChatAPI {
           }
 
           const workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
-          this._assistant = new SuperflexAssistant(workspaceDirPath, "local", openWorkspace.name);
+          this._assistant = new SuperflexAssistant(workspaceDirPath, "local", toKebabCase(openWorkspace.name));
           await this.syncProjectFiles(sendEventMessageCb);
 
           this._isInitialized = true;

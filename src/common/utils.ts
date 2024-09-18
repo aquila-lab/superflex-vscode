@@ -1,6 +1,5 @@
 import path from "path";
 import * as vscode from "vscode";
-import * as crypto from "crypto";
 
 import { runningOnWindows } from "./operatingSystem";
 
@@ -51,4 +50,11 @@ export function mapToJson<T>(map: Map<string, T>): string {
 export function jsonToMap<T>(jsonStr: string, reviver?: (key: string, value: any) => T): Map<string, T> {
   const entries: [string, T][] = JSON.parse(jsonStr);
   return new Map<string, T>(entries.map(([key, value]) => [key, reviver ? reviver(key, value) : value]));
+}
+
+export function toKebabCase(text: string): string {
+  return text
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .replace(/[\s_]+/g, "-")
+    .toLowerCase();
 }
