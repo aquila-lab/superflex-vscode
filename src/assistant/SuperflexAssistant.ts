@@ -12,7 +12,8 @@ import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
 
 const ASSISTENT_NAME = "superflex";
-
+// Increment the version when we need to reindex all files
+const FILES_MAP_VERSION = 1;
 export default class SuperflexAssistant implements Assistant {
   readonly workspaceDirPath: string;
   readonly owner: string;
@@ -30,7 +31,7 @@ export default class SuperflexAssistant implements Assistant {
     this.workspaceDirPath = workspaceDirPath;
     this.owner = owner;
     this.repo = repo;
-    this.cacheFileName = createFilesMapName(ASSISTENT_NAME);
+    this.cacheFileName = createFilesMapName(ASSISTENT_NAME, FILES_MAP_VERSION);
   }
 
   async createThread(title?: string): Promise<Thread> {
