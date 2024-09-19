@@ -77,7 +77,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             onClick={handleSend}>
             <span className="sr-only">Enter</span>
             <IoIosReturnLeft className="size-4" aria-hidden="true" />
-            <span className="text-xs">chat</span>
+            <span className="text-xs">send</span>
           </button>
         </div>
       </div>
