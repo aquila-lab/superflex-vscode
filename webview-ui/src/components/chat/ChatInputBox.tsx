@@ -33,19 +33,21 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
 
   return (
     <div className="flex flex-col bg-input rounded-md border border-border focus:outline-none">
-      <TextareaAutosize
-        autoFocus
-        value={input}
-        placeholder="Describe your UI component..."
-        className="flex-1 p-2 max-h-[15rem] border-0 shadow-none"
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (!disabled && e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-          }
-        }}
-      />
+      <div className="flex-1">
+        <TextareaAutosize
+          autoFocus
+          value={input}
+          placeholder="Describe your UI component..."
+          className="p-2 border-0 shadow-none"
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (!disabled && e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+        />
+      </div>
 
       <div className="flex flex-row justify-between items-center gap-4 py-1 pr-2">
         <div className="flex flex-row items-center gap-1">
