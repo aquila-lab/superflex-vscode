@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { PaperClipIcon } from '@heroicons/react/24/outline';
+import { IoImage } from 'react-icons/io5';
 
 import { cn } from '../../common/utils';
 
@@ -22,19 +22,16 @@ const FilePicker: React.FC<FilePickerProps> = ({ onChange, accept, disabled }) =
   };
 
   return (
-    <div className="flex flex-col justify-center h-10">
-      <div
-        className={cn(
-          'flex-initial flex flex-col justify-center items-center rounded-md',
-          !disabled && 'hover:bg-muted'
-        )}>
+    <div className="flex flex-col justify-center">
+      <div className="flex-initial flex flex-col justify-center items-center rounded-md">
         <label
           htmlFor="chat-file-picker"
           className={cn(
-            'p-1.5 text-muted-foreground',
+            'flex items-center gap-1 p-1.5 text-muted-foreground',
             disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
           )}>
-          <PaperClipIcon className="size-5" />
+          <IoImage className="size-3.5" />
+          <span className="text-xs">Image</span>
         </label>
         <input
           hidden

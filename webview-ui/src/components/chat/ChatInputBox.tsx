@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PaperPlaneIcon } from '@radix-ui/react-icons';
+import { IoIosReturnLeft } from 'react-icons/io';
 
 import { cn } from '../../common/utils';
 import { FigmaButton } from '../figma/FigmaButton';
@@ -32,12 +32,12 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   };
 
   return (
-    <div className="flex flex-row items-end min-h-10 bg-muted rounded-md border border-border focus:outline-none">
+    <div className="flex flex-col bg-input rounded-md border border-border focus:outline-none">
       <TextareaAutosize
         autoFocus
         value={input}
         placeholder="Describe your UI component..."
-        className="flex-1 p-2 pt-2.5 min-h-10 max-h-[15rem] rounded-l-md border-0 scrollbar-hide"
+        className="flex-1 p-2 max-h-[15rem] border-0 shadow-none"
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => {
           if (!disabled && e.key === 'Enter' && !e.shiftKey) {
@@ -47,31 +47,37 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         }}
       />
 
-      <FigmaButton disabled={disabled && isFigmaAuthenticated} onClick={onFigmaButtonClicked} />
+      <div className="flex flex-row justify-between items-center gap-4 py-1 pr-2">
+        <div className="flex flex-row items-center gap-1">
+          <FigmaButton disabled={disabled && isFigmaAuthenticated} onClick={onFigmaButtonClicked} />
+          <FilePicker
+            disabled={disabled}
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
 
-      <FilePicker
-        disabled={disabled}
-        accept="image/*"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (!file) return;
+              onFileSelected(file);
+            }}
+          />
+        </div>
 
-          onFileSelected(file);
-        }}
-      />
-
-      <div className="flex flex-col justify-center h-10 mx-1">
-        <button
-          type="button"
-          disabled={disabled}
-          className={cn(
-            'p-1.5 text-muted-foreground',
-            disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
-          )}
-          onClick={handleSend}>
-          <span className="sr-only">Send</span>
-          <PaperPlaneIcon className="size-5" aria-hidden="true" />
-        </button>
+        <div className="flex flex-row items-center gap-1">
+          <button
+            type="button"
+            disabled={disabled}
+            className={cn(
+              'flex items-center gap-1 py-1 px-2 text-muted-foreground rounded-md',
+              disabled ? 'opacity-60' : 'cursor-pointer hover:text-button-secondary-foreground',
+              input.length > 0 &&
+                'bg-button-secondary-background-hover text-button-secondary-foreground opacity-80 hover:opacity-100'
+            )}
+            onClick={handleSend}>
+            <span className="sr-only">Enter</span>
+            <IoIosReturnLeft className="size-4" aria-hidden="true" />
+            <span className="text-xs">chat</span>
+          </button>
+        </div>
       </div>
     </div>
   );
