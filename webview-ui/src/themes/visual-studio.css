@@ -166,7 +166,7 @@ html[data-ide='VisualStudio'] {
   /* --vscode-editorGroup-focusedEmptyBorder: var(); */
   /* --vscode-editorGroupHeader-border: var(); */
   /* --vscode-editorGroupHeader-noTabsBackground: var(); */
-  /* --vscode-editorGutter-addedBackground: var(); */
+  --vscode-editorGutter-addedBackground: var(--visualstudio-editorgutteraddedbackground);
   /* --vscode-editorGutter-background: var(); */
   /* --vscode-editorGutter-commentGlyphForeground: var(); */
   /* --vscode-editorGutter-commentRangeForeground: var(); */

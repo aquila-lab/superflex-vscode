@@ -8,11 +8,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
 
 interface FileSelectorPopoverProps {
+  selectedFiles: FilePayload[];
   fetchFiles: () => void;
   onFileSelected: (file: FilePayload) => void;
 }
 
-const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ fetchFiles, onFileSelected }) => {
+const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles, fetchFiles, onFileSelected }) => {
   const [open, setOpen] = useState(false);
   const files = useAppSelector((state) => state.chat.files);
 
@@ -42,9 +43,9 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ fetchFiles, o
                 <CommandItem
                   key={file.path}
                   value={file.name}
+                  added={!!selectedFiles.find((f) => f.path === file.path)}
                   onSelect={() => {
                     onFileSelected(file);
-                    setOpen(false);
                   }}>
                   <div className="flex items-baseline gap-2 w-full">
                     <span className="text-sm whitespace-nowrap">{file.name}</span>

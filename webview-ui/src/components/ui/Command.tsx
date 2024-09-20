@@ -103,13 +103,14 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
 const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { tooltip?: string }
->(({ className, tooltip, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { added?: boolean; tooltip?: string }
+>(({ className, added, tooltip, ...props }, ref) => {
   const item = (
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
         'relative flex cursor-pointer select-none items-center rounded-md py-1 px-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        added && 'border-l-2 border-l-combobox-item-selected rounded-l-none',
         className
       )}
       title={tooltip}

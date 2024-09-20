@@ -64,6 +64,11 @@ export default {
           border: 'var(--vscode-contrastBorder)',
           foreground: 'var(--vscode-badge-foreground)',
           background: 'var(--vscode-badge-background)'
+        },
+        combobox: {
+          item: {
+            selected: 'var(--vscode-editorGutter-addedBackground)'
+          }
         }
       },
       borderRadius: {
