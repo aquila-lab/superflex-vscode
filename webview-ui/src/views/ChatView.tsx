@@ -36,7 +36,7 @@ const ChatView: React.FunctionComponent<{
   const [selectedFiles, setSelectedFiles] = useState<FilePayload[]>([]);
 
   useEffect(() => {
-    const unsubscribe = vscodeAPI.onMessage((message: EventMessage<EventType>) => {
+    return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
       const { command, payload, error } = message;
 
       switch (command) {
@@ -110,6 +110,7 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.SET_CURRENT_OPEN_FILE: {
           const file = payload as EventPayloads[typeof command]['request'];
+          console.log('SET_CURRENT_OPEN_FILE', file);
           if (file) {
             setSelectedFiles((prev) => [
               file,
@@ -120,8 +121,6 @@ const ChatView: React.FunctionComponent<{
         }
       }
     });
-
-    return () => unsubscribe();
   }, [vscodeAPI]);
 
   // If we are here that means we are authenticated and have active subscription or token

@@ -188,11 +188,17 @@ export class ChatAPI {
 
         const workspaceDirPath = this._workspaceDirPath;
         const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath);
-        return documentPaths.map((docPath) => ({
-          name: path.basename(docPath),
-          path: docPath,
-          relativePath: path.relative(workspaceDirPath, docPath),
-        }));
+        return documentPaths
+          .sort((a, b) => {
+            const statA = fs.statSync(a);
+            const statB = fs.statSync(b);
+            return statB.mtime.getTime() - statA.mtime.getTime();
+          })
+          .map((docPath) => ({
+            name: path.basename(docPath),
+            path: docPath,
+            relativePath: path.relative(workspaceDirPath, docPath),
+          }));
       });
   }
 

@@ -56,6 +56,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           }
         }
 
+        // When webview is initialized we need to set current open file
+        if (command === EventType.INITIALIZED) {
+          this.handleActiveEditorChange(vscode.window.activeTextEditor);
+        }
+
         try {
           const resonsePayload = await this.chatApi.handleEvent(
             command,
