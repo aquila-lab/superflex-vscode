@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { IoIosReturnLeft } from 'react-icons/io';
 
-import { cn } from '../../common/utils';
-import { FigmaButton } from '../figma/FigmaButton';
+import { Button } from '../ui/Button';
 import { FilePicker } from '../ui/FilePicker';
-import { TextareaAutosize } from '../ui/TextareaAutosize';
 import { useAppSelector } from '../../core/store';
+import { FigmaButton } from '../figma/FigmaButton';
+import FileSelectorPopover from './FileSelectorPopover';
+import { TextareaAutosize } from '../ui/TextareaAutosize';
 
 interface ChatInputBoxProps {
   disabled?: boolean;
@@ -33,6 +34,12 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
 
   return (
     <div className="flex flex-col bg-input rounded-md border border-border focus:outline-none">
+      {/* Chat top toolbar */}
+      <div className="flex flex-row items-center gap-2">
+        <FileSelectorPopover onFileSelected={() => {}} />
+      </div>
+
+      {/* Chat input */}
       <div className="flex-1">
         <TextareaAutosize
           autoFocus
@@ -49,6 +56,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         />
       </div>
 
+      {/* Chat bottom toolbar */}
       <div className="flex flex-row justify-between items-center gap-4 py-1 pr-2">
         <div className="flex flex-row items-center gap-1">
           <FigmaButton disabled={disabled && isFigmaAuthenticated} onClick={onFigmaButtonClicked} />
@@ -65,20 +73,17 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         </div>
 
         <div className="flex flex-row items-center gap-1">
-          <button
-            type="button"
+          <Button
+            size="xs"
+            variant="text"
+            active={!disabled && input.length > 0 ? 'active' : 'none'}
             disabled={disabled}
-            className={cn(
-              'flex items-center gap-1 py-1 px-2 text-muted-foreground rounded-md',
-              disabled ? 'opacity-60' : 'cursor-pointer hover:text-button-secondary-foreground',
-              input.length > 0 &&
-                'bg-button-secondary-background-hover text-button-secondary-foreground opacity-80 hover:opacity-100'
-            )}
+            className={disabled ? 'opacity-60' : ''}
             onClick={handleSend}>
             <span className="sr-only">Enter</span>
             <IoIosReturnLeft className="size-4" aria-hidden="true" />
-            <span className="text-xs">send</span>
-          </button>
+            <span>send</span>
+          </Button>
         </div>
       </div>
     </div>
