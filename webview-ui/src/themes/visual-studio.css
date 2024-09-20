@@ -52,7 +52,7 @@ html[data-ide='VisualStudio'] {
   /* --vscode-commandCenter-border: var(); */
   /* --vscode-commandCenter-debuggingBackground: var(); */
   /* --vscode-commandCenter-foreground: var(); */
-  /* --vscode-commentsView-resolvedIcon: var(); */
+  --vscode-commentsView-resolvedIcon: var(--visualstudio-commentresolvedicon);
   /* --vscode-commentsView-unresolvedIcon: var(); */
   /* --vscode-contrastActiveBorder: var(); */
   /* --vscode-contrastBorder: var(); */

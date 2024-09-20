@@ -37,7 +37,10 @@ export default {
         muted: {
           DEFAULT: 'var(--vscode-input-background)',
           transparent: 'color-mix(in lch, currentColor 15%, transparent)',
-          foreground: 'var(--vscode-input-placeholderForeground)'
+          foreground: 'var(--vscode-input-placeholderForeground)',
+          secondary: {
+            foreground: 'var(--vscode-commentsView-resolvedIcon)'
+          }
         },
         accent: {
           DEFAULT: 'var(--vscode-list-activeSelectionBackground)',

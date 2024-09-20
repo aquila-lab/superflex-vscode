@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { MessageType, Role } from '../../../shared/model';
-import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol';
+import { EventMessage, EventPayloads, EventType, FilePayload, newEventRequest } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import {
   addMessages,
@@ -33,6 +33,7 @@ const ChatView: React.FunctionComponent<{
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<FilePayload[]>([]);
 
   useEffect(() => {
     const unsubscribe = vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -105,6 +106,16 @@ const ChatView: React.FunctionComponent<{
         case EventType.FETCH_FILES: {
           const files = payload as EventPayloads[typeof command]['response'];
           dispatch(setProjectFiles(files));
+          break;
+        }
+        case EventType.SET_CURRENT_OPEN_FILE: {
+          const file = payload as EventPayloads[typeof command]['request'];
+          if (file) {
+            setSelectedFiles((prev) => [
+              file,
+              ...prev.filter((f) => !f.isCurrentOpenFile && f.relativePath !== file.relativePath)
+            ]);
+          }
           break;
         }
       }
@@ -214,6 +225,8 @@ const ChatView: React.FunctionComponent<{
           onImageSelected={handleImageUpload}
           onSendClicked={handleTextMessageSend}
           fetchFiles={fetchFiles}
+          selectedFiles={selectedFiles}
+          setSelectedFiles={setSelectedFiles}
         />
       </div>
 

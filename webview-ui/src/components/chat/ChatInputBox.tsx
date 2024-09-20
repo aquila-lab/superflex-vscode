@@ -16,6 +16,8 @@ interface ChatInputBoxProps {
   onImageSelected: (file: File) => void;
   onSendClicked: (content: string) => void;
   fetchFiles: () => void;
+  selectedFiles: FilePayload[];
+  setSelectedFiles: React.Dispatch<React.SetStateAction<FilePayload[]>>;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
@@ -23,12 +25,13 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   onFigmaButtonClicked,
   onImageSelected,
   onSendClicked,
-  fetchFiles
+  fetchFiles,
+  selectedFiles,
+  setSelectedFiles
 }) => {
   const isFigmaAuthenticated = useAppSelector((state) => state.chat.init.isFigmaAuthenticated);
 
   const [input, setInput] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<FilePayload[]>([]);
 
   function handleSend(): void {
     if (input.trim()) {
@@ -38,7 +41,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   }
 
   function handleFileSelected(file: FilePayload): void {
-    if (selectedFiles.find((f) => f.path === file.path)) {
+    if (selectedFiles.find((f) => f.relativePath === file.relativePath)) {
       handleFileRemove(file);
       return;
     }
@@ -47,7 +50,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   }
 
   function handleFileRemove(file: FilePayload): void {
-    setSelectedFiles(selectedFiles.filter((f) => f.path !== file.path));
+    setSelectedFiles(selectedFiles.filter((f) => f.relativePath !== file.relativePath));
   }
 
   return (
@@ -60,8 +63,13 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
           onFileSelected={handleFileSelected}
         />
         {selectedFiles.map((file) => (
-          <div key={file.path} className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
-            <span className="text-xs text-muted-foreground truncate max-w-36">{file.name}</span>
+          <div key={file.relativePath} className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
+            <div className="flex flex-row items-center gap-1">
+              <p className="text-xs text-muted-foreground truncate max-w-36">{file.name}</p>
+              <p className="text-xs text-muted-secondary-foreground">
+                {file.isCurrentOpenFile ? 'Current file' : 'File'}
+              </p>
+            </div>
             <Button
               size="xs"
               variant="text"

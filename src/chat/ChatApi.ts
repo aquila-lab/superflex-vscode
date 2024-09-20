@@ -190,7 +190,8 @@ export class ChatAPI {
         const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath);
         return documentPaths.map((docPath) => ({
           name: path.basename(docPath),
-          path: path.relative(workspaceDirPath, docPath),
+          path: docPath,
+          relativePath: path.relative(workspaceDirPath, docPath),
         }));
       });
   }

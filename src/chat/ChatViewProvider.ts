@@ -1,6 +1,8 @@
+import path from "path";
 import * as vscode from "vscode";
 
 import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
+import { decodeUriAndRemoveFilePrefix, getOpenWorkspace } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -9,6 +11,8 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   private _chatWebviewView?: vscode.WebviewView;
   private _chatWebview?: vscode.Webview;
+  private _workspaceDirPath?: string;
+  private _currentOpenFile?: string;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
@@ -23,6 +27,16 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         () => this._chatWebview && this.sendEventMessage(newEventRequest(EventType.CMD_SYNC_PROJECT))
       )
     );
+
+    const openWorkspace = getOpenWorkspace();
+    if (!openWorkspace) {
+      return;
+    }
+
+    this._workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
+
+    // Subscribe to the active text editor change event
+    vscode.window.onDidChangeActiveTextEditor(this.handleActiveEditorChange.bind(this));
   }
 
   private init() {
@@ -170,5 +184,29 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         </body>
       </html>
     `;
+  }
+
+  private handleActiveEditorChange(editor: vscode.TextEditor | undefined): void {
+    if (!editor) {
+      this._currentOpenFile = undefined;
+      this.sendEventMessage(newEventRequest(EventType.SET_CURRENT_OPEN_FILE, null));
+      return;
+    }
+
+    const newCurrentOpenFile = editor.document.uri.path;
+    if (newCurrentOpenFile === this._currentOpenFile) {
+      return;
+    }
+
+    this._currentOpenFile = newCurrentOpenFile;
+
+    this.sendEventMessage(
+      newEventRequest(EventType.SET_CURRENT_OPEN_FILE, {
+        name: path.basename(newCurrentOpenFile),
+        path: newCurrentOpenFile,
+        relativePath: path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile),
+        isCurrentOpenFile: true,
+      })
+    );
   }
 }

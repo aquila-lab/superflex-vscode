@@ -11,4 +11,6 @@ export type SyncProjectProgressPayload = {
 export type FilePayload = {
   name: string;
   path: string;
+  relativePath: string;
+  isCurrentOpenFile?: boolean;
 };

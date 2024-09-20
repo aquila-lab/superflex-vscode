@@ -30,7 +30,7 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" role="combobox" aria-expanded={open}>
           <span className="sr-only">Select File</span>
-          <PlusIcon aria-hidden="true" />
+          <PlusIcon className="text-muted-foreground" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60 h-[300px] p-0">
@@ -41,15 +41,15 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles
             <CommandGroup>
               {files.map((file) => (
                 <CommandItem
-                  key={file.path}
+                  key={file.relativePath}
                   value={file.name}
-                  added={!!selectedFiles.find((f) => f.path === file.path)}
+                  added={!!selectedFiles.find((f) => f.relativePath === file.relativePath)}
                   onSelect={() => {
                     onFileSelected(file);
                   }}>
                   <div className="flex items-baseline gap-2 w-full">
                     <span className="text-sm whitespace-nowrap">{file.name}</span>
-                    <span className="text-left text-xs text-muted-foreground truncate flex-1">{file.path}</span>
+                    <span className="text-left text-xs text-muted-foreground truncate flex-1">{file.relativePath}</span>
                   </div>
                 </CommandItem>
               ))}
