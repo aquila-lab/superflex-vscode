@@ -35,7 +35,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   return (
     <div className="flex flex-col bg-input rounded-md border border-border focus:outline-none">
       {/* Chat top toolbar */}
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-2 p-2">
         <FileSelectorPopover onFileSelected={() => {}} />
       </div>
 

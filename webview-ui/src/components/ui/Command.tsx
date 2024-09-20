@@ -27,7 +27,7 @@ const CommandInput = React.forwardRef<
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        'flex w-full border-solid border border-transparent bg-transparent pt-4 pb-3 px-3 text-sm leading-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
+        'flex w-full border-solid border border-border bg-transparent rounded-md m-1 py-1 px-1.5 text-sm leading-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
         className
       )}
       inputMode="search"
@@ -57,7 +57,7 @@ const CommandEmpty = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className={cn('py-3 px-2 text-muted-foreground font-medium text-xs', className)}
+    className={cn('py-1 px-1.5 text-muted-foreground font-medium text-xs', className)}
     {...props}
   />
 ));
@@ -70,7 +70,7 @@ const CommandLoading = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Loading
     ref={ref}
-    className={cn('py-3 px-2 text-muted-foreground font-medium text-xs', className)}
+    className={cn('py-1 px-1.5 text-muted-foreground font-medium text-xs', className)}
     {...props}
   />
 ));
@@ -84,7 +84,7 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      'overflow-hidden p-2 text-foreground [&:not(:last-child)]:border-border [&:not(:last-child)]:border-b [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground',
+      'overflow-hidden text-foreground [&:not(:last-child)]:border-border [&:not(:last-child)]:border-b [&_[cmdk-group-heading]]:px-1.5 [&_[cmdk-group-heading]]:py-1 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground',
       className
     )}
     {...props}
@@ -109,7 +109,7 @@ const CommandItem = React.forwardRef<
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        'relative flex cursor-pointer select-none items-center rounded-sm py-3 px-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+        'relative flex cursor-pointer select-none items-center rounded-md py-1 px-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent hover:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
         className
       )}
       title={tooltip}

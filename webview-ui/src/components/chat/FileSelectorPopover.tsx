@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { PlusIcon } from '@radix-ui/react-icons';
 
 import { Button } from '../ui/Button';
-import { TabContainer, TabRoot } from '../ui/Tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '../ui/Command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
 
 interface FileSelectorPopoverProps {
   onFileSelected: (file: { name: string; path: string }) => void;
@@ -27,43 +26,34 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ onFileSelecte
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" role="combobox" aria-expanded={open}>
           <span className="sr-only">Select File</span>
           <PlusIcon aria-hidden="true" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
-        <TabRoot>
-          <TabContainer value="file-selector">
-            <div className="flex items-center justify-between p-4 border-b">
-              <span className="font-semibold">AppPages.tsx Current File</span>
-            </div>
-          </TabContainer>
-        </TabRoot>
-
-        <div className="mt-4">
-          <Command>
-            <CommandInput placeholder="Search files..." className="h-10" />
-            <CommandList>
-              {files.length > 0 ? (
-                files.map((file) => (
-                  <CommandItem
-                    key={file.name}
-                    onSelect={() => {
-                      onFileSelected(file);
-                      setOpen(false);
-                    }}
-                    className="flex justify-between p-2 hover:bg-gray-100">
-                    <span className="font-bold">{file.name}</span>
-                    <span className="text-gray-500">{file.path}</span>
-                  </CommandItem>
-                ))
-              ) : (
-                <CommandEmpty>No files found.</CommandEmpty>
-              )}
-            </CommandList>
-          </Command>
-        </div>
+      <PopoverContent className="w-60 h-[300px] p-0">
+        <Command>
+          <CommandInput placeholder="Search files..." className="h-6" />
+          <CommandList>
+            <CommandEmpty>No files found.</CommandEmpty>
+            <CommandGroup>
+              {files.map((file) => (
+                <CommandItem
+                  key={file.path}
+                  value={file.name}
+                  onSelect={() => {
+                    onFileSelected(file);
+                    setOpen(false);
+                  }}>
+                  <div className="flex items-baseline gap-2 w-full">
+                    <span>{file.name}</span>
+                    <span className="text-xs text-muted-foreground truncate flex-1">{file.path}</span>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </PopoverContent>
     </Popover>
   );
