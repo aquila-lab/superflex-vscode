@@ -9,7 +9,8 @@ import {
   clearMessages,
   setInitState,
   setIsMessageProcessing,
-  setIsProjectSyncing
+  setIsProjectSyncing,
+  setProjectFiles
 } from '../core/chat/chatSlice';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
@@ -99,6 +100,11 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.CMD_SYNC_PROJECT: {
           vscodeAPI.postMessage(newEventRequest(EventType.SYNC_PROJECT));
+          break;
+        }
+        case EventType.FETCH_FILES: {
+          const files = payload as EventPayloads[typeof command]['response'];
+          dispatch(setProjectFiles(files));
           break;
         }
       }
@@ -191,6 +197,10 @@ const ChatView: React.FunctionComponent<{
     return true;
   }
 
+  function fetchFiles(): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
+  }
+
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
   return (
@@ -201,8 +211,9 @@ const ChatView: React.FunctionComponent<{
         <ChatInputBox
           disabled={disableIteractions}
           onFigmaButtonClicked={handleFigmaButtonClicked}
-          onFileSelected={handleImageUpload}
+          onImageSelected={handleImageUpload}
           onSendClicked={handleTextMessageSend}
+          fetchFiles={fetchFiles}
         />
       </div>
 

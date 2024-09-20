@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { Message, MessageReqest } from "../model";
-import { InitState, SyncProjectProgressPayload } from "./types";
+import { FilePayload, InitState, SyncProjectProgressPayload } from "./types";
 
 export enum EventType {
   READY = "ready",
@@ -21,6 +21,7 @@ export enum EventType {
   NEW_THREAD = "new_thread",
   NEW_MESSAGE = "new_message",
   ADD_MESSAGE = "add_message",
+  FETCH_FILES = "fetch_files",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -42,6 +43,7 @@ export interface EventPayloads {
   [EventType.NEW_THREAD]: { request: void; response: void };
   [EventType.NEW_MESSAGE]: { request: MessageReqest[]; response: Message | null };
   [EventType.ADD_MESSAGE]: { request: void; response: Message };
+  [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };

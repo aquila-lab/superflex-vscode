@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { InitState } from '../../../../shared/protocol';
-import { ChatMessage } from '../message/ChatMessage.model';
 import { MessageType, Role } from '../../../../shared/model';
+import { FilePayload, InitState } from '../../../../shared/protocol';
+import { ChatMessage } from '../message/ChatMessage.model';
 
 const defaultMessages: ChatMessage[] = [
   {
@@ -21,6 +21,7 @@ type ChatState = {
   messages: ChatMessage[];
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
+  files: FilePayload[];
 };
 
 const initialState: ChatState = {
@@ -30,7 +31,8 @@ const initialState: ChatState = {
   },
   messages: defaultMessages,
   isMessageProcessing: false,
-  isProjectSyncing: false
+  isProjectSyncing: false,
+  files: []
 };
 
 const chatSlice = createSlice({
@@ -51,11 +53,20 @@ const chatSlice = createSlice({
     },
     setIsProjectSyncing: (state, action: PayloadAction<boolean>) => {
       state.isProjectSyncing = action.payload;
+    },
+    setProjectFiles: (state, action: PayloadAction<FilePayload[]>) => {
+      state.files = action.payload;
     }
   }
 });
 
-export const { setInitState, addMessages, clearMessages, setIsMessageProcessing, setIsProjectSyncing } =
-  chatSlice.actions;
+export const {
+  setInitState,
+  addMessages,
+  clearMessages,
+  setIsMessageProcessing,
+  setIsProjectSyncing,
+  setProjectFiles
+} = chatSlice.actions;
 
 export default chatSlice.reducer;

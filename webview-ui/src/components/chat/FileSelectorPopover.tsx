@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 
+import { FilePayload } from '../../../../shared/protocol';
+import { useAppSelector } from '../../core/store';
 import { Button } from '../ui/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
 
 interface FileSelectorPopoverProps {
-  onFileSelected: (file: { name: string; path: string }) => void;
+  fetchFiles: () => void;
+  onFileSelected: (file: FilePayload) => void;
 }
 
-const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ onFileSelected }) => {
-  const files = [
-    { name: 'AppPages.tsx', path: 'src/pages/AppPages.tsx' },
-    { name: 'LoginPage.tsx', path: 'public/LoginPage.tsx' },
-    { name: 'PrivacyPolicyPage.tsx', path: 'src/pages/PrivacyPolicyPage.tsx' },
-    { name: 'ResetPasswordPage.tsx', path: 'src/pages/ResetPasswordPage.tsx' },
-    { name: 'ForgotPasswordPage.tsx', path: 'src/pages/ForgotPasswordPage.tsx' },
-    { name: 'FigmaSuccessfulPage.tsx', path: 'src/pages/FigmaSuccessfulPage.tsx' },
-    { name: 'index.ts', path: 'src/pages/public/index.ts' },
-    { name: 'firebase-hosting-merge.yml', path: 'firebase-hosting-merge.yml' },
-    { name: 'firebase-hosting-pull-request.yml', path: 'firebase-hosting-pull-request.yml' }
-  ];
+const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ fetchFiles, onFileSelected }) => {
   const [open, setOpen] = useState(false);
+  const files = useAppSelector((state) => state.chat.files);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    fetchFiles();
+  }, [open]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,7 +48,7 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ onFileSelecte
                   }}>
                   <div className="flex items-baseline gap-2 w-full">
                     <span className="text-sm whitespace-nowrap">{file.name}</span>
-                    <span className="text-xs text-muted-foreground truncate flex-1">{file.path}</span>
+                    <span className="text-left text-xs text-muted-foreground truncate flex-1">{file.path}</span>
                   </div>
                 </CommandItem>
               ))}

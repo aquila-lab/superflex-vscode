@@ -11,15 +11,17 @@ import { TextareaAutosize } from '../ui/TextareaAutosize';
 interface ChatInputBoxProps {
   disabled?: boolean;
   onFigmaButtonClicked: () => void;
-  onFileSelected: (file: File) => void;
+  onImageSelected: (file: File) => void;
   onSendClicked: (content: string) => void;
+  fetchFiles: () => void;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   disabled,
   onFigmaButtonClicked,
-  onFileSelected,
-  onSendClicked
+  onImageSelected,
+  onSendClicked,
+  fetchFiles
 }) => {
   const isFigmaAuthenticated = useAppSelector((state) => state.chat.init.isFigmaAuthenticated);
 
@@ -35,8 +37,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   return (
     <div className="flex flex-col bg-input rounded-md border border-border focus:outline-none">
       {/* Chat top toolbar */}
-      <div className="flex flex-row items-center gap-2 p-2">
-        <FileSelectorPopover onFileSelected={() => {}} />
+      <div className="flex flex-row items-center gap-2 p-2 pb-0.5">
+        <FileSelectorPopover fetchFiles={fetchFiles} onFileSelected={() => {}} />
       </div>
 
       {/* Chat input */}
@@ -45,7 +47,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
           autoFocus
           value={input}
           placeholder="Describe your UI component..."
-          className="p-2 border-0 shadow-none"
+          className="border-0 shadow-none"
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (!disabled && e.key === 'Enter' && !e.shiftKey) {
@@ -57,7 +59,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
       </div>
 
       {/* Chat bottom toolbar */}
-      <div className="flex flex-row justify-between items-center gap-4 py-1 pr-2">
+      <div className="flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2">
         <div className="flex flex-row items-center gap-1">
           <FigmaButton disabled={disabled && isFigmaAuthenticated} onClick={onFigmaButtonClicked} />
           <FilePicker
@@ -67,7 +69,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
               const file = e.target.files?.[0];
               if (!file) return;
 
-              onFileSelected(file);
+              onImageSelected(file);
             }}
           />
         </div>

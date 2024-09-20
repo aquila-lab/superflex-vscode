@@ -13,6 +13,7 @@ import { getFigmaSelectionImageUrl } from "../api";
 import { extractFigmaSelectionUrl } from "../model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
+import { findWorkspaceFiles } from "src/scanner";
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -25,6 +26,7 @@ export class ChatAPI {
   private _chatEventRegistry = new EventRegistry();
   private _isSyncProjectRunning = false;
   private _thread?: Thread;
+  private _workspaceDirPath?: string;
 
   constructor() {
     this._chatEventRegistry
@@ -54,8 +56,8 @@ export class ChatAPI {
             return { isInitialized: false, isFigmaAuthenticated };
           }
 
-          const workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
-          this._assistant = new SuperflexAssistant(workspaceDirPath, "local", toKebabCase(openWorkspace.name));
+          this._workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
+          this._assistant = new SuperflexAssistant(this._workspaceDirPath, "local", toKebabCase(openWorkspace.name));
           await this.syncProjectFiles(sendEventMessageCb);
 
           this._isInitialized = true;
@@ -178,6 +180,18 @@ export class ChatAPI {
 
         const assistantMessage = await this._assistant.sendMessage(thread.id, messages);
         return assistantMessage;
+      })
+      .registerEvent(EventType.FETCH_FILES, async () => {
+        if (!this._isInitialized || !this._assistant || !this._workspaceDirPath) {
+          return [];
+        }
+
+        const workspaceDirPath = this._workspaceDirPath;
+        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath);
+        return documentPaths.map((docPath) => ({
+          name: path.basename(docPath),
+          path: path.relative(workspaceDirPath, docPath),
+        }));
       });
   }
 

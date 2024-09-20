@@ -7,3 +7,8 @@ export type SyncProjectProgressPayload = {
   progress: number;
   isFirstTimeSync?: boolean;
 };
+
+export type FilePayload = {
+  name: string;
+  path: string;
+};
