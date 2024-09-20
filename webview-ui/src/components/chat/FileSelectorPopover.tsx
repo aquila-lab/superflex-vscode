@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusIcon } from '@radix-ui/react-icons';
+import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 
 import { Button } from '../ui/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
@@ -46,13 +46,26 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ onFileSelecte
                     setOpen(false);
                   }}>
                   <div className="flex items-baseline gap-2 w-full">
-                    <span>{file.name}</span>
+                    <span className="text-sm whitespace-nowrap">{file.name}</span>
                     <span className="text-xs text-muted-foreground truncate flex-1">{file.path}</span>
                   </div>
                 </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
+
+          <div className="flex justify-between items-center gap-3 p-2 border-t border-border mt-auto">
+            <div className="flex items-center gap-1 text-xs">
+              <ArrowUpIcon className="size-4 p-1 rounded-md bg-muted" aria-hidden="true" />
+              <ArrowDownIcon className="size-4 p-1 rounded-md bg-muted" aria-hidden="true" />
+              <span className="text-muted-foreground">Navigate</span>
+            </div>
+
+            <div className="flex items-center gap-1 text-xs">
+              <div className="py-0.5 px-1 rounded-md bg-muted">Enter</div>
+              <span className="text-muted-foreground">Toggle</span>
+            </div>
+          </div>
         </Command>
       </PopoverContent>
     </Popover>
