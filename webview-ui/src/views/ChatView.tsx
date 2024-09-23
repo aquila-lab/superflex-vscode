@@ -110,7 +110,6 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.SET_CURRENT_OPEN_FILE: {
           const file = payload as EventPayloads[typeof command]['request'];
-          console.log('SET_CURRENT_OPEN_FILE', file);
           if (file) {
             setSelectedFiles((prev) => [
               file,
