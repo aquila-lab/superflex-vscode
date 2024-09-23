@@ -1,3 +1,4 @@
+import { FilePayload } from "../../shared/protocol";
 import { Message, MessageReqest, TextDelta, Thread } from "../../shared/model";
 
 export interface Assistant {
@@ -13,12 +14,14 @@ export interface Assistant {
    * Send a message in a chat thread. If there is no active thread, a new thread will be created.
    *
    * @param threadID - The ID of the thread to send the message to.
+   * @param files - The files to send to the assistant.
    * @param messages - The messages to send to the assistant.
    * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
    * @returns A promise that resolves with the response message.
    */
   sendMessage(
     threadID: string,
+    files: FilePayload[],
     messages: MessageReqest[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<Message>;

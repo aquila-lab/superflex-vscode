@@ -4,8 +4,14 @@ import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 import { v4 as uuidv4 } from "uuid";
 
-import { MessageReqest, MessageType, Role, Thread } from "../../shared/model";
-import { EventMessage, EventPayloads, EventType, newEventResponse } from "../../shared/protocol";
+import { MessageType, Role, Thread } from "../../shared/model";
+import {
+  EventMessage,
+  EventPayloads,
+  EventType,
+  newEventResponse,
+  SendMessagesRequestPayload,
+} from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
@@ -117,18 +123,18 @@ export class ChatAPI {
        * Event (new_message): This event is fired when the user sends a message in the webview Chat.
        * It is used to send a message to the AI code assistant, and return the assistant's message response.
        *
-       * @param messages - Array of messages to send.
+       * @param payload - Payload containing the messages to send.
        * @param sendEventMessageCb - Callback function to send event messages to the webview.
        * @returns A promise that resolves with the assistant's message response.
        * @throws An error if the message cannot be sent or processed.
        */
-      .registerEvent(EventType.NEW_MESSAGE, async (messages: MessageReqest[], sendEventMessageCb) => {
+      .registerEvent(EventType.NEW_MESSAGE, async (payload: SendMessagesRequestPayload, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
           return null;
         }
 
-        messages = await Promise.all(
-          messages.map(async (msg) => {
+        const messages = await Promise.all(
+          payload.messages.map(async (msg) => {
             if (msg.type === MessageType.Image) {
               // Read the image file
               const imageData = fs.readFileSync(path.resolve(msg.content));
@@ -180,7 +186,7 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const assistantMessage = await this._assistant.sendMessage(thread.id, messages);
+        const assistantMessage = await this._assistant.sendMessage(thread.id, payload.files, messages);
         return assistantMessage;
       })
       .registerEvent(EventType.FETCH_FILES, async () => {

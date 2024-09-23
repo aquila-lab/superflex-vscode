@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
 
-import { Button } from '../ui/Button';
+import { FilePayload } from '../../../../shared/protocol';
+import { useAppDispatch, useAppSelector } from '../../core/store';
+import { setSelectedFiles } from '../../core/chat/chatSlice';
 import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
 
 interface FigmaFilePickerModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (figmaSelectionLink: string) => Promise<boolean>;
+  onSubmit: (selectedFiles: FilePayload[], figmaSelectionLink: string) => Promise<boolean>;
 }
 
 const FigmaFilePickerModal: React.FunctionComponent<FigmaFilePickerModalProps> = ({ open, onClose, onSubmit }) => {
+  const dispatch = useAppDispatch();
+
+  const selectedFiles = useAppSelector((state) => state.chat.selectedFiles);
+
   const [figmaSelectionLink, setFigmaSelectionLink] = useState('');
 
   async function handleSubmit(): Promise<void> {
-    const success = await onSubmit(figmaSelectionLink);
+    const success = await onSubmit(selectedFiles, figmaSelectionLink);
     if (!success) {
       return;
     }
 
     setFigmaSelectionLink('');
+    dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
     onClose();
   }
 

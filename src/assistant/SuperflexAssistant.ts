@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import asyncQ from "async";
 
+import { FilePayload } from "../../shared/protocol";
 import { Message, MessageReqest, TextDelta, Thread } from "../../shared/model";
 import * as api from "../api";
 import { jsonToMap, mapToJson } from "../common/utils";
@@ -41,10 +42,11 @@ export default class SuperflexAssistant implements Assistant {
 
   async sendMessage(
     threadID: string,
+    files: FilePayload[],
     messages: MessageReqest[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<Message> {
-    const message = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, messages });
+    const message = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
 
     // const stream = await api.stream.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, messages });
     //

@@ -22,6 +22,7 @@ type ChatState = {
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
   files: FilePayload[];
+  selectedFiles: FilePayload[];
 };
 
 const initialState: ChatState = {
@@ -32,7 +33,8 @@ const initialState: ChatState = {
   messages: defaultMessages,
   isMessageProcessing: false,
   isProjectSyncing: false,
-  files: []
+  files: [],
+  selectedFiles: []
 };
 
 const chatSlice = createSlice({
@@ -56,6 +58,26 @@ const chatSlice = createSlice({
     },
     setProjectFiles: (state, action: PayloadAction<FilePayload[]>) => {
       state.files = action.payload;
+    },
+    setSelectedFiles: (state, action: PayloadAction<FilePayload[]>) => {
+      state.selectedFiles = action.payload;
+    },
+    addSelectedFile: (state, action: PayloadAction<FilePayload>) => {
+      if (action.payload.isCurrentOpenFile) {
+        state.selectedFiles = [
+          action.payload,
+          ...state.selectedFiles.filter((f) => !f.isCurrentOpenFile && f.relativePath !== action.payload.relativePath)
+        ];
+        return;
+      }
+      if (state.selectedFiles.find((f) => f.relativePath === action.payload.relativePath)) {
+        return;
+      }
+
+      state.selectedFiles = [...state.selectedFiles, action.payload];
+    },
+    removeSelectedFile: (state, action: PayloadAction<FilePayload>) => {
+      state.selectedFiles = state.selectedFiles.filter((file) => file.relativePath !== action.payload.relativePath);
     }
   }
 });
@@ -66,7 +88,10 @@ export const {
   clearMessages,
   setIsMessageProcessing,
   setIsProjectSyncing,
-  setProjectFiles
+  setProjectFiles,
+  setSelectedFiles,
+  addSelectedFile,
+  removeSelectedFile
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

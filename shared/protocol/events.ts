@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { Message, MessageReqest } from "../model";
-import { FilePayload, InitState, SyncProjectProgressPayload } from "./types";
+import { Message } from "../model";
+import { FilePayload, InitState, SendMessagesRequestPayload, SyncProjectProgressPayload } from "./types";
 
 export enum EventType {
   READY = "ready",
@@ -42,7 +42,7 @@ export interface EventPayloads {
   [EventType.FIGMA_OAUTH_CONNECT]: { request: void; response: boolean };
   [EventType.FIGMA_OAUTH_DISCONNECT]: { request: void; response: void };
   [EventType.NEW_THREAD]: { request: void; response: void };
-  [EventType.NEW_MESSAGE]: { request: MessageReqest[]; response: Message | null };
+  [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.ADD_MESSAGE]: { request: void; response: Message };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };

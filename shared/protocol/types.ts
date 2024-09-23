@@ -1,3 +1,5 @@
+import { MessageReqest } from "../model";
+
 export type InitState = {
   isInitialized: boolean;
   isFigmaAuthenticated: boolean;
@@ -13,4 +15,9 @@ export type FilePayload = {
   path: string;
   relativePath: string;
   isCurrentOpenFile?: boolean;
+};
+
+export type SendMessagesRequestPayload = {
+  files: FilePayload[];
+  messages: MessageReqest[];
 };

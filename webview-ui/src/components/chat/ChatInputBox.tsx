@@ -1,42 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { Cross2Icon } from '@radix-ui/react-icons';
 
 import { FilePayload } from '../../../../shared/protocol';
 import { Button } from '../ui/Button';
 import { FilePicker } from '../ui/FilePicker';
-import { useAppSelector } from '../../core/store';
+import { useAppDispatch, useAppSelector } from '../../core/store';
 import { FigmaButton } from '../figma/FigmaButton';
 import FileSelectorPopover from './FileSelectorPopover';
 import { TextareaAutosize } from '../ui/TextareaAutosize';
+import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../core/chat/chatSlice';
 
 interface ChatInputBoxProps {
   disabled?: boolean;
+  currentOpenFile: FilePayload | null;
   onFigmaButtonClicked: () => void;
-  onImageSelected: (file: File) => void;
-  onSendClicked: (content: string) => void;
+  onImageSelected: (selectedFiles: FilePayload[], file: File) => void;
+  onSendClicked: (selectedFiles: FilePayload[], content: string) => void;
   fetchFiles: () => void;
-  selectedFiles: FilePayload[];
-  setSelectedFiles: React.Dispatch<React.SetStateAction<FilePayload[]>>;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   disabled,
+  currentOpenFile,
   onFigmaButtonClicked,
   onImageSelected,
   onSendClicked,
-  fetchFiles,
-  selectedFiles,
-  setSelectedFiles
+  fetchFiles
 }) => {
+  const dispatch = useAppDispatch();
+
+  const selectedFiles = useAppSelector((state) => state.chat.selectedFiles);
   const isFigmaAuthenticated = useAppSelector((state) => state.chat.init.isFigmaAuthenticated);
 
   const [input, setInput] = useState('');
 
+  useEffect(() => {
+    if (!currentOpenFile) {
+      dispatch(setSelectedFiles([...selectedFiles.filter((f) => !f.isCurrentOpenFile)]));
+      return;
+    }
+
+    dispatch(addSelectedFile(currentOpenFile));
+  }, [currentOpenFile]);
+
   function handleSend(): void {
     if (input.trim()) {
-      onSendClicked(input);
+      onSendClicked(selectedFiles, input);
       setInput('');
+      dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
     }
   }
 
@@ -46,11 +58,11 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
       return;
     }
 
-    setSelectedFiles((prev) => [...prev, file]);
+    dispatch(addSelectedFile(file));
   }
 
   function handleFileRemove(file: FilePayload): void {
-    setSelectedFiles(selectedFiles.filter((f) => f.relativePath !== file.relativePath));
+    dispatch(removeSelectedFile(file));
   }
 
   return (
@@ -110,7 +122,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
               const file = e.target.files?.[0];
               if (!file) return;
 
-              onImageSelected(file);
+              onImageSelected(selectedFiles, file);
+              dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
             }}
           />
         </div>
