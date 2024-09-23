@@ -114,6 +114,9 @@ export default class SuperflexAssistant implements Assistant {
         }
         SuperflexCache.set(this.cacheFileName, mapToJson(cachedFilesMap));
       } catch (err: any) {
+        if (err?.statusCode === 401 || err?.statusCode === 403) {
+          throw err;
+        }
         console.error(`Failed to upload files: ${err?.message}`);
       }
     }, concurrency);
@@ -215,6 +218,9 @@ export default class SuperflexAssistant implements Assistant {
         cachedFilesMap.delete(relativePath);
       }
     } catch (err: any) {
+      if (err?.statusCode === 401 || err?.statusCode === 403) {
+        throw err;
+      }
       console.error(`Failed to delete files: ${err?.message}`);
     }
   }

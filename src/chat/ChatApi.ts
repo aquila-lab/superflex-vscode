@@ -68,6 +68,8 @@ export class ChatAPI {
           }
 
           return { isInitialized: true, isFigmaAuthenticated };
+        } catch (err) {
+          throw err;
         } finally {
           release();
         }
@@ -256,6 +258,9 @@ export class ChatAPI {
         sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
       });
     } catch (err: any) {
+      if (err?.statusCode === 401 || err?.statusCode === 403) {
+        throw err;
+      }
       if (err?.message && err.message.startsWith("No supported files found in the workspace")) {
         vscode.window.showWarningMessage(err.message);
       }

@@ -41,6 +41,11 @@ const ChatView: React.FunctionComponent<{
 
       switch (command) {
         case EventType.INITIALIZED: {
+          if (error) {
+            dispatch(setInitState({ isInitialized: false }));
+            return;
+          }
+
           const initState = payload as EventPayloads[typeof command]['response'];
           dispatch(setInitState(initState));
           break;
