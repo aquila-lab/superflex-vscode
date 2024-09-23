@@ -13,7 +13,7 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
-      const { command, payload } = message;
+      const { command, payload, error } = message;
 
       switch (command) {
         case EventType.SHOW_LOGIN_VIEW: {
@@ -21,6 +21,8 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
           break;
         }
         case EventType.INITIALIZED: {
+          if (error) return;
+
           const initState = payload as EventPayloads[typeof command]['response'];
 
           if (!initState.isInitialized) {

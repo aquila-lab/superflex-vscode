@@ -1,3 +1,6 @@
+import fs from "fs";
+
+import { FilePayload } from "../../shared/protocol";
 import { MessageReqest, Message, Thread } from "../../shared/model";
 
 import { Api } from "./api";
@@ -52,12 +55,17 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
 }
 
 export type SendThreadMessageArgs = GetThreadArgs & {
+  files: FilePayload[];
   messages: MessageReqest[];
 };
 
-async function sendThreadMessage({ owner, repo, threadID, messages }: SendThreadMessageArgs): Promise<Message> {
+async function sendThreadMessage({ owner, repo, threadID, files, messages }: SendThreadMessageArgs): Promise<Message> {
   try {
     const { data } = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
+      files: files.map((file) => ({
+        path: file.relativePath,
+        content: fs.readFileSync(file.path).toString(),
+      })),
       messages: messages.map((msg) => ({
         type: msg.type,
         content: msg.content,

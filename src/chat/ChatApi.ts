@@ -4,8 +4,14 @@ import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 import { v4 as uuidv4 } from "uuid";
 
-import { MessageReqest, MessageType, Role, Thread } from "../../shared/model";
-import { EventMessage, EventPayloads, EventType, newEventResponse } from "../../shared/protocol";
+import { MessageType, Role, Thread } from "../../shared/model";
+import {
+  EventMessage,
+  EventPayloads,
+  EventType,
+  newEventResponse,
+  SendMessagesRequestPayload,
+} from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { EventRegistry, Handler } from "./EventRegistry";
@@ -13,6 +19,7 @@ import { getFigmaSelectionImageUrl } from "../api";
 import { extractFigmaSelectionUrl } from "../model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
+import { findWorkspaceFiles } from "src/scanner";
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -25,6 +32,7 @@ export class ChatAPI {
   private _chatEventRegistry = new EventRegistry();
   private _isSyncProjectRunning = false;
   private _thread?: Thread;
+  private _workspaceDirPath?: string;
 
   constructor() {
     this._chatEventRegistry
@@ -54,8 +62,8 @@ export class ChatAPI {
             return { isInitialized: false, isFigmaAuthenticated };
           }
 
-          const workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
-          this._assistant = new SuperflexAssistant(workspaceDirPath, "local", toKebabCase(openWorkspace.name));
+          this._workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
+          this._assistant = new SuperflexAssistant(this._workspaceDirPath, "local", toKebabCase(openWorkspace.name));
           await this.syncProjectFiles(sendEventMessageCb);
 
           this._isInitialized = true;
@@ -66,6 +74,8 @@ export class ChatAPI {
           }
 
           return { isInitialized: true, isFigmaAuthenticated };
+        } catch (err) {
+          throw err;
         } finally {
           release();
         }
@@ -113,18 +123,18 @@ export class ChatAPI {
        * Event (new_message): This event is fired when the user sends a message in the webview Chat.
        * It is used to send a message to the AI code assistant, and return the assistant's message response.
        *
-       * @param messages - Array of messages to send.
+       * @param payload - Payload containing the messages to send.
        * @param sendEventMessageCb - Callback function to send event messages to the webview.
        * @returns A promise that resolves with the assistant's message response.
        * @throws An error if the message cannot be sent or processed.
        */
-      .registerEvent(EventType.NEW_MESSAGE, async (messages: MessageReqest[], sendEventMessageCb) => {
+      .registerEvent(EventType.NEW_MESSAGE, async (payload: SendMessagesRequestPayload, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
           return null;
         }
 
-        messages = await Promise.all(
-          messages.map(async (msg) => {
+        const messages = await Promise.all(
+          payload.messages.map(async (msg) => {
             if (msg.type === MessageType.Image) {
               // Read the image file
               const imageData = fs.readFileSync(path.resolve(msg.content));
@@ -176,8 +186,27 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const assistantMessage = await this._assistant.sendMessage(thread.id, messages);
+        const assistantMessage = await this._assistant.sendMessage(thread.id, payload.files, messages);
         return assistantMessage;
+      })
+      .registerEvent(EventType.FETCH_FILES, async () => {
+        if (!this._isInitialized || !this._assistant || !this._workspaceDirPath) {
+          return [];
+        }
+
+        const workspaceDirPath = this._workspaceDirPath;
+        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath);
+        return documentPaths
+          .sort((a, b) => {
+            const statA = fs.statSync(a);
+            const statB = fs.statSync(b);
+            return statB.mtime.getTime() - statA.mtime.getTime();
+          })
+          .map((docPath) => ({
+            name: path.basename(docPath),
+            path: docPath,
+            relativePath: path.relative(workspaceDirPath, docPath),
+          }));
       });
   }
 
@@ -235,6 +264,9 @@ export class ChatAPI {
         sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
       });
     } catch (err: any) {
+      if (err?.statusCode === 401 || err?.statusCode === 403) {
+        throw err;
+      }
       if (err?.message && err.message.startsWith("No supported files found in the workspace")) {
         vscode.window.showWarningMessage(err.message);
       }

@@ -65,7 +65,7 @@ export default class SuperflexAuthenticationService {
     try {
       ApiProvider.setHeader("Authorization", `Bearer ${token}`);
       ApiProvider.addHeaderTokenInterceptor(async (err) => {
-        if (err?.response?.status === 401) {
+        if (err?.response?.status === 401 || err?.response?.status === 403) {
           this.handleUnauthorizedResponse(err.response, logoutAction);
         }
         return Promise.reject(err);

@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { InitState } from '../../../../shared/protocol';
-import { ChatMessage } from '../message/ChatMessage.model';
 import { MessageType, Role } from '../../../../shared/model';
+import { FilePayload, InitState } from '../../../../shared/protocol';
+import { ChatMessage } from '../message/ChatMessage.model';
 
 const defaultMessages: ChatMessage[] = [
   {
@@ -21,6 +21,8 @@ type ChatState = {
   messages: ChatMessage[];
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
+  files: FilePayload[];
+  selectedFiles: FilePayload[];
 };
 
 const initialState: ChatState = {
@@ -30,7 +32,9 @@ const initialState: ChatState = {
   },
   messages: defaultMessages,
   isMessageProcessing: false,
-  isProjectSyncing: false
+  isProjectSyncing: false,
+  files: [],
+  selectedFiles: []
 };
 
 const chatSlice = createSlice({
@@ -51,11 +55,43 @@ const chatSlice = createSlice({
     },
     setIsProjectSyncing: (state, action: PayloadAction<boolean>) => {
       state.isProjectSyncing = action.payload;
+    },
+    setProjectFiles: (state, action: PayloadAction<FilePayload[]>) => {
+      state.files = action.payload;
+    },
+    setSelectedFiles: (state, action: PayloadAction<FilePayload[]>) => {
+      state.selectedFiles = action.payload;
+    },
+    addSelectedFile: (state, action: PayloadAction<FilePayload>) => {
+      if (action.payload.isCurrentOpenFile) {
+        state.selectedFiles = [
+          action.payload,
+          ...state.selectedFiles.filter((f) => !f.isCurrentOpenFile && f.relativePath !== action.payload.relativePath)
+        ];
+        return;
+      }
+      if (state.selectedFiles.find((f) => f.relativePath === action.payload.relativePath)) {
+        return;
+      }
+
+      state.selectedFiles = [...state.selectedFiles, action.payload];
+    },
+    removeSelectedFile: (state, action: PayloadAction<FilePayload>) => {
+      state.selectedFiles = state.selectedFiles.filter((file) => file.relativePath !== action.payload.relativePath);
     }
   }
 });
 
-export const { setInitState, addMessages, clearMessages, setIsMessageProcessing, setIsProjectSyncing } =
-  chatSlice.actions;
+export const {
+  setInitState,
+  addMessages,
+  clearMessages,
+  setIsMessageProcessing,
+  setIsProjectSyncing,
+  setProjectFiles,
+  setSelectedFiles,
+  addSelectedFile,
+  removeSelectedFile
+} = chatSlice.actions;
 
 export default chatSlice.reducer;

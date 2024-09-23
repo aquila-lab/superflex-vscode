@@ -2,14 +2,15 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { MessageType, Role } from '../../../shared/model';
-import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol';
+import { EventMessage, EventPayloads, EventType, FilePayload, newEventRequest } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import {
   addMessages,
   clearMessages,
   setInitState,
   setIsMessageProcessing,
-  setIsProjectSyncing
+  setIsProjectSyncing,
+  setProjectFiles
 } from '../core/chat/chatSlice';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
@@ -32,13 +33,19 @@ const ChatView: React.FunctionComponent<{
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
+  const [currentOpenFile, setCurrentOpenFile] = useState<FilePayload | null>(null);
 
   useEffect(() => {
-    const unsubscribe = vscodeAPI.onMessage((message: EventMessage<EventType>) => {
+    return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
       const { command, payload, error } = message;
 
       switch (command) {
         case EventType.INITIALIZED: {
+          if (error) {
+            dispatch(setInitState({ isInitialized: false }));
+            return;
+          }
+
           const initState = payload as EventPayloads[typeof command]['response'];
           dispatch(setInitState(initState));
           break;
@@ -101,10 +108,18 @@ const ChatView: React.FunctionComponent<{
           vscodeAPI.postMessage(newEventRequest(EventType.SYNC_PROJECT));
           break;
         }
+        case EventType.FETCH_FILES: {
+          const files = payload as EventPayloads[typeof command]['response'];
+          dispatch(setProjectFiles(files));
+          break;
+        }
+        case EventType.SET_CURRENT_OPEN_FILE: {
+          const file = payload as EventPayloads[typeof command]['request'];
+          setCurrentOpenFile(file);
+          break;
+        }
       }
     });
-
-    return () => unsubscribe();
   }, [vscodeAPI]);
 
   // If we are here that means we are authenticated and have active subscription or token
@@ -133,14 +148,14 @@ const ChatView: React.FunctionComponent<{
     };
   }, [vscodeAPI]);
 
-  const handleTextMessageSend = (content: string) => {
+  const handleTextMessageSend = (selectedFiles: FilePayload[], content: string) => {
     const newMessage: ChatMessage = { id: uuidv4(), role: Role.User, type: MessageType.Text, content };
     dispatch(addMessages([newMessage]));
-    vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, [newMessage]));
+    vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, { files: selectedFiles, messages: [newMessage] }));
     dispatch(setIsMessageProcessing(true));
   };
 
-  function handleImageUpload(file: File): void {
+  function handleImageUpload(selectedFiles: FilePayload[], file: File): void {
     dispatch(
       addMessages([
         {
@@ -153,12 +168,15 @@ const ChatView: React.FunctionComponent<{
     );
 
     vscodeAPI.postMessage(
-      newEventRequest(EventType.NEW_MESSAGE, [
-        {
-          type: MessageType.Image,
-          content: (file as any).path
-        }
-      ])
+      newEventRequest(EventType.NEW_MESSAGE, {
+        files: selectedFiles,
+        messages: [
+          {
+            type: MessageType.Image,
+            content: (file as any).path
+          }
+        ]
+      })
     );
 
     dispatch(setIsMessageProcessing(true));
@@ -177,18 +195,25 @@ const ChatView: React.FunctionComponent<{
    *
    * @param figmaSelectionLink Figma selection link. Example: https://www.figma.com/design/GAo9lY4bIk8j2UBUwU33l9/Wireframing-in-Figma?node-id=0-761&t=1QgxKWtCMVPD6cci-4
    */
-  async function handleFigmaFileSelected(figmaSelectionLink: string): Promise<boolean> {
+  async function handleFigmaFileSelected(selectedFiles: FilePayload[], figmaSelectionLink: string): Promise<boolean> {
     vscodeAPI.postMessage(
-      newEventRequest(EventType.NEW_MESSAGE, [
-        {
-          type: MessageType.Figma,
-          content: figmaSelectionLink
-        }
-      ])
+      newEventRequest(EventType.NEW_MESSAGE, {
+        files: selectedFiles,
+        messages: [
+          {
+            type: MessageType.Figma,
+            content: figmaSelectionLink
+          }
+        ]
+      })
     );
 
     dispatch(setIsMessageProcessing(true));
     return true;
+  }
+
+  function fetchFiles(): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
   }
 
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
@@ -200,9 +225,11 @@ const ChatView: React.FunctionComponent<{
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <ChatInputBox
           disabled={disableIteractions}
-          onFigmaButtonClicked={handleFigmaButtonClicked}
-          onFileSelected={handleImageUpload}
+          currentOpenFile={currentOpenFile}
+          fetchFiles={fetchFiles}
           onSendClicked={handleTextMessageSend}
+          onImageSelected={handleImageUpload}
+          onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>
 

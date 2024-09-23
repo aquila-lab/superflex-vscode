@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { Message, MessageReqest } from "../model";
-import { InitState, SyncProjectProgressPayload } from "./types";
+import { Message } from "../model";
+import { FilePayload, InitState, SendMessagesRequestPayload, SyncProjectProgressPayload } from "./types";
 
 export enum EventType {
   READY = "ready",
@@ -21,6 +21,8 @@ export enum EventType {
   NEW_THREAD = "new_thread",
   NEW_MESSAGE = "new_message",
   ADD_MESSAGE = "add_message",
+  FETCH_FILES = "fetch_files",
+  SET_CURRENT_OPEN_FILE = "set_current_open_file",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -40,8 +42,10 @@ export interface EventPayloads {
   [EventType.FIGMA_OAUTH_CONNECT]: { request: void; response: boolean };
   [EventType.FIGMA_OAUTH_DISCONNECT]: { request: void; response: void };
   [EventType.NEW_THREAD]: { request: void; response: void };
-  [EventType.NEW_MESSAGE]: { request: MessageReqest[]; response: Message | null };
+  [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.ADD_MESSAGE]: { request: void; response: Message };
+  [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
+  [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };

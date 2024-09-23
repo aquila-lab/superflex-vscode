@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaFigma } from 'react-icons/fa';
 import { cn } from '../../common/utils';
+import { Button } from '../ui/Button';
 
 interface FigmaButtonProps {
   onClick: () => void;
@@ -9,25 +10,16 @@ interface FigmaButtonProps {
 
 const FigmaButton: React.FunctionComponent<FigmaButtonProps> = ({ onClick, disabled }) => {
   return (
-    <div className="flex flex-col justify-center h-10">
-      <div
-        className={cn(
-          'flex-initial flex flex-col justify-center items-center rounded-md',
-          !disabled && 'hover:bg-muted'
-        )}>
-        <button
-          type="button"
-          disabled={disabled}
-          className={cn(
-            'p-1.5 text-muted-foreground',
-            disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
-          )}
-          onClick={onClick}>
-          <span className="sr-only">Figma</span>
-          <FaFigma className="size-5" aria-hidden="true" />
-        </button>
-      </div>
-    </div>
+    <Button
+      size="xs"
+      variant="text"
+      disabled={disabled}
+      className={cn('gap-0.5', disabled && 'opacity-60')}
+      onClick={onClick}>
+      <span className="sr-only">Figma</span>
+      <FaFigma className="size-3.5" aria-hidden="true" />
+      <span>Figma</span>
+    </Button>
   );
 };
 
