@@ -4,6 +4,7 @@ import { AuthenticationProvider } from "vscode";
 import { EventType, newEventResponse } from "../../shared/protocol";
 import { ApiProvider } from "../api";
 import ChatViewProvider from "../chat/ChatViewProvider";
+import { Telemetry } from "../common/analytics/Telemetry";
 import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
 
 export default class SuperflexAuthenticationService {
@@ -22,6 +23,11 @@ export default class SuperflexAuthenticationService {
     this.setAuthHeader(session.accessToken, () => this.signOut(provider));
 
     vscode.window.showInformationMessage(`Signed in as ${session.account.label} 🎉`);
+
+    Telemetry.capture("signin", {
+      userID: session.account.id,
+      email: session.account.label,
+    });
   }
 
   /**
@@ -40,6 +46,13 @@ export default class SuperflexAuthenticationService {
 
     vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", false);
     vscode.window.showInformationMessage("Signed out!");
+
+    const fields: Record<string, string> = {};
+    if (session) {
+      fields.userID = session.account.id;
+      fields.email = session.account.label;
+    }
+    Telemetry.capture("signout", fields);
   }
 
   /**

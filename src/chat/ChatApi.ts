@@ -14,12 +14,13 @@ import {
 } from "../../shared/protocol";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
+import { Telemetry } from "../common/analytics/Telemetry";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl } from "../api";
 import { extractFigmaSelectionUrl } from "../model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
-import { findWorkspaceFiles } from "src/scanner";
+import { findWorkspaceFiles } from "../scanner";
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -41,6 +42,8 @@ export class ChatAPI {
        */
       .registerEvent(EventType.READY, () => {
         this._ready.fire();
+
+        Telemetry.capture("ready", {});
       })
 
       /**
@@ -72,6 +75,8 @@ export class ChatAPI {
           if (session && session.accessToken) {
             isFigmaAuthenticated = true;
           }
+
+          Telemetry.capture("initialized", {});
 
           return { isInitialized: true, isFigmaAuthenticated };
         } catch (err) {
@@ -117,6 +122,10 @@ export class ChatAPI {
         }
 
         this._thread = await this._assistant.createThread();
+
+        Telemetry.capture("new_thread", {
+          threadID: this._thread?.id ?? "",
+        });
       })
 
       /**
@@ -132,6 +141,8 @@ export class ChatAPI {
         if (!this._isInitialized || !this._assistant) {
           return null;
         }
+
+        const timeNow = Date.now();
 
         const messages = await Promise.all(
           payload.messages.map(async (msg) => {
@@ -187,6 +198,15 @@ export class ChatAPI {
         }
 
         const assistantMessage = await this._assistant.sendMessage(thread.id, payload.files, messages);
+
+        Telemetry.capture("new_message", {
+          threadID: thread.id,
+          customSelectedFiles: payload.files.length,
+          assistantMessageID: assistantMessage.id,
+          assistantMessageLength: assistantMessage.content.length,
+          processingDeltaTimeMs: Date.now() - timeNow,
+        });
+
         return assistantMessage;
       })
       .registerEvent(EventType.FETCH_FILES, async () => {
