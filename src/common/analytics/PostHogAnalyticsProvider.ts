@@ -1,13 +1,14 @@
 import { Analytics } from "./types";
 import { AnalyticsProvider } from "./AnalyticsProvider";
+import { PostHog } from "posthog-node";
 
 export default class PostHogAnalyticsProvider implements AnalyticsProvider {
-  client?: any;
+  client?: PostHog;
   uniqueID?: string;
 
   async capture(event: string, properties: { [key: string]: any }): Promise<void> {
     this.client?.capture({
-      distinctID: this.uniqueID,
+      distinctId: this.uniqueID ?? "NOT_UNIQUE",
       event,
       properties,
     });
@@ -20,7 +21,6 @@ export default class PostHogAnalyticsProvider implements AnalyticsProvider {
       try {
         this.uniqueID = uniqueID;
 
-        const { PostHog } = await import("posthog-node");
         this.client = new PostHog(config.clientKey, {
           host: config.url,
         });

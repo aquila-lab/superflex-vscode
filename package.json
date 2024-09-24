@@ -212,7 +212,7 @@
         "superflex.analytics": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable analytics"
+          "description": "Specify whether to allow Superflex to collect product usage analytics"
         }
       }
     }
