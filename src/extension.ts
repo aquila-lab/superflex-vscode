@@ -93,7 +93,7 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 
 async function initializeAnalytics(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("superflex");
-  const analyticsEnabled = config.get<boolean>("enableAnalytics", true);
+  const analyticsEnabled = config.get<boolean>("analytics", false);
 
   if (analyticsEnabled && SUPERFLEX_POSTHOG_API_KEY) {
     const uniqueID = await getUniqueID(context);

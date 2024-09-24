@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { EventType, newEventResponse } from "../../shared/protocol";
 import ChatViewProvider from "../chat/ChatViewProvider";
 import { FigmaTokenInformation } from "../model/Figma.model";
+import { Telemetry } from "../common/analytics/Telemetry";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { FigmaApiProvider, figmaRefreshAccessToken } from "../api";
 import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
@@ -40,6 +41,11 @@ export default class FigmaAuthenticationService {
 
     this._webviewProvider.sendEventMessage(newEventResponse(EventType.FIGMA_OAUTH_CONNECT, true));
 
+    Telemetry.capture("figma_connect", {
+      userID: session.account.id,
+      email: session.account.label,
+    });
+
     return figmaTokenInfo;
   }
 
@@ -59,6 +65,13 @@ export default class FigmaAuthenticationService {
 
     vscode.commands.executeCommand("setContext", "superflex.figma.authenticated", false);
     vscode.window.showInformationMessage("Disconnected Figma account from Superflex!");
+
+    const fields: Record<string, string> = {};
+    if (session) {
+      fields.userID = session.account.id;
+      fields.email = session.account.label;
+    }
+    Telemetry.capture("figma_disconnect", fields);
   }
 
   /**
