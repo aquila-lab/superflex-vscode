@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
-import posthog from "posthog-js";
 
 import { EventType } from "../shared/protocol";
 import { ChatAPI } from "./chat/ChatApi";
-import { getOpenWorkspace } from "./common/utils";
-import { AUTH_PROVIDER_ID } from "./common/constants";
+import { getExtensionVersion, getOpenWorkspace, getUniqueID } from "./common/utils";
+import { AUTH_PROVIDER_ID, SUPERFLEX_POSTHOG_API_KEY } from "./common/constants";
+import { Telemetry } from "./common/analytics/Telemetry";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import { SuperflexCache } from "./cache/SuperflexCache";
 import registerChatWidgetWebview from "./chat/chatWidgetWebview";
@@ -22,11 +22,6 @@ type AppState = {
   chatViewProvider: ChatViewProvider;
 };
 
-// Initialize PostHog
-if (process.env.SUPERFLEX_POSTHOG_API_KEY) {
-  posthog.init(process.env.SUPERFLEX_POSTHOG_API_KEY, { api_host: "https://app.posthog.com" });
-}
-
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const chatApi = new ChatAPI();
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
@@ -42,12 +37,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     chatViewProvider: chatWebviewProvider,
   };
 
-  await initializeAnalytics();
+  await initializeAnalytics(context);
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
   // before considering Superflex ready to operate.
   void backgroundInit(context, appState);
 
+  Telemetry.capture("extension_activated", {});
   return Promise.resolve();
 }
 
@@ -95,12 +91,21 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
   state.figmaAuthService.authenticate(state.figmaAuthProvider);
 }
 
-async function initializeAnalytics() {
+async function initializeAnalytics(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration("superflex");
   const analyticsEnabled = config.get<boolean>("enableAnalytics", true);
 
-  if (analyticsEnabled && process.env.SUPERFLEX_POSTHOG_API_KEY) {
-    posthog.init(process.env.SUPERFLEX_POSTHOG_API_KEY, { api_host: "https://app.posthog.com" });
+  if (analyticsEnabled && SUPERFLEX_POSTHOG_API_KEY) {
+    const uniqueID = await getUniqueID(context);
+    const extensionVersion = getExtensionVersion();
+
+    console.log("uniqueID", uniqueID);
+    console.log("extensionVersion", extensionVersion);
+
+    await Telemetry.setup(analyticsEnabled, uniqueID, extensionVersion, {
+      clientKey: SUPERFLEX_POSTHOG_API_KEY,
+      url: "https://app.posthog.com",
+    });
   }
 }
 

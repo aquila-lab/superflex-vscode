@@ -1,6 +1,8 @@
 import path from "path";
 import * as vscode from "vscode";
+import { v4 as uuidv4 } from "uuid";
 
+import { EXTENSION_ID } from "./constants";
 import { runningOnWindows } from "./operatingSystem";
 
 function lowercaseDriveLetter(uri: string) {
@@ -57,4 +59,19 @@ export function toKebabCase(text: string): string {
     .replace(/([a-z])([A-Z])/g, "$1-$2")
     .replace(/[\s_]+/g, "-")
     .toLowerCase();
+}
+
+export function getExtensionVersion(): string {
+  const extension = vscode.extensions.getExtension(EXTENSION_ID);
+  return extension?.packageJSON.version || "unknown";
+}
+
+const UNIQUE_ID_KEY = "uniqueID";
+export async function getUniqueID(context: vscode.ExtensionContext): Promise<string> {
+  let uniqueID = context.globalState.get<string>(UNIQUE_ID_KEY);
+  if (!uniqueID) {
+    uniqueID = uuidv4();
+    await context.globalState.update(UNIQUE_ID_KEY, uniqueID);
+  }
+  return uniqueID;
 }
