@@ -12,11 +12,15 @@ export class Telemetry {
   static extensionVersion: string | undefined = undefined;
 
   static async capture(event: string, properties: { [key: string]: any }) {
-    if (process.env.NODE_ENV === "test") {
+    if (!IS_PROD) {
       return;
     }
+    if (!Telemetry.client) {
+      return;
+    }
+
     try {
-      Telemetry.client?.capture(event, {
+      await Telemetry.client.capture(event, {
         ...properties,
         os: Telemetry.os,
         extensionVersion: Telemetry.extensionVersion,
@@ -46,6 +50,9 @@ export class Telemetry {
   }
 
   static async shutdown() {
-    await Telemetry.client?.shutdown();
+    if (!Telemetry.client) {
+      return;
+    }
+    await Telemetry.client.shutdown();
   }
 }
