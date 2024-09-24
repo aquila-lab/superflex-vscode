@@ -205,7 +205,17 @@
         "title": "Project Sync",
         "icon": "$(refresh)"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "superflex.analytics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable analytics"
+        }
+      }
+    }
   },
   "devDependencies": {
     "@types/async": "^3.2.24",
@@ -227,6 +237,8 @@
     "axios": "^1.7.7",
     "crypto": "^1.0.1",
     "fast-glob": "^3.3.2",
+    "posthog-js": "^1.164.2",
+    "posthog-node": "^4.2.0",
     "uuidv4": "^6.2.13"
   }
 }

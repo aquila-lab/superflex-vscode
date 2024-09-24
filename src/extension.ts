@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import posthog from "posthog-js";
 
 import { EventType } from "../shared/protocol";
 import { ChatAPI } from "./chat/ChatApi";
@@ -21,6 +22,11 @@ type AppState = {
   chatViewProvider: ChatViewProvider;
 };
 
+// Initialize PostHog
+if (process.env.SUPERFLEX_POSTHOG_API_KEY) {
+  posthog.init(process.env.SUPERFLEX_POSTHOG_API_KEY, { api_host: "https://app.posthog.com" });
+}
+
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const chatApi = new ChatAPI();
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
@@ -35,6 +41,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     figmaAuthProvider: figmaAuthProvider,
     chatViewProvider: chatWebviewProvider,
   };
+
+  await initializeAnalytics();
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
   // before considering Superflex ready to operate.
@@ -85,6 +93,15 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
 
   state.authService.authenticate(state.authProvider);
   state.figmaAuthService.authenticate(state.figmaAuthProvider);
+}
+
+async function initializeAnalytics() {
+  const config = vscode.workspace.getConfiguration("superflex");
+  const analyticsEnabled = config.get<boolean>("enableAnalytics", true);
+
+  if (analyticsEnabled && process.env.SUPERFLEX_POSTHOG_API_KEY) {
+    posthog.init(process.env.SUPERFLEX_POSTHOG_API_KEY, { api_host: "https://app.posthog.com" });
+  }
 }
 
 // This method is called when your extension is deactivated
