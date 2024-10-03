@@ -35,7 +35,6 @@ export class Telemetry {
     Telemetry.os = os.platform();
     Telemetry.extensionVersion = extensionVersion;
 
-    console.log("Superflex: IS_PROD", IS_PROD);
     if (!allow || !IS_PROD) {
       Telemetry.client = undefined;
     } else {

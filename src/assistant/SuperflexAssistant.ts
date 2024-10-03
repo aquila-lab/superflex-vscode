@@ -13,8 +13,8 @@ import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
 
 const ASSISTENT_NAME = "superflex";
-// Increment the version when we need to reindex all files
-const FILES_MAP_VERSION = 1;
+const FILES_MAP_VERSION = 1; // Increment the version when we need to reindex all files
+
 export default class SuperflexAssistant implements Assistant {
   readonly workspaceDirPath: string;
   readonly owner: string;
@@ -71,13 +71,17 @@ export default class SuperflexAssistant implements Assistant {
       );
     }
 
-    const rawCachedFilesMap = SuperflexCache.get(this.cacheFileName);
-    const cachedFilesMap: Map<string, number> = rawCachedFilesMap
-      ? jsonToMap<number>(rawCachedFilesMap)
-      : new Map<string, number>();
+    const repoExists = await api.repoExists({ owner: this.owner, repo: this.repo });
+
+    // If the repo does not exist, we will ignore the cache and upload all files
+    let cachedFilesMap: Map<string, number> = new Map<string, number>();
+    if (repoExists) {
+      const rawCachedFilesMap = SuperflexCache.get(this.cacheFileName);
+      cachedFilesMap = rawCachedFilesMap ? jsonToMap<number>(rawCachedFilesMap) : new Map<string, number>();
+    }
 
     if (progressCb) {
-      progressCb(0, !rawCachedFilesMap);
+      progressCb(0, !repoExists);
     }
 
     const progressCoefficient = 98 / documentPaths.length;
