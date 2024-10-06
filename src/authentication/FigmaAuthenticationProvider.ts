@@ -197,7 +197,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
         try {
           return await Promise.race([
             codeExchangePromise.promise,
-            new Promise<string>((_, reject) => setTimeout(() => reject("Cancelled"), 60000)),
+            new Promise<string>((_, reject) => setTimeout(() => reject("Cancelled"), 5 * 60 * 1000)), // 5 minutes
             promiseFromEvent<any, any>(token.onCancellationRequested, (_, __, reject) => {
               reject("User Cancelled");
             }).promise,

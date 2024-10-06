@@ -18,13 +18,15 @@ export default class SuperflexAuthenticationService {
    * Command to sign in the user.
    */
   async signIn(provider: AuthenticationProvider): Promise<void> {
+    Telemetry.capture("signin_started", {});
+
     const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: true });
 
     this.setAuthHeader(session.accessToken, () => this.signOut(provider));
 
     vscode.window.showInformationMessage(`Signed in as ${session.account.label} 🎉`);
 
-    Telemetry.capture("signin", {
+    Telemetry.capture("signin_succeeded", {
       userID: session.account.id,
       email: session.account.label,
     });
@@ -34,6 +36,8 @@ export default class SuperflexAuthenticationService {
    * Command to sign out the user.
    */
   async signOut(provider: AuthenticationProvider): Promise<void> {
+    Telemetry.capture("signout_started", {});
+
     const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: false });
     if (session) {
       await provider.removeSession(session.id);
@@ -52,7 +56,8 @@ export default class SuperflexAuthenticationService {
       fields.userID = session.account.id;
       fields.email = session.account.label;
     }
-    Telemetry.capture("signout", fields);
+
+    Telemetry.capture("signout_succeeded", fields);
   }
 
   /**
