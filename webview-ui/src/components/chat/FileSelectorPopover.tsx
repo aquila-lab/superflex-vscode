@@ -42,7 +42,7 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles
               {files.map((file) => (
                 <CommandItem
                   key={file.relativePath}
-                  value={file.name}
+                  value={file.relativePath}
                   added={!!selectedFiles.find((f) => f.relativePath === file.relativePath)}
                   onSelect={() => {
                     onFileSelected(file);
