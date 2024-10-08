@@ -4,9 +4,10 @@ import { LoadingDots } from '../ui/LoadingDots';
 import { ChatMessage } from './ChatMessage';
 
 export const ChatMessageList: React.FC = () => {
+  const listRef = useRef<HTMLUListElement>(null);
+
   const messages = useAppSelector((state) => state.chat.messages);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
-  const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     if (listRef.current) {
