@@ -215,7 +215,15 @@
           "description": "Specify whether to allow Superflex to collect product usage analytics"
         }
       }
-    }
+    },
+    "keybindings": [
+      {
+        "command": "superflex.chat.focus-input",
+        "key": "cmd+;",
+        "mac": "cmd+;",
+        "when": "editorTextFocus"
+      }
+    ]
   },
   "devDependencies": {
     "@types/async": "^3.2.24",
