@@ -17,10 +17,11 @@ export default class SuperflexAuthenticationService {
   /**
    * Command to sign in the user.
    */
-  async signIn(provider: AuthenticationProvider): Promise<void> {
+  async signIn(provider: AuthenticationProvider, createAccount: boolean = false): Promise<void> {
     Telemetry.capture("signin_started", {});
 
-    const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: true });
+    const scopes = createAccount ? ["create_account"] : [];
+    const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, scopes, { createIfNone: true });
 
     this.setAuthHeader(session.accessToken, () => this.signOut(provider));
 

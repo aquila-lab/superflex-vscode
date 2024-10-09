@@ -8,6 +8,7 @@ export enum EventType {
 
   // Login events
   LOGIN_CLICKED = "login_clicked",
+  CREATE_ACCOUNT_CLICKED = "create_account_clicked",
 
   // Project events
   SYNC_PROJECT = "sync_project",
@@ -37,6 +38,7 @@ export interface EventPayloads {
   [EventType.READY]: { request: void; response: void };
   [EventType.INITIALIZED]: { request: void; response: InitState };
   [EventType.LOGIN_CLICKED]: { request: void; response: void };
+  [EventType.CREATE_ACCOUNT_CLICKED]: { request: void; response: void };
   [EventType.SYNC_PROJECT]: { request: void; response: void };
   [EventType.SYNC_PROJECT_PROGRESS]: { request: void; response: SyncProjectProgressPayload };
   [EventType.FIGMA_OAUTH_CONNECT]: { request: void; response: boolean };

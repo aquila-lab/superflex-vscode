@@ -82,6 +82,10 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
   state.chatApi.registerEvent(EventType.LOGIN_CLICKED, async () => {
     await state.authService.signIn(state.authProvider);
   });
+  state.chatApi.registerEvent(EventType.CREATE_ACCOUNT_CLICKED, async () => {
+    await state.authService.signIn(state.authProvider, true);
+  });
+
   state.chatApi.registerEvent(EventType.FIGMA_OAUTH_CONNECT, async () => {
     const token = await state.figmaAuthService.connect();
     return !!token && !!token.accessToken;

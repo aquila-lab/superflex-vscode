@@ -68,9 +68,11 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
     return JSON.parse(allSessions) as AuthenticationSession[];
   }
 
-  public async createSession(): Promise<AuthenticationSession> {
+  public async createSession(scopes: readonly string[]): Promise<AuthenticationSession> {
     try {
-      const { accessToken } = await this.login();
+      const createAccount = scopes.includes("create_account");
+
+      const { accessToken } = await this.login(createAccount);
       if (!accessToken) {
         throw new Error("Superflex - Auth login failure");
       }
@@ -120,7 +122,7 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
     this._disposable.dispose();
   }
 
-  private async login(): Promise<TokenInformation> {
+  private async login(createAccount: boolean = false): Promise<TokenInformation> {
     return await window.withProgress<TokenInformation>(
       {
         location: ProgressLocation.Notification,
@@ -152,7 +154,7 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
           ["uniqueID", Telemetry.uniqueID],
           ["state", encodeURIComponent(callbackUri.toString(true))],
         ]);
-        const uri = Uri.parse(`${APP_BASE_URL}/login?${searchParams.toString()}`);
+        const uri = Uri.parse(`${APP_BASE_URL}/${createAccount ? "register" : "login"}?${searchParams.toString()}`);
 
         remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
 
