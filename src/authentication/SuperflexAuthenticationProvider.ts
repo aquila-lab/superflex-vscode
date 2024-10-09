@@ -15,6 +15,7 @@ import {
 
 import { User } from "../../shared/model";
 import * as api from "../api";
+import { Telemetry } from "../common/analytics/Telemetry";
 import { APP_BASE_URL, AUTH_PROVIDER_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import AuthService from "./SuperflexAuthenticationService";
@@ -147,7 +148,10 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
 
         this._pendingStates.push(stateID);
 
-        const searchParams = new URLSearchParams([["state", encodeURIComponent(callbackUri.toString(true))]]);
+        const searchParams = new URLSearchParams([
+          ["uniqueID", Telemetry.uniqueID],
+          ["state", encodeURIComponent(callbackUri.toString(true))],
+        ]);
         const uri = Uri.parse(`${APP_BASE_URL}/login?${searchParams.toString()}`);
 
         remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);

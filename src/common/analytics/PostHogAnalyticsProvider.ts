@@ -6,6 +6,13 @@ export default class PostHogAnalyticsProvider implements AnalyticsProvider {
   client?: PostHog;
   uniqueID?: string;
 
+  async identify(properties: { [key: string]: any }): Promise<void> {
+    this.client?.identify({
+      distinctId: this.uniqueID ?? "NOT_UNIQUE",
+      properties,
+    });
+  }
+
   async capture(event: string, properties: { [key: string]: any }): Promise<void> {
     this.client?.capture({
       distinctId: this.uniqueID ?? "NOT_UNIQUE",

@@ -30,6 +30,10 @@ export default class SuperflexAuthenticationService {
       userID: session.account.id,
       email: session.account.label,
     });
+    Telemetry.identify({
+      userID: session.account.id,
+      email: session.account.label,
+    });
   }
 
   /**

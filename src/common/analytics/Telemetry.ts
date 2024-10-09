@@ -11,6 +11,22 @@ export class Telemetry {
   static os: string | undefined = undefined;
   static extensionVersion: string | undefined = undefined;
 
+  static async identify(properties: { [key: string]: any }) {
+    if (!IS_PROD) {
+      return;
+    }
+
+    if (!Telemetry.client) {
+      return;
+    }
+
+    try {
+      await Telemetry.client.identify(properties);
+    } catch (e) {
+      console.error(`Failed to identify: ${e}`);
+    }
+  }
+
   static async capture(event: string, properties: { [key: string]: any }) {
     if (!IS_PROD) {
       return;
