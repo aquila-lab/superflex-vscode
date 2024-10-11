@@ -100,13 +100,17 @@ async function initializeAnalytics(context: vscode.ExtensionContext) {
   const analyticsEnabled = config.get<boolean>("analytics", false);
 
   if (analyticsEnabled && SUPERFLEX_POSTHOG_API_KEY) {
-    const uniqueID = await getUniqueID(context);
+    const { uniqueID, isNew } = await getUniqueID(context);
     const extensionVersion = getExtensionVersion();
 
     await Telemetry.setup(analyticsEnabled, uniqueID, extensionVersion, {
       clientKey: SUPERFLEX_POSTHOG_API_KEY,
       url: "https://app.posthog.com",
     });
+
+    if (isNew) {
+      Telemetry.capture("new_anon_user", {});
+    }
   }
 }
 

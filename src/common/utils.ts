@@ -67,11 +67,13 @@ export function getExtensionVersion(): string {
 }
 
 const UNIQUE_ID_KEY = "uniqueID";
-export async function getUniqueID(context: vscode.ExtensionContext): Promise<string> {
+export async function getUniqueID(context: vscode.ExtensionContext): Promise<{ uniqueID: string; isNew: boolean }> {
   let uniqueID = context.globalState.get<string>(UNIQUE_ID_KEY);
   if (!uniqueID) {
     uniqueID = uuidv4();
     await context.globalState.update(UNIQUE_ID_KEY, uniqueID);
+    return { uniqueID, isNew: true };
   }
-  return uniqueID;
+
+  return { uniqueID, isNew: false };
 }
