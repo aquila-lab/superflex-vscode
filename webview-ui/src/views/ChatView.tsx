@@ -2,7 +2,14 @@ import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { MessageType, Role } from '../../../shared/model';
-import { EventMessage, EventPayloads, EventType, FilePayload, newEventRequest } from '../../../shared/protocol';
+import {
+  EventMessage,
+  EventPayloads,
+  EventType,
+  FilePayload,
+  newEventRequest,
+  SendMessagesRequestPayload
+} from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import {
   addMessages,
@@ -18,6 +25,13 @@ import { ChatMessageList } from '../components/chat/ChatMessageList';
 import { ProjectSyncProgress } from '../components/chat/ProjectSyncProgress';
 import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
 import { ChatMessage } from '../core/message/ChatMessage.model';
+import { ImagePreview } from '../components/ui/ImagePreview';
+
+interface FigmaFile {
+  selectionLink: string;
+  imageUrl: string;
+  isLoading: boolean;
+}
 
 const ChatView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -34,6 +48,8 @@ const ChatView: React.FunctionComponent<{
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
   const [currentOpenFile, setCurrentOpenFile] = useState<FilePayload | null>(null);
+  const [chatImageAttachment, setChatImageAttachment] = useState<File>();
+  const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -148,38 +164,72 @@ const ChatView: React.FunctionComponent<{
     };
   }, [vscodeAPI]);
 
-  const handleTextMessageSend = (selectedFiles: FilePayload[], content: string) => {
-    const newMessage: ChatMessage = { id: uuidv4(), role: Role.User, type: MessageType.Text, content };
-    dispatch(addMessages([newMessage]));
-    vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, { files: selectedFiles, messages: [newMessage] }));
-    dispatch(setIsMessageProcessing(true));
-  };
+  function handleSend(
+    selectedFiles: FilePayload[],
+    textContent: string,
+    imageFile?: File,
+    figmaFile?: FigmaFile
+  ): boolean {
+    const messages: ChatMessage[] = [];
+    const eventPayload: SendMessagesRequestPayload = { files: selectedFiles, messages: [] };
 
-  function handleImageUpload(selectedFiles: FilePayload[], file: File): void {
-    dispatch(
-      addMessages([
-        {
-          id: uuidv4(),
-          role: Role.User,
-          type: MessageType.Image,
-          content: URL.createObjectURL(file)
-        }
-      ])
-    );
+    // Add image message if present
+    if (imageFile) {
+      const imageMessage: ChatMessage = {
+        id: uuidv4(),
+        role: Role.User,
+        type: MessageType.Image,
+        content: URL.createObjectURL(imageFile)
+      };
 
-    vscodeAPI.postMessage(
-      newEventRequest(EventType.NEW_MESSAGE, {
-        files: selectedFiles,
-        messages: [
-          {
-            type: MessageType.Image,
-            content: (file as any).path
-          }
-        ]
-      })
-    );
+      messages.push(imageMessage);
+      eventPayload.messages.push({
+        type: MessageType.Image,
+        content: (imageFile as any).path
+      });
+    }
 
-    dispatch(setIsMessageProcessing(true));
+    // Handle Figma content if present
+    if (figmaFile) {
+      const figmaMessage: ChatMessage = {
+        id: uuidv4(),
+        role: Role.User,
+        type: MessageType.Figma,
+        content: figmaFile.selectionLink
+      };
+
+      messages.push(figmaMessage);
+      eventPayload.messages.push(figmaMessage);
+    }
+
+    // Add text message if present
+    if (textContent.trim()) {
+      const textMessage: ChatMessage = {
+        id: uuidv4(),
+        role: Role.User,
+        type: MessageType.Text,
+        content: textContent
+      };
+
+      messages.push(textMessage);
+      eventPayload.messages.push(textMessage);
+    }
+
+    // Only proceed if there's at least one message
+    if (messages.length > 0) {
+      dispatch(addMessages(messages));
+
+      vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, eventPayload));
+      dispatch(setIsMessageProcessing(true));
+
+      // Clear the attachments
+      setChatImageAttachment(undefined);
+      setChatFigmaAttachment(undefined);
+
+      return true;
+    }
+
+    return false;
   }
 
   function handleFigmaButtonClicked(): void {
@@ -218,17 +268,53 @@ const ChatView: React.FunctionComponent<{
 
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
+  const PreviewChatAttachment = (): React.ReactNode => {
+    if (!chatImageAttachment && !chatFigmaAttachment) {
+      return null;
+    }
+
+    let src: string = '';
+    let isLoading: boolean = false;
+    if (chatImageAttachment) {
+      src = URL.createObjectURL(chatImageAttachment);
+      isLoading = false;
+    }
+    if (chatFigmaAttachment) {
+      src = chatFigmaAttachment.imageUrl;
+      isLoading = chatFigmaAttachment.isLoading;
+    }
+
+    return (
+      <div className="flex items-center bg-transparent p-2">
+        <ImagePreview
+          size="sm"
+          spinnerSize="sm"
+          alt="preview image"
+          src={src}
+          isLoading={isLoading}
+          onRemove={() => {
+            setChatImageAttachment(undefined);
+            setChatFigmaAttachment(undefined);
+          }}
+        />
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="flex flex-col h-full p-2">
         <ChatMessageList />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
+        <PreviewChatAttachment />
         <ChatInputBox
           disabled={disableIteractions}
           currentOpenFile={currentOpenFile}
           fetchFiles={fetchFiles}
-          onSendClicked={handleTextMessageSend}
-          onImageSelected={handleImageUpload}
+          onSendClicked={(selectedFiles, textContent) =>
+            handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
+          }
+          onImageSelected={setChatImageAttachment}
           onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>

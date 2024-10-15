@@ -4,6 +4,7 @@ import { ChatMessage as ChatMessageType } from '../../core/message/ChatMessage.m
 import { Role, MessageType } from '../../../../shared/model';
 import { MarkdownRender } from '../ui/MarkdownRender';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
+import { ImagePreview } from '../ui/ImagePreview';
 
 declare global {
   interface Window {
@@ -31,7 +32,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
       {message.type === MessageType.Text && <MarkdownRender mdString={message.content} />}
 
-      {message.type === MessageType.Image && <img alt="preview image" className="mt-2" src={message.content} />}
+      {message.type === MessageType.Image && (
+        <ImagePreview
+          alt="preview image"
+          className="mt-2"
+          isLoading={message.content === 'loading'}
+          src={message.content}
+        />
+      )}
     </div>
   );
 };

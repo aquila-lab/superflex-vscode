@@ -14,19 +14,19 @@ import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../cor
 interface ChatInputBoxProps {
   disabled?: boolean;
   currentOpenFile: FilePayload | null;
-  onFigmaButtonClicked: () => void;
-  onImageSelected: (selectedFiles: FilePayload[], file: File) => void;
-  onSendClicked: (selectedFiles: FilePayload[], content: string) => void;
   fetchFiles: () => void;
+  onSendClicked: (selectedFiles: FilePayload[], content: string) => boolean;
+  onImageSelected: (file: File) => void;
+  onFigmaButtonClicked: () => void;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   disabled,
   currentOpenFile,
-  onFigmaButtonClicked,
-  onImageSelected,
+  fetchFiles,
   onSendClicked,
-  fetchFiles
+  onImageSelected,
+  onFigmaButtonClicked
 }) => {
   const dispatch = useAppDispatch();
 
@@ -45,11 +45,13 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   }, [currentOpenFile]);
 
   function handleSend(): void {
-    if (input.trim()) {
-      onSendClicked(selectedFiles, input);
-      setInput('');
-      dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
+    const isSendSuccessful = onSendClicked(selectedFiles, input);
+    if (!isSendSuccessful) {
+      return;
     }
+
+    setInput('');
+    dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
   }
 
   function handleFileSelected(file: FilePayload): void {
@@ -121,9 +123,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (!file) return;
-
-              onImageSelected(selectedFiles, file);
-              dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
+              onImageSelected(file);
             }}
           />
         </div>
