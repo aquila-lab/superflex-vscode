@@ -47,9 +47,6 @@ const chatSlice = createSlice({
     addMessages: (state, action: PayloadAction<ChatMessage[]>) => {
       state.messages = [...state.messages, ...action.payload];
     },
-    updateMessage: (state, action: PayloadAction<ChatMessage>) => {
-      state.messages = state.messages.map((message) => (message.id === action.payload.id ? action.payload : message));
-    },
     clearMessages(state) {
       state.messages = defaultMessages;
     },
@@ -88,7 +85,6 @@ const chatSlice = createSlice({
 export const {
   setInitState,
   addMessages,
-  updateMessage,
   clearMessages,
   setIsMessageProcessing,
   setIsProjectSyncing,

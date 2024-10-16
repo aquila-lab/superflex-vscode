@@ -178,13 +178,7 @@ export class ChatAPI {
               return { ...msg, content: base64Image };
             }
             if (msg.type === MessageType.Figma) {
-              const figma = extractFigmaSelectionUrl(msg.content);
-              if (!figma) {
-                throw new Error("Invalid figma link: Please provide a valid Figma selection url.");
-              }
-
-              const imageUrl = await getFigmaSelectionImageUrl(figma);
-              return { ...msg, type: MessageType.Image, content: imageUrl };
+              return { ...msg, type: MessageType.Image };
             }
 
             return msg;

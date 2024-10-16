@@ -19,8 +19,7 @@ import {
   setIsMessageProcessing,
   setIsProjectSyncing,
   setProjectFiles,
-  setSelectedFiles,
-  updateMessage
+  setSelectedFiles
 } from '../core/chat/chatSlice';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
@@ -38,12 +37,12 @@ const ChatView: React.FunctionComponent<{
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const initState = useAppSelector((state) => state.chat.init);
-  const chatMessages = useAppSelector((state) => state.chat.messages);
   const isProjectSyncing = useAppSelector((state) => state.chat.isProjectSyncing);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
 
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
+  const [isFigmaFileLoading, setIsFigmaFileLoading] = useState(false);
   const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
   const [currentOpenFile, setCurrentOpenFile] = useState<FilePayload | null>(null);
   const [chatImageAttachment, setChatImageAttachment] = useState<File>();
@@ -93,25 +92,15 @@ const ChatView: React.FunctionComponent<{
           break;
         }
         case EventType.FIGMA_FILE_SELECTED: {
+          if (error) {
+            setChatFigmaAttachment(undefined);
+            setIsFigmaFileLoading(false);
+            return;
+          }
+
           const figmaFile = payload as EventPayloads[typeof command]['response'];
-
-          if (chatFigmaAttachment) {
-            setChatFigmaAttachment(figmaFile);
-          }
-
-          const figmaLoadingMessage = chatMessages.find(
-            (message) => message.type === MessageType.Figma && message.content === 'loading'
-          );
-          if (figmaLoadingMessage) {
-            dispatch(
-              updateMessage({
-                ...figmaLoadingMessage,
-                type: MessageType.Image,
-                content: figmaFile.imageUrl
-              })
-            );
-          }
-
+          setChatFigmaAttachment(figmaFile);
+          setIsFigmaFileLoading(false);
           break;
         }
         case EventType.NEW_MESSAGE: {
@@ -215,10 +204,10 @@ const ChatView: React.FunctionComponent<{
         id: uuidv4(),
         role: Role.User,
         type: MessageType.Figma,
-        content: figmaFile.selectionLink
+        content: figmaFile.imageUrl
       };
 
-      messages.push(figmaMessage);
+      messages.push({ ...figmaMessage, type: MessageType.Image });
       eventPayload.messages.push(figmaMessage);
     }
 
@@ -269,7 +258,9 @@ const ChatView: React.FunctionComponent<{
   function handleFigmaFileSelected(figmaSelectionLink: string): void {
     const figmaFile: FigmaFile = { selectionLink: figmaSelectionLink, imageUrl: '', isLoading: true };
 
+    setIsFigmaFileLoading(true);
     setChatFigmaAttachment(figmaFile);
+    setChatImageAttachment(undefined);
     vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_FILE_SELECTED, figmaFile));
   }
 
@@ -319,13 +310,16 @@ const ChatView: React.FunctionComponent<{
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <PreviewChatAttachment />
         <ChatInputBox
-          disabled={disableIteractions}
+          disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
           fetchFiles={fetchFiles}
           onSendClicked={(selectedFiles, textContent) =>
             handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
           }
-          onImageSelected={setChatImageAttachment}
+          onImageSelected={(file) => {
+            setChatImageAttachment(file);
+            setChatFigmaAttachment(undefined);
+          }}
           onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>
