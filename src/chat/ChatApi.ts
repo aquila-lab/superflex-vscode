@@ -63,6 +63,7 @@ export class ChatAPI {
 
           const openWorkspace = getOpenWorkspace();
           if (!openWorkspace) {
+            Telemetry.capture("workspace_not_found", {});
             return { isInitialized: false, isFigmaAuthenticated };
           }
 
