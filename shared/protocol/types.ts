@@ -1,5 +1,13 @@
 import { MessageReqest } from "../model";
 
+export type CreateAuthLinkPayload = {
+  action: "login" | "create_account";
+};
+
+export type AuthLinkPayload = {
+  uniqueLink: string;
+};
+
 export type InitState = {
   isInitialized: boolean;
   isFigmaAuthenticated: boolean;
@@ -26,4 +34,8 @@ export type FigmaFile = {
   selectionLink: string;
   imageUrl: string;
   isLoading: boolean;
+};
+
+export type SendNotificationPayload = {
+  message: string;
 };

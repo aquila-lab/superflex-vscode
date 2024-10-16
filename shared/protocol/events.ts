@@ -1,6 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
 import { Message } from "../model";
-import { FigmaFile, FilePayload, InitState, SendMessagesRequestPayload, SyncProjectProgressPayload } from "./types";
+import {
+  AuthLinkPayload,
+  CreateAuthLinkPayload,
+  FigmaFile,
+  FilePayload,
+  InitState,
+  SendMessagesRequestPayload,
+  SendNotificationPayload,
+  SyncProjectProgressPayload,
+} from "./types";
 
 export enum EventType {
   READY = "ready",
@@ -9,6 +18,7 @@ export enum EventType {
   // Login events
   LOGIN_CLICKED = "login_clicked",
   CREATE_ACCOUNT_CLICKED = "create_account_clicked",
+  CREATE_AUTH_LINK = "create_auth_link",
 
   // Project events
   SYNC_PROJECT = "sync_project",
@@ -33,6 +43,8 @@ export enum EventType {
   // Views
   SHOW_LOGIN_VIEW = "show_login_view",
   SHOW_CHAT_VIEW = "show_chat_view",
+
+  SEND_NOTIFICATION = "send_notification",
 }
 
 export interface EventPayloads {
@@ -40,6 +52,7 @@ export interface EventPayloads {
   [EventType.INITIALIZED]: { request: void; response: InitState };
   [EventType.LOGIN_CLICKED]: { request: void; response: void };
   [EventType.CREATE_ACCOUNT_CLICKED]: { request: void; response: void };
+  [EventType.CREATE_AUTH_LINK]: { request: CreateAuthLinkPayload; response: AuthLinkPayload };
   [EventType.SYNC_PROJECT]: { request: void; response: void };
   [EventType.SYNC_PROJECT_PROGRESS]: { request: void; response: SyncProjectProgressPayload };
   [EventType.FIGMA_OAUTH_CONNECT]: { request: void; response: boolean };
@@ -54,6 +67,7 @@ export interface EventPayloads {
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
   [EventType.SHOW_CHAT_VIEW]: { request: void; response: void };
+  [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;

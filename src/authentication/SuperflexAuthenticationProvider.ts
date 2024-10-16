@@ -37,6 +37,9 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
   private _sessionChangeEmitter = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
   private _codeExchangePromises = new Map<string, { promise: Promise<TokenInformation>; cancel: EventEmitter<void> }>();
   private _authService: AuthService;
+  private _userLoginConsentEmitter = new EventEmitter<void>();
+  private _waitingForLoginConsent = false;
+  private _loginConsentTimeout: NodeJS.Timeout | null = null;
 
   constructor(private readonly context: ExtensionContext, authService: AuthService) {
     this._authService = authService;
@@ -122,6 +125,65 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
     this._disposable.dispose();
   }
 
+  async waitForUserConsentToLogin(timeoutMs: number = 30000): Promise<void> {
+    if (this._waitingForLoginConsent) {
+      // Reset the emitter if we're already waiting
+      this._userLoginConsentEmitter = new EventEmitter<void>();
+      if (this._loginConsentTimeout) {
+        clearTimeout(this._loginConsentTimeout);
+      }
+    }
+    this._waitingForLoginConsent = true;
+
+    return new Promise<void>((resolve, reject) => {
+      const disposable = this._userLoginConsentEmitter.event(() => {
+        if (this._loginConsentTimeout) {
+          clearTimeout(this._loginConsentTimeout);
+        }
+        disposable.dispose();
+        this._waitingForLoginConsent = false;
+        resolve();
+      });
+
+      this._loginConsentTimeout = setTimeout(() => {
+        disposable.dispose();
+        this._waitingForLoginConsent = false;
+        reject(new Error("User consent timeout"));
+      }, timeoutMs);
+    });
+  }
+
+  async createAuthUniqueLink(createAccount: boolean): Promise<{ uri: Uri; stateID: string }> {
+    let callbackUri = await env.asExternalUri(Uri.parse(this.redirectUri));
+    remoteOutput.appendLine(`Callback URI: ${callbackUri.toString(true)}`);
+
+    const callbackQuery = new URLSearchParams(callbackUri.query);
+
+    const nonceID = uuidv4();
+    const stateID = callbackQuery.get("state") || nonceID;
+
+    remoteOutput.appendLine(`State ID: ${stateID}`);
+    remoteOutput.appendLine(`Nonce ID: ${nonceID}`);
+
+    callbackQuery.set("state", encodeURIComponent(stateID));
+    callbackQuery.set("nonce", encodeURIComponent(nonceID));
+    callbackUri = callbackUri.with({
+      query: callbackQuery.toString(),
+    });
+
+    this._pendingStates.push(stateID);
+
+    const searchParams = new URLSearchParams([
+      ["uniqueID", Telemetry.uniqueID],
+      ["state", encodeURIComponent(callbackUri.toString(true))],
+    ]);
+    const uri = Uri.parse(`${APP_BASE_URL}/${createAccount ? "register" : "login"}?${searchParams.toString()}`);
+
+    remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
+
+    return { uri, stateID };
+  }
+
   private async login(createAccount: boolean = false): Promise<TokenInformation> {
     return await window.withProgress<TokenInformation>(
       {
@@ -130,35 +192,12 @@ export default class SuperflexAuthenticationProvider implements AuthenticationPr
         cancellable: true,
       },
       async (_, token) => {
-        let callbackUri = await env.asExternalUri(Uri.parse(this.redirectUri));
-
-        remoteOutput.appendLine(`Callback URI: ${callbackUri.toString(true)}`);
-
-        const callbackQuery = new URLSearchParams(callbackUri.query);
-
-        const nonceID = uuidv4();
-        const stateID = callbackQuery.get("state") || nonceID;
-
-        remoteOutput.appendLine(`State ID: ${stateID}`);
-        remoteOutput.appendLine(`Nonce ID: ${nonceID}`);
-
-        callbackQuery.set("state", encodeURIComponent(stateID));
-        callbackQuery.set("nonce", encodeURIComponent(nonceID));
-        callbackUri = callbackUri.with({
-          query: callbackQuery.toString(),
-        });
-
-        this._pendingStates.push(stateID);
-
-        const searchParams = new URLSearchParams([
-          ["uniqueID", Telemetry.uniqueID],
-          ["state", encodeURIComponent(callbackUri.toString(true))],
-        ]);
-        const uri = Uri.parse(`${APP_BASE_URL}/${createAccount ? "register" : "login"}?${searchParams.toString()}`);
-
-        remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
+        const { uri, stateID } = await this.createAuthUniqueLink(createAccount);
 
         await env.openExternal(uri);
+
+        // Emit the user consent to login event
+        this._userLoginConsentEmitter.fire();
 
         let codeExchangePromise = this._codeExchangePromises.get(stateID);
         if (!codeExchangePromise) {

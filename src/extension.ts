@@ -51,6 +51,10 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   registerSuperflexCache(context);
   registerAuthenticationProviders(context, appState);
   registerChatWidgetWebview(context, appState.chatViewProvider);
+
+  appState.chatApi.registerEvent(EventType.SEND_NOTIFICATION, (payload) => {
+    vscode.window.showInformationMessage(payload.message);
+  });
 }
 
 function registerSuperflexCache(context: vscode.ExtensionContext): void {
@@ -84,6 +88,11 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
   });
   state.chatApi.registerEvent(EventType.CREATE_ACCOUNT_CLICKED, async () => {
     await state.authService.signIn(state.authProvider, true);
+  });
+  state.chatApi.registerEvent(EventType.CREATE_AUTH_LINK, async (payload) => {
+    const { uri } = await state.authProvider.createAuthUniqueLink(payload.action === "create_account");
+    await state.authProvider.waitForUserConsentToLogin();
+    return { uniqueLink: uri.toString(true) };
   });
 
   state.chatApi.registerEvent(EventType.FIGMA_OAUTH_CONNECT, async () => {
