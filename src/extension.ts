@@ -2,8 +2,8 @@ import * as vscode from "vscode";
 
 import { EventType } from "../shared/protocol";
 import { ChatAPI } from "./chat/ChatApi";
-import { getExtensionVersion, getOpenWorkspace, getUniqueID } from "./common/utils";
 import { AUTH_PROVIDER_ID, SUPERFLEX_POSTHOG_API_KEY } from "./common/constants";
+import { getExtensionVersion, getOpenWorkspace, getUniqueID } from "./common/utils";
 import { Telemetry } from "./common/analytics/Telemetry";
 import ChatViewProvider from "./chat/ChatViewProvider";
 import { SuperflexCache } from "./cache/SuperflexCache";

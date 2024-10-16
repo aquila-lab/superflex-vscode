@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { Message } from "../model";
-import { FilePayload, InitState, SendMessagesRequestPayload, SyncProjectProgressPayload } from "./types";
+import { FigmaFile, FilePayload, InitState, SendMessagesRequestPayload, SyncProjectProgressPayload } from "./types";
 
 export enum EventType {
   READY = "ready",
@@ -17,6 +17,7 @@ export enum EventType {
   // Figma events
   FIGMA_OAUTH_CONNECT = "figma_oauth_connect",
   FIGMA_OAUTH_DISCONNECT = "figma_oauth_disconnect",
+  FIGMA_FILE_SELECTED = "figma_file_selected",
 
   // Chat events
   NEW_THREAD = "new_thread",
@@ -43,6 +44,7 @@ export interface EventPayloads {
   [EventType.SYNC_PROJECT_PROGRESS]: { request: void; response: SyncProjectProgressPayload };
   [EventType.FIGMA_OAUTH_CONNECT]: { request: void; response: boolean };
   [EventType.FIGMA_OAUTH_DISCONNECT]: { request: void; response: void };
+  [EventType.FIGMA_FILE_SELECTED]: { request: FigmaFile; response: FigmaFile };
   [EventType.NEW_THREAD]: { request: void; response: void };
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.ADD_MESSAGE]: { request: void; response: Message };

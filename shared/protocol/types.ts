@@ -21,3 +21,9 @@ export type SendMessagesRequestPayload = {
   files: FilePayload[];
   messages: MessageReqest[];
 };
+
+export type FigmaFile = {
+  selectionLink: string;
+  imageUrl: string;
+  isLoading: boolean;
+};

@@ -49,9 +49,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     if (!isSendSuccessful) {
       return;
     }
-
     setInput('');
-    dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
   }
 
   function handleFileSelected(file: FilePayload): void {

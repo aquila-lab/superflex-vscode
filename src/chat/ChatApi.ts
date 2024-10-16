@@ -9,6 +9,7 @@ import {
   EventMessage,
   EventPayloads,
   EventType,
+  FigmaFile,
   newEventResponse,
   SendMessagesRequestPayload,
 } from "../../shared/protocol";
@@ -129,6 +130,29 @@ export class ChatAPI {
       })
 
       /**
+       * Event (figma_file_selected): This event is fired when the user selects a Figma file in the webview.
+       * It is used to extract the Figma selection URL get image url and send it back to the webview.
+       *
+       * @param payload - Payload containing the Figma file selection URL.
+       * @param sendEventMessageCb - Callback function to send event messages to the webview.
+       * @returns A promise that resolves with the Figma file image URL.
+       * @throws An error if the Figma file selection URL is invalid.
+       */
+      .registerEvent(EventType.FIGMA_FILE_SELECTED, async (payload: FigmaFile, _) => {
+        if (!this._isInitialized || !this._assistant) {
+          return;
+        }
+
+        const figma = extractFigmaSelectionUrl(payload.selectionLink);
+        if (!figma) {
+          throw new Error("Invalid figma link: Please provide a valid Figma selection url.");
+        }
+
+        const imageUrl = await getFigmaSelectionImageUrl(figma);
+        return { ...payload, imageUrl, isLoading: false } as FigmaFile;
+      })
+
+      /**
        * Event (new_message): This event is fired when the user sends a message in the webview Chat.
        * It is used to send a message to the AI code assistant, and return the assistant's message response.
        *
@@ -151,10 +175,7 @@ export class ChatAPI {
               const imageData = fs.readFileSync(path.resolve(msg.content));
               const base64Image = Buffer.from(imageData).toString("base64");
 
-              return {
-                ...msg,
-                content: base64Image,
-              };
+              return { ...msg, content: base64Image };
             }
             if (msg.type === MessageType.Figma) {
               const figma = extractFigmaSelectionUrl(msg.content);
@@ -163,23 +184,7 @@ export class ChatAPI {
               }
 
               const imageUrl = await getFigmaSelectionImageUrl(figma);
-              sendEventMessageCb(
-                newEventResponse(EventType.ADD_MESSAGE, {
-                  id: uuidv4(),
-                  threadID: this._thread?.id ?? "",
-                  role: Role.User,
-                  type: MessageType.Image,
-                  content: imageUrl,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                })
-              );
-
-              return {
-                ...msg,
-                type: MessageType.Image,
-                content: imageUrl,
-              };
+              return { ...msg, type: MessageType.Image, content: imageUrl };
             }
 
             return msg;
@@ -209,6 +214,14 @@ export class ChatAPI {
 
         return assistantMessage;
       })
+
+      /**
+       * Event (fetch_files): This event is fired when the webview needs to fetch the project files.
+       * It is used to fetch the project files from the workspace directory.
+       *
+       * @returns A promise that resolves with the project files.
+       * @throws An error if the project files cannot be fetched.
+       */
       .registerEvent(EventType.FETCH_FILES, async () => {
         if (!this._isInitialized || !this._assistant || !this._workspaceDirPath) {
           return [];

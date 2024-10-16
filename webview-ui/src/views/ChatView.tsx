@@ -6,6 +6,7 @@ import {
   EventMessage,
   EventPayloads,
   EventType,
+  FigmaFile,
   FilePayload,
   newEventRequest,
   SendMessagesRequestPayload
@@ -17,7 +18,9 @@ import {
   setInitState,
   setIsMessageProcessing,
   setIsProjectSyncing,
-  setProjectFiles
+  setProjectFiles,
+  setSelectedFiles,
+  updateMessage
 } from '../core/chat/chatSlice';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
@@ -27,12 +30,6 @@ import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
 import { ChatMessage } from '../core/message/ChatMessage.model';
 import { ImagePreview } from '../components/ui/ImagePreview';
 
-interface FigmaFile {
-  selectionLink: string;
-  imageUrl: string;
-  isLoading: boolean;
-}
-
 const ChatView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
 }> = ({ vscodeAPI }) => {
@@ -41,6 +38,7 @@ const ChatView: React.FunctionComponent<{
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const initState = useAppSelector((state) => state.chat.init);
+  const chatMessages = useAppSelector((state) => state.chat.messages);
   const isProjectSyncing = useAppSelector((state) => state.chat.isProjectSyncing);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
 
@@ -92,6 +90,28 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.FIGMA_OAUTH_DISCONNECT: {
           dispatch(setInitState({ isFigmaAuthenticated: false }));
+          break;
+        }
+        case EventType.FIGMA_FILE_SELECTED: {
+          const figmaFile = payload as EventPayloads[typeof command]['response'];
+
+          if (chatFigmaAttachment) {
+            setChatFigmaAttachment(figmaFile);
+          }
+
+          const figmaLoadingMessage = chatMessages.find(
+            (message) => message.type === MessageType.Figma && message.content === 'loading'
+          );
+          if (figmaLoadingMessage) {
+            dispatch(
+              updateMessage({
+                ...figmaLoadingMessage,
+                type: MessageType.Image,
+                content: figmaFile.imageUrl
+              })
+            );
+          }
+
           break;
         }
         case EventType.NEW_MESSAGE: {
@@ -225,6 +245,7 @@ const ChatView: React.FunctionComponent<{
       // Clear the attachments
       setChatImageAttachment(undefined);
       setChatFigmaAttachment(undefined);
+      dispatch(setSelectedFiles(selectedFiles.filter((f) => f.isCurrentOpenFile)));
 
       return true;
     }
@@ -245,21 +266,11 @@ const ChatView: React.FunctionComponent<{
    *
    * @param figmaSelectionLink Figma selection link. Example: https://www.figma.com/design/GAo9lY4bIk8j2UBUwU33l9/Wireframing-in-Figma?node-id=0-761&t=1QgxKWtCMVPD6cci-4
    */
-  async function handleFigmaFileSelected(selectedFiles: FilePayload[], figmaSelectionLink: string): Promise<boolean> {
-    vscodeAPI.postMessage(
-      newEventRequest(EventType.NEW_MESSAGE, {
-        files: selectedFiles,
-        messages: [
-          {
-            type: MessageType.Figma,
-            content: figmaSelectionLink
-          }
-        ]
-      })
-    );
+  function handleFigmaFileSelected(figmaSelectionLink: string): void {
+    const figmaFile: FigmaFile = { selectionLink: figmaSelectionLink, imageUrl: '', isLoading: true };
 
-    dispatch(setIsMessageProcessing(true));
-    return true;
+    setChatFigmaAttachment(figmaFile);
+    vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_FILE_SELECTED, figmaFile));
   }
 
   function fetchFiles(): void {

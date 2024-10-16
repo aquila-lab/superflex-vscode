@@ -32,11 +32,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
       {message.type === MessageType.Text && <MarkdownRender mdString={message.content} />}
 
-      {message.type === MessageType.Image && (
+      {(message.type === MessageType.Image || message.type === MessageType.Figma) && (
         <ImagePreview
           alt="preview image"
           className="mt-2"
-          isLoading={message.content === 'loading'}
+          isLoading={message.type === MessageType.Figma}
           src={message.content}
         />
       )}

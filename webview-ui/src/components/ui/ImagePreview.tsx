@@ -3,6 +3,7 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { type VariantProps, cva } from 'class-variance-authority';
 
 import { cn } from '../../common/utils';
+import { Spinner } from './Spinner';
 
 const imagePreviewVariants = cva('object-cover rounded-md', {
   variants: {
@@ -16,39 +17,29 @@ const imagePreviewVariants = cva('object-cover rounded-md', {
   }
 });
 
-const imagePreviewSpinnerVariants = cva('animate-spin', {
-  variants: {
-    spinnerSize: {
-      default: 'size-16',
-      sm: 'size-5'
-    }
-  },
-  defaultVariants: {
-    spinnerSize: 'default'
-  }
-});
-
 interface ImagePreviewProps
   extends React.ImgHTMLAttributes<HTMLImageElement>,
-    VariantProps<typeof imagePreviewVariants>,
-    VariantProps<typeof imagePreviewSpinnerVariants> {
+    VariantProps<typeof imagePreviewVariants> {
   isLoading: boolean;
   onRemove?: () => void;
+  spinnerSize?: 'sm' | 'default';
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({
   isLoading,
   onRemove,
   size,
-  spinnerSize,
+  spinnerSize = 'default',
   src,
   className,
   ...props
 }) => {
   return (
-    <div className="relative">
+    <div className={cn('relative bg-muted', imagePreviewVariants({ size }))}>
       {isLoading ? (
-        <svg className={cn(imagePreviewSpinnerVariants({ spinnerSize }))} />
+        <div className="flex items-center justify-center w-full h-full">
+          <Spinner size={spinnerSize} />
+        </div>
       ) : (
         <img src={src} className={cn(imagePreviewVariants({ size }), className)} {...props} />
       )}
