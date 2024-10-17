@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { MessageType, Role } from '../../../shared/model';
+import { Message, MessageType, Role } from '../../../shared/model';
 import {
   EventMessage,
   EventPayloads,
@@ -26,7 +26,6 @@ import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessageList } from '../components/chat/ChatMessageList';
 import { ProjectSyncProgress } from '../components/chat/ProjectSyncProgress';
 import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
-import { ChatMessage } from '../core/message/ChatMessage.model';
 import { ImagePreview } from '../components/ui/ImagePreview';
 
 const ChatView: React.FunctionComponent<{
@@ -119,11 +118,6 @@ const ChatView: React.FunctionComponent<{
           dispatch(addMessages([newMessage]));
           break;
         }
-        case EventType.ADD_MESSAGE: {
-          const newMessage = payload as EventPayloads[typeof command]['response'];
-          dispatch(addMessages([newMessage]));
-          break;
-        }
         case EventType.CMD_NEW_THREAD: {
           dispatch(clearMessages());
           vscodeAPI.postMessage(newEventRequest(EventType.NEW_THREAD));
@@ -179,16 +173,19 @@ const ChatView: React.FunctionComponent<{
     imageFile?: File,
     figmaFile?: FigmaFile
   ): boolean {
-    const messages: ChatMessage[] = [];
+    const messages: Message[] = [];
     const eventPayload: SendMessagesRequestPayload = { files: selectedFiles, messages: [] };
 
     // Add image message if present
     if (imageFile) {
-      const imageMessage: ChatMessage = {
+      const imageMessage: Message = {
         id: uuidv4(),
+        threadID: uuidv4(),
         role: Role.User,
         type: MessageType.Image,
-        content: URL.createObjectURL(imageFile)
+        content: URL.createObjectURL(imageFile),
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       messages.push(imageMessage);
@@ -200,11 +197,14 @@ const ChatView: React.FunctionComponent<{
 
     // Handle Figma content if present
     if (figmaFile) {
-      const figmaMessage: ChatMessage = {
+      const figmaMessage: Message = {
         id: uuidv4(),
+        threadID: uuidv4(),
         role: Role.User,
         type: MessageType.Figma,
-        content: figmaFile.imageUrl
+        content: figmaFile.imageUrl,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       messages.push({ ...figmaMessage, type: MessageType.Image });
@@ -213,11 +213,14 @@ const ChatView: React.FunctionComponent<{
 
     // Add text message if present
     if (textContent.trim()) {
-      const textMessage: ChatMessage = {
+      const textMessage: Message = {
         id: uuidv4(),
+        threadID: uuidv4(),
         role: Role.User,
         type: MessageType.Text,
-        content: textContent
+        content: textContent,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       messages.push(textMessage);
@@ -268,6 +271,10 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
   }
 
+  function handleMessageFeedback(message: Message, feedback: string): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.UPDATE_MESSAGE, { ...message, feedback }));
+  }
+
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
   const PreviewChatAttachment = (): React.ReactNode => {
@@ -306,7 +313,7 @@ const ChatView: React.FunctionComponent<{
   return (
     <>
       <div className="flex flex-col h-full p-2">
-        <ChatMessageList />
+        <ChatMessageList handleMessageFeedback={handleMessageFeedback} />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <PreviewChatAttachment />
         <ChatInputBox

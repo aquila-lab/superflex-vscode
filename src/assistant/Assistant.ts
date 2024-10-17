@@ -27,6 +27,14 @@ export interface Assistant {
   ): Promise<Message>;
 
   /**
+   * Update a message in a chat thread.
+   *
+   * @param message - The message to update.
+   * @returns A promise that resolves when the message is updated.
+   */
+  updateMessage(message: Message): Promise<void>;
+
+  /**
    * Sync files parse and upload small bites of project files to the vector store.
    * NOTE: If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
    * NOTE: The files that are uploaded but missing from the filePaths input will be removed.

@@ -5,6 +5,7 @@ export { HttpStatusCode } from "./constants";
 
 export * from "./figma";
 export * from "./files";
+export * from "./message";
 export * from "./repo";
 export * from "./thread";
 export * from "./user";

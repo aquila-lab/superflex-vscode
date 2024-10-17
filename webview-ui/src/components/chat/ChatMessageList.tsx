@@ -2,8 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import { useAppSelector } from '../../core/store';
 import { LoadingDots } from '../ui/LoadingDots';
 import { ChatMessage } from './ChatMessage';
+import { Message } from '../../../../shared/model';
 
-export const ChatMessageList: React.FC = () => {
+interface ChatMessageListProps {
+  handleMessageFeedback: (message: Message, feedback: string) => void;
+}
+
+export const ChatMessageList: React.FC<ChatMessageListProps> = ({ handleMessageFeedback }) => {
   const listRef = useRef<HTMLUListElement>(null);
 
   const messages = useAppSelector((state) => state.chat.messages);
@@ -20,7 +25,7 @@ export const ChatMessageList: React.FC = () => {
       <ul ref={listRef} className="flex flex-col gap-y-2 overflow-y-auto">
         {messages.map((message) => (
           <li key={message.id}>
-            <ChatMessage message={message} />
+            <ChatMessage message={message} handleFeedback={handleMessageFeedback} />
           </li>
         ))}
       </ul>

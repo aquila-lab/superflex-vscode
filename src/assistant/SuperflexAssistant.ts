@@ -59,6 +59,16 @@ export default class SuperflexAssistant implements Assistant {
     return message;
   }
 
+  async updateMessage(message: Message): Promise<void> {
+    await api.updateMessage({
+      owner: this.owner,
+      repo: this.repo,
+      threadID: message.threadID,
+      messageID: message.id,
+      feedback: message.feedback,
+    });
+  }
+
   async syncFiles(progressCb?: (current: number, isFirstTimeSync?: boolean) => void): Promise<void> {
     if (!SuperflexCache.storagePath) {
       throw new Error("Storage path is not set");

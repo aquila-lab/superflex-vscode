@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { ChatMessage as ChatMessageType } from '../../core/message/ChatMessage.model';
-import { Role, MessageType } from '../../../../shared/model';
+import { Role, MessageType, Message } from '../../../../shared/model';
+import { ImagePreview } from '../ui/ImagePreview';
 import { MarkdownRender } from '../ui/MarkdownRender';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
-import { ImagePreview } from '../ui/ImagePreview';
+import FeedbackDialog from './FeedbackDialog';
 
 declare global {
   interface Window {
@@ -13,10 +13,14 @@ declare global {
 }
 
 interface ChatMessageProps {
-  message: ChatMessageType;
+  message: Message;
+  handleFeedback: (message: Message, feedback: string) => void;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleFeedback }) => {
+  const showFeedback =
+    message.role === Role.Assistant && !message.content.startsWith('Welcome to Superflex') && !message.feedback;
+
   return (
     <div
       className={`py-4 px-2 border-b border-border text-left rounded-lg ${message.role === Role.User ? 'bg-muted' : undefined}`}>
@@ -39,6 +43,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           isLoading={message.type === MessageType.Figma}
           src={message.content}
         />
+      )}
+
+      {showFeedback && (
+        <div className="mt-4">
+          <FeedbackDialog
+            onFeedback={(feedback) => {
+              handleFeedback(message, feedback);
+            }}
+          />
+        </div>
       )}
     </div>
   );

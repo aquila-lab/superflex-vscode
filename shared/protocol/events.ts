@@ -32,7 +32,7 @@ export enum EventType {
   // Chat events
   NEW_THREAD = "new_thread",
   NEW_MESSAGE = "new_message",
-  ADD_MESSAGE = "add_message",
+  UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
 
@@ -60,7 +60,7 @@ export interface EventPayloads {
   [EventType.FIGMA_FILE_SELECTED]: { request: FigmaFile; response: FigmaFile };
   [EventType.NEW_THREAD]: { request: void; response: void };
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
-  [EventType.ADD_MESSAGE]: { request: void; response: Message };
+  [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };

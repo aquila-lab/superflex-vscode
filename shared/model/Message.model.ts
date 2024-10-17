@@ -28,6 +28,8 @@ export type Message = {
   type: MessageType;
   content: string;
 
+  feedback?: string;
+
   updatedAt: Date;
   createdAt: Date;
 };

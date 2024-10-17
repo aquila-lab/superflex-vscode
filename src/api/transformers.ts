@@ -15,6 +15,7 @@ export function buildMessageFromResponse(res: any): Message {
     role: res.role,
     type: res.type,
     content: res.content,
+    feedback: res.feedback ?? undefined,
     updatedAt: new Date(res.updated_at),
     createdAt: new Date(res.created_at),
   };

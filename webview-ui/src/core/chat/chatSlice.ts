@@ -2,23 +2,26 @@ import { v4 as uuidv4 } from 'uuid';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { MessageType, Role } from '../../../../shared/model';
+import { Message, MessageType, Role } from '../../../../shared/model';
 import { FilePayload, InitState } from '../../../../shared/protocol';
-import { ChatMessage } from '../message/ChatMessage.model';
 
-const defaultMessages: ChatMessage[] = [
+const defaultMessages: Message[] = [
   {
     id: uuidv4(),
+    threadID: uuidv4(),
     role: Role.Assistant,
     type: MessageType.Text,
     content:
-      "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let’s work together and get things done—tell me what you'd like to build today!"
+      "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let’s work together and get things done—tell me what you'd like to build today!",
+    feedback: 'none',
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ];
 
 type ChatState = {
   init: InitState;
-  messages: ChatMessage[];
+  messages: Message[];
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
   files: FilePayload[];
@@ -44,7 +47,7 @@ const chatSlice = createSlice({
     setInitState: (state, action: PayloadAction<Partial<InitState>>) => {
       state.init = { ...state.init, ...action.payload };
     },
-    addMessages: (state, action: PayloadAction<ChatMessage[]>) => {
+    addMessages: (state, action: PayloadAction<Message[]>) => {
       state.messages = [...state.messages, ...action.payload];
     },
     clearMessages(state) {

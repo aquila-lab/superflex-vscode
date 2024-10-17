@@ -2,9 +2,8 @@ import fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
-import { v4 as uuidv4 } from "uuid";
 
-import { MessageType, Role, Thread } from "../../shared/model";
+import { Message, MessageType, Thread } from "../../shared/model";
 import {
   EventMessage,
   EventPayloads,
@@ -235,6 +234,22 @@ export class ChatAPI {
             path: docPath,
             relativePath: path.relative(workspaceDirPath, docPath),
           }));
+      })
+
+      /**
+       * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
+       * It is used to update the message with the feedback.
+       *
+       * @param payload - Payload containing the message ID and feedback.
+       * @returns A promise that resolves when the message is updated.
+       * @throws An error if the message cannot be updated.
+       */
+      .registerEvent(EventType.UPDATE_MESSAGE, async (payload: Message) => {
+        if (!this._isInitialized || !this._assistant) {
+          return;
+        }
+
+        await this._assistant.updateMessage(payload);
       });
   }
 
