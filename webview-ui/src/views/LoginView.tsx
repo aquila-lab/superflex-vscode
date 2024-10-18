@@ -31,8 +31,8 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
 
   if (authUniqueLink) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 h-full px-5 pb-4">
-        <div className="max-w-md">
+      <div className="flex flex-col items-center justify-center h-full px-5 pb-4">
+        <div className="flex flex-col items-center justify-center gap-3 max-w-md">
           <h3 className="text-lg font-bold">
             If you are not redirected to the webpage, copy this link to your browser:
           </h3>
@@ -57,7 +57,7 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
 
   return (
     <div className="flex flex-col justify-center items-center h-full px-5 pb-4">
-      <div className="max-w-md">
+      <div className="flex flex-col items-center justify-center max-w-md">
         <h3 className="text-2xl font-bold mb-2">Welcome to Superflex!</h3>
         <p className="text-center text-muted-foreground mb-4">Your one-stop solution for all your development needs!</p>
 
