@@ -1,10 +1,10 @@
 {
   "name": "superflex",
   "publisher": "aquilalabs",
-  "displayName": "Superflex: Your Frontend AI Pair Programmer",
+  "displayName": "Superflex: AI Frontend Code Assistant, Figma-to-Code, Image-to-Code, Sketch Conversion, Autocomplete, Realtime Code Generation for React, HTML, CSS or any framework based on JS/TS",
   "description": "Never code alone again. Superflex is your AI frontend pair programmer that helps you code faster and better.",
   "icon": "small_logo.png",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
@@ -45,7 +45,9 @@
   "categories": [
     "AI",
     "Chat",
+    "Testing",
     "Snippets",
+    "Debuggers",
     "Visualization",
     "Machine Learning",
     "Programming Languages",
@@ -67,6 +69,8 @@
     "continue",
     "refactor",
     "tailwind",
+    "debuggers",
+    "assistant",
     "superflex",
     "components",
     "javascript",
@@ -83,7 +87,15 @@
     "code completion",
     "code generation",
     "screenshot to code",
-    "generate components"
+    "code recommendation",
+    "generate components",
+    "GPT",
+    "GPT3",
+    "GPT3-turbo",
+    "GPT3.5-turbo",
+    "GPT4",
+    "GPT4o",
+    "GPTs"
   ],
   "engines": {
     "vscode": "^1.70.0",
