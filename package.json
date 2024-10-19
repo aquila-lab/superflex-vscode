@@ -2,9 +2,9 @@
   "name": "superflex",
   "publisher": "aquilalabs",
   "displayName": "Superflex: AI Frontend Code Assistant, GPT & Claude Powered Figma to Code, Screenshot to Code, Code Generation for React, HTML, CSS or any framework based on JavaScript/Typescript",
-  "description": "Never code alone again. Superflex is your AI frontend pair programmer that helps you code faster and better.",
+  "description": "Superflex AI Frontend Coding Assistant powered by GPT & Claude helps you code faster with Figma to Code, Screenshot to Code, debugging, and more. Supports React, HTML, CSS and any framework based on JS/TS. Trusted by developers at Amazon, Apple, Google. Start free no API key required.",
   "icon": "small_logo.png",
-  "version": "0.0.26",
+  "version": "0.0.27",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
@@ -63,8 +63,10 @@
     "react",
     "figma",
     "cursor",
+    "nextjs",
     "sketch",
     "copilot",
+    "angular",
     "tabnine",
     "continue",
     "refactor",
@@ -95,7 +97,13 @@
     "GPT3.5-turbo",
     "GPT4",
     "GPT4o",
-    "GPTs"
+    "GPTs",
+    "Claude",
+    "Sonnet",
+    "3.5 Sonnet",
+    "Claude 3.5 Sonnet",
+    "openai",
+    "anthropic"
   ],
   "engines": {
     "vscode": "^1.70.0",
