@@ -1,10 +1,10 @@
 {
   "name": "superflex",
   "publisher": "aquilalabs",
-  "displayName": "Superflex: AI Frontend Code Assistant, Figma-to-Code, Image-to-Code, Sketch Conversion, Autocomplete, Realtime Code Generation for React, HTML, CSS or any framework based on JS/TS",
+  "displayName": "Superflex: AI Frontend Code Assistant, GPT & Claude Powered Figma to Code, Screenshot to Code, Code Generation for React, HTML, CSS or any framework based on JavaScript/Typescript",
   "description": "Never code alone again. Superflex is your AI frontend pair programmer that helps you code faster and better.",
   "icon": "small_logo.png",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
