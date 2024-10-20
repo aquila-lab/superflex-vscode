@@ -33,6 +33,7 @@ const ChatView: React.FunctionComponent<{
 }> = ({ vscodeAPI }) => {
   const dispatch = useAppDispatch();
 
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const initState = useAppSelector((state) => state.chat.init);
@@ -166,6 +167,12 @@ const ChatView: React.FunctionComponent<{
       }
     };
   }, [vscodeAPI]);
+
+  useEffect(() => {
+    if (!!chatImageAttachment || !!chatFigmaAttachment) {
+      inputRef.current?.focus();
+    }
+  }, [chatImageAttachment, chatFigmaAttachment]);
 
   function handleSend(
     selectedFiles: FilePayload[],
@@ -317,6 +324,7 @@ const ChatView: React.FunctionComponent<{
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <PreviewChatAttachment />
         <ChatInputBox
+          inputRef={inputRef}
           disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
           fetchFiles={fetchFiles}

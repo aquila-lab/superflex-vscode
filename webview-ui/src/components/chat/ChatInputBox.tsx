@@ -12,6 +12,7 @@ import { TextareaAutosize } from '../ui/TextareaAutosize';
 import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../core/chat/chatSlice';
 
 interface ChatInputBoxProps {
+  inputRef: React.RefObject<HTMLTextAreaElement>;
   disabled?: boolean;
   currentOpenFile: FilePayload | null;
   fetchFiles: () => void;
@@ -21,6 +22,7 @@ interface ChatInputBoxProps {
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
+  inputRef,
   disabled,
   currentOpenFile,
   fetchFiles,
@@ -97,6 +99,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
       {/* Chat input */}
       <div className="flex-1">
         <TextareaAutosize
+          ref={inputRef}
           autoFocus
           value={input}
           placeholder="Describe your UI component..."
