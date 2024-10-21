@@ -85,8 +85,9 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
         <p className="text-lg font-semibold">Watch our onboarding video:</p>
         <div className="w-full">
           <iframe
-            className="w-full h-full border border-border rounded-lg shadow-sm"
+            className="w-full aspect-video border border-border rounded-lg shadow-sm"
             src="https://www.youtube.com/embed/hNSYwKTxIP8?si=8C9RVdflePElLhJx"
+            title="Superflex Onboarding Video"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen></iframe>
