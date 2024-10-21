@@ -56,8 +56,8 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
   }
 
   return (
-    <div className="flex flex-col justify-center items-center h-full px-5 pb-4">
-      <div className="flex flex-col items-center justify-center max-w-md">
+    <div className="flex flex-col justify-between items-center h-full px-5 pb-4">
+      <div className="flex-1 flex flex-col items-center justify-center max-w-md h-full">
         <h3 className="text-2xl font-bold mb-2">Welcome to Superflex!</h3>
         <p className="text-center text-muted-foreground mb-4">Your one-stop solution for all your development needs!</p>
 
@@ -79,6 +79,18 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
           }}>
           Create free account
         </Button>
+      </div>
+
+      <div className="flex flex-col items-center gap-3 mb-8">
+        <p className="text-lg font-semibold">Watch our onboarding video:</p>
+        <div className="w-full">
+          <iframe
+            className="w-full h-full border border-border rounded-lg shadow-sm"
+            src="https://www.youtube.com/embed/hNSYwKTxIP8?si=8C9RVdflePElLhJx"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen></iframe>
+        </div>
       </div>
     </div>
   );
