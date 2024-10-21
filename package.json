@@ -1,7 +1,7 @@
 {
   "name": "superflex",
   "publisher": "aquilalabs",
-  "displayName": "Superflex: AI Frontend Code Assistant, GPT & Claude Powered Figma to Code, Image to Code, Sketch to Code, Code Generation for React, HTML, CSS or any framework based on JavaScript/Typescript",
+  "displayName": "Superflex: AI Frontend Code Assistant, GPT & Claude Powered, Figma-to-Code, Image/Screenshot-to-Code, Code Generation for React, HTML, CSS or any framework based on Javascript/Typescript",
   "description": "Superflex AI Frontend Coding Assistant powered by GPT & Claude helps you code faster with Figma to Code, Image/Screenshot to Code, Sketch to Code, debugging, and more. Supports React, HTML, CSS and any framework based on JS/TS. Trusted by developers at Amazon, Apple, Google. Start free no API key required.",
   "icon": "small_logo.png",
   "version": "0.0.30",
