@@ -2,7 +2,7 @@
   "name": "superflex",
   "publisher": "aquilalabs",
   "displayName": "Superflex: AI Frontend Assistant, GPT & Claude Powered, Vercel V0 Alternative, Figma-to-Code, Image/Screenshot-to-Code, Code Generation for React, NextJS, HTML, CSS, javascript/Typescript Frameworks",
-  "description": "Superflex AI Frontend Coding Assistant powered by GPT & Claude helps you code faster with Figma to Code, Image/Screenshot to Code, Sketch to Code, debugging, and more. Supports React, HTML, CSS and any framework based on JS/TS. Trusted by developers at Amazon, Apple, Google. Start free no API key required.",
+  "description": "Superflex an AI Frontend Coding Assistant (Vercel V0 Alternative) powered by GPT & Claude helps you code faster with Figma to Code, Image/Screenshot to Code, Sketch to Code, debugging, and more. Supports React, HTML, CSS and any framework based on JS/TS. Trusted by developers at Amazon, Apple, Google. Start free no API key required.",
   "icon": "small_logo.png",
   "version": "0.0.30",
   "author": "Riphal <https://twitter.com/_riphal_>",
