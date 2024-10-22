@@ -6,7 +6,7 @@ import ChatViewProvider from "../chat/ChatViewProvider";
 import { FigmaTokenInformation } from "../model/Figma.model";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { FigmaApiProvider, figmaRefreshAccessToken } from "../api";
+import { FigmaApiProvider, figmaRefreshAccessToken, HttpStatusCode } from "../api";
 import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
 
 export default class FigmaAuthenticationService {
@@ -94,7 +94,10 @@ export default class FigmaAuthenticationService {
     try {
       FigmaApiProvider.setHeader("Authorization", `Bearer ${session.accessToken}`);
       FigmaApiProvider.addRefreshTokenInterceptor(async (err) => {
-        if (err?.response?.status === 401 || err?.response?.status === 403) {
+        if (
+          err?.response?.status === HttpStatusCode.UNAUTHORIZED ||
+          err?.response?.status === HttpStatusCode.FORBIDDEN
+        ) {
           try {
             const newTokenInfo = await figmaRefreshAccessToken({ refreshToken: session.refreshToken });
             if (newTokenInfo) {

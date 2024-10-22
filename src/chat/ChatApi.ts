@@ -16,7 +16,7 @@ import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { EventRegistry, Handler } from "./EventRegistry";
-import { getFigmaSelectionImageUrl } from "../api";
+import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
 import { extractFigmaSelectionUrl } from "../model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
@@ -307,7 +307,7 @@ export class ChatAPI {
         sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
       });
     } catch (err: any) {
-      if (err?.statusCode === 401 || err?.statusCode === 403) {
+      if (err?.statusCode === HttpStatusCode.UNAUTHORIZED) {
         throw err;
       }
       if (err?.message && err.message.startsWith("No supported files found in the workspace")) {

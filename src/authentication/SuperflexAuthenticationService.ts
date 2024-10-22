@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { AuthenticationProvider } from "vscode";
 
 import { EventType, newEventResponse } from "../../shared/protocol";
-import { ApiProvider } from "../api";
+import { ApiProvider, HttpStatusCode } from "../api";
 import ChatViewProvider from "../chat/ChatViewProvider";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { ApiErrorTypes, AUTH_PROVIDER_ID } from "../common/constants";
@@ -88,7 +88,7 @@ export default class SuperflexAuthenticationService {
     try {
       ApiProvider.setHeader("Authorization", `Bearer ${token}`);
       ApiProvider.addHeaderTokenInterceptor(async (err) => {
-        if (err?.response?.status === 401 || err?.response?.status === 403) {
+        if (err?.response?.status === HttpStatusCode.UNAUTHORIZED) {
           this.handleUnauthorizedResponse(err.response, logoutAction);
         }
         return Promise.reject(err);

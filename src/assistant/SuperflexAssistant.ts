@@ -130,7 +130,7 @@ export default class SuperflexAssistant implements Assistant {
         }
         SuperflexCache.set(this.cacheFileName, mapToJson(cachedFilesMap));
       } catch (err: any) {
-        if (err?.statusCode === 401 || err?.statusCode === 403) {
+        if (err?.statusCode === api.HttpStatusCode.UNAUTHORIZED) {
           throw err;
         }
         console.error(`Failed to upload files: ${err?.message}`);
@@ -234,7 +234,7 @@ export default class SuperflexAssistant implements Assistant {
         cachedFilesMap.delete(relativePath);
       }
     } catch (err: any) {
-      if (err?.statusCode === 401 || err?.statusCode === 403) {
+      if (err?.statusCode === api.HttpStatusCode.UNAUTHORIZED) {
         throw err;
       }
       console.error(`Failed to delete files: ${err?.message}`);
