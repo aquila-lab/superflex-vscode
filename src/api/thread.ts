@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import { FilePayload } from "../../shared/protocol";
-import { MessageReqest, Message, Thread } from "../../shared/model";
+import { MessageReqest, Thread, ThreadRun } from "../../shared/model";
 
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
@@ -59,7 +59,13 @@ export type SendThreadMessageArgs = GetThreadArgs & {
   messages: MessageReqest[];
 };
 
-async function sendThreadMessage({ owner, repo, threadID, files, messages }: SendThreadMessageArgs): Promise<Message> {
+async function sendThreadMessage({
+  owner,
+  repo,
+  threadID,
+  files,
+  messages,
+}: SendThreadMessageArgs): Promise<ThreadRun> {
   try {
     const { data } = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
       files: files.map((file) => ({
@@ -72,7 +78,10 @@ async function sendThreadMessage({ owner, repo, threadID, files, messages }: Sen
       })),
     });
 
-    return Promise.resolve(buildMessageFromResponse(data));
+    return Promise.resolve({
+      message: buildMessageFromResponse(data.message),
+      isPremium: data.is_premium,
+    });
   } catch (err) {
     return Promise.reject(parseError(err));
   }

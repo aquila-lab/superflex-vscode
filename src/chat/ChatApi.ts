@@ -196,17 +196,23 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const assistantMessage = await this._assistant.sendMessage(thread.id, payload.files, messages);
+        const threadRun = await this._assistant.sendMessage(thread.id, payload.files, messages);
 
         Telemetry.capture("new_message", {
           threadID: thread.id,
           customSelectedFiles: payload.files.length,
-          assistantMessageID: assistantMessage.id,
-          assistantMessageLength: assistantMessage.content.length,
+          assistantMessageID: threadRun.message.id,
+          assistantMessageLength: threadRun.message.content.length,
           processingDeltaTimeMs: Date.now() - timeNow,
         });
 
-        return assistantMessage;
+        if (!threadRun.isPremium) {
+          vscode.window.showWarningMessage(
+            "You have used up your free credits for today. Please upgrade to Superflex Premium to continue."
+          );
+        }
+
+        return threadRun.message;
       })
 
       /**
