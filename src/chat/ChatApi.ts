@@ -3,7 +3,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { Message, MessageType, Thread } from "../../shared/model";
+import { Message, MessageType, Thread, User, UserSubscription } from "../../shared/model";
 import {
   EventMessage,
   EventPayloads,
@@ -12,6 +12,7 @@ import {
   newEventResponse,
   SendMessagesRequestPayload,
 } from "../../shared/protocol";
+import * as api from "../api";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
 import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { Telemetry } from "../common/analytics/Telemetry";
@@ -34,6 +35,7 @@ export class ChatAPI {
   private _isSyncProjectRunning = false;
   private _thread?: Thread;
   private _workspaceDirPath?: string;
+  private _isPremiumGeneration = true;
 
   constructor() {
     this._chatEventRegistry
@@ -206,11 +208,13 @@ export class ChatAPI {
           processingDeltaTimeMs: Date.now() - timeNow,
         });
 
-        if (!threadRun.isPremium) {
+        // Send subscription prompt if user is out of premium requests
+        if (!threadRun.isPremium && this._isPremiumGeneration) {
           vscode.window.showWarningMessage(
             "You have used up your free credits for today. Please upgrade to Superflex Premium to continue."
           );
         }
+        this._isPremiumGeneration = threadRun.isPremium;
 
         return threadRun.message;
       })
@@ -256,6 +260,28 @@ export class ChatAPI {
         }
 
         await this._assistant.updateMessage(payload);
+      })
+
+      /**
+       * Event (get_user_info): This event is fired when webview requests user info.
+       */
+      .registerEvent(EventType.GET_USER_INFO, async () => {
+        if (!this._isInitialized) {
+          return;
+        }
+
+        return await api.getUserInfo();
+      })
+
+      /**
+       * Event (get_user_subscription): This event is fired when webview requests user subscription info.
+       */
+      .registerEvent(EventType.GET_USER_SUBSCRIPTION, async () => {
+        if (!this._isInitialized) {
+          return;
+        }
+
+        return await api.getUserSubscription();
       });
   }
 

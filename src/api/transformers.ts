@@ -1,10 +1,28 @@
-import { User, Message, Thread } from "../../shared/model";
+import { User, Message, Thread, Plan, UserSubscription } from "../../shared/model";
 
 export function buildUserFromResponse(res: any): User {
   return {
     id: res.id,
     email: res.email,
     username: res.username,
+  };
+}
+
+export function buildPlanFromResponse(res: any): Plan {
+  return {
+    name: res.name,
+    basicRequestLimit: res.basic_request_limit,
+    premiumRequestLimit: res.premium_request_limit,
+  };
+}
+
+export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
+  return {
+    plan: res.plan ? buildPlanFromResponse(res.plan) : null,
+    basicRequestsUsed: res.basic_requests_used,
+    premiumRequestsUsed: res.premium_requests_used,
+    lastResetDate: new Date(res.last_reset_date),
+    createdAt: new Date(res.created_at),
   };
 }
 

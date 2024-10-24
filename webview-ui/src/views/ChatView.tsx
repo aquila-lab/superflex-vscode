@@ -319,7 +319,7 @@ const ChatView: React.FunctionComponent<{
 
   return (
     <>
-      <div className="flex flex-col h-full p-2">
+      <div className="flex flex-col h-full p-2 pt-0">
         <ChatMessageList handleMessageFeedback={handleMessageFeedback} />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <PreviewChatAttachment />

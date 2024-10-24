@@ -1,9 +1,9 @@
-import ChatView from './ChatView';
+import MainView from './MainView';
 import LoginView from './LoginView';
 import OpenProjectPromptView from './OpenProjectPromptView';
 
 const views = {
-  chat: ChatView,
+  main: MainView,
   login: LoginView,
   openProjectPrompt: OpenProjectPromptView
 };
