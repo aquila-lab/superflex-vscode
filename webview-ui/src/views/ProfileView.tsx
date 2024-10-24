@@ -92,17 +92,6 @@ const ProfileView: React.FunctionComponent<{
             <CardDescription>Usage</CardDescription>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Basic Requests</span>
-                <span>
-                  {user.subscription?.basicRequestsUsed} / {user.subscription?.plan?.basicRequestLimit}
-                </span>
-              </div>
-              <Progress
-                value={(user.subscription?.basicRequestsUsed / user.subscription?.plan?.basicRequestLimit) * 100}
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
                 <span>Premium Requests</span>
                 <span>
                   {user.subscription?.premiumRequestsUsed} / {user.subscription?.plan?.premiumRequestLimit}
@@ -110,6 +99,17 @@ const ProfileView: React.FunctionComponent<{
               </div>
               <Progress
                 value={(user.subscription?.premiumRequestsUsed / user.subscription?.plan?.premiumRequestLimit) * 100}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Basic Requests</span>
+                <span>
+                  {user.subscription?.basicRequestsUsed} / {user.subscription?.plan?.basicRequestLimit}
+                </span>
+              </div>
+              <Progress
+                value={(user.subscription?.basicRequestsUsed / user.subscription?.plan?.basicRequestLimit) * 100}
               />
             </div>
           </div>
