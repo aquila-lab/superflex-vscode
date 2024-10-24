@@ -81,6 +81,9 @@ export class ChatAPI {
 
           Telemetry.capture("initialized", {});
 
+          const user = await api.getUserInfo();
+          sendEventMessageCb(newEventResponse(EventType.GET_USER_INFO, user));
+
           return { isInitialized: true, isFigmaAuthenticated };
         } catch (err) {
           throw err;

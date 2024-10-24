@@ -67,7 +67,7 @@ async function sendThreadMessage({
   messages,
 }: SendThreadMessageArgs): Promise<ThreadRun> {
   try {
-    const { data } = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
+    const response = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
       files: files.map((file) => ({
         path: file.relativePath,
         content: fs.readFileSync(file.path).toString(),
@@ -79,8 +79,8 @@ async function sendThreadMessage({
     });
 
     return Promise.resolve({
-      message: buildMessageFromResponse(data.message),
-      isPremium: data.is_premium,
+      message: buildMessageFromResponse(response.data),
+      isPremium: response.headers["x-is-premium-request"] === "true",
     });
   } catch (err) {
     return Promise.reject(parseError(err));

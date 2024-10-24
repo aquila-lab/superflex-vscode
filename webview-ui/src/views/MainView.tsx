@@ -24,7 +24,7 @@ const MainView: React.FunctionComponent<{
         </Button>
       </div>
 
-      <div className="flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto text-left">
         {activeView === 'chat' && <ChatView vscodeAPI={vscodeAPI} />}
         {activeView === 'profile' && <ProfileView vscodeAPI={vscodeAPI} />}
       </div>
