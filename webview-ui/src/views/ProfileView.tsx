@@ -45,9 +45,14 @@ const ProfileView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.GET_USER_SUBSCRIPTION));
   }, [vscodeAPI]);
 
-  const handleSubscribe = () => {
+  function handleSubscribe(): void {
+    // http://localhost:3000/pricing
     console.log('Subscribe clicked');
-  };
+  }
+
+  function handleManageBilling(): void {
+    console.log('Manage Billing clicked');
+  }
 
   if (!user.subscription?.plan) {
     return <div className="p-4">Loading user information...</div>;
@@ -83,9 +88,11 @@ const ProfileView: React.FunctionComponent<{
               <p className="text-sm font-medium text-muted-foreground">Current Plan</p>
               <p className="text-lg font-semibold capitalize">{user.subscription?.plan?.name}</p>
             </div>
-            <Button onClick={handleSubscribe}>
-              {user.subscription?.plan.name !== 'Free Plan' ? 'Manage Billing' : 'Subscribe'}
-            </Button>
+            {user.stripeCustomerID ? (
+              <Button onClick={handleManageBilling}>Manage Billing</Button>
+            ) : (
+              <Button onClick={handleSubscribe}>Subscribe</Button>
+            )}
           </div>
 
           <div className="space-y-4">

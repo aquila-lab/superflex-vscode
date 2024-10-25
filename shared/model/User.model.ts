@@ -4,6 +4,7 @@ export type User = {
   email: string;
   username: string;
   picture?: string | null;
+  stripeCustomerID?: string | null;
 };
 
 export type Plan = {
