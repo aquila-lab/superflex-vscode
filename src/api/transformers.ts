@@ -5,6 +5,8 @@ export function buildUserFromResponse(res: any): User {
     id: res.id,
     email: res.email,
     username: res.username,
+    picture: res.picture ?? null,
+    stripeCustomerID: res.stripe_customer_id ?? null,
   };
 }
 

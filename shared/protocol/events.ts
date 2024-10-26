@@ -44,12 +44,13 @@ export enum EventType {
   SHOW_LOGIN_VIEW = "show_login_view",
   SHOW_CHAT_VIEW = "show_chat_view",
 
-  // Notifications
-  SEND_NOTIFICATION = "send_notification",
-
   // User events
   GET_USER_INFO = "get_user_info",
   GET_USER_SUBSCRIPTION = "get_user_subscription",
+
+  // Helpers
+  SEND_NOTIFICATION = "send_notification",
+  OPEN_EXTERNAL_URL = "open_external_url",
 }
 
 export interface EventPayloads {
@@ -72,9 +73,10 @@ export interface EventPayloads {
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
   [EventType.SHOW_CHAT_VIEW]: { request: void; response: void };
-  [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
   [EventType.GET_USER_INFO]: { request: void; response: User };
   [EventType.GET_USER_SUBSCRIPTION]: { request: void; response: UserSubscription };
+  [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
+  [EventType.OPEN_EXTERNAL_URL]: { request: { url: string }; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;

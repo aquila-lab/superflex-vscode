@@ -6,6 +6,7 @@ import { Progress } from '../components/ui/Progress';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { setUser, setUserSubscription } from '../core/user/userSlice';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
+import { APP_BASE_URL } from '../../../shared/common/constants';
 
 const ProfileView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -46,8 +47,7 @@ const ProfileView: React.FunctionComponent<{
   }, [vscodeAPI]);
 
   function handleSubscribe(): void {
-    // http://localhost:3000/pricing
-    console.log('Subscribe clicked');
+    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: `${APP_BASE_URL}/pricing` }));
   }
 
   function handleManageBilling(): void {
