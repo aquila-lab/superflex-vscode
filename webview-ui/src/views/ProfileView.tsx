@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { VSCodeWrapper } from '../api/vscodeApi';
+
 import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol/events';
+import { VSCodeWrapper } from '../api/vscodeApi';
+import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Progress } from '../components/ui/Progress';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { setUser, setUserSubscription } from '../core/user/userSlice';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
-import { APP_BASE_URL } from '../../../shared/common/constants';
-import { Badge } from '../components/ui/Badge';
 
 interface UsageDisplayProps {
   label: string;
@@ -66,7 +66,7 @@ const ProfileView: React.FunctionComponent<{
   }, [vscodeAPI]);
 
   function handleSubscribe(): void {
-    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: `${APP_BASE_URL}/pricing` }));
+    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
   function handleManageBilling(): void {
@@ -106,7 +106,7 @@ const ProfileView: React.FunctionComponent<{
           <CardTitle>Billing</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {user.subscription?.endDate && (
+          {user.subscription.endDate && (
             <Badge variant="destructive">
               Your subscription has been canceled and will end on{' '}
               {new Date(user.subscription.endDate).toLocaleDateString()}.
@@ -116,10 +116,10 @@ const ProfileView: React.FunctionComponent<{
           <div className="flex flex-col gap-6 sm:flex-row sm:justify-between sm:items-center">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Current Plan</p>
-              <p className="text-lg font-semibold capitalize">{user.subscription?.plan?.name}</p>
+              <p className="text-lg font-semibold capitalize">{user.subscription.plan.name}</p>
             </div>
 
-            {user.stripeCustomerID ? (
+            {user.stripeCustomerID && !user.subscription.plan.name.toLowerCase().includes('free') ? (
               <Button onClick={handleManageBilling}>Manage Billing</Button>
             ) : (
               <Button onClick={handleSubscribe}>Subscribe</Button>
@@ -130,13 +130,13 @@ const ProfileView: React.FunctionComponent<{
             <CardDescription>Usage</CardDescription>
             <UsageDisplay
               label="Premium Requests"
-              used={user.subscription?.premiumRequestsUsed}
-              limit={user.subscription?.plan?.premiumRequestLimit}
+              used={user.subscription.premiumRequestsUsed}
+              limit={user.subscription.plan.premiumRequestLimit}
             />
             <UsageDisplay
               label="Basic Requests"
-              used={user.subscription?.basicRequestsUsed}
-              limit={user.subscription?.plan?.basicRequestLimit}
+              used={user.subscription.basicRequestsUsed}
+              limit={user.subscription.plan.basicRequestLimit}
             />
           </div>
         </CardContent>
