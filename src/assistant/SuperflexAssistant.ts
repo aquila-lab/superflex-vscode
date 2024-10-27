@@ -11,6 +11,7 @@ import { SuperflexCache } from "../cache/SuperflexCache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
+import { runningOnWindows } from "src/common/operatingSystem";
 
 const ASSISTENT_NAME = "superflex";
 const FILES_MAP_VERSION = 1; // Increment the version when we need to reindex all files
@@ -46,21 +47,28 @@ export default class SuperflexAssistant implements Assistant {
     messages: MessageReqest[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<Message> {
+    // Updating the file path for current open file for wins machine
+    let updatedFiles: FilePayload[] = [];
+    if (runningOnWindows()) {
+      updatedFiles = files.map((file) => ({
+        ...file,
+        path: file.path
+          .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase())
+          .replace(/\//g, "\\")
+          .replace(/^\\+/, "")
+          .replace(/\\+/g, "\\"),
+      }));
+    } else {
+      console.log("no windows");
+    }
 
-
-// Updating the file path for current open file
-    const updatedFiles = files.map(file => ({
-      ...file, 
-      path: file.path
-      .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase())
-      .replace(/\//g, '\\')
-      .replace(/^\\+/, '')  
-      .replace(/\\+/g, '\\')
-  }));
-  
- 
-
-    const message = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files:updatedFiles, messages });
+    const message = await api.sendThreadMessage({
+      owner: this.owner,
+      repo: this.repo,
+      threadID,
+      files: updatedFiles,
+      messages,
+    });
 
     // const stream = await api.stream.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, messages });
     //
