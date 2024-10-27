@@ -8,6 +8,24 @@ import { setUser, setUserSubscription } from '../core/user/userSlice';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { APP_BASE_URL } from '../../../shared/common/constants';
 
+interface UsageDisplayProps {
+  label: string;
+  used: number;
+  limit: number;
+}
+
+const UsageDisplay: React.FC<UsageDisplayProps> = ({ label, used, limit }) => {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>{label}</span>
+        <span>{limit > 9999 ? 'Unlimited' : `${used} / ${limit}`}</span>
+      </div>
+      <Progress value={limit > 9999 ? 0 : (used / limit) * 100} />
+    </div>
+  );
+};
+
 const ProfileView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
 }> = ({ vscodeAPI }) => {
@@ -59,13 +77,13 @@ const ProfileView: React.FunctionComponent<{
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="flex-1 w-full p-6 space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>User Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:gap-16">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Username</p>
               <p className="text-lg font-semibold">{user.username}</p>
@@ -83,11 +101,12 @@ const ProfileView: React.FunctionComponent<{
           <CardTitle>Billing</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-6 sm:flex-row sm:justify-between sm:items-center">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Current Plan</p>
               <p className="text-lg font-semibold capitalize">{user.subscription?.plan?.name}</p>
             </div>
+
             {user.stripeCustomerID ? (
               <Button onClick={handleManageBilling}>Manage Billing</Button>
             ) : (
@@ -97,28 +116,16 @@ const ProfileView: React.FunctionComponent<{
 
           <div className="space-y-4">
             <CardDescription>Usage</CardDescription>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Premium Requests</span>
-                <span>
-                  {user.subscription?.premiumRequestsUsed} / {user.subscription?.plan?.premiumRequestLimit}
-                </span>
-              </div>
-              <Progress
-                value={(user.subscription?.premiumRequestsUsed / user.subscription?.plan?.premiumRequestLimit) * 100}
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Basic Requests</span>
-                <span>
-                  {user.subscription?.basicRequestsUsed} / {user.subscription?.plan?.basicRequestLimit}
-                </span>
-              </div>
-              <Progress
-                value={(user.subscription?.basicRequestsUsed / user.subscription?.plan?.basicRequestLimit) * 100}
-              />
-            </div>
+            <UsageDisplay
+              label="Premium Requests"
+              used={user.subscription?.premiumRequestsUsed}
+              limit={user.subscription?.plan?.premiumRequestLimit}
+            />
+            <UsageDisplay
+              label="Basic Requests"
+              used={user.subscription?.basicRequestsUsed}
+              limit={user.subscription?.plan?.basicRequestLimit}
+            />
           </div>
         </CardContent>
       </Card>

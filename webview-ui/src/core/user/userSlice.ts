@@ -23,6 +23,7 @@ const userSlice = createSlice({
       state.username = action.payload.username;
       state.email = action.payload.email;
       state.picture = action.payload.picture;
+      state.stripeCustomerID = action.payload.stripeCustomerID;
     },
     setUserSubscription: (state, action: PayloadAction<UserSubscription>) => {
       state.subscription = action.payload;
