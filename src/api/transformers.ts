@@ -25,6 +25,7 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
     premiumRequestsUsed: res.premium_requests_used,
     lastResetDate: new Date(res.last_reset_date),
     createdAt: new Date(res.created_at),
+    endDate: res.end_date ? new Date(res.end_date) : null,
   };
 }
 

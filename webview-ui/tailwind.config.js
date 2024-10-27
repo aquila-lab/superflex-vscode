@@ -27,6 +27,11 @@ export default {
         ring: 'var(--vscode-focusBorder)',
         background: 'var(--vscode-editor-background)',
         foreground: 'var(--vscode-foreground)',
+        destructive: {
+          DEFAULT: 'var(--vscode-errorForeground)',
+          background: 'var(--vscode-errorForeground)',
+          foreground: 'var(--vscode-editor-background)'
+        },
         button: {
           background: {
             DEFAULT: 'var(--vscode-button-background)',

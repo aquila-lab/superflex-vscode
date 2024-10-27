@@ -19,4 +19,5 @@ export type UserSubscription = {
   premiumRequestsUsed: number;
   lastResetDate: Date;
   createdAt: Date;
+  endDate: Date | null;
 };

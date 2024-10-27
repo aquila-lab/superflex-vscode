@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../core/store';
 import { setUser, setUserSubscription } from '../core/user/userSlice';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { APP_BASE_URL } from '../../../shared/common/constants';
+import { Badge } from '../components/ui/Badge';
 
 interface UsageDisplayProps {
   label: string;
@@ -69,7 +70,11 @@ const ProfileView: React.FunctionComponent<{
   }
 
   function handleManageBilling(): void {
-    console.log('Manage Billing clicked');
+    vscodeAPI.postMessage(
+      newEventRequest(EventType.OPEN_EXTERNAL_URL, {
+        url: `https://billing.stripe.com/p/login/3cs3dQdenfJucIU144?prefilled_email=${encodeURIComponent(user.email)}`
+      })
+    );
   }
 
   if (!user.subscription?.plan) {
@@ -101,6 +106,13 @@ const ProfileView: React.FunctionComponent<{
           <CardTitle>Billing</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {user.subscription?.endDate && (
+            <Badge variant="destructive">
+              Your subscription has been canceled and will end on{' '}
+              {new Date(user.subscription.endDate).toLocaleDateString()}.
+            </Badge>
+          )}
+
           <div className="flex flex-col gap-6 sm:flex-row sm:justify-between sm:items-center">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Current Plan</p>
