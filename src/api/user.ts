@@ -1,8 +1,8 @@
-import { User } from "../../shared/model";
+import { User, UserSubscription } from "../../shared/model";
 
 import { Api } from "./api";
 import { parseError } from "./error";
-import { buildUserFromResponse } from "./transformers";
+import { buildUserFromResponse, buildUserSubscriptionFromResponse } from "./transformers";
 
 async function getUserInfo(): Promise<User> {
   try {
@@ -13,4 +13,13 @@ async function getUserInfo(): Promise<User> {
   }
 }
 
-export { getUserInfo };
+async function getUserSubscription(): Promise<UserSubscription> {
+  try {
+    const { data } = await Api.get("/billing/subscription");
+    return Promise.resolve(buildUserSubscriptionFromResponse(data));
+  } catch (err) {
+    return Promise.reject(parseError(err));
+  }
+}
+
+export { getUserInfo, getUserSubscription };

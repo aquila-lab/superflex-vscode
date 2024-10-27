@@ -3,7 +3,7 @@ import path from "path";
 import asyncQ from "async";
 
 import { FilePayload } from "../../shared/protocol";
-import { Message, MessageReqest, TextDelta, Thread } from "../../shared/model";
+import { Message, MessageReqest, TextDelta, Thread, ThreadRun } from "../../shared/model";
 import * as api from "../api";
 import { jsonToMap, mapToJson } from "../common/utils";
 import { findWorkspaceFiles } from "../scanner";
@@ -45,9 +45,8 @@ export default class SuperflexAssistant implements Assistant {
     files: FilePayload[],
     messages: MessageReqest[],
     streamResponse?: (event: TextDelta) => void
-  ): Promise<Message> {
-    const message = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
-
+  ): Promise<ThreadRun> {
+    const threadRun = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
     // const stream = await api.stream.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, messages });
     //
     // if (streamResponse) {
@@ -56,7 +55,7 @@ export default class SuperflexAssistant implements Assistant {
     //
     // const message = await stream.final();
 
-    return message;
+    return threadRun;
   }
 
   async updateMessage(message: Message): Promise<void> {

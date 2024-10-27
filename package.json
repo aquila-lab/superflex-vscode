@@ -179,7 +179,7 @@
         {
           "type": "webview",
           "id": "superflex.chat",
-          "name": "Superflex: Chat",
+          "name": "Chat",
           "when": "superflex.chat.webview == 'chat'"
         },
         {

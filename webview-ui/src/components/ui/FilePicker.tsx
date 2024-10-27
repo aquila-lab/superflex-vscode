@@ -31,7 +31,7 @@ const FilePicker: React.FC<FilePickerProps> = ({ onChange, accept, disabled }) =
             disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
           )}>
           <IoImage className="size-3.5" />
-          <span className="text-xs">Image</span>
+          <span className="hidden xs:block text-xs">Image</span>
         </label>
         <input
           hidden

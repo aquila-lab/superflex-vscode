@@ -11,7 +11,7 @@ const CollapsibleContent = (props: React.ComponentProps<typeof CollapsiblePrimit
   <CollapsiblePrimitive.CollapsibleContent
     className={clsx(
       // Radix adds data-state open/closed, and custom props for the content height. The animation is configured in tailwind.config.js
-      'overflow-hidden transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
+      'overflow-hidden transition data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
       props.className
     )}
     {...props}

@@ -55,6 +55,9 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   appState.chatApi.registerEvent(EventType.SEND_NOTIFICATION, (payload) => {
     vscode.window.showInformationMessage(payload.message);
   });
+  appState.chatApi.registerEvent(EventType.OPEN_EXTERNAL_URL, (payload) => {
+    vscode.env.openExternal(vscode.Uri.parse(payload.url));
+  });
 }
 
 function registerSuperflexCache(context: vscode.ExtensionContext): void {

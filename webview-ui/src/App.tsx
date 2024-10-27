@@ -30,11 +30,11 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
             return;
           }
 
-          setView('chat');
+          setView('main');
           break;
         }
         case EventType.SHOW_CHAT_VIEW: {
-          setView('chat');
+          setView('main');
           break;
         }
       }

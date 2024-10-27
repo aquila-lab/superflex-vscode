@@ -27,6 +27,7 @@ import { ChatMessageList } from '../components/chat/ChatMessageList';
 import { ProjectSyncProgress } from '../components/chat/ProjectSyncProgress';
 import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
 import { ImagePreview } from '../components/ui/ImagePreview';
+import { setUser } from '../core/user/userSlice';
 
 const ChatView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -61,6 +62,15 @@ const ChatView: React.FunctionComponent<{
 
           const initState = payload as EventPayloads[typeof command]['response'];
           dispatch(setInitState(initState));
+          break;
+        }
+        case EventType.GET_USER_INFO: {
+          if (error) {
+            return;
+          }
+
+          const user = payload as EventPayloads[typeof command]['response'];
+          dispatch(setUser(user));
           break;
         }
         case EventType.SYNC_PROJECT_PROGRESS: {
@@ -319,7 +329,7 @@ const ChatView: React.FunctionComponent<{
 
   return (
     <>
-      <div className="flex flex-col h-full p-2">
+      <div className="flex flex-col h-full p-2 pt-0">
         <ChatMessageList handleMessageFeedback={handleMessageFeedback} />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <PreviewChatAttachment />

@@ -21,7 +21,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({ handleMessageF
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col gap-y-2 mb-4 overflow-hidden">
+    <div className="flex-1 flex flex-col gap-y-2 mb-4 -mt-4 overflow-hidden">
       <ul ref={listRef} className="flex flex-col gap-y-2 overflow-y-auto">
         {messages.map((message) => (
           <li key={message.id}>
