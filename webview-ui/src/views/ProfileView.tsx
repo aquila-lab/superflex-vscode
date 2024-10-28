@@ -58,7 +58,7 @@ const ProfileView: React.FunctionComponent<{
         }
       }
     });
-  }, [vscodeAPI, dispatch]);
+  }, [vscodeAPI]);
 
   useEffect(() => {
     vscodeAPI.postMessage(newEventRequest(EventType.GET_USER_INFO));
