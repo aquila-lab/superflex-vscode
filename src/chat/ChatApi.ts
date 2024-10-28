@@ -84,6 +84,9 @@ export class ChatAPI {
           const user = await api.getUserInfo();
           sendEventMessageCb(newEventResponse(EventType.GET_USER_INFO, user));
 
+          const subscription = await api.getUserSubscription();
+          sendEventMessageCb(newEventResponse(EventType.GET_USER_SUBSCRIPTION, subscription));
+
           return { isInitialized: true, isFigmaAuthenticated };
         } catch (err) {
           throw err;
@@ -213,9 +216,7 @@ export class ChatAPI {
 
         // Send subscription prompt if user is out of premium requests
         if (!threadRun.isPremium && this._isPremiumGeneration) {
-          vscode.window.showWarningMessage(
-            "You have used up your free credits for today. Please upgrade to Superflex Premium to continue."
-          );
+          sendEventMessageCb(newEventResponse(EventType.SHOW_SOFT_PAYWALL_MODAL));
         }
         this._isPremiumGeneration = threadRun.isPremium;
 
