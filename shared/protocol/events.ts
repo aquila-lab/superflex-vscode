@@ -51,6 +51,7 @@ export enum EventType {
   // Helpers
   SEND_NOTIFICATION = "send_notification",
   OPEN_EXTERNAL_URL = "open_external_url",
+  SHOW_SOFT_PAYWALL_MODAL = "show_soft_paywall_modal",
 }
 
 export interface EventPayloads {
@@ -77,6 +78,7 @@ export interface EventPayloads {
   [EventType.GET_USER_SUBSCRIPTION]: { request: void; response: UserSubscription };
   [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
   [EventType.OPEN_EXTERNAL_URL]: { request: { url: string }; response: void };
+  [EventType.SHOW_SOFT_PAYWALL_MODAL]: { request: void; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;
@@ -85,7 +87,7 @@ export interface EventMessage<T extends EventType = EventType> {
   id: string;
   command: T;
   payload?: EventPayloads[T]["request"] | EventPayloads[T]["response"];
-  error?: string;
+  error?: Error;
 }
 
 export function newEventRequest<T extends EventType>(
