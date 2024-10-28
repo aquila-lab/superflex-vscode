@@ -47,26 +47,7 @@ export default class SuperflexAssistant implements Assistant {
     messages: MessageReqest[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<ThreadRun> {
-    // Updating the file path for current open file for wins machine
-    let updatedFiles: FilePayload[] = [];
-    if (runningOnWindows()) {
-      updatedFiles = files.map((file) => ({
-        ...file,
-        path: file.path
-          .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase())
-          .replace(/\//g, "\\")
-          .replace(/^\\+/, "")
-          .replace(/\\+/g, "\\"),
-      }));
-    }
-
-    const threadRun = await api.sendThreadMessage({
-      owner: this.owner,
-      repo: this.repo,
-      threadID,
-      files: updatedFiles,
-      messages,
-    });
+    const threadRun = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
 
     // const stream = await api.stream.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, messages });
     //
@@ -75,7 +56,6 @@ export default class SuperflexAssistant implements Assistant {
     // }
     //
     // const message = await stream.final();
-    // console.log("response from the api", message);
 
     return threadRun;
   }
