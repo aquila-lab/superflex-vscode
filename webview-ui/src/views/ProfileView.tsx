@@ -93,9 +93,9 @@ const ProfileView: React.FunctionComponent<{
               <p className="text-sm font-medium text-muted-foreground">Username</p>
               <p className="text-lg font-semibold">{user.username}</p>
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-muted-foreground">Email</p>
-              <p className="text-lg font-semibold">{user.email}</p>
+              <p className="text-lg font-semibold truncate">borisboir{user.email}</p>
             </div>
           </div>
         </CardContent>
