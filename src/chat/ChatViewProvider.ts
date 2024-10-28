@@ -198,7 +198,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
-    const newCurrentOpenFile = editor.document.uri.path;
+    const newCurrentOpenFile = decodeUriAndRemoveFilePrefix(editor.document.uri.path);
     if (newCurrentOpenFile === this._currentOpenFile) {
       return;
     }

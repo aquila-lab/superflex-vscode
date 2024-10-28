@@ -180,7 +180,7 @@ export class ChatAPI {
           payload.messages.map(async (msg) => {
             if (msg.type === MessageType.Image) {
               // Read the image file
-              const imageData = fs.readFileSync(path.resolve(msg.content));
+              const imageData = fs.readFileSync(path.resolve(decodeUriAndRemoveFilePrefix(msg.content)));
               const base64Image = Buffer.from(imageData).toString("base64");
 
               return { ...msg, content: base64Image };

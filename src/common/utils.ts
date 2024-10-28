@@ -5,10 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { EXTENSION_ID } from "./constants";
 import { runningOnWindows } from "./operatingSystem";
 
-function lowercaseDriveLetter(uri: string) {
-  return uri.replace(/^\/?\w+:/, (match) => match.toLowerCase());
-}
-
 export function decodeUriAndRemoveFilePrefix(uri: string): string {
   if (runningOnWindows() && uri && uri.includes("file:///")) {
     uri = uri.replace("file:///", "");
@@ -23,13 +19,16 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
     uri = decodeURIComponent(uri);
   }
 
-  uri = uri.replace(/\\/g, "/");
-  uri = lowercaseDriveLetter(uri);
-
-  // Remove leading slash on Windows
-  if (runningOnWindows() && uri.startsWith("/")) {
-    uri = uri.replace("/", "");
+  // Updating the file path for current open file for wins machine
+  if (runningOnWindows()) {
+    uri = uri
+      .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase()) // Ensure drive letter is lowercase
+      .replace(/\//g, "\\") // Convert forward slashes to backslashes
+      .replace(/^\\+/, "") // Remove leading backslashes
+      .replace(/\\+/g, "\\"); // Replace multiple backslashes with single
   }
+
+  uri = uri.replace(/\\/g, "/");
 
   return path.normalize(uri);
 }
