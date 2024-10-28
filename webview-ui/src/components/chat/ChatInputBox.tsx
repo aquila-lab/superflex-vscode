@@ -76,24 +76,29 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
           fetchFiles={fetchFiles}
           onFileSelected={handleFileSelected}
         />
-        {selectedFiles.map((file) => (
-          <div key={file.relativePath} className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
-            <div className="flex flex-row items-center gap-1">
-              <p className="text-xs text-muted-foreground truncate max-w-36">{file.name}</p>
-              <p className="text-xs text-muted-secondary-foreground">
-                {file.isCurrentOpenFile ? 'Current file' : 'File'}
-              </p>
+
+        {selectedFiles.length === 0 ? (
+          <p className="text-xs text-muted-foreground self-center">Add context</p>
+        ) : (
+          selectedFiles.map((file) => (
+            <div key={file.relativePath} className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
+              <div className="flex flex-row items-center gap-1">
+                <p className="text-xs text-muted-foreground truncate max-w-36">{file.name}</p>
+                <p className="text-xs text-muted-secondary-foreground">
+                  {file.isCurrentOpenFile ? 'Current file' : 'File'}
+                </p>
+              </div>
+              <Button
+                size="xs"
+                variant="text"
+                className="p-0"
+                onClick={() => handleFileRemove(file)}
+                aria-label={`remove-${file.name}`}>
+                <Cross2Icon className="size-3.5" />
+              </Button>
             </div>
-            <Button
-              size="xs"
-              variant="text"
-              className="p-0"
-              onClick={() => handleFileRemove(file)}
-              aria-label={`remove-${file.name}`}>
-              <Cross2Icon className="size-3.5" />
-            </Button>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Chat input */}

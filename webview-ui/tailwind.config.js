@@ -6,6 +6,14 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      screens: {
+        xs: '256px',
+        sm: '384px',
+        md: '512px',
+        lg: '640px',
+        xl: '896px',
+        '2xl': '1024px'
+      },
       fontSize: {
         sm: ['13px', '19px'],
         md: ['14px', '20px']
@@ -19,6 +27,11 @@ export default {
         ring: 'var(--vscode-focusBorder)',
         background: 'var(--vscode-editor-background)',
         foreground: 'var(--vscode-foreground)',
+        destructive: {
+          DEFAULT: 'var(--vscode-errorForeground)',
+          background: 'var(--vscode-errorForeground)',
+          foreground: 'var(--vscode-editor-background)'
+        },
         button: {
           background: {
             DEFAULT: 'var(--vscode-button-background)',

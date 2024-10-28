@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Message } from "../model";
+import { Message, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
   CreateAuthLinkPayload,
@@ -44,7 +44,14 @@ export enum EventType {
   SHOW_LOGIN_VIEW = "show_login_view",
   SHOW_CHAT_VIEW = "show_chat_view",
 
+  // User events
+  GET_USER_INFO = "get_user_info",
+  GET_USER_SUBSCRIPTION = "get_user_subscription",
+
+  // Helpers
   SEND_NOTIFICATION = "send_notification",
+  OPEN_EXTERNAL_URL = "open_external_url",
+  SHOW_SOFT_PAYWALL_MODAL = "show_soft_paywall_modal",
 }
 
 export interface EventPayloads {
@@ -67,7 +74,11 @@ export interface EventPayloads {
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
   [EventType.SHOW_CHAT_VIEW]: { request: void; response: void };
+  [EventType.GET_USER_INFO]: { request: void; response: User };
+  [EventType.GET_USER_SUBSCRIPTION]: { request: void; response: UserSubscription };
   [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
+  [EventType.OPEN_EXTERNAL_URL]: { request: { url: string }; response: void };
+  [EventType.SHOW_SOFT_PAYWALL_MODAL]: { request: void; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;
@@ -76,7 +87,7 @@ export interface EventMessage<T extends EventType = EventType> {
   id: string;
   command: T;
   payload?: EventPayloads[T]["request"] | EventPayloads[T]["response"];
-  error?: string;
+  error?: Error;
 }
 
 export function newEventRequest<T extends EventType>(

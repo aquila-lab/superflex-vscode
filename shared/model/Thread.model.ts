@@ -10,3 +10,8 @@ export type Thread = {
   updatedAt: Date;
   createdAt: Date;
 };
+
+export type ThreadRun = {
+  message: Message;
+  isPremium: boolean;
+};

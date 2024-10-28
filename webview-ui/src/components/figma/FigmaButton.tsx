@@ -23,7 +23,7 @@ const FigmaButton: React.FunctionComponent<FigmaButtonProps> = ({ onClick, disab
       onClick={onClick}>
       <span className="sr-only">{label}</span>
       <FaFigma className="size-3.5" aria-hidden="true" />
-      <span>{label}</span>
+      <span className="hidden xs:block">{label}</span>
     </Button>
   );
 };

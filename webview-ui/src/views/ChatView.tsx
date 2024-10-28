@@ -22,11 +22,13 @@ import {
   setSelectedFiles
 } from '../core/chat/chatSlice';
 import { useAppDispatch, useAppSelector } from '../core/store';
+import { setUser, setUserSubscription } from '../core/user/userSlice';
+import { OutOfRequestsPage, SoftLimitModal } from '../components/billing';
+import { ImagePreview } from '../components/ui/ImagePreview';
 import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessageList } from '../components/chat/ChatMessageList';
 import { ProjectSyncProgress } from '../components/chat/ProjectSyncProgress';
 import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
-import { ImagePreview } from '../components/ui/ImagePreview';
 
 const ChatView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -37,6 +39,7 @@ const ChatView: React.FunctionComponent<{
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const initState = useAppSelector((state) => state.chat.init);
+  const userSubscription = useAppSelector((state) => state.user.subscription);
   const isProjectSyncing = useAppSelector((state) => state.chat.isProjectSyncing);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
 
@@ -47,6 +50,8 @@ const ChatView: React.FunctionComponent<{
   const [currentOpenFile, setCurrentOpenFile] = useState<FilePayload | null>(null);
   const [chatImageAttachment, setChatImageAttachment] = useState<File>();
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
+  const [isOutOfRequests, setIsOutOfRequests] = useState(false);
+  const [isPremiumRequestModalOpen, setIsPremiumRequestModalOpen] = useState(false);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -61,6 +66,24 @@ const ChatView: React.FunctionComponent<{
 
           const initState = payload as EventPayloads[typeof command]['response'];
           dispatch(setInitState(initState));
+          break;
+        }
+        case EventType.GET_USER_INFO: {
+          if (error) {
+            return;
+          }
+
+          const user = payload as EventPayloads[typeof command]['response'];
+          dispatch(setUser(user));
+          break;
+        }
+        case EventType.GET_USER_SUBSCRIPTION: {
+          if (error) {
+            return;
+          }
+
+          const subscription = payload as EventPayloads[typeof command]['response'];
+          dispatch(setUserSubscription(subscription));
           break;
         }
         case EventType.SYNC_PROJECT_PROGRESS: {
@@ -106,8 +129,12 @@ const ChatView: React.FunctionComponent<{
         case EventType.NEW_MESSAGE: {
           dispatch(setIsMessageProcessing(false));
 
+          if (error && 'slug' in error && error.slug === 'quota_exceeded') {
+            setIsOutOfRequests(true);
+            return;
+          }
           if (error) {
-            console.error(`Error processing 'new_message': ${message.error}`);
+            console.error(`Error processing 'new_message': ${error.message}`);
             return;
           }
 
@@ -136,6 +163,10 @@ const ChatView: React.FunctionComponent<{
         case EventType.SET_CURRENT_OPEN_FILE: {
           const file = payload as EventPayloads[typeof command]['request'];
           setCurrentOpenFile(file);
+          break;
+        }
+        case EventType.SHOW_SOFT_PAYWALL_MODAL: {
+          setIsPremiumRequestModalOpen(true);
           break;
         }
       }
@@ -282,6 +313,10 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.UPDATE_MESSAGE, { ...message, feedback }));
   }
 
+  function handleSubscribe(): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
+  }
+
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
   const PreviewChatAttachment = (): React.ReactNode => {
@@ -317,9 +352,20 @@ const ChatView: React.FunctionComponent<{
     );
   };
 
+  if (
+    isOutOfRequests ||
+    (userSubscription?.plan && userSubscription.basicRequestsUsed >= userSubscription.plan.basicRequestLimit)
+  ) {
+    return (
+      <div className="flex flex-col h-full p-2 pt-0">
+        <OutOfRequestsPage onSubscribe={handleSubscribe} />
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="flex flex-col h-full p-2">
+      <div className="flex flex-col h-full p-2 pt-0">
         <ChatMessageList handleMessageFeedback={handleMessageFeedback} />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <PreviewChatAttachment />
@@ -343,6 +389,11 @@ const ChatView: React.FunctionComponent<{
         open={openFigmaFilePickerModal}
         onClose={() => setOpenFigmaFilePickerModal(false)}
         onSubmit={handleFigmaFileSelected}
+      />
+      <SoftLimitModal
+        isOpen={isPremiumRequestModalOpen}
+        onClose={() => setIsPremiumRequestModalOpen(false)}
+        onSubscribe={handleSubscribe}
       />
     </>
   );

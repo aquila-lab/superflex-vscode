@@ -1,5 +1,5 @@
 import { FilePayload } from "../../shared/protocol";
-import { Message, MessageReqest, TextDelta, Thread } from "../../shared/model";
+import { Message, MessageReqest, TextDelta, Thread, ThreadRun } from "../../shared/model";
 
 export interface Assistant {
   /**
@@ -24,7 +24,7 @@ export interface Assistant {
     files: FilePayload[],
     messages: MessageReqest[],
     streamResponse?: (event: TextDelta) => void
-  ): Promise<Message>;
+  ): Promise<ThreadRun>;
 
   /**
    * Update a message in a chat thread.

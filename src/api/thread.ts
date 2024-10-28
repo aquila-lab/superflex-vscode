@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import { FilePayload } from "../../shared/protocol";
-import { MessageReqest, Message, Thread } from "../../shared/model";
+import { MessageReqest, Thread, ThreadRun } from "../../shared/model";
 
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
@@ -59,9 +59,15 @@ export type SendThreadMessageArgs = GetThreadArgs & {
   messages: MessageReqest[];
 };
 
-async function sendThreadMessage({ owner, repo, threadID, files, messages }: SendThreadMessageArgs): Promise<Message> {
+async function sendThreadMessage({
+  owner,
+  repo,
+  threadID,
+  files,
+  messages,
+}: SendThreadMessageArgs): Promise<ThreadRun> {
   try {
-    const { data } = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
+    const response = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, {
       files: files.map((file) => ({
         path: file.relativePath,
         content: fs.readFileSync(file.path).toString(),
@@ -72,7 +78,10 @@ async function sendThreadMessage({ owner, repo, threadID, files, messages }: Sen
       })),
     });
 
-    return Promise.resolve(buildMessageFromResponse(data));
+    return Promise.resolve({
+      message: buildMessageFromResponse(response.data),
+      isPremium: response.headers["x-is-premium-request"] === "true",
+    });
   } catch (err) {
     return Promise.reject(parseError(err));
   }
