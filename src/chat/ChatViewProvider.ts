@@ -175,7 +175,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
                        connect-src 'self' http://localhost:3000 https://us.posthog.com/ https://app.posthog.com/ https://us.i.posthog.com/ https://www.youtube.com/;
                        style-src ${webview.cspSource} 'unsafe-inline';
                        font-src ${webview.cspSource};
-                       img-src ${webview.cspSource};
+                       img-src ${webview.cspSource} https://*.amazonaws.com blob: data:;
                        script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/ https://us-assets.i.posthog.com/;
                        frame-src https://www.youtube.com/;">
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
