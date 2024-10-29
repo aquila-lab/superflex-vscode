@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { Message, MessageType, Role } from '../../../../shared/model';
-import { FilePayload, InitState } from '../../../../shared/protocol';
+import { FilePayload, InitChatState } from '../../../../shared/protocol';
 
 const defaultMessages: Message[] = [
   {
@@ -20,7 +20,7 @@ const defaultMessages: Message[] = [
 ];
 
 type ChatState = {
-  init: InitState;
+  init: InitChatState;
   messages: Message[];
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
@@ -44,7 +44,7 @@ const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    setInitState: (state, action: PayloadAction<Partial<InitState>>) => {
+    setInitState: (state, action: PayloadAction<Partial<InitChatState>>) => {
       state.init = { ...state.init, ...action.payload };
     },
     addMessages: (state, action: PayloadAction<Message[]>) => {

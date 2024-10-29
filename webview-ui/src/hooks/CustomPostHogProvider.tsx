@@ -1,13 +1,15 @@
+import React, { PropsWithChildren, useEffect } from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
-import React, { PropsWithChildren, useEffect } from 'react';
-import { IS_PROD, SUPERFLEX_POSTHOG_API_KEY } from '../../../shared/common/constants';
+
+import { SUPERFLEX_POSTHOG_API_KEY } from '../../../shared/common/constants';
+import { useAppSelector } from '../core/store';
 
 const CustomPostHogProvider = ({ children }: PropsWithChildren) => {
-  const [client, setClient] = React.useState<any>(undefined);
+  const allowAnonymousTelemetry = useAppSelector((state) => state.config.allowAnonymousTelemetry);
 
   useEffect(() => {
-    if (IS_PROD && SUPERFLEX_POSTHOG_API_KEY) {
+    if (allowAnonymousTelemetry) {
       posthog.init(SUPERFLEX_POSTHOG_API_KEY, {
         api_host: 'https://app.posthog.com',
         disable_session_recording: true,
@@ -15,15 +17,11 @@ const CustomPostHogProvider = ({ children }: PropsWithChildren) => {
         capture_pageleave: false,
         capture_pageview: false
       });
-      //   posthog.identify(window.vscMachineId);
-      //   posthog.opt_in_capturing();
-      setClient(client);
-    } else {
-      setClient(undefined);
+      posthog.opt_in_capturing();
     }
-  }, []);
+  }, [allowAnonymousTelemetry]);
 
-  return <PostHogProvider client={client}>{children}</PostHogProvider>;
+  return allowAnonymousTelemetry ? <PostHogProvider>{children}</PostHogProvider> : <>{children}</>;
 };
 
 export default CustomPostHogProvider;
