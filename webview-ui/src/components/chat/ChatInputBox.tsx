@@ -125,7 +125,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
           <FigmaButton disabled={disabled && isFigmaAuthenticated} onClick={onFigmaButtonClicked} />
           <FilePicker
             disabled={disabled}
-            accept="image/*"
+            accept="image/jpeg, image/png"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (!file) return;
