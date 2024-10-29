@@ -25,9 +25,9 @@ export function SoftLimitModal({ isOpen, onClose, onSubscribe }: SoftLimitModalP
           You&apos;ve used all your premium requests. Subscribe for unlimited access or continue with free requests!
         </DialogDescription>
         <DialogFooter className="flex flex-col sm:flex-row sm:justify-start gap-2">
-          <Button onClick={handleSubscribe}>Subscribe Now</Button>
+          <Button onClick={handleSubscribe}>Upgrade to Premium</Button>
           <Button variant="secondary" onClick={onClose}>
-            Continue with Free
+            Switch to Basic
           </Button>
         </DialogFooter>
       </DialogContent>
