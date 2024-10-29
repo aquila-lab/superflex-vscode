@@ -1,6 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
-import { v4 as uuidv4 } from "uuid";
+import { machineIdSync } from "node-machine-id";
 
 import { EXTENSION_ID } from "./constants";
 import { runningOnWindows } from "./operatingSystem";
@@ -65,14 +65,19 @@ export function getExtensionVersion(): string {
   return extension?.packageJSON.version || "unknown";
 }
 
-const UNIQUE_ID_KEY = "uniqueID";
-export async function getUniqueID(context: vscode.ExtensionContext): Promise<{ uniqueID: string; isNew: boolean }> {
-  let uniqueID = context.globalState.get<string>(UNIQUE_ID_KEY);
-  if (!uniqueID) {
-    uniqueID = uuidv4();
-    await context.globalState.update(UNIQUE_ID_KEY, uniqueID);
-    return { uniqueID, isNew: true };
+export function getNonce() {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
+  return text;
+}
 
-  return { uniqueID, isNew: false };
+export function getUniqueID(): { uniqueID: string; isNew: boolean } {
+  const id = vscode.env.machineId;
+  if (id === "someValue.machineId") {
+    return { uniqueID: machineIdSync(), isNew: true };
+  }
+  return { uniqueID: id, isNew: false };
 }

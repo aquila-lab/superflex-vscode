@@ -83,12 +83,20 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
 
       <div className="flex flex-col items-center gap-3 mb-8">
         <p className="text-lg font-semibold">Watch our onboarding video:</p>
-        <div className="w-full">
+        <div
+          className="w-full cursor-pointer relative"
+          onClick={() =>
+            vscodeAPI.postMessage(
+              newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://www.youtube.com/watch?v=hNSYwKTxIP8' })
+            )
+          }>
+          <div className="absolute inset-0 z-10"></div>
           <iframe
             className="w-full aspect-video border border-border rounded-lg shadow-sm"
             src="https://www.youtube.com/embed/hNSYwKTxIP8?si=8C9RVdflePElLhJx"
             title="Superflex Onboarding Video"
             frameBorder="0"
+            sandbox="allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-top-navigation allow-presentation"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen></iframe>
         </div>

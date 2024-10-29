@@ -268,6 +268,7 @@
     "axios": "^1.7.7",
     "crypto": "^1.0.1",
     "fast-glob": "^3.3.2",
+    "node-machine-id": "^1.1.12",
     "posthog-node": "^4.2.0",
     "uuidv4": "^6.2.13"
   }

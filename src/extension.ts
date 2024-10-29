@@ -37,7 +37,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     chatViewProvider: chatWebviewProvider,
   };
 
-  await initializeAnalytics(context, appState);
+  await initializeAnalytics(appState);
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
   // before considering Superflex ready to operate.
@@ -107,7 +107,7 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
   state.figmaAuthService.authenticate(state.figmaAuthProvider);
 }
 
-async function initializeAnalytics(context: vscode.ExtensionContext, appState: AppState) {
+async function initializeAnalytics(appState: AppState) {
   const config = vscode.workspace.getConfiguration("superflex");
   const analyticsEnabled = config.get<boolean>("analytics", false);
 
@@ -116,7 +116,7 @@ async function initializeAnalytics(context: vscode.ExtensionContext, appState: A
   );
 
   if (analyticsEnabled && SUPERFLEX_POSTHOG_API_KEY) {
-    const { uniqueID, isNew } = await getUniqueID(context);
+    const { uniqueID, isNew } = getUniqueID();
     const extensionVersion = getExtensionVersion();
 
     await Telemetry.setup(analyticsEnabled, uniqueID, extensionVersion, {
