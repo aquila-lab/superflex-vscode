@@ -1,5 +1,9 @@
 import { MessageReqest } from "../model";
 
+export type ConfigPayload = {
+  allowAnonymousTelemetry: boolean;
+};
+
 export type CreateAuthLinkPayload = {
   action: "login" | "create_account";
 };
@@ -8,7 +12,7 @@ export type AuthLinkPayload = {
   uniqueLink: string;
 };
 
-export type InitState = {
+export type InitChatState = {
   isInitialized: boolean;
   isFigmaAuthenticated: boolean;
 };

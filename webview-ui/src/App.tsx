@@ -4,11 +4,15 @@ import React, { useEffect, useState } from 'react';
 
 import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../shared/protocol';
 import views from './views';
+import { useAppDispatch } from './core/store';
+import { configActions } from './core/actions';
 import { VSCodeWrapper } from './api/vscodeApi';
 
 type View = keyof typeof views;
 
 const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI }) => {
+  const dispatch = useAppDispatch();
+
   const [view, setView] = useState<View>('login');
 
   useEffect(() => {
@@ -16,6 +20,13 @@ const App: React.FunctionComponent<{ vscodeAPI: VSCodeWrapper }> = ({ vscodeAPI 
       const { command, payload, error } = message;
 
       switch (command) {
+        case EventType.CONFIG: {
+          if (error) return;
+
+          const config = payload as EventPayloads[typeof command]['request'];
+          dispatch(configActions.setConfig(config));
+          break;
+        }
         case EventType.SHOW_LOGIN_VIEW: {
           setView('login');
           break;

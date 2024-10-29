@@ -2,10 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Message, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
+  ConfigPayload,
   CreateAuthLinkPayload,
   FigmaFile,
   FilePayload,
-  InitState,
+  InitChatState,
   SendMessagesRequestPayload,
   SendNotificationPayload,
   SyncProjectProgressPayload,
@@ -14,6 +15,7 @@ import {
 export enum EventType {
   READY = "ready",
   INITIALIZED = "initialized",
+  CONFIG = "config",
 
   // Login events
   LOGIN_CLICKED = "login_clicked",
@@ -56,7 +58,8 @@ export enum EventType {
 
 export interface EventPayloads {
   [EventType.READY]: { request: void; response: void };
-  [EventType.INITIALIZED]: { request: void; response: InitState };
+  [EventType.INITIALIZED]: { request: void; response: InitChatState };
+  [EventType.CONFIG]: { request: ConfigPayload; response: void };
   [EventType.LOGIN_CLICKED]: { request: void; response: void };
   [EventType.CREATE_ACCOUNT_CLICKED]: { request: void; response: void };
   [EventType.CREATE_AUTH_LINK]: { request: CreateAuthLinkPayload; response: AuthLinkPayload };

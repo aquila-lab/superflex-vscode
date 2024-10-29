@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { EventType } from "../shared/protocol";
+import { EventType, newEventRequest } from "../shared/protocol";
 import { ChatAPI } from "./chat/ChatApi";
 import { AUTH_PROVIDER_ID, SUPERFLEX_POSTHOG_API_KEY } from "./common/constants";
 import { getExtensionVersion, getOpenWorkspace, getUniqueID } from "./common/utils";
@@ -37,7 +37,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     chatViewProvider: chatWebviewProvider,
   };
 
-  await initializeAnalytics(context);
+  await initializeAnalytics(context, appState);
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
   // before considering Superflex ready to operate.
@@ -107,9 +107,13 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
   state.figmaAuthService.authenticate(state.figmaAuthProvider);
 }
 
-async function initializeAnalytics(context: vscode.ExtensionContext) {
+async function initializeAnalytics(context: vscode.ExtensionContext, appState: AppState) {
   const config = vscode.workspace.getConfiguration("superflex");
   const analyticsEnabled = config.get<boolean>("analytics", false);
+
+  appState.chatViewProvider.sendEventMessage(
+    newEventRequest(EventType.CONFIG, { allowAnonymousTelemetry: analyticsEnabled })
+  );
 
   if (analyticsEnabled && SUPERFLEX_POSTHOG_API_KEY) {
     const { uniqueID, isNew } = await getUniqueID(context);
