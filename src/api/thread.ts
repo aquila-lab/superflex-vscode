@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import { FilePayload } from "../../shared/protocol";
-import { MessageReqest, Thread, ThreadRun } from "../../shared/model";
+import { MessageContent, MessageType, Thread, ThreadRun } from "../../shared/model";
 
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
@@ -56,7 +56,7 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
 
 export type SendThreadMessageArgs = GetThreadArgs & {
   files: FilePayload[];
-  messages: MessageReqest[];
+  messages: MessageContent[];
 };
 
 async function sendThreadMessage({
@@ -72,10 +72,16 @@ async function sendThreadMessage({
         path: file.relativePath,
         content: fs.readFileSync(file.path).toString(),
       })),
-      messages: messages.map((msg) => ({
-        type: msg.type,
-        content: msg.content,
-      })),
+      messages: messages.map((msg) => {
+        if (msg.type === MessageType.Figma) {
+          return {
+            type: msg.type,
+            file_id: msg.fileID,
+            node_id: msg.nodeID,
+          };
+        }
+        return msg;
+      }),
     });
 
     return Promise.resolve({

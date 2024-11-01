@@ -2,17 +2,20 @@ import { v4 as uuidv4 } from 'uuid';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { Message, MessageType, Role } from '../../../../shared/model';
 import { FilePayload, InitChatState } from '../../../../shared/protocol';
+import { Message, MessageType, Role, TextContent } from '../../../../shared/model';
+
+const defaultMessageContent: TextContent = {
+  type: MessageType.Text,
+  text: "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let’s work together and get things done—tell me what you'd like to build today!"
+};
 
 const defaultMessages: Message[] = [
   {
     id: uuidv4(),
     threadID: uuidv4(),
     role: Role.Assistant,
-    type: MessageType.Text,
-    content:
-      "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let’s work together and get things done—tell me what you'd like to build today!",
+    content: defaultMessageContent,
     feedback: 'none',
     createdAt: new Date(),
     updatedAt: new Date()

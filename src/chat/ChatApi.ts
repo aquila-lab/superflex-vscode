@@ -3,7 +3,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { Message, MessageType, Thread, User, UserSubscription } from "../../shared/model";
+import { ImageContent, Message, MessageType, Thread } from "../../shared/model";
 import {
   EventMessage,
   EventPayloads,
@@ -18,7 +18,7 @@ import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../
 import { Telemetry } from "../common/analytics/Telemetry";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
-import { extractFigmaSelectionUrl } from "../model/Figma.model";
+import { extractFigmaSelectionUrl } from "../../shared/model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
 import { findWorkspaceFiles } from "../scanner";
@@ -179,14 +179,11 @@ export class ChatAPI {
         const messages = await Promise.all(
           payload.messages.map(async (msg) => {
             if (msg.type === MessageType.Image) {
-              // Read the image file
-              const imageData = fs.readFileSync(path.resolve(decodeUriAndRemoveFilePrefix(msg.content)));
-              const base64Image = Buffer.from(imageData).toString("base64");
-
-              return { ...msg, content: base64Image };
-            }
-            if (msg.type === MessageType.Figma) {
-              return { ...msg, type: MessageType.Image };
+              if (typeof msg.image === "object" && "type" in msg.image && msg.image.type === "image_file") {
+                const imageData = fs.readFileSync(path.resolve(decodeUriAndRemoveFilePrefix(msg.image.path)));
+                const base64Image = Buffer.from(imageData).toString("base64");
+                return { ...msg, image: base64Image } as ImageContent;
+              }
             }
 
             return msg;
@@ -210,7 +207,6 @@ export class ChatAPI {
           threadID: thread.id,
           customSelectedFiles: payload.files.length,
           assistantMessageID: threadRun.message.id,
-          assistantMessageLength: threadRun.message.content.length,
           processingDeltaTimeMs: Date.now() - timeNow,
         });
 

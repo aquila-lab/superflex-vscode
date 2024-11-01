@@ -1,12 +1,12 @@
 import axios from "axios";
 import * as vscode from "vscode";
 
+import { FigmaTokenInformation } from "../../shared/model";
 import { EventType, newEventResponse } from "../../shared/protocol";
 import ChatViewProvider from "../chat/ChatViewProvider";
-import { FigmaTokenInformation } from "../model/Figma.model";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { FigmaApiProvider, figmaRefreshAccessToken, HttpStatusCode } from "../api";
+import { ApiProvider, FigmaApiProvider, figmaRefreshAccessToken, HttpStatusCode } from "../api";
 import FigmaAuthenticationProvider, { FigmaAuthenticationSession } from "./FigmaAuthenticationProvider";
 
 export default class FigmaAuthenticationService {
@@ -92,6 +92,7 @@ export default class FigmaAuthenticationService {
 
   private async setAuthHeader(session: FigmaAuthenticationSession, disconnect: () => void): Promise<void> {
     try {
+      ApiProvider.setHeader("X-Figma-Token", session.accessToken);
       FigmaApiProvider.setHeader("Authorization", `Bearer ${session.accessToken}`);
       FigmaApiProvider.addRefreshTokenInterceptor(async (err) => {
         if (
@@ -102,6 +103,7 @@ export default class FigmaAuthenticationService {
             const newTokenInfo = await figmaRefreshAccessToken({ refreshToken: session.refreshToken });
             if (newTokenInfo) {
               this._figmaAuthenticationProvider.updateSession(session.id, newTokenInfo);
+              ApiProvider.setHeader("X-Figma-Token", newTokenInfo.accessToken);
               FigmaApiProvider.setHeader("Authorization", `Bearer ${newTokenInfo.accessToken}`);
             }
 

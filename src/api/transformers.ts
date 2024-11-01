@@ -1,4 +1,4 @@
-import { User, Message, Thread, Plan, UserSubscription } from "../../shared/model";
+import { User, Message, Thread, Plan, UserSubscription, MessageType, MessageContent } from "../../shared/model";
 
 export function buildUserFromResponse(res: any): User {
   return {
@@ -29,13 +29,22 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
   };
 }
 
+function buildMessageContentFromResponse(res: any): MessageContent {
+  if (res.type === MessageType.Figma) {
+    return { type: MessageType.Figma, fileID: res.file_id, nodeID: res.node_id, image: res.image };
+  }
+  if (res.type === MessageType.Image) {
+    return { type: MessageType.Image, image: res.image };
+  }
+  return { type: MessageType.Text, text: res.content };
+}
+
 export function buildMessageFromResponse(res: any): Message {
   return {
     id: res.id,
     threadID: res.thread_id,
     role: res.role,
-    type: res.type,
-    content: res.content,
+    content: buildMessageContentFromResponse(res.content),
     feedback: res.feedback ?? undefined,
     updatedAt: new Date(res.updated_at),
     createdAt: new Date(res.created_at),

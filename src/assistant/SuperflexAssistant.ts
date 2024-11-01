@@ -3,10 +3,10 @@ import path from "path";
 import asyncQ from "async";
 
 import { FilePayload } from "../../shared/protocol";
-import { Message, MessageReqest, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
 import * as api from "../api";
-import { jsonToMap, mapToJson } from "../common/utils";
 import { findWorkspaceFiles } from "../scanner";
+import { jsonToMap, mapToJson } from "../common/utils";
 import { SuperflexCache } from "../cache/SuperflexCache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { Assistant } from "./Assistant";
@@ -43,7 +43,7 @@ export default class SuperflexAssistant implements Assistant {
   async sendMessage(
     threadID: string,
     files: FilePayload[],
-    messages: MessageReqest[],
+    messages: MessageContent[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<ThreadRun> {
     const threadRun = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });

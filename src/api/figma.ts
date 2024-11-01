@@ -1,5 +1,4 @@
-import { User } from "../../shared/model";
-import { FigmaTokenInformation } from "../model/Figma.model";
+import { User, FigmaTokenInformation } from "../../shared/model";
 import { PublicApi } from "./api";
 import { FigmaApi } from "./figmaApi";
 import { parseError } from "./error";
@@ -51,28 +50,4 @@ async function getFigmaSelectionImageUrl({ fileID, nodeID }: GetFigmaSelectionIm
   }
 }
 
-async function getFigmaSelectionFile({ fileID, nodeID }: GetFigmaSelectionImageUrlArgs): Promise<any> {
-  try {
-    const { data } = await FigmaApi.get(`/files/${fileID}?ids=${nodeID}`);
-    return Promise.resolve(data);
-  } catch (err) {
-    return Promise.reject(parseError(err));
-  }
-}
-
-async function getFigmaSelectionFileNodes({ fileID, nodeID }: GetFigmaSelectionImageUrlArgs): Promise<any> {
-  try {
-    const { data } = await FigmaApi.get(`/files/${fileID}/nodes?ids=${nodeID}`);
-    return Promise.resolve(data);
-  } catch (err) {
-    return Promise.reject(parseError(err));
-  }
-}
-
-export {
-  figmaRefreshAccessToken,
-  getFigmaUserInfo,
-  getFigmaSelectionImageUrl,
-  getFigmaSelectionFile,
-  getFigmaSelectionFileNodes,
-};
+export { figmaRefreshAccessToken, getFigmaUserInfo, getFigmaSelectionImageUrl };

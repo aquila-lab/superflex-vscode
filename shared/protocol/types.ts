@@ -1,4 +1,4 @@
-import { MessageReqest } from "../model";
+import { MessageContent } from "../model";
 
 export type ConfigPayload = {
   allowAnonymousTelemetry: boolean;
@@ -31,7 +31,7 @@ export type FilePayload = {
 
 export type SendMessagesRequestPayload = {
   files: FilePayload[];
-  messages: MessageReqest[];
+  messages: MessageContent[];
 };
 
 export type FigmaFile = {

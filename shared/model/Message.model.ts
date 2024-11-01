@@ -9,14 +9,33 @@ export enum MessageType {
   Figma = "figma",
 }
 
+export type ImageFile = {
+  type: "image_file";
+  path: string;
+};
+
 export type TextDelta = {
   value: string;
 };
 
-export type MessageReqest = {
-  type: MessageType;
-  content: string;
-};
+export interface TextContent {
+  type: MessageType.Text;
+  text: string;
+}
+
+export interface ImageContent {
+  type: MessageType.Image;
+  image: ImageFile | string;
+}
+
+export interface FigmaContent {
+  type: MessageType.Figma;
+  fileID: string;
+  nodeID: string;
+  image: string;
+}
+
+export type MessageContent = TextContent | ImageContent | FigmaContent;
 
 export type Message = {
   /** @type {Generics.UUID} */
@@ -25,8 +44,7 @@ export type Message = {
   threadID: string;
 
   role: Role;
-  type: MessageType;
-  content: string;
+  content: MessageContent;
 
   feedback?: string;
 

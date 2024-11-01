@@ -20,13 +20,13 @@ const imagePreviewVariants = cva('object-cover rounded-md', {
 interface ImagePreviewProps
   extends React.ImgHTMLAttributes<HTMLImageElement>,
     VariantProps<typeof imagePreviewVariants> {
-  isLoading: boolean;
+  isLoading?: boolean;
   onRemove?: () => void;
   spinnerSize?: 'sm' | 'default';
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({
-  isLoading,
+  isLoading = false,
   onRemove,
   size,
   spinnerSize = 'default',

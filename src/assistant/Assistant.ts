@@ -1,5 +1,5 @@
 import { FilePayload } from "../../shared/protocol";
-import { Message, MessageReqest, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
 
 export interface Assistant {
   /**
@@ -22,7 +22,7 @@ export interface Assistant {
   sendMessage(
     threadID: string,
     files: FilePayload[],
-    messages: MessageReqest[],
+    messages: MessageContent[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<ThreadRun>;
 

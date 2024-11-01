@@ -1,9 +1,12 @@
 import axios from "axios";
 
 import { API_BASE_URL } from "../common/constants";
+import { getExtensionVersion } from "../common/utils";
 
-const Api = axios.create({ baseURL: API_BASE_URL });
-const PublicApi = axios.create({ baseURL: API_BASE_URL });
+const extensionVersion = getExtensionVersion();
+
+const Api = axios.create({ baseURL: API_BASE_URL, headers: { "X-Extension-Version": extensionVersion } });
+const PublicApi = axios.create({ baseURL: API_BASE_URL, headers: { "X-Extension-Version": extensionVersion } });
 
 class ApiProviderClass {
   responseInterceptor: any = null;

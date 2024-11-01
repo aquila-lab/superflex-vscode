@@ -18,8 +18,7 @@ interface ChatMessageProps {
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleFeedback }) => {
-  const showFeedback =
-    message.role === Role.Assistant && !message.content.startsWith('Welcome to Superflex') && !message.feedback;
+  const showFeedback = message.role === Role.Assistant && !message.feedback;
 
   return (
     <div
@@ -34,15 +33,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleFeedbac
         <p className="text-sm font-medium text-primary">{message.role === Role.User ? 'You' : 'Superflex'}</p>
       </div>
 
-      {message.type === MessageType.Text && <MarkdownRender mdString={message.content} />}
+      {message.content.type === MessageType.Text && <MarkdownRender mdString={message.content.text} />}
 
-      {(message.type === MessageType.Image || message.type === MessageType.Figma) && (
-        <ImagePreview
-          alt="preview image"
-          className="mt-2"
-          isLoading={message.type === MessageType.Figma}
-          src={message.content}
-        />
+      {(message.content.type === MessageType.Image || message.content.type === MessageType.Figma) && (
+        <ImagePreview alt="preview image" className="mt-2" src={message.content.image as string} />
       )}
 
       {showFeedback && (

@@ -13,12 +13,11 @@ import {
   ProgressLocation,
 } from "vscode";
 
-import { User } from "../../shared/model";
+import { User, FigmaTokenInformation } from "../../shared/model";
 import * as api from "../api";
 import { FIGMA_AUTH_PROVIDER_ID, FIGMA_OAUTH_CALLBACK_URL, FIGMA_OAUTH_CLIENT_ID } from "../common/constants";
 import { PromiseAdapter, promiseFromEvent } from "../adapters/promiseFromEvent";
 import uriEventHandler, { UriEventHandler } from "./UriEventHandler";
-import { FigmaTokenInformation } from "../model/Figma.model";
 
 const AUTH_PROVIDER_LABEL = "Figma Authentication";
 const SESSIONS_SECRET_KEY = `${FIGMA_AUTH_PROVIDER_ID}.sessions`;
@@ -73,6 +72,7 @@ export default class FigmaAuthenticationProvider implements AuthenticationProvid
         throw new Error("Superflex - (Figma): Connecting Figma account failed!");
       }
 
+      api.ApiProvider.setHeader("X-Figma-Token", accessToken);
       api.FigmaApiProvider.setHeader("Authorization", `Bearer ${accessToken}`);
       const user: User = await api.getFigmaUserInfo();
 

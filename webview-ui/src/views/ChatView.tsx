@@ -1,7 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Message, MessageType, Role } from '../../../shared/model';
+import {
+  FigmaContent,
+  ImageContent,
+  Message,
+  MessageContent,
+  MessageType,
+  Role,
+  TextContent,
+  extractFigmaSelectionUrl
+} from '../../../shared/model';
 import {
   EventMessage,
   EventPayloads,
@@ -211,54 +220,48 @@ const ChatView: React.FunctionComponent<{
     imageFile?: File,
     figmaFile?: FigmaFile
   ): boolean {
-    const messages: Message[] = [];
+    const messages: MessageContent[] = [];
     const eventPayload: SendMessagesRequestPayload = { files: selectedFiles, messages: [] };
 
     // Add image message if present
     if (imageFile) {
-      const imageMessage: Message = {
-        id: uuidv4(),
-        threadID: uuidv4(),
-        role: Role.User,
+      const imageMessage: ImageContent = {
         type: MessageType.Image,
-        content: URL.createObjectURL(imageFile),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        image: URL.createObjectURL(imageFile)
       };
 
       messages.push(imageMessage);
-      eventPayload.messages.push({
-        type: MessageType.Image,
-        content: (imageFile as any).path
-      });
+      eventPayload.messages.push(imageMessage);
     }
 
     // Handle Figma content if present
     if (figmaFile) {
-      const figmaMessage: Message = {
-        id: uuidv4(),
-        threadID: uuidv4(),
-        role: Role.User,
+      const figmaSelection = extractFigmaSelectionUrl(figmaFile.selectionLink);
+      if (!figmaSelection) {
+        vscodeAPI.postMessage(
+          newEventRequest(EventType.SEND_NOTIFICATION, {
+            message: 'Invalid Figma selection link. Please provide a valid Figma selection url.'
+          })
+        );
+        return false;
+      }
+
+      const figmaMessage: FigmaContent = {
         type: MessageType.Figma,
-        content: figmaFile.imageUrl,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        fileID: figmaSelection.fileID,
+        nodeID: figmaSelection.nodeID,
+        image: figmaFile.imageUrl
       };
 
-      messages.push({ ...figmaMessage, type: MessageType.Image });
+      messages.push(figmaMessage);
       eventPayload.messages.push(figmaMessage);
     }
 
     // Add text message if present
     if (textContent.trim()) {
-      const textMessage: Message = {
-        id: uuidv4(),
-        threadID: uuidv4(),
-        role: Role.User,
+      const textMessage: TextContent = {
         type: MessageType.Text,
-        content: textContent,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        text: textContent
       };
 
       messages.push(textMessage);
@@ -267,7 +270,21 @@ const ChatView: React.FunctionComponent<{
 
     // Only proceed if there's at least one message
     if (messages.length > 0) {
-      dispatch(addMessages(messages));
+      dispatch(
+        addMessages(
+          messages.map((m) => {
+            const message: Message = {
+              id: uuidv4(),
+              threadID: uuidv4(),
+              role: Role.User,
+              content: m,
+              updatedAt: new Date(),
+              createdAt: new Date()
+            };
+            return message;
+          })
+        )
+      );
 
       vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, eventPayload));
       dispatch(setIsMessageProcessing(true));
