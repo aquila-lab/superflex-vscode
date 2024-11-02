@@ -36,7 +36,7 @@ function buildMessageContentFromResponse(res: any): MessageContent {
   if (res.type === MessageType.Image) {
     return { type: MessageType.Image, image: res.image };
   }
-  return { type: MessageType.Text, text: res.content };
+  return { type: MessageType.Text, text: res.text };
 }
 
 export function buildMessageFromResponse(res: any): Message {
