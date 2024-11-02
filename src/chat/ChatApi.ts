@@ -182,7 +182,7 @@ export class ChatAPI {
               if (typeof msg.image === "object" && "type" in msg.image && msg.image.type === "image_file") {
                 const imageData = fs.readFileSync(path.resolve(decodeUriAndRemoveFilePrefix(msg.image.path)));
                 const base64Image = Buffer.from(imageData).toString("base64");
-                return { ...msg, image: base64Image } as ImageContent;
+                return { type: msg.type, image: base64Image } as ImageContent;
               }
             }
 

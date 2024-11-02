@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import {
   FigmaContent,
-  ImageContent,
   Message,
   MessageContent,
   MessageType,
@@ -225,13 +224,14 @@ const ChatView: React.FunctionComponent<{
 
     // Add image message if present
     if (imageFile) {
-      const imageMessage: ImageContent = {
+      messages.push({ type: MessageType.Image, image: URL.createObjectURL(imageFile) });
+      eventPayload.messages.push({
         type: MessageType.Image,
-        image: URL.createObjectURL(imageFile)
-      };
-
-      messages.push(imageMessage);
-      eventPayload.messages.push(imageMessage);
+        image: {
+          type: 'image_file',
+          path: (imageFile as any).path
+        }
+      });
     }
 
     // Handle Figma content if present
