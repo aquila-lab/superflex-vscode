@@ -174,22 +174,8 @@ export class ChatAPI {
           return null;
         }
 
+        const { files, messages } = payload;
         const timeNow = Date.now();
-
-        const messages = await Promise.all(
-          payload.messages.map(async (msg) => {
-            if (msg.type === MessageType.Image) {
-              if (typeof msg.image === "object" && "type" in msg.image && msg.image.type === "image_file") {
-                const imageData = fs.readFileSync(path.resolve(decodeUriAndRemoveFilePrefix(msg.image.path)));
-                const base64Image = Buffer.from(imageData).toString("base64");
-                return { type: msg.type, image: base64Image } as ImageContent;
-              }
-            }
-
-            return msg;
-          })
-        );
-
         // Do not send empty messages
         if (messages.length === 0) {
           return null;
@@ -201,11 +187,11 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const threadRun = await this._assistant.sendMessage(thread.id, payload.files, messages);
+        const threadRun = await this._assistant.sendMessage(thread.id, files, messages);
 
         Telemetry.capture("new_message", {
           threadID: thread.id,
-          customSelectedFiles: payload.files.length,
+          customSelectedFiles: files.length,
           assistantMessageID: threadRun.message.id,
           processingDeltaTimeMs: Date.now() - timeNow,
         });

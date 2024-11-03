@@ -9,11 +9,6 @@ export enum MessageType {
   Figma = "figma",
 }
 
-export type ImageFile = {
-  type: "image_file";
-  path: string;
-};
-
 export type TextDelta = {
   value: string;
 };
@@ -25,7 +20,7 @@ export interface TextContent {
 
 export interface ImageContent {
   type: MessageType.Image;
-  image: ImageFile | string;
+  image: string;
 }
 
 export interface FigmaContent {

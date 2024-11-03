@@ -37,6 +37,7 @@ import { ChatInputBox } from '../components/chat/ChatInputBox';
 import { ChatMessageList } from '../components/chat/ChatMessageList';
 import { ProjectSyncProgress } from '../components/chat/ProjectSyncProgress';
 import { FigmaFilePickerModal } from '../components/figma/FigmaFilePickerModal';
+import { readImageFileAsBase64 } from '../common/utils';
 
 const ChatView: React.FunctionComponent<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -213,24 +214,22 @@ const ChatView: React.FunctionComponent<{
     }
   }, [chatImageAttachment, chatFigmaAttachment]);
 
-  function handleSend(
+  async function handleSend(
     selectedFiles: FilePayload[],
     textContent: string,
     imageFile?: File,
     figmaFile?: FigmaFile
-  ): boolean {
+  ): Promise<boolean> {
     const messages: MessageContent[] = [];
     const eventPayload: SendMessagesRequestPayload = { files: selectedFiles, messages: [] };
 
     // Add image message if present
     if (imageFile) {
+      const imageBase64 = await readImageFileAsBase64(imageFile);
       messages.push({ type: MessageType.Image, image: URL.createObjectURL(imageFile) });
       eventPayload.messages.push({
         type: MessageType.Image,
-        image: {
-          type: 'image_file',
-          path: (imageFile as any).path
-        }
+        image: imageBase64
       });
     }
 
@@ -391,7 +390,7 @@ const ChatView: React.FunctionComponent<{
           disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
           fetchFiles={fetchFiles}
-          onSendClicked={(selectedFiles, textContent) =>
+          onSendClicked={async (selectedFiles, textContent) =>
             handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
           }
           onImageSelected={(file) => {

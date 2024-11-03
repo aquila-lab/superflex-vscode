@@ -16,7 +16,7 @@ interface ChatInputBoxProps {
   disabled?: boolean;
   currentOpenFile: FilePayload | null;
   fetchFiles: () => void;
-  onSendClicked: (selectedFiles: FilePayload[], content: string) => boolean;
+  onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
 }
@@ -46,8 +46,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     dispatch(addSelectedFile(currentOpenFile));
   }, [currentOpenFile]);
 
-  function handleSend(): void {
-    const isSendSuccessful = onSendClicked(selectedFiles, input);
+  async function handleSend(): Promise<void> {
+    const isSendSuccessful = await onSendClicked(selectedFiles, input);
     if (!isSendSuccessful) {
       return;
     }
