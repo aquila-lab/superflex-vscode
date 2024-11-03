@@ -4,7 +4,7 @@
   "displayName": "Superflex: AI Frontend Assistant, GPT & Claude Powered, Figma-to-Code, Image-to-Code, Code Generation for React, NextJS, HTML, CSS, Javascript/Typescript Frameworks",
   "description": "Superflex an AI Frontend Coding Assistant powered by GPT & Claude helps you code faster with Figma to Code, Image to Code, Sketch to Code, debugging, and more. Supports React, HTML, CSS and any framework based on JS/TS. Trusted by developers at Amazon, Apple, Google. Start free no API key required.",
   "icon": "small_logo.png",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
