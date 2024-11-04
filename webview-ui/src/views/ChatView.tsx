@@ -17,6 +17,7 @@ import {
   FigmaFile,
   FilePayload,
   newEventRequest,
+  SelectionPayload,
   SendMessagesRequestPayload
 } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
@@ -61,6 +62,7 @@ const ChatView: React.FunctionComponent<{
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
   const [isOutOfRequests, setIsOutOfRequests] = useState(false);
   const [isPremiumRequestModalOpen, setIsPremiumRequestModalOpen] = useState(false);
+  const [selectedCode, setSelectedCode] = useState<SelectionPayload | null>(null);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -176,6 +178,11 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.SHOW_SOFT_PAYWALL_MODAL: {
           setIsPremiumRequestModalOpen(true);
+          break;
+        }
+        case EventType.SELECTION_CHANGED: {
+          const selectedCode = payload as EventPayloads[typeof command]['request'];
+          setSelectedCode(selectedCode);
           break;
         }
       }
@@ -398,6 +405,7 @@ const ChatView: React.FunctionComponent<{
             setChatFigmaAttachment(undefined);
           }}
           onFigmaButtonClicked={handleFigmaButtonClicked}
+          selectedCode={selectedCode}
         />
       </div>
 

@@ -245,6 +245,14 @@
         "key": "cmd+;",
         "mac": "cmd+;",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "superflex.addSelectionToChat",
+        "key": "cmd+shift+l",
+        "mac": "cmd+shift+l",
+        "win": "ctrl+shift+l",
+        "linux": "ctrl+shift+l",
+        "when": "editorHasSelection"
       }
     ]
   },

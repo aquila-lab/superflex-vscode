@@ -43,3 +43,12 @@ export type FigmaFile = {
 export type SendNotificationPayload = {
   message: string;
 };
+
+export interface SelectionPayload {
+  selectedText: string;
+  fileName: string;
+  startLine: number;
+  endLine: number;
+  filePath: string;
+  relativePath: string;
+}

@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
 import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
+import { SelectionPayload } from "../../shared/protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _extensionUri: vscode.Uri;
@@ -13,9 +14,25 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _chatWebview?: vscode.Webview;
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
+  private _decorationType: vscode.TextEditorDecorationType;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
+
+    this._decorationType = vscode.window.createTextEditorDecorationType({
+      after: {
+        contentText: "Superflex: Add to Chat (⌘+Shift+L)",
+        margin: "0 0 0 1em",
+        color: new vscode.ThemeColor("editorCodeLens.foreground"),
+      },
+    });
+
+    // Register the command
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.addSelectionToChat", () => {
+        this.handleAddSelectionToChat();
+      })
+    );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
@@ -37,6 +54,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     // Subscribe to the active text editor change event
     vscode.window.onDidChangeActiveTextEditor(this.handleActiveEditorChange.bind(this));
+
+    // Subscribe to the selection change event
+    context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(this.handleSelectionChange.bind(this)));
   }
 
   private init() {
@@ -223,5 +243,57 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         isCurrentOpenFile: true,
       })
     );
+  }
+
+  private handleSelectionChange(event: vscode.TextEditorSelectionChangeEvent): void {
+    const editor = event.textEditor;
+    const selection = editor.selection;
+
+    // Clear existing decorations
+    editor.setDecorations(this._decorationType, []);
+
+    // Only show tip if there's an actual selection
+    if (!selection.isEmpty) {
+      const range = new vscode.Range(
+        selection.end.line,
+        selection.end.character,
+        selection.end.line,
+        selection.end.character
+      );
+
+      // Add the inline tip decoration
+      editor.setDecorations(this._decorationType, [
+        {
+          range,
+        },
+      ]);
+    }
+  }
+
+  private handleAddSelectionToChat(): void {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor || !this._chatWebview || !this._workspaceDirPath) {
+      return;
+    }
+
+    const selection = editor.selection;
+    if (selection.isEmpty) {
+      return;
+    }
+
+    const document = editor.document;
+    const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
+
+    const payload: SelectionPayload = {
+      selectedText: document.getText(selection),
+      fileName: path.basename(filePath),
+      startLine: selection.start.line + 1,
+      endLine: selection.end.line + 1,
+      filePath: filePath,
+      relativePath: path.relative(this._workspaceDirPath, filePath),
+    };
+
+    // Send to webview
+    this.sendEventMessage(newEventRequest(EventType.SELECTION_CHANGED, payload));
   }
 }

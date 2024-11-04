@@ -10,6 +10,7 @@ import {
   SendMessagesRequestPayload,
   SendNotificationPayload,
   SyncProjectProgressPayload,
+  SelectionPayload,
 } from "./types";
 
 export enum EventType {
@@ -37,6 +38,7 @@ export enum EventType {
   UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
+  SELECTION_CHANGED = "SELECTION_CHANGED",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -82,6 +84,7 @@ export interface EventPayloads {
   [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
   [EventType.OPEN_EXTERNAL_URL]: { request: { url: string }; response: void };
   [EventType.SHOW_SOFT_PAYWALL_MODAL]: { request: void; response: void };
+  [EventType.SELECTION_CHANGED]: { request: SelectionPayload; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;
