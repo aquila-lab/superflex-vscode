@@ -74,10 +74,18 @@ export function getNonce() {
   return text;
 }
 
-export function getUniqueID(): { uniqueID: string; isNew: boolean } {
-  const id = vscode.env.machineId;
-  if (id === "someValue.machineId") {
-    return { uniqueID: machineIdSync(), isNew: true };
+const UNIQUE_ID_KEY = "uniqueID";
+export function getUniqueID(context: vscode.ExtensionContext): { uniqueID: string; isNew: boolean } {
+  let uniqueID = context.globalState.get<string>(UNIQUE_ID_KEY);
+
+  if (!uniqueID) {
+    uniqueID = vscode.env.machineId;
+    if (uniqueID === "someValue.machineId") {
+      uniqueID = machineIdSync();
+    }
+    context.globalState.update(UNIQUE_ID_KEY, uniqueID);
+    return { uniqueID, isNew: true };
   }
-  return { uniqueID: id, isNew: false };
+
+  return { uniqueID, isNew: false };
 }
