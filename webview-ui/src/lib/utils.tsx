@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import DOMPurify from 'dompurify';
 import { themeIcons } from 'seti-file-icons';
+import styled from 'styled-components';
+import { VscThemeContext } from '../context/VscTheme';
 
-const FileIcon = ({ filename, height, width }: { filename: string; height: string; width: string }) => {
+export const FileIcon = ({ filename, height, width }: { filename: string; height: string; width: string }) => {
   const filenameParts = filename.includes(' (') ? filename.split(' ') : [filename, ''];
   filenameParts.pop();
 
@@ -25,11 +27,52 @@ const FileIcon = ({ filename, height, width }: { filename: string; height: strin
   const sanitizedSVG = DOMPurify.sanitize(svg);
 
   return (
-    <div
-      dangerouslySetInnerHTML={{ __html: sanitizedSVG }}
-      style={{ width: width, height: height, fill: color, flexShrink: 0 }}
-    />
+    <div dangerouslySetInnerHTML={{ __html: sanitizedSVG }} style={{ width, height, fill: color, flexShrink: 0 }} />
   );
 };
+export function parseHexColor(hexColor: string): {
+  r: number;
+  g: number;
+  b: number;
+} {
+  if (hexColor.startsWith('#')) {
+    hexColor = hexColor.slice(1);
+  }
 
-export default FileIcon;
+  if (hexColor.length > 6) {
+    hexColor = hexColor.slice(0, 6);
+  }
+
+  const r = parseInt(hexColor.substring(0, 2), 16);
+  const g = parseInt(hexColor.substring(2, 4), 16);
+  const b = parseInt(hexColor.substring(4, 6), 16);
+
+  return { r, g, b };
+}
+
+const StyledPre = styled.pre<{ theme: any }>`
+  & .hljs {
+    color: --vscode-editor-foreground;
+  }
+
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 0 0 5px 5px !important;
+
+  ${(props) =>
+    Object.keys(props.theme)
+      .map((key, index) => {
+        return `
+      & ${key} {
+        color: ${props.theme[key]};
+      }
+    `;
+      })
+      .join('')}
+`;
+
+export const SyntaxHighlightedPre = (props: any) => {
+  const currentTheme = useContext(VscThemeContext);
+
+  return <StyledPre {...props} theme={currentTheme} />;
+};

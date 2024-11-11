@@ -62,7 +62,7 @@ const ChatView: React.FunctionComponent<{
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
   const [isOutOfRequests, setIsOutOfRequests] = useState(false);
   const [isPremiumRequestModalOpen, setIsPremiumRequestModalOpen] = useState(false);
-  const [selectedCode, setSelectedCode] = useState<SelectionPayload | null>(null);
+  const [selectedCode, setSelectedCode] = useState<SelectionPayload[] | null>(null);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -340,6 +340,10 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
+  function handleRemoveSelectedCode(index: number, removeAllFlag: boolean = false): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.REMOVE_SELECTION, { index, removeAllFlag }));
+  }
+
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
   const PreviewChatAttachment = (): React.ReactNode => {
@@ -406,9 +410,10 @@ const ChatView: React.FunctionComponent<{
           }}
           onFigmaButtonClicked={handleFigmaButtonClicked}
           selectedCode={selectedCode}
+          setSelectedCode={setSelectedCode}
+          handleRemoveSelectedCode={handleRemoveSelectedCode}
         />
       </div>
-
       <FigmaFilePickerModal
         open={openFigmaFilePickerModal}
         onClose={() => setOpenFigmaFilePickerModal(false)}

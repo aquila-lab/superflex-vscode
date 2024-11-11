@@ -15,6 +15,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
   private _decorationType: vscode.TextEditorDecorationType;
+  private _selectionPayloads: SelectionPayload[] = [];
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
@@ -79,6 +80,12 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         // When webview is initialized we need to set current open file
         if (command === EventType.INITIALIZED) {
           this.handleActiveEditorChange(vscode.window.activeTextEditor);
+        }
+
+        if (command === EventType.REMOVE_SELECTION) {
+          const { index, removeAllFlag } = payload as EventPayloads[typeof command]["request"];
+          this.removeSelection(index, removeAllFlag);
+          return;
         }
 
         try {
@@ -293,7 +300,17 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       relativePath: path.relative(this._workspaceDirPath, filePath),
     };
 
+    this._selectionPayloads.push(payload);
+
     // Send to webview
-    this.sendEventMessage(newEventRequest(EventType.SELECTION_CHANGED, payload));
+    this.sendEventMessage(newEventRequest(EventType.SELECTION_CHANGED, this._selectionPayloads));
+  }
+
+  private removeSelection(index: number, removeAllFlag: boolean): void {
+    if (removeAllFlag) {
+      this._selectionPayloads = [];
+      return;
+    }
+    this._selectionPayloads.splice(index, 1);
   }
 }

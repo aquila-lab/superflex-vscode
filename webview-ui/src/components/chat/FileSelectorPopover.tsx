@@ -6,6 +6,7 @@ import { useAppSelector } from '../../core/store';
 import { Button } from '../ui/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
+import { FileIcon } from '../../lib/utils';
 
 interface FileSelectorPopoverProps {
   selectedFiles: FilePayload[];
@@ -48,6 +49,7 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles
                     onFileSelected(file);
                   }}>
                   <div className="flex items-baseline gap-2 w-full">
+                    <FileIcon height="20px" width="20px" filename={file.name} />
                     <span className="text-sm whitespace-nowrap">{file.name}</span>
                     <span className="text-left text-xs text-muted-foreground truncate flex-1">{file.relativePath}</span>
                   </div>

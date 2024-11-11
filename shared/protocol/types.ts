@@ -52,3 +52,7 @@ export interface SelectionPayload {
   filePath: string;
   relativePath: string;
 }
+export interface RemoveSelectionPayload {
+  index: number;
+  removeAllFlag: boolean;
+}

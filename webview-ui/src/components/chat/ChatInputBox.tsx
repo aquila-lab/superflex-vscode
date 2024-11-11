@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IoIosReturnLeft } from 'react-icons/io';
-import { Cross2Icon } from '@radix-ui/react-icons';
-
+import { Cross2Icon, EyeNoneIcon } from '@radix-ui/react-icons';
 import { FilePayload, SelectionPayload } from '../../../../shared/protocol';
 import { Button } from '../ui/Button';
 import { FilePicker } from '../ui/FilePicker';
@@ -13,7 +12,7 @@ import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../cor
 import Editor from 'react-simple-code-editor';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css';
-import FileIcon from '../../lib/utils';
+import { SyntaxHighlightedPre, FileIcon } from '../../lib/utils';
 
 interface ChatInputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
@@ -23,7 +22,9 @@ interface ChatInputBoxProps {
   onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
-  selectedCode: SelectionPayload | null;
+  selectedCode: SelectionPayload[] | null;
+  setSelectedCode: React.Dispatch<React.SetStateAction<SelectionPayload[] | null>>;
+  handleRemoveSelectedCode: (index: number, removeAllFlag?: boolean) => void;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
@@ -34,7 +35,9 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   onSendClicked,
   onImageSelected,
   onFigmaButtonClicked,
-  selectedCode
+  selectedCode,
+  setSelectedCode,
+  handleRemoveSelectedCode
 }) => {
   const dispatch = useAppDispatch();
 
@@ -42,27 +45,39 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   const isFigmaAuthenticated = useAppSelector((state) => state.chat.init.isFigmaAuthenticated);
 
   const [input, setInput] = useState('');
-  const [EditorData, setEditorData] = useState<SelectionPayload | null>(selectedCode);
+  // const [EditorData, setEditorData] = useState<SelectionPayload[]>(selectedCode ?? []);
+  // const [EditToggle, setEditToggle] = useState<boolean>(false);
+  const [visibleEditors, setVisibleEditors] = useState<boolean[]>(selectedCode?.map(() => true) ?? []);
+
+  useEffect(() => {
+    if (selectedCode) {
+      setVisibleEditors((prevVisibleEditors) => {
+        // Map over the `selectedCode` array and set visibility
+        return selectedCode.map((_, index) => {
+          // If the current editor is already false, keep it false
+          // eslint-disable-next-line no-unneeded-ternary, @typescript-eslint/no-unnecessary-boolean-literal-compare
+          return prevVisibleEditors[index] === false ? false : true;
+        });
+      });
+    }
+  }, [selectedCode]);
 
   useEffect(() => {
     if (!currentOpenFile) {
       dispatch(setSelectedFiles([...selectedFiles.filter((f) => !f.isCurrentOpenFile)]));
       return;
     }
-    console.log('selected code', selectedCode);
     dispatch(addSelectedFile(currentOpenFile));
   }, [currentOpenFile]);
 
-  useEffect(() => {
-    setEditorData(selectedCode);
-    console.log('Editor data', EditorData);
-  }, [selectedCode]);
-
   async function handleSend(): Promise<void> {
-    const isSendSuccessful = await onSendClicked(selectedFiles, input);
+    const formattedInput = formatInput();
+    const isSendSuccessful = await onSendClicked(selectedFiles, formattedInput);
     if (!isSendSuccessful) {
       return;
     }
+    handleRemoveSelectedCode(0, true);
+    setSelectedCode([]);
     setInput('');
   }
 
@@ -71,7 +86,6 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
       handleFileRemove(file);
       return;
     }
-
     dispatch(addSelectedFile(file));
   }
 
@@ -79,14 +93,68 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     dispatch(removeSelectedFile(file));
   }
 
+  function handleCodeRemove(index: number = 0, removeAllFlag?: boolean): void {
+    setSelectedCode((prev: SelectionPayload[] | null) => {
+      if (removeAllFlag) {
+        // Remove all selected code
+        setVisibleEditors([]); // Clear all visibility states
+        return [];
+      } else if (prev && index >= 0 && index < prev.length) {
+        // Ensure index is within bounds
+        const updatedItems = [...prev];
+        updatedItems.splice(index, 1);
+
+        setVisibleEditors((prevVisible) => {
+          const updatedVisible = [...prevVisible];
+          updatedVisible.splice(index, 1); // Remove visibility for the deleted item
+          return updatedVisible;
+        });
+        return updatedItems;
+      }
+      return prev; // Return unchanged if index is out of bounds
+    });
+    handleRemoveSelectedCode(index, removeAllFlag);
+  }
+
+  function formatInput(): string {
+    if (selectedCode) {
+      const formattedInput =
+        selectedCode
+          .map((item) => {
+            const fileExtension = item.fileName.split('.').pop();
+            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n<superflex_domain_knowledge>\n${item.selectedText.replace(/"/g, '\\"')}\n</superflex_domain_knowledge>\n\`\`\``;
+          })
+          .join('\n\n') +
+        '\n\n' +
+        input;
+      return formattedInput;
+    } else {
+      return input;
+    }
+  }
+
+  const toggleEditorVisibility = (index: number) => {
+    setVisibleEditors((prev) => prev.map((visible, i) => (i === index ? !visible : visible)));
+  };
+
+  const handleSelectedCodeShow = (name: string) => {
+    if (selectedCode) {
+      selectedCode.forEach((item, index) => {
+        if (item.fileName === name && !visibleEditors[index]) {
+          toggleEditorVisibility(index); // Show any hidden code for this file
+        }
+      });
+    }
+  };
+
   return (
     <div
       className={
         disabled
           ? "relative p-[1px] rounded-md before:content-[''] before:absolute before:inset-0 before:rounded-md before:p-[1px] before:bg-[length:400%_400%] before:bg-[linear-gradient(115deg,#1bbe84_0%,#331bbe_16%,#be1b55_33%,#a6be1b_55%,#be1b55_67%)] before:animate-[gradient_3s_linear_infinite]"
-          : 'border border-border rounded-md'
+          : 'border border-border rounded-md overflow-y-auto max-h-96'
       }>
-      <div className="relative flex flex-col bg-input rounded-md z-10">
+      <div className="relative flex flex-col bg-input rounded-md z-10 ">
         {/* Chat top toolbar */}
         <div className="flex flex-wrap gap-2 p-2 pb-0.5">
           <FileSelectorPopover
@@ -94,17 +162,18 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             fetchFiles={fetchFiles}
             onFileSelected={handleFileSelected}
           />
-
           {selectedFiles.length === 0 ? (
             <p className="text-xs text-muted-foreground self-center">Add context</p>
           ) : (
             selectedFiles.map((file) => (
               <div key={file.relativePath} className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
-                <div className="flex flex-row items-center gap-1">
+                <div
+                  className="flex flex-row items-center gap-1 hover:cursor-pointer"
+                  onClick={() => handleSelectedCodeShow(file.name)}>
                   <FileIcon height="20px" width="20px" filename={file.name} />
                   <p className="text-xs text-muted-foreground truncate max-w-36">{file.name}</p>
                   <p className="text-xs text-muted-foreground truncate max-w-36">
-                    {EditorData && `(${EditorData?.startLine}-${EditorData?.endLine})`}
+                    {/* {EditorData && `(${EditorData?.startLine}-${EditorData?.endLine})`} */}
                   </p>
                   <p className="text-xs text-muted-secondary-foreground">
                     {file.isCurrentOpenFile ? 'Current file' : 'File'}
@@ -124,27 +193,45 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         </div>
 
         {/* Code Editor */}
-        {EditorData?.selectedText && (
-          <div className="rounded-lg border-border border-[1px] bg-background max-h-64 overflow-y-auto">
-            <Editor
-              value={EditorData?.selectedText || ''}
-              onValueChange={(code) =>
-                setEditorData((prevState) => ({
-                  ...prevState,
-                  selectedText: code
-                }))
-              }
-              highlight={(codeProp) => hljs.highlight(codeProp, { language: 'js' }).value}
-              padding={10}
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 12,
-                outline: 'none',
-                border: 'none'
-              }}
-            />
+
+        {selectedCode?.map((item, index) => (
+          <div key={index}>
+            {visibleEditors && visibleEditors[index] && (
+              <div className="rounded-xl ml-2 mr-2  border-gray-600 border-[1px] bg-background max-h-64 overflow-y-auto mt-4">
+                <div className="flex gap-1 pt-2 pl-2 border-gray-600 border-b-[1px] bg-[--vscode-panel-background]">
+                  <FileIcon height="22px" width="22px" filename={item.fileName} />
+                  <p className="text-xm text-foreground truncate max-w-36">{item.fileName}</p>
+                  <p className="text-xs text-foreground truncate max-w-36">{`(${item?.startLine}-${item?.endLine})`}</p>
+                  <div className="ml-40 flex gap-4">
+                    <Button size="xs" variant="text" className="p-0" onClick={() => toggleEditorVisibility(index)}>
+                      <EyeNoneIcon className="size-4" />
+                    </Button>
+                    <Button size="xs" variant="text" className="p-0" onClick={() => handleCodeRemove(index)}>
+                      <Cross2Icon className="size-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <Editor
+                  value={item?.selectedText || ''}
+                  onValueChange={(code) => console.log('not editable')}
+                  highlight={(code) => (
+                    <SyntaxHighlightedPre>
+                      <div dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />
+                    </SyntaxHighlightedPre>
+                  )}
+                  // highlight={(code) => hljs.highlight(code, { language: 'js' }).value}
+                  padding={10}
+                  style={{
+                    fontFamily: '"Fira code", "Fira Mono", monospace',
+                    fontSize: 12
+                  }}
+                />
+              </div>
+            )}
           </div>
-        )}
+        ))}
+
         {/* Chat input */}
         <div className="flex-1">
           <TextareaAutosize
