@@ -103,9 +103,20 @@ async function sendThreadMessage({
       response.data.removeAllListeners();
     };
 
+    let buffer = "";
     response.data.on("data", (chunk: Buffer) => {
       try {
-        const data = JSON.parse(chunk.toString());
+        let chunkStr = chunk.toString();
+        if (!chunkStr.endsWith("}")) {
+          buffer += chunkStr;
+          return;
+        }
+        if (!chunkStr.startsWith("{")) {
+          chunkStr = buffer + chunkStr;
+          buffer = "";
+        }
+
+        const data = JSON.parse(chunkStr);
         if (data.is_complete) {
           response.data.emit("complete", {
             message: buildMessageFromResponse(data.message),
