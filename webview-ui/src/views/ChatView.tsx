@@ -25,9 +25,11 @@ import {
   clearMessages,
   setInitState,
   setIsMessageProcessing,
+  setIsMessageStreaming,
   setIsProjectSyncing,
   setProjectFiles,
-  setSelectedFiles
+  setSelectedFiles,
+  updateMessageTextDelta
 } from '../core/chat/chatSlice';
 import { useAppDispatch, useAppSelector } from '../core/store';
 import { setUser, setUserSubscription } from '../core/user/userSlice';
@@ -153,6 +155,12 @@ const ChatView: React.FunctionComponent<{
           }
 
           dispatch(addMessages([newMessage]));
+          break;
+        }
+        case EventType.MESSAGE_TEXT_DELTA: {
+          const delta = payload as EventPayloads[typeof command]['response'];
+          dispatch(updateMessageTextDelta(delta));
+          dispatch(setIsMessageStreaming(true));
           break;
         }
         case EventType.CMD_NEW_THREAD: {

@@ -46,16 +46,14 @@ export default class SuperflexAssistant implements Assistant {
     messages: MessageContent[],
     streamResponse?: (event: TextDelta) => void
   ): Promise<ThreadRun> {
-    const threadRun = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
-    // const stream = await api.stream.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, messages });
-    //
-    // if (streamResponse) {
-    //   stream.on("textDelta", (event) => streamResponse({ value: event.value }));
-    // }
-    //
-    // const message = await stream.final();
+    const stream = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
 
-    return threadRun;
+    if (streamResponse) {
+      stream.on("textDelta", streamResponse);
+    }
+
+    const message = await stream.final();
+    return message;
   }
 
   async updateMessage(message: Message): Promise<void> {

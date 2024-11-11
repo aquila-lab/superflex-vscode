@@ -187,7 +187,9 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const threadRun = await this._assistant.sendMessage(thread.id, files, messages);
+        const threadRun = await this._assistant.sendMessage(thread.id, files, messages, (delta) => {
+          sendEventMessageCb(newEventResponse(EventType.MESSAGE_TEXT_DELTA, delta));
+        });
 
         Telemetry.capture("new_message", {
           threadID: thread.id,
