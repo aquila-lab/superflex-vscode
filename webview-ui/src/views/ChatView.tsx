@@ -52,6 +52,7 @@ const ChatView: React.FunctionComponent<{
   const initState = useAppSelector((state) => state.chat.init);
   const userSubscription = useAppSelector((state) => state.user.subscription);
   const isProjectSyncing = useAppSelector((state) => state.chat.isProjectSyncing);
+  const isMessageStreaming = useAppSelector((state) => state.chat.isMessageStreaming);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
 
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
@@ -138,6 +139,7 @@ const ChatView: React.FunctionComponent<{
           break;
         }
         case EventType.NEW_MESSAGE: {
+          dispatch(setIsMessageStreaming(false));
           dispatch(setIsMessageProcessing(false));
 
           if (error && 'slug' in error && error.slug === 'quota_exceeded') {
@@ -158,9 +160,17 @@ const ChatView: React.FunctionComponent<{
           break;
         }
         case EventType.MESSAGE_TEXT_DELTA: {
+          if (error) {
+            dispatch(setIsMessageStreaming(false));
+            dispatch(setIsMessageProcessing(false));
+            return;
+          }
+          if (!isMessageStreaming) {
+            dispatch(setIsMessageStreaming(true));
+          }
+
           const delta = payload as EventPayloads[typeof command]['response'];
           dispatch(updateMessageTextDelta(delta));
-          dispatch(setIsMessageStreaming(true));
           break;
         }
         case EventType.CMD_NEW_THREAD: {

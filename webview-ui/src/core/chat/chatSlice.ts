@@ -58,7 +58,6 @@ const chatSlice = createSlice({
       // If the last message is a text delta, replace it with the new messages
       if (lastMessage.content.type === MessageType.TextDelta) {
         state.messages = [...state.messages.slice(0, -1), ...action.payload];
-        state.isMessageStreaming = false;
         return;
       }
 
