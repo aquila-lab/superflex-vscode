@@ -114,15 +114,15 @@ export default {
           '25%': { backgroundPosition: '100% 0%' },
           '50%': { backgroundPosition: '100% 100%' },
           '75%': { backgroundPosition: '0% 100%' },
-          '100%': { backgroundPosition: '0% 0%' },
-        },
+          '100%': { backgroundPosition: '0% 0%' }
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.15s ease-out',
         'accordion-up': 'accordion-up 0.15s ease-out',
         'collapsible-down': 'collapsible-down 0.15s ease-out',
         'collapsible-up': 'collapsible-up 0.15s ease-out',
-        'gradient': 'gradient '
+        gradient: 'gradient '
       }
     }
   },

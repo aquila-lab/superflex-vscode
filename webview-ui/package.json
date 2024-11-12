@@ -52,7 +52,7 @@
     "@typescript-eslint/parser": "^6.7.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
-    "daisyui": "^4.12.10",
+    "daisyui": "^4.12.14",
     "eslint": "^8.0.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "9.0.0",
