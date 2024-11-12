@@ -44,15 +44,10 @@ export type SendNotificationPayload = {
   message: string;
 };
 
-export interface SelectionPayload {
-  selectedText: string;
+export type CodeSelectionPayload = {
   fileName: string;
+  relativePath: string;
   startLine: number;
   endLine: number;
-  filePath: string;
-  relativePath: string;
-}
-export interface RemoveSelectionPayload {
-  index: number;
-  removeAllFlag: boolean;
-}
+  selectedText: string;
+};

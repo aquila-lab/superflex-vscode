@@ -1,10 +1,10 @@
 import path from "path";
 import * as vscode from "vscode";
 
+import { CodeSelectionPayload } from "../../shared/protocol";
 import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
 import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
-import { SelectionPayload } from "../../shared/protocol";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _extensionUri: vscode.Uri;
@@ -15,7 +15,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
   private _decorationType: vscode.TextEditorDecorationType;
-  private _selectionPayloads: SelectionPayload[] = [];
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
@@ -80,12 +79,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         // When webview is initialized we need to set current open file
         if (command === EventType.INITIALIZED) {
           this.handleActiveEditorChange(vscode.window.activeTextEditor);
-        }
-
-        if (command === EventType.REMOVE_SELECTION) {
-          const { index, removeAllFlag } = payload as EventPayloads[typeof command]["request"];
-          this.removeSelection(index, removeAllFlag);
-          return;
         }
 
         try {
@@ -291,26 +284,15 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const document = editor.document;
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
-    const payload: SelectionPayload = {
-      selectedText: document.getText(selection),
+    const codeSelection: CodeSelectionPayload = {
       fileName: path.basename(filePath),
+      relativePath: path.relative(this._workspaceDirPath, filePath),
       startLine: selection.start.line + 1,
       endLine: selection.end.line + 1,
-      filePath: filePath,
-      relativePath: path.relative(this._workspaceDirPath, filePath),
+      selectedText: document.getText(selection),
     };
 
-    this._selectionPayloads.push(payload);
-
     // Send to webview
-    this.sendEventMessage(newEventRequest(EventType.SELECTION_CHANGED, this._selectionPayloads));
-  }
-
-  private removeSelection(index: number, removeAllFlag: boolean): void {
-    if (removeAllFlag) {
-      this._selectionPayloads = [];
-      return;
-    }
-    this._selectionPayloads.splice(index, 1);
+    this.sendEventMessage(newEventRequest(EventType.ADD_SELECTED_CODE, codeSelection));
   }
 }

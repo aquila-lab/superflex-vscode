@@ -4,7 +4,7 @@ import Editor from 'react-simple-code-editor';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { Cross2Icon, EyeNoneIcon } from '@radix-ui/react-icons';
 
-import { FilePayload, SelectionPayload } from '../../../../shared/protocol';
+import { FilePayload, CodeSelectionPayload } from '../../../../shared/protocol';
 import { useAppDispatch, useAppSelector } from '../../core/store';
 import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../core/chat/chatSlice';
 import { Button } from '../ui/Button';
@@ -20,26 +20,24 @@ interface ChatInputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
   disabled?: boolean;
   currentOpenFile: FilePayload | null;
+  selectedCode: CodeSelectionPayload[];
   fetchFiles: () => void;
   onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
-  selectedCode: SelectionPayload[] | null;
-  setSelectedCode: React.Dispatch<React.SetStateAction<SelectionPayload[] | null>>;
-  handleRemoveSelectedCode: (index: number, removeAllFlag?: boolean) => void;
+  onSelectedCodeRemoved: (relativePath: string, removeAll?: boolean) => void;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   inputRef,
   disabled,
   currentOpenFile,
+  selectedCode,
   fetchFiles,
   onSendClicked,
   onImageSelected,
   onFigmaButtonClicked,
-  selectedCode,
-  setSelectedCode,
-  handleRemoveSelectedCode
+  onSelectedCodeRemoved
 }) => {
   const dispatch = useAppDispatch();
 
@@ -75,8 +73,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     if (!isSendSuccessful) {
       return;
     }
-    handleRemoveSelectedCode(0, true);
-    setSelectedCode([]);
+    onSelectedCodeRemoved('', true);
     setInput('');
   }
 
@@ -90,29 +87,6 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
 
   function handleFileRemove(file: FilePayload): void {
     dispatch(removeSelectedFile(file));
-  }
-
-  function handleCodeRemove(index: number = 0, removeAllFlag?: boolean): void {
-    setSelectedCode((prev: SelectionPayload[] | null) => {
-      if (removeAllFlag) {
-        // Remove all selected code
-        setVisibleEditors([]); // Clear all visibility states
-        return [];
-      } else if (prev && index >= 0 && index < prev.length) {
-        // Ensure index is within bounds
-        const updatedItems = [...prev];
-        updatedItems.splice(index, 1);
-
-        setVisibleEditors((prevVisible) => {
-          const updatedVisible = [...prevVisible];
-          updatedVisible.splice(index, 1); // Remove visibility for the deleted item
-          return updatedVisible;
-        });
-        return updatedItems;
-      }
-      return prev; // Return unchanged if index is out of bounds
-    });
-    handleRemoveSelectedCode(index, removeAllFlag);
   }
 
   function formatInput(): string {
@@ -188,7 +162,11 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
                     <Button size="xs" variant="text" className="p-0" onClick={() => toggleEditorVisibility(index)}>
                       <EyeNoneIcon className="size-4" />
                     </Button>
-                    <Button size="xs" variant="text" className="p-0" onClick={() => handleCodeRemove(index)}>
+                    <Button
+                      size="xs"
+                      variant="text"
+                      className="p-0"
+                      onClick={() => onSelectedCodeRemoved(item.relativePath)}>
                       <Cross2Icon className="size-4" />
                     </Button>
                   </div>

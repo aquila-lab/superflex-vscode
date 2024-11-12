@@ -10,8 +10,7 @@ import {
   SendMessagesRequestPayload,
   SendNotificationPayload,
   SyncProjectProgressPayload,
-  SelectionPayload,
-  RemoveSelectionPayload,
+  CodeSelectionPayload,
 } from "./types";
 
 export enum EventType {
@@ -40,8 +39,7 @@ export enum EventType {
   UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
-  SELECTION_CHANGED = "SELECTION_CHANGED",
-  REMOVE_SELECTION = "REMOVE_SELECTION",
+  ADD_SELECTED_CODE = "add_selected_code",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -79,6 +77,7 @@ export interface EventPayloads {
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
+  [EventType.ADD_SELECTED_CODE]: { request: CodeSelectionPayload; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
@@ -88,8 +87,6 @@ export interface EventPayloads {
   [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
   [EventType.OPEN_EXTERNAL_URL]: { request: { url: string }; response: void };
   [EventType.SHOW_SOFT_PAYWALL_MODAL]: { request: void; response: void };
-  [EventType.SELECTION_CHANGED]: { request: SelectionPayload[]; response: void };
-  [EventType.REMOVE_SELECTION]: { request: RemoveSelectionPayload; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;
