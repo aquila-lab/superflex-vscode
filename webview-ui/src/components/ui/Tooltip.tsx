@@ -23,7 +23,7 @@ const TooltipContent = React.forwardRef<React.ElementRef<typeof TooltipPrimitive
           ref={ref}
           sideOffset={sideOffset}
           className={cn(
-            'z-50 overflow-hidden flex items-center rounded-md border border-border leading-tight bg-popover px-1 py-1 text-sm text-popover-foreground max-w-72 text-center whitespace-pre-line shadow-lg [&_kbd]:ml-3 [&_kbd]:-mr-1 [&_kbd]:mt-[-4px] [&_kbd]:mb-[-4px]',
+            'z-50 overflow-hidden flex items-center rounded-md border border-border leading-tight bg-popover px-3 py-2 text-sm text-popover-foreground max-w-72 text-center whitespace-pre-line shadow-lg [&_kbd]:ml-3 [&_kbd]:-mr-1 [&_kbd]:mt-[-4px] [&_kbd]:mb-[-4px]',
             className
           )}
           {...props}>
