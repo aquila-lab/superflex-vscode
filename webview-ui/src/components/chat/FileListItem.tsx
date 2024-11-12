@@ -13,7 +13,7 @@ interface FileListItemProps {
 
 export const FileListItem: React.FC<FileListItemProps> = ({ file, onShowSelectedCode, onRemoveFile }) => {
   return (
-    <div className="flex items-center gap-1 bg-background border border-border rounded-md px-1.5 py-[1px]">
+    <div className="flex items-center gap-1 bg-background border border-border rounded-md pl-0.5 pr-1.5">
       <div
         className="flex flex-row items-center gap-1 hover:cursor-pointer"
         onClick={() => onShowSelectedCode(file.name)}>
