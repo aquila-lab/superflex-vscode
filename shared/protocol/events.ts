@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Message, User, UserSubscription } from "../model";
+import { Message, TextDelta, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
   ConfigPayload,
@@ -36,6 +36,7 @@ export enum EventType {
   // Chat events
   NEW_THREAD = "new_thread",
   NEW_MESSAGE = "new_message",
+  MESSAGE_TEXT_DELTA = "message_text_delta",
   UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
@@ -74,6 +75,7 @@ export interface EventPayloads {
   [EventType.FIGMA_FILE_SELECTED]: { request: FigmaFile; response: FigmaFile };
   [EventType.NEW_THREAD]: { request: void; response: void };
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
+  [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };

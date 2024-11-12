@@ -34,6 +34,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleFeedbac
       </div>
 
       {message.content.type === MessageType.Text && <MarkdownRender mdString={message.content.text} />}
+      {message.content.type === MessageType.TextDelta && <MarkdownRender mdString={message.content.value} />}
 
       {(message.content.type === MessageType.Image || message.content.type === MessageType.Figma) && (
         <ImagePreview alt="preview image" className="mt-2" src={message.content.image as string} />

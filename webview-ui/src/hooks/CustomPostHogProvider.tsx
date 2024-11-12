@@ -12,12 +12,8 @@ const CustomPostHogProvider = ({ children }: PropsWithChildren) => {
     if (allowAnonymousTelemetry) {
       posthog.init(SUPERFLEX_POSTHOG_API_KEY, {
         api_host: 'https://app.posthog.com',
-        disable_session_recording: true,
-        autocapture: false,
-        capture_pageleave: false,
-        capture_pageview: false
+        disable_session_recording: true
       });
-      posthog.opt_in_capturing();
     }
   }, [allowAnonymousTelemetry]);
 

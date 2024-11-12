@@ -5,11 +5,13 @@ export enum Role {
 
 export enum MessageType {
   Text = "text",
+  TextDelta = "text_delta",
   Image = "image",
   Figma = "figma",
 }
 
 export type TextDelta = {
+  type: MessageType.TextDelta;
   value: string;
 };
 
@@ -30,7 +32,7 @@ export interface FigmaContent {
   image: string;
 }
 
-export type MessageContent = TextContent | ImageContent | FigmaContent;
+export type MessageContent = TextContent | TextDelta | ImageContent | FigmaContent;
 
 export type Message = {
   /** @type {Generics.UUID} */
