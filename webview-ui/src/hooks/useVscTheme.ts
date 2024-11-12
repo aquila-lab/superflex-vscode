@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { parseHexColor } from '../lib/utils';
-import { getVSCodeAPI } from '../api/vscodeApi'; // Ensure this path matches your file structure
+
+import { parseHexColor } from '../common/utils';
+import { getVSCodeAPI } from '../api/vscodeApi';
 
 const hljsToTextMate: Record<string, string[]> = {
   '.hljs-comment': ['comment'],
@@ -130,17 +131,11 @@ export function useVscTheme() {
   useEffect(() => {
     const vsCodeAPI = getVSCodeAPI();
 
-    // Listen for theme updates
-    const unsubscribe = vsCodeAPI.onMessage(({ theme }) => {
+    return vsCodeAPI.onMessage(({ theme }: any) => {
       if (theme) {
         setTheme(constructTheme(theme));
       }
     });
-
-    return () => {
-      // Clean up listener on unmount
-      unsubscribe();
-    };
   }, []);
 
   return theme;

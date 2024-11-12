@@ -22,7 +22,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._decorationType = vscode.window.createTextEditorDecorationType({
       after: {
-        contentText: "Superflex: Add to Chat (⌘+Shift+L)",
+        contentText: "Superflex: Add to Chat (⌘+M)",
         margin: "0 0 0 1em",
         color: new vscode.ThemeColor("editorCodeLens.foreground"),
       },

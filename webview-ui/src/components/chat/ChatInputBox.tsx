@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import hljs from 'highlight.js';
+import Editor from 'react-simple-code-editor';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { Cross2Icon, EyeNoneIcon } from '@radix-ui/react-icons';
+
 import { FilePayload, SelectionPayload } from '../../../../shared/protocol';
-import { Button } from '../ui/Button';
-import { FilePicker } from '../ui/FilePicker';
 import { useAppDispatch, useAppSelector } from '../../core/store';
-import { FigmaButton } from '../figma/FigmaButton';
-import FileSelectorPopover from './FileSelectorPopover';
-import { TextareaAutosize } from '../ui/TextareaAutosize';
 import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../core/chat/chatSlice';
-import Editor from 'react-simple-code-editor';
-import hljs from 'highlight.js';
-import 'highlight.js/styles/vs2015.css';
-import { SyntaxHighlightedPre, FileIcon } from '../../lib/utils';
+import { Button } from '../ui/Button';
+import { FileIcon } from '../ui/FileIcon';
+import { FilePicker } from '../ui/FilePicker';
+import { FigmaButton } from '../figma/FigmaButton';
+import { TextareaAutosize } from '../ui/TextareaAutosize';
+import { SyntaxHighlightedPre } from '../ui/MarkdownRender';
+import { FileListItem } from './FileListItem';
+import FileSelectorPopover from './FileSelectorPopover';
 
 interface ChatInputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
@@ -45,8 +47,6 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   const isFigmaAuthenticated = useAppSelector((state) => state.chat.init.isFigmaAuthenticated);
 
   const [input, setInput] = useState('');
-  // const [EditorData, setEditorData] = useState<SelectionPayload[]>(selectedCode ?? []);
-  // const [EditToggle, setEditToggle] = useState<boolean>(false);
   const [visibleEditors, setVisibleEditors] = useState<boolean[]>(selectedCode?.map(() => true) ?? []);
 
   useEffect(() => {
@@ -55,8 +55,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         // Map over the `selectedCode` array and set visibility
         return selectedCode.map((_, index) => {
           // If the current editor is already false, keep it false
-          // eslint-disable-next-line no-unneeded-ternary, @typescript-eslint/no-unnecessary-boolean-literal-compare
-          return prevVisibleEditors[index] === false ? false : true;
+          return prevVisibleEditors[index] ?? true;
         });
       });
     }
@@ -166,40 +165,23 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             <p className="text-xs text-muted-foreground self-center">Add context</p>
           ) : (
             selectedFiles.map((file) => (
-              <div key={file.relativePath} className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
-                <div
-                  className="flex flex-row items-center gap-1 hover:cursor-pointer"
-                  onClick={() => handleSelectedCodeShow(file.name)}>
-                  <FileIcon height="20px" width="20px" filename={file.name} />
-                  <p className="text-xs text-muted-foreground truncate max-w-36">{file.name}</p>
-                  <p className="text-xs text-muted-foreground truncate max-w-36">
-                    {/* {EditorData && `(${EditorData?.startLine}-${EditorData?.endLine})`} */}
-                  </p>
-                  <p className="text-xs text-muted-secondary-foreground">
-                    {file.isCurrentOpenFile ? 'Current file' : 'File'}
-                  </p>
-                </div>
-                <Button
-                  size="xs"
-                  variant="text"
-                  className="p-0"
-                  onClick={() => handleFileRemove(file)}
-                  aria-label={`remove-${file.name}`}>
-                  <Cross2Icon className="size-3.5" />
-                </Button>
-              </div>
+              <FileListItem
+                key={file.relativePath}
+                file={file}
+                onShowSelectedCode={handleSelectedCodeShow}
+                onRemoveFile={handleFileRemove}
+              />
             ))
           )}
         </div>
 
         {/* Code Editor */}
-
         {selectedCode?.map((item, index) => (
           <div key={index}>
             {visibleEditors && visibleEditors[index] && (
-              <div className="rounded-xl ml-2 mr-2  border-gray-600 border-[1px] bg-background max-h-64 overflow-y-auto mt-4">
+              <div className="rounded-xl ml-2 mr-2 border-gray-600 border-[1px] bg-background max-h-64 overflow-y-auto mt-4">
                 <div className="flex gap-1 pt-2 pl-2 border-gray-600 border-b-[1px] bg-[--vscode-panel-background]">
-                  <FileIcon height="22px" width="22px" filename={item.fileName} />
+                  <FileIcon filename={item.fileName} className="size-5" />
                   <p className="text-xm text-foreground truncate max-w-36">{item.fileName}</p>
                   <p className="text-xs text-foreground truncate max-w-36">{`(${item?.startLine}-${item?.endLine})`}</p>
                   <div className="ml-40 flex gap-4">

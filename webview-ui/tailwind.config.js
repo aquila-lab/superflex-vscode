@@ -122,7 +122,7 @@ export default {
         'accordion-up': 'accordion-up 0.15s ease-out',
         'collapsible-down': 'collapsible-down 0.15s ease-out',
         'collapsible-up': 'collapsible-up 0.15s ease-out',
-        gradient: 'gradient '
+        gradient: 'gradient'
       }
     }
   },

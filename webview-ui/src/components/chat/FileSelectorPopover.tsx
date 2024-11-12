@@ -4,9 +4,9 @@ import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
 import { FilePayload } from '../../../../shared/protocol';
 import { useAppSelector } from '../../core/store';
 import { Button } from '../ui/Button';
+import { FileIcon } from '../ui/FileIcon';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../ui/Command';
-import { FileIcon } from '../../lib/utils';
 
 interface FileSelectorPopoverProps {
   selectedFiles: FilePayload[];
@@ -49,7 +49,7 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles
                     onFileSelected(file);
                   }}>
                   <div className="flex items-baseline gap-2 w-full">
-                    <FileIcon height="20px" width="20px" filename={file.name} />
+                    <FileIcon filename={file.name} className="size-5" />
                     <span className="text-sm whitespace-nowrap">{file.name}</span>
                     <span className="text-left text-xs text-muted-foreground truncate flex-1">{file.relativePath}</span>
                   </div>
