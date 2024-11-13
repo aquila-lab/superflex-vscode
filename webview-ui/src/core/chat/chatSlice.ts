@@ -68,22 +68,26 @@ const chatSlice = createSlice({
     setSelectedFiles: (state, action: PayloadAction<FilePayload[]>) => {
       state.selectedFiles = action.payload;
     },
-    addSelectedFile: (state, action: PayloadAction<FilePayload>) => {
-      if (action.payload.isCurrentOpenFile) {
-        state.selectedFiles = [
-          action.payload,
-          ...state.selectedFiles.filter((f) => !f.isCurrentOpenFile && f.relativePath !== action.payload.relativePath)
-        ];
-        return;
-      }
-      if (state.selectedFiles.find((f) => f.relativePath === action.payload.relativePath)) {
-        return;
-      }
+    addSelectedFile: (state, action) => {
+      const file = action.payload;
 
-      state.selectedFiles = [...state.selectedFiles, action.payload];
+      // Check if file is already in selectedFiles by matching id or unique identifier
+      const existingFileIndex = state.selectedFiles.findIndex((f) => f.id === file.id);
+
+      if (existingFileIndex !== -1) {
+        // File already exists, so update selections instead of adding a new entry
+        state.selectedFiles[existingFileIndex] = {
+          ...state.selectedFiles[existingFileIndex],
+          // Merge any additional fields if necessary, such as code selections
+          ...file
+        };
+      } else {
+        // If file doesn't exist, add it to the selectedFiles array
+        state.selectedFiles.push(file);
+      }
     },
-    removeSelectedFile: (state, action: PayloadAction<FilePayload>) => {
-      state.selectedFiles = state.selectedFiles.filter((file) => file.relativePath !== action.payload.relativePath);
+    removeSelectedFile: (state, action: PayloadAction<string>) => {
+      state.selectedFiles = state.selectedFiles.filter((file) => file.id !== action.payload);
     }
   }
 });

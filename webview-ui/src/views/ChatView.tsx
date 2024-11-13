@@ -340,8 +340,8 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
-  function handleRemoveSelectedCode(index: number, removeAllFlag: boolean = false): void {
-    vscodeAPI.postMessage(newEventRequest(EventType.REMOVE_SELECTION, { index, removeAllFlag }));
+  function handleRemoveSelectedCode(id: string, removeAllFlag: boolean = false): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.REMOVE_SELECTION, { id, removeAllFlag }));
   }
 
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;

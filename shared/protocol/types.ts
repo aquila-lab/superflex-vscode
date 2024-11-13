@@ -23,10 +23,13 @@ export type SyncProjectProgressPayload = {
 };
 
 export type FilePayload = {
+  id: string;
   name: string;
   path: string;
   relativePath: string;
   isCurrentOpenFile?: boolean;
+  startLine?: number;
+  endLine?: number;
 };
 
 export type SendMessagesRequestPayload = {
@@ -45,6 +48,7 @@ export type SendNotificationPayload = {
 };
 
 export interface SelectionPayload {
+  id: string;
   selectedText: string;
   fileName: string;
   startLine: number;
@@ -53,6 +57,6 @@ export interface SelectionPayload {
   relativePath: string;
 }
 export interface RemoveSelectionPayload {
-  index: number;
+  id: string;
   removeAllFlag: boolean;
 }

@@ -5,6 +5,7 @@ import { EventMessage, EventPayloads, EventType, newEventRequest, newEventRespon
 import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 import { SelectionPayload } from "../../shared/protocol";
+import { v4 as uuidv4 } from "uuid";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _extensionUri: vscode.Uri;
@@ -83,8 +84,8 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         }
 
         if (command === EventType.REMOVE_SELECTION) {
-          const { index, removeAllFlag } = payload as EventPayloads[typeof command]["request"];
-          this.removeSelection(index, removeAllFlag);
+          const { id, removeAllFlag } = payload as EventPayloads[typeof command]["request"];
+          this.removeSelection(id, removeAllFlag);
           return;
         }
 
@@ -202,7 +203,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
                        connect-src 'self' http://localhost:3000 https://us.posthog.com/ https://app.posthog.com/ https://us.i.posthog.com/ https://www.youtube.com/;
                        style-src ${webview.cspSource} 'unsafe-inline';
                        font-src ${webview.cspSource};
-                       img-src ${webview.cspSource} https://*.amazonaws.com blob: data:;
+                       img-src ${
+                         webview.cspSource
+                       } https://*.amazonaws.com https://lh3.googleusercontent.com blob: data:;
                        script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/ https://us-assets.i.posthog.com/;
                        frame-src https://www.youtube.com/;">
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
@@ -244,6 +247,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this.sendEventMessage(
       newEventRequest(EventType.SET_CURRENT_OPEN_FILE, {
+        id: uuidv4(),
         name: path.basename(newCurrentOpenFile),
         path: newCurrentOpenFile,
         relativePath: path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile),
@@ -292,6 +296,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
     const payload: SelectionPayload = {
+      id: uuidv4(),
       selectedText: document.getText(selection),
       fileName: path.basename(filePath),
       startLine: selection.start.line + 1,
@@ -306,11 +311,14 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this.sendEventMessage(newEventRequest(EventType.SELECTION_CHANGED, this._selectionPayloads));
   }
 
-  private removeSelection(index: number, removeAllFlag: boolean): void {
+  private removeSelection(id: string, removeAllFlag: boolean): void {
+    console.log("Initial _selectionPayloads:", this._selectionPayloads);
+    console.log("ID to remove:", id);
     if (removeAllFlag) {
       this._selectionPayloads = [];
       return;
     }
-    this._selectionPayloads.splice(index, 1);
+    this._selectionPayloads = this._selectionPayloads.filter((payload) => payload.id !== id);
+    console.log("Removed selection", this._selectionPayloads);
   }
 }
