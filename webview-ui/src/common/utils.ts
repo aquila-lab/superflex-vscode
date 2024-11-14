@@ -18,20 +18,3 @@ export async function readImageFileAsBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
-
-interface RGBColor {
-  r: number;
-  g: number;
-  b: number;
-}
-
-export const parseHexColor = (hexColor: string): RGBColor => {
-  const hex = hexColor.startsWith('#') ? hexColor.slice(1) : hexColor;
-  const parsedHex = hex.length > 6 ? hex.slice(0, 6) : hex;
-
-  return {
-    r: parseInt(parsedHex.substring(0, 2), 16),
-    g: parseInt(parsedHex.substring(2, 4), 16),
-    b: parseInt(parsedHex.substring(4, 6), 16)
-  };
-};
