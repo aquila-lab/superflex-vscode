@@ -17,7 +17,6 @@ import {
   FigmaFile,
   FilePayload,
   newEventRequest,
-  CodeSelectionPayload,
   SendMessagesRequestPayload
 } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
@@ -65,7 +64,7 @@ const ChatView: React.FunctionComponent<{
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
   const [isOutOfRequests, setIsOutOfRequests] = useState(false);
   const [isPremiumRequestModalOpen, setIsPremiumRequestModalOpen] = useState(false);
-  const [selectedCode, setSelectedCode] = useState<CodeSelectionPayload[]>([]);
+  const [selectedCode, setSelectedCode] = useState<FilePayload[]>([]);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {

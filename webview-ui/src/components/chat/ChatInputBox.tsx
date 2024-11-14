@@ -5,7 +5,7 @@ import Editor from 'react-simple-code-editor';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { Cross2Icon, EyeNoneIcon } from '@radix-ui/react-icons';
 
-import { FilePayload, CodeSelectionPayload } from '../../../../shared/protocol';
+import { FilePayload } from '../../../../shared/protocol';
 import { useAppDispatch, useAppSelector } from '../../core/store';
 import { addSelectedFile, removeSelectedFile, setSelectedFiles } from '../../core/chat/chatSlice';
 import { Button } from '../ui/Button';
@@ -21,7 +21,7 @@ interface ChatInputBoxProps {
   inputRef: React.RefObject<HTMLTextAreaElement>;
   disabled?: boolean;
   currentOpenFile: FilePayload | null;
-  selectedCode: CodeSelectionPayload[];
+  selectedCode: FilePayload[];
   fetchFiles: () => void;
   onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
@@ -84,7 +84,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         ${selectedCode
           .map((item) => {
             const fileExtension = item.relativePath.split('.').pop();
-            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n\n${item.selectedText}\n\`\`\``;
+            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n\n${item.content}\n\`\`\``;
           })
           .join('\n\n')}
         </user_selected_code>\n\n`;
@@ -176,7 +176,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
                 </div>
 
                 <Editor
-                  value={item?.selectedText || ''}
+                  value={item?.content ?? ''}
                   onValueChange={() => {}} // Not editable
                   highlight={(code) => (
                     <SyntaxHighlightedPre>
