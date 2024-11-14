@@ -10,7 +10,7 @@ import {
   newEventRequest,
   newEventResponse,
 } from "../../shared/protocol";
-import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace } from "../common/utils";
+import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace, debounce } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -22,6 +22,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
   private _decorationType: vscode.TextEditorDecorationType;
+  private debouncedShowInlineTip: (editor: vscode.TextEditor, selection: vscode.Selection) => void;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
@@ -29,10 +30,13 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this._decorationType = vscode.window.createTextEditorDecorationType({
       after: {
         contentText: "Superflex: Add to Chat (⌘+M)",
-        margin: "0 0 0 1em",
-        color: new vscode.ThemeColor("editorCodeLens.foreground"),
+        color: "#888",
+        margin: "0 0 0 6em",
+        fontWeight: "bold",
       },
     });
+
+    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 300);
 
     // Register the command
     context.subscriptions.push(
@@ -258,26 +262,28 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private handleSelectionChange(event: vscode.TextEditorSelectionChangeEvent): void {
     const editor = event.textEditor;
     const selection = editor.selection;
-
-    // Clear existing decorations
     editor.setDecorations(this._decorationType, []);
 
-    // Only show tip if there's an actual selection
     if (!selection.isEmpty) {
-      const range = new vscode.Range(
-        selection.end.line,
-        selection.end.character,
-        selection.end.line,
-        selection.end.character
-      );
-
-      // Add the inline tip decoration
-      editor.setDecorations(this._decorationType, [
-        {
-          range,
-        },
-      ]);
+      this.debouncedShowInlineTip(editor, selection);
     }
+  }
+
+  private showInlineTip(editor: vscode.TextEditor, selection: vscode.Selection): void {
+    const lineBelow = Math.min(selection.end.line + 1, editor.document.lineCount - 1);
+
+    // Position the tip at the beginning of the line below the selected text
+    const nextLine = editor.document.lineAt(lineBelow);
+    const position = nextLine.isEmptyOrWhitespace
+      ? new vscode.Position(lineBelow, 0) // Start of the line if it's empty
+      : new vscode.Position(lineBelow, nextLine.text.length); // End of the text if line has content
+
+    const range = new vscode.Range(position, position);
+    editor.setDecorations(this._decorationType, [
+      {
+        range,
+      },
+    ]);
   }
 
   private handleAddSelectionToChat(): void {
