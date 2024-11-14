@@ -89,7 +89,7 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
           const hasLang = /language-(\w+)/.exec(className || '');
           const codeProp = String(props.children).replace(/\n$/, '');
 
-          const currentFileName = fileName[codeBlockIndex - 1] || 'main.js';
+          const currentFileName = fileName[codeBlockIndex - 1] || 'text';
           const currentStartLine = startLine[codeBlockIndex - 1];
           const currentEndLine = endLine[codeBlockIndex - 1];
 
