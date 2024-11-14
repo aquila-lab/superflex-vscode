@@ -61,11 +61,14 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
   lines.forEach((line) => {
     if (line.includes('file=')) {
       const fileMatch = line.match(/file="([^"]+)"/);
+
       if (fileMatch) {
         const fileInfo = fileMatch[1];
+
         if (fileInfo.includes('#')) {
           const [filePath, lineNumbers] = fileInfo.split('#');
-          fileName.push(filePath);
+          fileName.push(filePath.split(/[/\\]/).pop() ?? 'text');
+
           if (lineNumbers && lineNumbers.includes('-')) {
             const [start, end] = lineNumbers.split('-');
             startLine.push(parseInt(start, 10));
@@ -100,8 +103,8 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
                   <FileIcon filename={currentFileName} className="size-5" />
 
                   <p className="text-xs text-foreground truncate max-w-36">{currentFileName}</p>
-                  {currentStartLine !== null && currentEndLine !== null && (
-                    <p className="text-xs text-foreground truncate max-w-36">
+                  {currentStartLine && currentEndLine && (
+                    <p className="text-xs text-foreground">
                       ({currentStartLine}-{currentEndLine})
                     </p>
                   )}

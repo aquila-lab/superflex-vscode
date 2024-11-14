@@ -163,8 +163,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             visibleEditorID === item.id && (
               <div key={item.id} className="rounded-md mt-4 mx-2 border border-border bg-background">
                 <div className="flex gap-1 pt-1 px-2 border-b border-border bg-[--vscode-panel-background]">
-                  <FileIcon filename={item.relativePath} className="size-5" />
-                  <p className="text-xs text-foreground truncate max-w-36">{item.relativePath}</p>
+                  <FileIcon filename={item.name} className="size-5" />
+                  <p className="text-xs text-foreground truncate max-w-36">{item.name}</p>
                   <p className="text-xs text-foreground truncate max-w-36">{`(${item?.startLine}-${item?.endLine})`}</p>
                   <div className="ml-auto flex gap-4">
                     <Button size="xs" variant="text" className="p-0" onClick={() => toggleSelectedFileVisibility(item)}>
