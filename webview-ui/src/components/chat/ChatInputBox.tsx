@@ -161,8 +161,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         {selectedCode?.map(
           (item) =>
             visibleEditorID === item.id && (
-              <div key={item.id} className="rounded-xl mt-4 mx-2 border-[1px] border-border bg-background">
-                <div className="flex gap-1 pt-1 px-2 border-b-[1px] border-border bg-[--vscode-panel-background]">
+              <div key={item.id} className="rounded-md mt-4 mx-2 border border-border bg-background">
+                <div className="flex gap-1 pt-1 px-2 border-b border-border bg-[--vscode-panel-background]">
                   <FileIcon filename={item.relativePath} className="size-5" />
                   <p className="text-xs text-foreground truncate max-w-36">{item.relativePath}</p>
                   <p className="text-xs text-foreground truncate max-w-36">{`(${item?.startLine}-${item?.endLine})`}</p>
@@ -178,7 +178,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
 
                 <Editor
                   value={item?.selectedText || ''}
-                  onValueChange={(code) => console.log('not editable')}
+                  onValueChange={() => {}} // Not editable
                   highlight={(code) => (
                     <SyntaxHighlightedPre>
                       <div dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />

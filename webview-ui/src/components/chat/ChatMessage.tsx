@@ -19,17 +19,18 @@ interface ChatMessageProps {
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleFeedback }) => {
-  const showFeedback = message.role === Role.Assistant && !message.feedback;
   const user = useAppSelector((state) => state.user);
-  console.log('user', user);
-  const [userInfo, setUserInfo] = useState({
-    picture: user.picture
-  });
+
+  const [userInfo, setUserInfo] = useState({ picture: user.picture });
+
   useEffect(() => {
     setUserInfo({
       picture: user.picture
     });
   }, [user.picture]);
+
+  const showFeedback = message.role === Role.Assistant && !message.feedback;
+
   return (
     <div
       className={`py-4 px-2 border-b border-border text-left rounded-lg ${message.role === Role.User ? 'bg-muted' : undefined}`}>

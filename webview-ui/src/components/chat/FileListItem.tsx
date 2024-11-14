@@ -17,6 +17,9 @@ export const FileListItem: React.FC<FileListItemProps> = ({ file, onShowSelected
       <div className="flex flex-row items-center gap-1 hover:cursor-pointer" onClick={() => onShowSelectedCode(file)}>
         <FileIcon filename={file.name} className="size-5" />
         <p className="text-xs text-muted-foreground truncate max-w-36">{file.name}</p>
+        <p className="text-xs text-muted-foreground">
+          {file.startLine && file.endLine && ` (${file?.startLine}-${file?.endLine})`}
+        </p>
         <p className="text-xs text-muted-secondary-foreground">{file.isCurrentOpenFile ? 'Current file' : 'File'}</p>
       </div>
       <Button

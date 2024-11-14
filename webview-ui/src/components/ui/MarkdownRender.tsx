@@ -94,13 +94,13 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
 
           return !inline && hasLang ? (
             role === Role.Assistant ? (
-              <div className="rounded-xl ml-2 mr-2 border-gray-600 border-[1px] bg-background  mt-4">
-                <div className="flex align-middle gap-1 pt-1 pl-2 border-gray-600 border-b-[1px] pr-2">
+              <div className="rounded-md mx-2 mt-4 border border-border bg-background">
+                <div className="flex align-middle gap-1 pt-1 px-2 border-b border-border">
                   <FileIcon filename={currentFileName} className="size-5" />
 
-                  <p className="text-[11px] m-0 text-foreground truncate max-w-36">{currentFileName}</p>
+                  <p className="text-xs text-foreground truncate max-w-36">{currentFileName}</p>
                   {currentStartLine !== null && currentEndLine !== null && (
-                    <p className="text-[11px] m-0 text-foreground truncate max-w-36">
+                    <p className="text-xs text-foreground truncate max-w-36">
                       ({currentStartLine}-{currentEndLine})
                     </p>
                   )}
@@ -114,10 +114,10 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
                         setCopyTip('Copy code');
                       }}>
                       {copyTip === 'Copied' ? (
-                        <DocumentCheckIcon className="h-[14px] w-[14px] text-muted-foreground hover:text-foreground" />
+                        <DocumentCheckIcon className="size-4 text-muted-foreground hover:text-foreground" />
                       ) : (
                         <Button size="xs" variant="text" className="p-0">
-                          <DocumentDuplicateIcon className="h-[14px] w-[14px] text-muted-foreground hover:text-foreground" />
+                          <DocumentDuplicateIcon className="size-4 text-muted-foreground hover:text-foreground" />
                         </Button>
                       )}
                     </CopyToClipboard>
