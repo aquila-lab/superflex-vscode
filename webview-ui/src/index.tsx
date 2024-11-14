@@ -6,13 +6,17 @@ import './index.css';
 import App from './App';
 import store from './core/store';
 import { getVSCodeAPI } from './api/vscodeApi';
+import { useVscTheme } from './hooks/useVscTheme';
+import { VscThemeContext } from './context/VscTheme';
 import CustomPostHogProvider from './hooks/CustomPostHogProvider';
 
 const Root = (): JSX.Element => (
   <StrictMode>
     <Provider store={store}>
       <CustomPostHogProvider>
-        <App vscodeAPI={getVSCodeAPI()} />
+        <VscThemeContext.Provider value={useVscTheme()}>
+          <App vscodeAPI={getVSCodeAPI()} />
+        </VscThemeContext.Provider>
       </CustomPostHogProvider>
     </Provider>
   </StrictMode>

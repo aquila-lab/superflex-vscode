@@ -10,6 +10,7 @@ import {
   SendMessagesRequestPayload,
   SendNotificationPayload,
   SyncProjectProgressPayload,
+  CodeSelectionPayload,
 } from "./types";
 
 export enum EventType {
@@ -38,6 +39,7 @@ export enum EventType {
   UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
+  ADD_SELECTED_CODE = "add_selected_code",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -75,6 +77,7 @@ export interface EventPayloads {
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
+  [EventType.ADD_SELECTED_CODE]: { request: CodeSelectionPayload; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
