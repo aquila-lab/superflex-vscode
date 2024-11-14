@@ -87,6 +87,7 @@ const ChatView: React.FunctionComponent<{
 
           const user = payload as EventPayloads[typeof command]['response'];
           dispatch(setUser(user));
+
           break;
         }
         case EventType.GET_USER_SUBSCRIPTION: {
