@@ -23,10 +23,13 @@ export type SyncProjectProgressPayload = {
 };
 
 export type FilePayload = {
+  id: string;
   name: string;
   path: string;
   relativePath: string;
   isCurrentOpenFile?: boolean;
+  startLine?: number;
+  endLine?: number;
 };
 
 export type SendMessagesRequestPayload = {
@@ -42,4 +45,14 @@ export type FigmaFile = {
 
 export type SendNotificationPayload = {
   message: string;
+};
+
+export type CodeSelectionPayload = {
+  id: string;
+  name: string;
+  path: string;
+  relativePath: string;
+  startLine: number;
+  endLine: number;
+  selectedText: string;
 };

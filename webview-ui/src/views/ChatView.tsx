@@ -17,6 +17,7 @@ import {
   FigmaFile,
   FilePayload,
   newEventRequest,
+  CodeSelectionPayload,
   SendMessagesRequestPayload
 } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
@@ -64,6 +65,7 @@ const ChatView: React.FunctionComponent<{
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
   const [isOutOfRequests, setIsOutOfRequests] = useState(false);
   const [isPremiumRequestModalOpen, setIsPremiumRequestModalOpen] = useState(false);
+  const [selectedCode, setSelectedCode] = useState<CodeSelectionPayload[]>([]);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -194,6 +196,11 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.SHOW_SOFT_PAYWALL_MODAL: {
           setIsPremiumRequestModalOpen(true);
+          break;
+        }
+        case EventType.ADD_SELECTED_CODE: {
+          const selectedCode = payload as EventPayloads[typeof command]['request'];
+          setSelectedCode((prev) => [...prev, selectedCode]);
           break;
         }
       }
@@ -351,6 +358,13 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
+  function handleRemoveSelectedCode(relativePath: string, removeAll?: boolean): void {
+    if (removeAll) {
+      setSelectedCode([]);
+    }
+    setSelectedCode((prev) => prev.filter((c) => c.relativePath !== relativePath));
+  }
+
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
 
   const PreviewChatAttachment = (): React.ReactNode => {
@@ -407,6 +421,8 @@ const ChatView: React.FunctionComponent<{
           inputRef={inputRef}
           disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
+          selectedCode={selectedCode}
+          onSelectedCodeRemoved={handleRemoveSelectedCode}
           fetchFiles={fetchFiles}
           onSendClicked={async (selectedFiles, textContent) =>
             handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
@@ -418,7 +434,6 @@ const ChatView: React.FunctionComponent<{
           onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>
-
       <FigmaFilePickerModal
         open={openFigmaFilePickerModal}
         onClose={() => setOpenFigmaFilePickerModal(false)}
