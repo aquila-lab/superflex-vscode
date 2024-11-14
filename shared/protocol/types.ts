@@ -30,6 +30,7 @@ export type FilePayload = {
   isCurrentOpenFile?: boolean;
   startLine?: number;
   endLine?: number;
+  content?: string;
 };
 
 export type SendMessagesRequestPayload = {
@@ -45,14 +46,4 @@ export type FigmaFile = {
 
 export type SendNotificationPayload = {
   message: string;
-};
-
-export type CodeSelectionPayload = {
-  id: string;
-  name: string;
-  path: string;
-  relativePath: string;
-  startLine: number;
-  endLine: number;
-  selectedText: string;
 };

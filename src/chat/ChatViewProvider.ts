@@ -2,8 +2,14 @@ import path from "path";
 import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
 
-import { CodeSelectionPayload } from "../../shared/protocol";
-import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
+import {
+  EventMessage,
+  EventPayloads,
+  EventType,
+  FilePayload,
+  newEventRequest,
+  newEventResponse,
+} from "../../shared/protocol";
 import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 
@@ -288,14 +294,14 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const document = editor.document;
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
-    const codeSelection: CodeSelectionPayload = {
+    const codeSelection: FilePayload = {
       id: uuidv4(),
       name: path.basename(filePath),
       path: filePath,
       relativePath: path.relative(this._workspaceDirPath, filePath),
       startLine: selection.start.line + 1,
       endLine: selection.end.line + 1,
-      selectedText: document.getText(selection),
+      content: document.getText(selection),
     };
 
     // Send to webview
