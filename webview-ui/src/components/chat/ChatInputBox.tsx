@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import hljs from 'highlight.js';
+import 'highlight.js/styles/vs2015.css';
 import Editor from 'react-simple-code-editor';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { Cross2Icon, EyeNoneIcon } from '@radix-ui/react-icons';
@@ -45,17 +46,14 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   const isFigmaAuthenticated = useAppSelector((state) => state.chat.init.isFigmaAuthenticated);
 
   const [input, setInput] = useState('');
-  const [visibleEditors, setVisibleEditors] = useState<boolean[]>(selectedCode?.map(() => true) ?? []);
+  const [visibleEditorID, setVisibleEditorID] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedCode) {
-      setVisibleEditors((prevVisibleEditors) => {
-        // Map over the `selectedCode` array and set visibility
-        return selectedCode.map((_, index) => {
-          // If the current editor is already false, keep it false
-          return prevVisibleEditors[index] ?? true;
-        });
-      });
+      dispatch(setSelectedFiles(selectedCode));
+      if (selectedCode.length > 0) {
+        setVisibleEditorID(selectedCode[selectedCode.length - 1].id);
+      }
     }
   }, [selectedCode]);
 
@@ -73,50 +71,60 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     if (!isSendSuccessful) {
       return;
     }
-    onSelectedCodeRemoved('', true);
+
     setInput('');
+    setVisibleEditorID(null);
+    onSelectedCodeRemoved('', true);
+  }
+
+  function formatInput(): string {
+    let formattedUserSelectedCodeInput = '';
+    if (selectedCode) {
+      formattedUserSelectedCodeInput = `<user_selected_code>\n
+        ${selectedCode
+          .map((item) => {
+            const fileExtension = item.relativePath.split('.').pop();
+            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n\n${item.selectedText}\n\`\`\``;
+          })
+          .join('\n\n')}
+        </user_selected_code>\n\n
+        `;
+    }
+
+    return formattedUserSelectedCodeInput + input;
   }
 
   function handleFileSelected(file: FilePayload): void {
-    if (selectedFiles.find((f) => f.relativePath === file.relativePath)) {
-      handleFileRemove(file);
+    if (selectedFiles.find((f) => f.id === file.id)) {
+      dispatch(removeSelectedFile(file));
       return;
     }
     dispatch(addSelectedFile(file));
   }
 
   function handleFileRemove(file: FilePayload): void {
+    // Filter out the item with the matching `id`
+    const updatedItems = selectedFiles.filter((f) => f.id !== file.id);
+
+    // Update visible editors to match the new selection
+    if (file.id === visibleEditorID && updatedItems.length > 0) {
+      setVisibleEditorID(updatedItems[updatedItems.length - 1].id);
+    } else if (updatedItems.length === 0) {
+      setVisibleEditorID(null);
+    }
+
     dispatch(removeSelectedFile(file));
   }
 
-  function formatInput(): string {
-    if (selectedCode) {
-      const formattedInput =
-        selectedCode
-          .map((item) => {
-            const fileExtension = item.fileName.split('.').pop();
-            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n<superflex_domain_knowledge>\n${item.selectedText.replace(/"/g, '\\"')}\n</superflex_domain_knowledge>\n\`\`\``;
-          })
-          .join('\n\n') +
-        '\n\n' +
-        input;
-      return formattedInput;
+  const toggleSelectedFileVisibility = (file: FilePayload) => {
+    if (visibleEditorID === file.id) {
+      if (selectedCode && selectedCode.length > 0 && selectedCode[selectedCode.length - 1].id !== file.id) {
+        setVisibleEditorID(selectedCode[selectedCode.length - 1].id);
+      } else {
+        setVisibleEditorID(null);
+      }
     } else {
-      return input;
-    }
-  }
-
-  const toggleEditorVisibility = (index: number) => {
-    setVisibleEditors((prev) => prev.map((visible, i) => (i === index ? !visible : visible)));
-  };
-
-  const handleSelectedCodeShow = (name: string) => {
-    if (selectedCode) {
-      selectedCode.forEach((item, index) => {
-        if (item.fileName === name && !visibleEditors[index]) {
-          toggleEditorVisibility(index); // Show any hidden code for this file
-        }
-      });
+      setVisibleEditorID(file.id);
     }
   };
 
@@ -142,7 +150,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
               <FileListItem
                 key={file.relativePath}
                 file={file}
-                onShowSelectedCode={handleSelectedCodeShow}
+                onShowSelectedCode={toggleSelectedFileVisibility}
                 onRemoveFile={handleFileRemove}
               />
             ))
@@ -150,23 +158,19 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         </div>
 
         {/* Code Editor */}
-        {selectedCode?.map((item, index) => (
-          <div key={index}>
-            {visibleEditors && visibleEditors[index] && (
-              <div className="rounded-xl ml-2 mr-2 border-gray-600 border-[1px] bg-background max-h-64 overflow-y-auto mt-4">
-                <div className="flex gap-1 pt-2 pl-2 border-gray-600 border-b-[1px] bg-[--vscode-panel-background]">
-                  <FileIcon filename={item.fileName} className="size-5" />
-                  <p className="text-xm text-foreground truncate max-w-36">{item.fileName}</p>
+        {selectedCode?.map(
+          (item) =>
+            visibleEditorID === item.id && (
+              <div key={item.id} className="rounded-xl mt-4 mx-2 border-[1px] border-border bg-background">
+                <div className="flex gap-1 pt-1 px-2 border-b-[1px] border-border bg-[--vscode-panel-background]">
+                  <FileIcon filename={item.relativePath} className="size-5" />
+                  <p className="text-xs text-foreground truncate max-w-36">{item.relativePath}</p>
                   <p className="text-xs text-foreground truncate max-w-36">{`(${item?.startLine}-${item?.endLine})`}</p>
-                  <div className="ml-40 flex gap-4">
-                    <Button size="xs" variant="text" className="p-0" onClick={() => toggleEditorVisibility(index)}>
+                  <div className="ml-auto flex gap-4">
+                    <Button size="xs" variant="text" className="p-0" onClick={() => toggleSelectedFileVisibility(item)}>
                       <EyeNoneIcon className="size-4" />
                     </Button>
-                    <Button
-                      size="xs"
-                      variant="text"
-                      className="p-0"
-                      onClick={() => onSelectedCodeRemoved(item.relativePath)}>
+                    <Button size="xs" variant="text" className="p-0" onClick={() => handleFileRemove(item)}>
                       <Cross2Icon className="size-4" />
                     </Button>
                   </div>
@@ -180,7 +184,6 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
                       <div dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />
                     </SyntaxHighlightedPre>
                   )}
-                  // highlight={(code) => hljs.highlight(code, { language: 'js' }).value}
                   padding={10}
                   style={{
                     fontFamily: '"Fira code", "Fira Mono", monospace',
@@ -188,10 +191,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
                   }}
                 />
               </div>
-            )}
-          </div>
-        ))}
-
+            )
+        )}
         {/* Chat input */}
         <div className="flex-1">
           <TextareaAutosize

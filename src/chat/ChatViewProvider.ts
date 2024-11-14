@@ -1,5 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
+import { v4 as uuidv4 } from "uuid";
 
 import { CodeSelectionPayload } from "../../shared/protocol";
 import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
@@ -195,7 +196,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
                        connect-src 'self' http://localhost:3000 https://us.posthog.com/ https://app.posthog.com/ https://us.i.posthog.com/ https://www.youtube.com/;
                        style-src ${webview.cspSource} 'unsafe-inline';
                        font-src ${webview.cspSource};
-                       img-src ${webview.cspSource} https://*.amazonaws.com blob: data:;
+                       img-src ${
+                         webview.cspSource
+                       } https://*.amazonaws.com https://lh3.googleusercontent.com blob: data:;
                        script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/ https://us-assets.i.posthog.com/;
                        frame-src https://www.youtube.com/;">
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
@@ -237,6 +240,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this.sendEventMessage(
       newEventRequest(EventType.SET_CURRENT_OPEN_FILE, {
+        id: uuidv4(),
         name: path.basename(newCurrentOpenFile),
         path: newCurrentOpenFile,
         relativePath: path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile),
@@ -285,7 +289,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
     const codeSelection: CodeSelectionPayload = {
-      fileName: path.basename(filePath),
+      id: uuidv4(),
+      name: path.basename(filePath),
+      path: filePath,
       relativePath: path.relative(this._workspaceDirPath, filePath),
       startLine: selection.start.line + 1,
       endLine: selection.end.line + 1,
