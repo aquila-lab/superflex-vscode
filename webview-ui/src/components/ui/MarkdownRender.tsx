@@ -85,7 +85,9 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
 
   return (
     <ReactMarkdown
-      className={role !== Role.Assistant ? 'flex gap-2 flex-wrap' : 'prose prose-sm text-sm dark:prose-invert'}
+      className={
+        role !== Role.Assistant ? 'flex gap-2 flex-wrap' : 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
+      }
       components={{
         code({ inline, className, ...props }: any) {
           codeBlockIndex += 1;
