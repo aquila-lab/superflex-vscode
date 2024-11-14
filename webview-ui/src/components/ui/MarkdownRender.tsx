@@ -67,7 +67,7 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
 
         if (fileInfo.includes('#')) {
           const [filePath, lineNumbers] = fileInfo.split('#');
-          fileName.push(filePath.split(/[/\\]/).pop() ?? 'text');
+          fileName.push(filePath.split(/[/\\]/g).pop() ?? 'text');
 
           if (lineNumbers && lineNumbers.includes('-')) {
             const [start, end] = lineNumbers.split('-');
