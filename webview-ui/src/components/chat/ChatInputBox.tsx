@@ -80,14 +80,15 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   function formatInput(): string {
     let formattedUserSelectedCodeInput = '';
     if (selectedCode.length > 0) {
-      formattedUserSelectedCodeInput = `<user_selected_code>\n
-        ${selectedCode
+      formattedUserSelectedCodeInput =
+        '<user_selected_code>\n' +
+        selectedCode
           .map((item) => {
             const fileExtension = item.relativePath.split('.').pop();
             return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n\n${item.content}\n\`\`\``;
           })
-          .join('\n\n')}
-        </user_selected_code>\n\n`;
+          .join('\n\n') +
+        '\n</user_selected_code>\n\n';
     }
 
     return formattedUserSelectedCodeInput + input;

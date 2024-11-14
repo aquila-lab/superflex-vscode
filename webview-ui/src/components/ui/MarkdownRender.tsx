@@ -50,6 +50,12 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
   const startLine: number[] = [];
   const endLine: number[] = [];
 
+  mdString = mdString
+    .replace(/<user_selected_code>\n?/, '')
+    .replace(/\n?<\/user_selected_code>/, '')
+    .trimStart()
+    .trimEnd();
+
   // Pre-process mdString to extract file details
   const lines = mdString.split('\n');
   lines.forEach((line) => {
@@ -87,11 +93,6 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
           const currentStartLine = startLine[codeBlockIndex - 1];
           const currentEndLine = endLine[codeBlockIndex - 1];
 
-          const cleanedCode = codeProp
-            .replace(/<superflex_domain_knowledge>\n?/, '')
-            .replace(/\n?<\/superflex_domain_knowledge>/, '')
-            .trim();
-
           return !inline && hasLang ? (
             role === Role.Assistant ? (
               <div className="rounded-md mx-2 mt-4 border border-border bg-background">
@@ -125,8 +126,8 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
                 </div>
 
                 <Editor
-                  value={cleanedCode}
-                  onValueChange={() => console.log('not editable')}
+                  value={codeProp}
+                  onValueChange={() => {}}
                   highlight={(code) =>
                     // <SyntaxHighlightedPre>
                     //   <div dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />
