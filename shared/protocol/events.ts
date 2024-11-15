@@ -39,6 +39,8 @@ export enum EventType {
   FETCH_FILES = "fetch_files",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
   ADD_SELECTED_CODE = "add_selected_code",
+  ADD_COPIED_CODE = "add_copied_code",
+  PASTE_COPIED_CODE = "PASTE_COPIED_CODE",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -86,6 +88,8 @@ export interface EventPayloads {
   [EventType.SEND_NOTIFICATION]: { request: SendNotificationPayload; response: void };
   [EventType.OPEN_EXTERNAL_URL]: { request: { url: string }; response: void };
   [EventType.SHOW_SOFT_PAYWALL_MODAL]: { request: void; response: void };
+  [EventType.ADD_COPIED_CODE]: { request: void; response: void };
+  [EventType.PASTE_COPIED_CODE]: { request: FilePayload; response: void };
 }
 
 export type EventCallback<T extends EventType> = (payload: EventPayloads[T]["response"]) => void;

@@ -202,6 +202,15 @@ const ChatView: React.FunctionComponent<{
           setSelectedCode((prev) => [...prev, selectedCode]);
           break;
         }
+        case EventType.PASTE_COPIED_CODE: {
+          const selectedCode = payload as EventPayloads[typeof command]['request'];
+          console.log('selectedCode', selectedCode);
+          if (selectedCode && Object.keys(selectedCode).length > 0) {
+            console.log('running');
+            setSelectedCode((prev) => [...prev, selectedCode]);
+            break;
+          }
+        }
       }
     });
   }, [vscodeAPI]);
@@ -357,11 +366,15 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
-  function handleRemoveSelectedCode(relativePath: string, removeAll?: boolean): void {
+  function handleRemoveSelectedCode(id: string, removeAll?: boolean): void {
     if (removeAll) {
       setSelectedCode([]);
     }
-    setSelectedCode((prev) => prev.filter((c) => c.relativePath !== relativePath));
+    setSelectedCode((prev) => prev.filter((c) => c.id !== id));
+  }
+
+  function handlePaste(): void {
+    vscodeAPI.postMessage(newEventRequest(EventType.ADD_COPIED_CODE));
   }
 
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
@@ -421,6 +434,7 @@ const ChatView: React.FunctionComponent<{
           disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
           selectedCode={selectedCode}
+          handlePaste={handlePaste}
           onSelectedCodeRemoved={handleRemoveSelectedCode}
           fetchFiles={fetchFiles}
           onSendClicked={async (selectedFiles, textContent) =>

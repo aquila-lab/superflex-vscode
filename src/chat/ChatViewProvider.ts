@@ -23,6 +23,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _currentOpenFile?: string;
   private _decorationType: vscode.TextEditorDecorationType;
   private debouncedShowInlineTip: (editor: vscode.TextEditor, selection: vscode.Selection) => void;
+  private copiedText: FilePayload = {} as FilePayload;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
@@ -42,6 +43,12 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     context.subscriptions.push(
       vscode.commands.registerCommand("superflex.addSelectionToChat", () => {
         this.handleAddSelectionToChat();
+      })
+    );
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.addCopyToChat", () => {
+        this.handleCopySelectionToChat();
       })
     );
 
@@ -90,6 +97,11 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         // When webview is initialized we need to set current open file
         if (command === EventType.INITIALIZED) {
           this.handleActiveEditorChange(vscode.window.activeTextEditor);
+        }
+
+        if (command === EventType.ADD_COPIED_CODE) {
+          this.sendEventMessage(newEventRequest(EventType.PASTE_COPIED_CODE, this.copiedText));
+          this.copiedText = {} as FilePayload;
         }
 
         try {
@@ -312,5 +324,35 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     // Send to webview
     this.sendEventMessage(newEventRequest(EventType.ADD_SELECTED_CODE, codeSelection));
+  }
+  private async handleCopySelectionToChat(): Promise<void> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor || !this._chatWebview || !this._workspaceDirPath) {
+      return;
+    }
+
+    const selection = editor.selection;
+    if (selection.isEmpty) {
+      return;
+    }
+
+    const document = editor.document;
+    const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
+
+    const codeSelection: FilePayload = {
+      id: uuidv4(),
+      name: path.basename(filePath),
+      path: filePath,
+      relativePath: path.relative(this._workspaceDirPath, filePath),
+      startLine: selection.start.line + 1,
+      endLine: selection.end.line + 1,
+      content: document.getText(selection),
+    };
+
+    this.copiedText = codeSelection;
+    await vscode.env.clipboard.writeText("");
+    if (codeSelection.content) {
+      await vscode.env.clipboard.writeText(codeSelection.content);
+    }
   }
 }

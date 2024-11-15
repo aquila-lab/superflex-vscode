@@ -26,7 +26,8 @@ interface ChatInputBoxProps {
   onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
-  onSelectedCodeRemoved: (relativePath: string, removeAll?: boolean) => void;
+  onSelectedCodeRemoved: (id: string, removeAll?: boolean) => void;
+  handlePaste: () => void;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
@@ -38,7 +39,8 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   onSendClicked,
   onImageSelected,
   onFigmaButtonClicked,
-  onSelectedCodeRemoved
+  onSelectedCodeRemoved,
+  handlePaste
 }) => {
   const dispatch = useAppDispatch();
 
@@ -64,6 +66,17 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     }
     dispatch(addSelectedFile(currentOpenFile));
   }, [currentOpenFile]);
+
+  useEffect(() => {
+    if (
+      Array.isArray(selectedCode) &&
+      selectedCode.length > 0 &&
+      input === selectedCode[selectedCode.length - 1].content
+    ) {
+      console.log('run');
+      setInput('');
+    }
+  }, [selectedCode]);
 
   async function handleSend(): Promise<void> {
     const formattedInput = formatInput();
@@ -105,7 +118,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   function handleFileRemove(file: FilePayload): void {
     // Filter out the item with the matching `id`
     const updatedItems = selectedFiles.filter((f) => f.id !== file.id);
-
+    onSelectedCodeRemoved(file.id, false);
     // Update visible editors to match the new selection
     if (file.id === visibleEditorID && updatedItems.length > 0) {
       setVisibleEditorID(updatedItems[updatedItems.length - 1].id);
@@ -208,6 +221,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
                 handleSend();
               }
             }}
+            onPaste={handlePaste}
           />
         </div>
 
