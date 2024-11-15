@@ -42,7 +42,7 @@ interface MarkdownRenderProps {
 const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString }) => {
   return (
     <ReactMarkdown
-      className="prose prose-sm text-sm dark:prose-invert"
+      className="prose prose-sm text-sm dark:prose-invert w-full max-w-none"
       components={{
         code({ inline, className, ...props }: any) {
           const hasLang = /language-(\w+)/.exec(className || '');
