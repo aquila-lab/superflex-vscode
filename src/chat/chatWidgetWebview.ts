@@ -32,13 +32,6 @@ function registerWebview(context: vscode.ExtensionContext, chatProvider: ChatVie
     })
   );
 
-  // Register commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand("superflex.chat.focus-input", () => {
-      void chatProvider.focusChatInput();
-    })
-  );
-
   hasRegisteredChatWebview = true;
 }
 

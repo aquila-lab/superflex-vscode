@@ -30,21 +30,25 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this._decorationType = vscode.window.createTextEditorDecorationType({
       after: {
         contentText: "Superflex: Add to Chat (⌘+M)",
-        color: "#888",
+        color: new vscode.ThemeColor("editorCodeLens.foreground"),
         margin: "0 0 0 6em",
-        fontWeight: "bold",
       },
     });
 
-    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 300);
+    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 100);
 
-    // Register the command
+    // Register the commands
     context.subscriptions.push(
-      vscode.commands.registerCommand("superflex.addSelectionToChat", () => {
+      vscode.commands.registerCommand("superflex.chat.focus-input", () => {
+        this.focusChatInput();
+      })
+    );
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.addSelectionToChat", async () => {
+        await this.focusChatInput();
         this.handleAddSelectionToChat();
       })
     );
-
     context.subscriptions.push(
       vscode.commands.registerCommand(
         "superflex.chat.new-thread",
@@ -139,6 +143,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   async focusChatInput() {
+    if (this._chatWebviewView?.visible) {
+      return;
+    }
+
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
@@ -270,13 +278,13 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   private showInlineTip(editor: vscode.TextEditor, selection: vscode.Selection): void {
-    const lineBelow = Math.min(selection.end.line + 1, editor.document.lineCount - 1);
+    const lineAbove = Math.max(selection.start.line - 1, 0);
 
-    // Position the tip at the beginning of the line below the selected text
-    const nextLine = editor.document.lineAt(lineBelow);
-    const position = nextLine.isEmptyOrWhitespace
-      ? new vscode.Position(lineBelow, 0) // Start of the line if it's empty
-      : new vscode.Position(lineBelow, nextLine.text.length); // End of the text if line has content
+    // Position the tip at the beginning of the line above the selected text
+    const prevLine = editor.document.lineAt(lineAbove);
+    const position = prevLine.isEmptyOrWhitespace
+      ? new vscode.Position(lineAbove, 0) // Start of the line if it's empty
+      : new vscode.Position(lineAbove, prevLine.text.length); // End of the text if line has content
 
     const range = new vscode.Range(position, position);
     editor.setDecorations(this._decorationType, [
