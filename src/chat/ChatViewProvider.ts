@@ -39,9 +39,17 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 300);
 
-    // Register the command
+    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 300);
+
+    // Register the commands
     context.subscriptions.push(
-      vscode.commands.registerCommand("superflex.addSelectionToChat", () => {
+      vscode.commands.registerCommand("superflex.chat.focus-input", () => {
+        this.focusChatInput();
+      })
+    );
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.addSelectionToChat", async () => {
+        await this.focusChatInput();
         this.handleAddSelectionToChat();
       })
     );
@@ -151,6 +159,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   async focusChatInput() {
+    if (this._chatWebviewView?.visible) {
+      return;
+    }
+
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
