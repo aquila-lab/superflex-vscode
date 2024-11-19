@@ -78,7 +78,7 @@ export interface EventPayloads {
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
-  [EventType.PASTE_COPIED_CODE]: { request: void; response: FilePayload };
+  [EventType.PASTE_COPIED_CODE]: { request: void; response: FilePayload | null };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };

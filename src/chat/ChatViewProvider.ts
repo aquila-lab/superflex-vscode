@@ -21,7 +21,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _chatWebview?: vscode.Webview;
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
-  private _copiedText?: FilePayload;
+  private _copiedText: FilePayload | null = null;
   private _decorationType: vscode.TextEditorDecorationType;
   private debouncedShowInlineTip: (editor: vscode.TextEditor, selection: vscode.Selection) => void;
 
@@ -108,12 +108,15 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           this.handleActiveEditorChange(vscode.window.activeTextEditor);
         }
 
-        if (command === EventType.PASTE_COPIED_CODE && this._copiedText) {
-          this.sendEventMessage(newEventResponse(EventType.PASTE_COPIED_CODE, this._copiedText));
-          this._copiedText = {} as FilePayload;
-        }
-
         try {
+          if (command === EventType.PASTE_COPIED_CODE) {
+            const eventResponse = newEventResponse(command, this._copiedText);
+            eventResponse.id = message.id;
+            this.sendEventMessage(eventResponse);
+            this._copiedText = null;
+            return;
+          }
+
           const resonsePayload = await this.chatApi.handleEvent(
             command,
             payload as EventPayloads[typeof command]["request"],

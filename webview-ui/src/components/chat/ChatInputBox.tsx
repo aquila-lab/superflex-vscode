@@ -27,7 +27,7 @@ interface ChatInputBoxProps {
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
   onSelectedCodeRemoved: (id: string, removeAll?: boolean) => void;
-  handlePaste: () => void;
+  onPaste: () => Promise<boolean>;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
@@ -40,7 +40,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   onImageSelected,
   onFigmaButtonClicked,
   onSelectedCodeRemoved,
-  handlePaste
+  onPaste
 }) => {
   const dispatch = useAppDispatch();
 
@@ -212,7 +212,17 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
                 handleSend();
               }
             }}
-            onPaste={handlePaste}
+            onPaste={async (e) => {
+              // Hold the paste event from happening immediately
+              e.preventDefault();
+
+              const isPasteSuccessful = await onPaste();
+              // If paste wasn't handled by our custom handler, manually insert the text
+              if (!isPasteSuccessful) {
+                const pastedText = e.clipboardData.getData('text');
+                setInput((prev) => prev + pastedText);
+              }
+            }}
           />
         </div>
 

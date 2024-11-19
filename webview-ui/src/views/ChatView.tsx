@@ -20,6 +20,7 @@ import {
   SendMessagesRequestPayload
 } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
+import { sendEventWithResponse } from '../api/eventUtils';
 import {
   addMessages,
   clearMessages,
@@ -202,15 +203,6 @@ const ChatView: React.FunctionComponent<{
           setSelectedCode((prev) => [...prev, selectedCode]);
           break;
         }
-        case EventType.PASTE_COPIED_CODE: {
-          const selectedCode = payload as EventPayloads[typeof command]['response'];
-          if (!selectedCode || error) {
-            return;
-          }
-
-          setSelectedCode((prev) => [...prev, selectedCode]);
-          break;
-        }
       }
     });
   }, [vscodeAPI]);
@@ -375,8 +367,21 @@ const ChatView: React.FunctionComponent<{
     setSelectedCode((prev) => prev.filter((c) => c.id !== id));
   }
 
-  function handlePaste(): void {
-    vscodeAPI.postMessage(newEventRequest(EventType.PASTE_COPIED_CODE));
+  async function handlePaste(): Promise<boolean> {
+    try {
+      const selectedCode = await sendEventWithResponse<EventType.PASTE_COPIED_CODE>(
+        vscodeAPI,
+        EventType.PASTE_COPIED_CODE
+      );
+      if (!selectedCode) {
+        return false;
+      }
+
+      setSelectedCode((prev) => [...prev, selectedCode]);
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
@@ -437,7 +442,7 @@ const ChatView: React.FunctionComponent<{
           currentOpenFile={currentOpenFile}
           selectedCode={selectedCode}
           onSelectedCodeRemoved={handleRemoveSelectedCode}
-          handlePaste={handlePaste}
+          onPaste={handlePaste}
           fetchFiles={fetchFiles}
           onSendClicked={async (selectedFiles, textContent) =>
             handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
