@@ -213,14 +213,10 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
               }
             }}
             onPaste={async (e) => {
-              // Hold the paste event from happening immediately
-              e.preventDefault();
-
+              const pastedText = e.clipboardData.getData('text');
               const isPasteSuccessful = await onPaste();
-              // If paste wasn't handled by our custom handler, manually insert the text
-              if (!isPasteSuccessful) {
-                const pastedText = e.clipboardData.getData('text');
-                setInput((prev) => prev + pastedText);
+              if (isPasteSuccessful) {
+                setInput((prev) => prev.replace(pastedText, ''));
               }
             }}
           />
