@@ -28,6 +28,7 @@ import { findWorkspaceFiles } from "../scanner";
  */
 export class ChatAPI {
   private _assistant?: Assistant;
+  private _isReady = false;
   private _ready = new vscode.EventEmitter<void>();
   private _isInitialized = false;
   private _initializedMutex = new Mutex();
@@ -44,7 +45,7 @@ export class ChatAPI {
        */
       .registerEvent(EventType.READY, () => {
         this._ready.fire();
-
+        this._isReady = true;
         Telemetry.capture("ready", {});
       })
 
@@ -277,6 +278,10 @@ export class ChatAPI {
    * Returns a Promise that resolves when the ChatAPI is ready.
    */
   onReady(): Promise<void> {
+    if (this._isReady) {
+      return Promise.resolve();
+    }
+
     return new Promise((resolve) => {
       this._ready.event(resolve);
     });

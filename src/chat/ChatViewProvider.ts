@@ -21,9 +21,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _chatWebview?: vscode.Webview;
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
+  private _copiedText?: FilePayload;
   private _decorationType: vscode.TextEditorDecorationType;
   private debouncedShowInlineTip: (editor: vscode.TextEditor, selection: vscode.Selection) => void;
-  private copiedText: FilePayload = {} as FilePayload;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
@@ -31,15 +31,12 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this._decorationType = vscode.window.createTextEditorDecorationType({
       after: {
         contentText: "Superflex: Add to Chat (⌘+M)",
-        color: "#888",
+        color: new vscode.ThemeColor("editorCodeLens.foreground"),
         margin: "0 0 0 6em",
-        fontWeight: "bold",
       },
     });
 
-    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 300);
-
-    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 300);
+    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 100);
 
     // Register the commands
     context.subscriptions.push(
@@ -48,14 +45,18 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       })
     );
     context.subscriptions.push(
-      vscode.commands.registerCommand("superflex.addSelectionToChat", async () => {
+      vscode.commands.registerCommand("superflex.add-selection-to-chat", async () => {
         await this.focusChatInput();
         this.handleAddSelectionToChat();
       })
     );
 
     context.subscriptions.push(
-      vscode.commands.registerCommand("superflex.addCopyToChat", () => {
+      vscode.commands.registerCommand("superflex.add-copy-to-chat", async () => {
+        // Execute the default copy command first
+        await vscode.commands.executeCommand("editor.action.clipboardCopyAction");
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         this.handleCopySelectionToChat();
       })
     );
@@ -107,9 +108,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           this.handleActiveEditorChange(vscode.window.activeTextEditor);
         }
 
-        if (command === EventType.ADD_COPIED_CODE) {
-          this.sendEventMessage(newEventRequest(EventType.PASTE_COPIED_CODE, this.copiedText));
-          this.copiedText = {} as FilePayload;
+        if (command === EventType.PASTE_COPIED_CODE && this._copiedText) {
+          this.sendEventMessage(newEventResponse(EventType.PASTE_COPIED_CODE, this._copiedText));
+          this._copiedText = {} as FilePayload;
         }
 
         try {
@@ -158,9 +159,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void this._chatWebview.postMessage(msg);
   }
 
-  async focusChatInput() {
+  async focusChatInput(): Promise<void> {
     if (this._chatWebviewView?.visible) {
-      return;
+      return Promise.resolve();
     }
 
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
@@ -337,9 +338,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     // Send to webview
     this.sendEventMessage(newEventRequest(EventType.ADD_SELECTED_CODE, codeSelection));
   }
+
   private async handleCopySelectionToChat(): Promise<void> {
     const editor = vscode.window.activeTextEditor;
-    if (!editor || !this._chatWebview || !this._workspaceDirPath) {
+    if (!editor || !this._workspaceDirPath) {
       return;
     }
 
@@ -361,10 +363,6 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       content: document.getText(selection),
     };
 
-    this.copiedText = codeSelection;
-    await vscode.env.clipboard.writeText("");
-    if (codeSelection.content) {
-      await vscode.env.clipboard.writeText(codeSelection.content);
-    }
+    this._copiedText = codeSelection;
   }
 }

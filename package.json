@@ -222,10 +222,6 @@
         "category": "Superflex",
         "title": "Project Sync",
         "icon": "$(refresh)"
-      },
-      {
-        "command": "add_copied_code",
-        "title": "Add Copied Code"
       }
     ],
     "configuration": {
@@ -248,7 +244,7 @@
         "when": "editorTextFocus"
       },
       {
-        "command": "superflex.addSelectionToChat",
+        "command": "superflex.add-selection-to-chat",
         "key": "cmd+m",
         "mac": "cmd+m",
         "win": "ctrl+m",
@@ -256,7 +252,7 @@
         "when": "editorHasSelection"
       },
       {
-        "command": "superflex.addCopyToChat",
+        "command": "superflex.add-copy-to-chat",
         "key": "cmd+c",
         "mac": "cmd+c",
         "win": "ctrl+c",
