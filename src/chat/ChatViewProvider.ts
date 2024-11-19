@@ -164,12 +164,14 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   async focusChatInput(): Promise<void> {
     if (this._chatWebviewView?.visible) {
+      void this._chatWebview?.postMessage(newEventRequest(EventType.FOCUS_CHAT_INPUT));
       return Promise.resolve();
     }
 
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
+    void this._chatWebview?.postMessage(newEventRequest(EventType.FOCUS_CHAT_INPUT));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {

@@ -175,6 +175,10 @@ const ChatView: React.FunctionComponent<{
           dispatch(updateMessageTextDelta(delta));
           break;
         }
+        case EventType.FOCUS_CHAT_INPUT: {
+          inputRef.current?.focus();
+          break;
+        }
         case EventType.CMD_NEW_THREAD: {
           dispatch(clearMessages());
           vscodeAPI.postMessage(newEventRequest(EventType.NEW_THREAD));
