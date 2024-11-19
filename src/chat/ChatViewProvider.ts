@@ -294,13 +294,13 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   }
 
   private showInlineTip(editor: vscode.TextEditor, selection: vscode.Selection): void {
-    const lineBelow = Math.min(selection.end.line + 1, editor.document.lineCount - 1);
+    const lineAbove = Math.max(selection.start.line - 1, 0);
 
-    // Position the tip at the beginning of the line below the selected text
-    const nextLine = editor.document.lineAt(lineBelow);
-    const position = nextLine.isEmptyOrWhitespace
-      ? new vscode.Position(lineBelow, 0) // Start of the line if it's empty
-      : new vscode.Position(lineBelow, nextLine.text.length); // End of the text if line has content
+    // Position the tip at the end of the line above the selected text
+    const prevLine = editor.document.lineAt(lineAbove);
+    const position = prevLine.isEmptyOrWhitespace
+      ? new vscode.Position(lineAbove, 0) // Start of the line if it's empty
+      : new vscode.Position(lineAbove, prevLine.text.length); // End of the text if line has content
 
     const range = new vscode.Range(position, position);
     editor.setDecorations(this._decorationType, [
