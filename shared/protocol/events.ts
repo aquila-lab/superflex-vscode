@@ -37,6 +37,7 @@ export enum EventType {
   MESSAGE_TEXT_DELTA = "message_text_delta",
   UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
+  FETCH_FILE_CONTENT = "fetch_file_content",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
   ADD_SELECTED_CODE = "add_selected_code",
   PASTE_COPIED_CODE = "paste_copied_code",
@@ -77,6 +78,7 @@ export interface EventPayloads {
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
+  [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
   [EventType.PASTE_COPIED_CODE]: { request: void; response: FilePayload | null };

@@ -13,6 +13,7 @@ import { Button } from '../ui/Button';
 import { FilePicker } from '../ui/FilePicker';
 import { FigmaButton } from '../figma/FigmaButton';
 import { TextareaAutosize } from '../ui/TextareaAutosize';
+import { FileTab } from './FileTab';
 import { FilePreview } from './FilePreview';
 import FileSelectorPopover from './FileSelectorPopover';
 
@@ -21,6 +22,7 @@ interface ChatInputBoxProps {
   disabled?: boolean;
   currentOpenFile: FilePayload | null;
   fetchFiles: () => void;
+  fetchFileContent: (file: FilePayload) => Promise<string>;
   onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
@@ -32,6 +34,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   disabled,
   currentOpenFile,
   fetchFiles,
+  fetchFileContent,
   onSendClicked,
   onImageSelected,
   onFigmaButtonClicked,
@@ -54,7 +57,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   }, [currentOpenFile]);
 
   async function handleSend(): Promise<void> {
-    const formattedInput = formatInput();
+    const formattedInput = await formatInput();
     const isSendSuccessful = await onSendClicked(selectedFiles, formattedInput);
     if (!isSendSuccessful) {
       return;
@@ -64,20 +67,31 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     dispatch(setPreviewVisibleForFileID(null));
   }
 
-  function formatInput(): string {
+  async function formatInput(): Promise<string> {
     let formattedUserSelectedCodeInput = '';
+
+    const currentOpenFile = selectedFiles.find((f) => f.isCurrentOpenFile);
+    if (currentOpenFile) {
+      const fileExtension = currentOpenFile.relativePath.split('.').pop();
+      const content = await fetchFileContent(currentOpenFile);
+      currentOpenFile.content = content;
+
+      formattedUserSelectedCodeInput = `- The content of the user's currently open file:
+      <current_open_file>\n\`\`\`${fileExtension} file="${currentOpenFile.relativePath}"\n${content}\n\`\`\`\n</current_open_file>\n\n`;
+    }
 
     const selectedCode = selectedFiles.filter((f) => f.endLine);
     if (selectedCode.length > 0) {
-      formattedUserSelectedCodeInput =
-        '<user_selected_code>\n' +
+      formattedUserSelectedCodeInput +=
+        '- The specific code snippets selected by the user:\n' +
+        '<selected_code_snippets>\n' +
         selectedCode
           .map((item) => {
             const fileExtension = item.relativePath.split('.').pop();
-            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n\n${item.content}\n\`\`\``;
+            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n${item.content}\n\`\`\``;
           })
           .join('\n\n') +
-        '\n</user_selected_code>\n\n';
+        '\n</selected_code_snippets>\n\n';
     }
 
     return formattedUserSelectedCodeInput + input;
@@ -115,6 +129,12 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
           : 'border border-border rounded-md overflow-y-auto max-h-96'
       }>
       <div className="relative flex flex-col bg-input rounded-md z-10 ">
+        {/* File preview */}
+        {previewVisibleForFileID &&
+          selectedFiles
+            .filter((file) => file.id === previewVisibleForFileID)
+            .map((file) => <FilePreview key={file.id} file={file} fetchFileContent={fetchFileContent} />)}
+
         {/* Chat top toolbar */}
         <div className="flex flex-wrap gap-2 p-2 pb-0.5">
           <FileSelectorPopover
@@ -126,13 +146,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             <p className="text-xs text-muted-foreground self-center">Add context</p>
           ) : (
             selectedFiles.map((file) => (
-              <FilePreview
-                key={file.id}
-                file={file}
-                previewVisibleForFile={previewVisibleForFileID}
-                onTogglePreview={togglePreview}
-                onRemoveFile={handleFileRemove}
-              />
+              <FileTab key={file.id} file={file} onTogglePreview={togglePreview} onRemoveFile={handleFileRemove} />
             ))
           )}
         </div>

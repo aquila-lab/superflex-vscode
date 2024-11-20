@@ -72,7 +72,9 @@ async function sendThreadMessage({
   messages,
 }: SendThreadMessageArgs): Promise<ThreadRunStream> {
   try {
-    const filesToSend = files.filter((file) => !file.endLine);
+    // We don't want to send the current open file, and code snippets to the server
+    // We are submitting them separately as user message
+    const filesToSend = files.filter((file) => !file.endLine && !file.isCurrentOpenFile);
 
     const response = await Api.post(
       `/repos/${owner}/${repo}/threads/${threadID}/runs`,

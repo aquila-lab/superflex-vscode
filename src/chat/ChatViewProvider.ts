@@ -286,7 +286,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         path: newCurrentOpenFile,
         relativePath,
         isCurrentOpenFile: true,
-      })
+      } as FilePayload)
     );
   }
 

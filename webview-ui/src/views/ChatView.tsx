@@ -356,6 +356,22 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
   }
 
+  async function fetchFileContent(file: FilePayload): Promise<string> {
+    try {
+      const content = await sendEventWithResponse<EventType.FETCH_FILE_CONTENT>(
+        vscodeAPI,
+        EventType.FETCH_FILE_CONTENT,
+        file
+      );
+      if (!content) {
+        return '';
+      }
+      return content;
+    } catch (err) {
+      return '';
+    }
+  }
+
   function handleMessageFeedback(message: Message, feedback: string): void {
     vscodeAPI.postMessage(newEventRequest(EventType.UPDATE_MESSAGE, { ...message, feedback }));
   }
@@ -440,6 +456,7 @@ const ChatView: React.FunctionComponent<{
           currentOpenFile={currentOpenFile}
           onPaste={handlePaste}
           fetchFiles={fetchFiles}
+          fetchFileContent={fetchFileContent}
           onSendClicked={async (selectedFiles, textContent) =>
             handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
           }

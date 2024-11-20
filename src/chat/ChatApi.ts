@@ -241,6 +241,22 @@ export class ChatAPI {
       })
 
       /**
+       * Event (fetch_file_content): This event is fired when the webview needs to fetch the content of a file.
+       * It is used to fetch the content of a file from the workspace directory.
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves with the file content.
+       * @throws An error if the file content cannot be fetched.
+       */
+      .registerEvent(EventType.FETCH_FILE_CONTENT, (payload: FilePayload) => {
+        if (!this._isInitialized || !this._workspaceDirPath) {
+          return "";
+        }
+
+        return fs.readFileSync(payload.path, "utf8");
+      })
+
+      /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
        * It is used to update the message with the feedback.
        *
