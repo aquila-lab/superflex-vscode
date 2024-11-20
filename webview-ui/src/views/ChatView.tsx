@@ -23,11 +23,13 @@ import { VSCodeWrapper } from '../api/vscodeApi';
 import { sendEventWithResponse } from '../api/eventUtils';
 import {
   addMessages,
+  addSelectedFile,
   clearMessages,
   setInitState,
   setIsMessageProcessing,
   setIsMessageStreaming,
   setIsProjectSyncing,
+  setPreviewVisibleForFileID,
   setProjectFiles,
   setSelectedFiles,
   updateMessageTextDelta
@@ -65,7 +67,6 @@ const ChatView: React.FunctionComponent<{
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
   const [isOutOfRequests, setIsOutOfRequests] = useState(false);
   const [isPremiumRequestModalOpen, setIsPremiumRequestModalOpen] = useState(false);
-  const [selectedCode, setSelectedCode] = useState<FilePayload[]>([]);
 
   useEffect(() => {
     return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
@@ -204,7 +205,8 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.ADD_SELECTED_CODE: {
           const selectedCode = payload as EventPayloads[typeof command]['request'];
-          setSelectedCode((prev) => [...prev, selectedCode]);
+          dispatch(addSelectedFile(selectedCode));
+          dispatch(setPreviewVisibleForFileID(selectedCode.id));
           break;
         }
       }
@@ -362,15 +364,6 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
-  function handleRemoveSelectedCode(id: string, removeAll?: boolean): void {
-    if (removeAll) {
-      setSelectedCode([]);
-      return;
-    }
-
-    setSelectedCode((prev) => prev.filter((c) => c.id !== id));
-  }
-
   async function handlePaste(): Promise<boolean> {
     try {
       const selectedCode = await sendEventWithResponse<EventType.PASTE_COPIED_CODE>(
@@ -381,7 +374,8 @@ const ChatView: React.FunctionComponent<{
         return false;
       }
 
-      setSelectedCode((prev) => [...prev, selectedCode]);
+      dispatch(addSelectedFile(selectedCode));
+      dispatch(setPreviewVisibleForFileID(selectedCode.id));
       return true;
     } catch (err) {
       return false;
@@ -444,8 +438,6 @@ const ChatView: React.FunctionComponent<{
           inputRef={inputRef}
           disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
-          selectedCode={selectedCode}
-          onSelectedCodeRemoved={handleRemoveSelectedCode}
           onPaste={handlePaste}
           fetchFiles={fetchFiles}
           onSendClicked={async (selectedFiles, textContent) =>

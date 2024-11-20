@@ -26,25 +26,39 @@ const FileSelectorPopover: React.FC<FileSelectorPopoverProps> = ({ selectedFiles
     fetchFiles();
   }, [open]);
 
+  const customFilter = (value: string, search: string): number => {
+    const searchTerms = search
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((term) => term.length > 0);
+    const valueLower = value.toLowerCase();
+
+    // Check if all search terms are included in the value
+    const matches = searchTerms.every((term) => valueLower.includes(term));
+
+    // Return 1 if all terms match, otherwise 0
+    return matches ? 1 : 0;
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" role="combobox" aria-expanded={open}>
-          <span className="sr-only">Select File</span>
+          <span className="sr-only">Select Files</span>
           <PlusIcon className="text-muted-foreground" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60 h-[300px] p-0">
-        <Command>
+        <Command filter={customFilter}>
           <CommandInput placeholder="Search files..." className="h-6" />
           <CommandList>
             <CommandEmpty>No files found.</CommandEmpty>
             <CommandGroup>
               {files.map((file) => (
                 <CommandItem
-                  key={file.relativePath}
+                  key={file.id}
                   value={file.relativePath}
-                  added={!!selectedFiles.find((f) => f.relativePath === file.relativePath)}
+                  added={!!selectedFiles.find((f) => f.id === file.id)}
                   onSelect={() => {
                     onFileSelected(file);
                   }}>

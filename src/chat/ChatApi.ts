@@ -3,18 +3,19 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { ImageContent, Message, MessageType, Thread } from "../../shared/model";
+import { Message, Thread } from "../../shared/model";
 import {
   EventMessage,
   EventPayloads,
   EventType,
   FigmaFile,
+  FilePayload,
   newEventResponse,
   SendMessagesRequestPayload,
 } from "../../shared/protocol";
 import * as api from "../api";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
+import { decodeUriAndRemoveFilePrefix, generateFileID, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
@@ -221,18 +222,22 @@ export class ChatAPI {
         }
 
         const workspaceDirPath = this._workspaceDirPath;
-        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath);
+        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath, ["**/*"]);
         return documentPaths
           .sort((a, b) => {
             const statA = fs.statSync(a);
             const statB = fs.statSync(b);
             return statB.mtime.getTime() - statA.mtime.getTime();
           })
-          .map((docPath) => ({
-            name: path.basename(docPath),
-            path: docPath,
-            relativePath: path.relative(workspaceDirPath, docPath),
-          }));
+          .map((docPath) => {
+            const relativePath = path.relative(workspaceDirPath, docPath);
+            return {
+              id: generateFileID(relativePath),
+              name: path.basename(docPath),
+              path: docPath,
+              relativePath,
+            } as FilePayload;
+          });
       })
 
       /**

@@ -30,6 +30,7 @@ type ChatState = {
   isProjectSyncing: boolean;
   files: FilePayload[];
   selectedFiles: FilePayload[];
+  previewVisibleForFileID: string | null;
 };
 
 const initialState: ChatState = {
@@ -42,7 +43,8 @@ const initialState: ChatState = {
   isMessageProcessing: false,
   isProjectSyncing: false,
   files: [],
-  selectedFiles: []
+  selectedFiles: [],
+  previewVisibleForFileID: null
 };
 
 const chatSlice = createSlice({
@@ -124,6 +126,9 @@ const chatSlice = createSlice({
     },
     removeSelectedFile: (state, action: PayloadAction<FilePayload>) => {
       state.selectedFiles = state.selectedFiles.filter((file) => file.id !== action.payload.id);
+    },
+    setPreviewVisibleForFileID: (state, action: PayloadAction<string | null>) => {
+      state.previewVisibleForFileID = action.payload;
     }
   }
 });
@@ -139,7 +144,8 @@ export const {
   setProjectFiles,
   setSelectedFiles,
   addSelectedFile,
-  removeSelectedFile
+  removeSelectedFile,
+  setPreviewVisibleForFileID
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

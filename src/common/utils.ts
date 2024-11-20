@@ -1,4 +1,5 @@
 import path from "path";
+import crypto from "crypto";
 import * as vscode from "vscode";
 import { machineIdSync } from "node-machine-id";
 
@@ -96,4 +97,15 @@ export function debounce(func: (...args: any[]) => void, delay: number) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), delay);
   };
+}
+
+export function generateFileID(relativePath: string, startLine: number = 0, endLine: number = -1): string {
+  const hash = crypto.createHash("sha256").update(`${relativePath}#${startLine}-${endLine}`).digest("hex");
+  return [
+    hash.slice(0, 8),
+    hash.slice(8, 12),
+    "4" + hash.slice(13, 16),
+    "8" + hash.slice(17, 20),
+    hash.slice(20, 32),
+  ].join("-");
 }

@@ -10,7 +10,7 @@ import {
   newEventRequest,
   newEventResponse,
 } from "../../shared/protocol";
-import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace, debounce } from "../common/utils";
+import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace, debounce, generateFileID } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -278,12 +278,13 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._currentOpenFile = newCurrentOpenFile;
 
+    const relativePath = path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile);
     this.sendEventMessage(
       newEventRequest(EventType.SET_CURRENT_OPEN_FILE, {
-        id: uuidv4(),
+        id: generateFileID(relativePath),
         name: path.basename(newCurrentOpenFile),
         path: newCurrentOpenFile,
-        relativePath: path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile),
+        relativePath,
         isCurrentOpenFile: true,
       })
     );
@@ -330,11 +331,12 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const document = editor.document;
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
+    const relativePath = path.relative(this._workspaceDirPath, filePath);
     const codeSelection: FilePayload = {
-      id: uuidv4(),
+      id: generateFileID(relativePath, selection.start.line + 1, selection.end.line + 1),
       name: path.basename(filePath),
       path: filePath,
-      relativePath: path.relative(this._workspaceDirPath, filePath),
+      relativePath,
       startLine: selection.start.line + 1,
       endLine: selection.end.line + 1,
       content: document.getText(selection),
@@ -358,11 +360,12 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const document = editor.document;
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
+    const relativePath = path.relative(this._workspaceDirPath, filePath);
     const codeSelection: FilePayload = {
-      id: uuidv4(),
+      id: generateFileID(relativePath, selection.start.line + 1, selection.end.line + 1),
       name: path.basename(filePath),
       path: filePath,
-      relativePath: path.relative(this._workspaceDirPath, filePath),
+      relativePath,
       startLine: selection.start.line + 1,
       endLine: selection.end.line + 1,
       content: document.getText(selection),

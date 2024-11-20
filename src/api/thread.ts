@@ -72,10 +72,12 @@ async function sendThreadMessage({
   messages,
 }: SendThreadMessageArgs): Promise<ThreadRunStream> {
   try {
+    const filesToSend = files.filter((file) => !file.endLine);
+
     const response = await Api.post(
       `/repos/${owner}/${repo}/threads/${threadID}/runs`,
       {
-        files: files.map((file) => ({
+        files: filesToSend.map((file) => ({
           path: file.relativePath,
           content: fs.readFileSync(file.path).toString(),
         })),
