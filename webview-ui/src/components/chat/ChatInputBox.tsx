@@ -146,7 +146,13 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             <p className="text-xs text-muted-foreground self-center">Add context</p>
           ) : (
             selectedFiles.map((file) => (
-              <FileTab key={file.id} file={file} onTogglePreview={togglePreview} onRemoveFile={handleFileRemove} />
+              <FileTab
+                key={file.id}
+                file={file}
+                previewVisibleForFileID={previewVisibleForFileID}
+                onTogglePreview={togglePreview}
+                onRemoveFile={handleFileRemove}
+              />
             ))
           )}
         </div>

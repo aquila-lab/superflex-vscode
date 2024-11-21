@@ -290,8 +290,8 @@ html[data-ide='VisualStudio'] {
   /* --vscode-list-hoverBackground: var(); */
   --vscode-list-invalidItemForeground: var(--visualstudio-toolwindowvalidationerrortext);
   --vscode-list-inactiveSelectionBackground: var(--visualstudio-sortbackground);
-  --vscode-list-activeSelectionForeground: var(--visualstudio-sorttext);
-  --vscode-list-activeSelectionBackground: var(--visualstudio-sortbackground);
+  --vscode-list-activeSelectionForeground: var(--visualstudio-filetabparenttext);
+  --vscode-list-activeSelectionBackground: var(--visualstudio-filetabbackground);
   /* --vscode-listFilterWidget-background: var(); */
   /* --vscode-listFilterWidget-noMatchesOutline: var(); */
   /* --vscode-listFilterWidget-outline: var(); */

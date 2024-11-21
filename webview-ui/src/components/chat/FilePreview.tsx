@@ -26,7 +26,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, fetchFileContent
   }
 
   return (
-    <div className="rounded-md -mb-1 mt-1.5 mx-1.5 border border-border bg-background">
+    <div className="rounded-md -mb-1 mt-1.5 mx-1.5 bg-background border border-accent">
       <Editor
         className="text-xs font-mono max-h-60"
         value={content}
