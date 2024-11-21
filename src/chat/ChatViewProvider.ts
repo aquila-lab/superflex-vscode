@@ -46,8 +46,18 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     );
     context.subscriptions.push(
       vscode.commands.registerCommand("superflex.add-selection-to-chat", async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+          return;
+        }
+
+        const selection = editor.selection;
+        if (selection.isEmpty || selection.end.line === selection.start.line) {
+          return;
+        }
+
         await this.focusChatInput();
-        this.handleAddSelectionToChat();
+        this.handleAddSelectionToChat(editor, selection);
       })
     );
 
@@ -295,7 +305,8 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const selection = editor.selection;
     editor.setDecorations(this._decorationType, []);
 
-    if (!selection.isEmpty) {
+    // Show tip only if selection spans multiple lines
+    if (!selection.isEmpty && selection.end.line > selection.start.line) {
       this.debouncedShowInlineTip(editor, selection);
     }
   }
@@ -317,14 +328,8 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     ]);
   }
 
-  private handleAddSelectionToChat(): void {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor || !this._chatWebview || !this._workspaceDirPath) {
-      return;
-    }
-
-    const selection = editor.selection;
-    if (selection.isEmpty) {
+  private handleAddSelectionToChat(editor: vscode.TextEditor, selection: vscode.Selection): void {
+    if (!this._workspaceDirPath) {
       return;
     }
 
@@ -332,6 +337,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
 
     const relativePath = path.relative(this._workspaceDirPath, filePath);
+    const startPos = new vscode.Position(selection.start.line, 0);
+    const endPos = new vscode.Position(selection.end.line, document.lineAt(selection.end.line).text.length);
+    const fullLineSelection = new vscode.Range(startPos, endPos);
+
     const codeSelection: FilePayload = {
       id: generateFileID(relativePath, selection.start.line + 1, selection.end.line + 1),
       name: path.basename(filePath),
@@ -339,7 +348,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       relativePath,
       startLine: selection.start.line + 1,
       endLine: selection.end.line + 1,
-      content: document.getText(selection),
+      content: document.getText(fullLineSelection),
     };
 
     // Send to webview
