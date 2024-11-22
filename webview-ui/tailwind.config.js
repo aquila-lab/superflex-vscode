@@ -56,8 +56,8 @@ export default {
           }
         },
         accent: {
-          DEFAULT: 'var(--vscode-list-activeSelectionBackground)',
-          foreground: 'var(--vscode-list-activeSelectionForeground)'
+          DEFAULT: 'var(--vscode-button-background)',
+          foreground: 'var(--vscode-button-foreground)'
         },
         popover: {
           DEFAULT: 'var(--vscode-quickInput-background)',
