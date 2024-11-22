@@ -59,6 +59,7 @@ export async function findWorkspaceFiles(
       "**/.docz/**",
       "**/static/**",
       "**/.DS_Store/**",
+      ".env",
     ];
   }
 
