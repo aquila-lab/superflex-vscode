@@ -26,7 +26,7 @@ interface ChatInputBoxProps {
   onSendClicked: (selectedFiles: FilePayload[], content: string) => Promise<boolean>;
   onImageSelected: (file: File) => void;
   onFigmaButtonClicked: () => void;
-  onPaste: () => Promise<boolean>;
+  onPaste: (text: string) => Promise<boolean>;
 }
 
 const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
@@ -174,7 +174,7 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             }}
             onPaste={async (e) => {
               const pastedText = e.clipboardData.getData('text');
-              const isPasteSuccessful = await onPaste();
+              const isPasteSuccessful = await onPaste(pastedText);
               if (isPasteSuccessful) {
                 setInput((prev) => prev.replace(pastedText, ''));
               }

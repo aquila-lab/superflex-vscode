@@ -380,11 +380,12 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
   }
 
-  async function handlePaste(): Promise<boolean> {
+  async function handlePaste(text: string): Promise<boolean> {
     try {
       const selectedCode = await sendEventWithResponse<EventType.PASTE_COPIED_CODE>(
         vscodeAPI,
-        EventType.PASTE_COPIED_CODE
+        EventType.PASTE_COPIED_CODE,
+        { text }
       );
       if (!selectedCode) {
         return false;

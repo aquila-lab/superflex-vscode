@@ -81,7 +81,7 @@ export interface EventPayloads {
   [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
-  [EventType.PASTE_COPIED_CODE]: { request: void; response: FilePayload | null };
+  [EventType.PASTE_COPIED_CODE]: { request: { text: string }; response: FilePayload | null };
   [EventType.FOCUS_CHAT_INPUT]: { request: void; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };

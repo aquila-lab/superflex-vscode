@@ -120,8 +120,21 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
         try {
           if (command === EventType.PASTE_COPIED_CODE) {
-            const eventResponse = newEventResponse(command, this._copiedText);
+            const paste = payload as EventPayloads[typeof command]["request"];
+
+            let eventResponse = newEventResponse(command, null);
             eventResponse.id = message.id;
+
+            if (!this._copiedText || paste.text !== this._copiedText.content) {
+              this.sendEventMessage(eventResponse);
+              return;
+            }
+            if (this._copiedText.startLine === this._copiedText.endLine) {
+              this.sendEventMessage(eventResponse);
+              return;
+            }
+
+            eventResponse.payload = this._copiedText;
             this.sendEventMessage(eventResponse);
             this._copiedText = null;
             return;
