@@ -74,7 +74,6 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
     if (currentOpenFile) {
       const fileExtension = currentOpenFile.relativePath.split('.').pop();
       const content = await fetchFileContent(currentOpenFile);
-      currentOpenFile.content = content;
 
       formattedUserSelectedCodeInput = `- The content of the user's currently open file:
       <current_open_file>\n\`\`\`${fileExtension} file="${currentOpenFile.relativePath}"\n${content}\n\`\`\`\n</current_open_file>\n\n`;
