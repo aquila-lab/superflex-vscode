@@ -57,43 +57,13 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   }, [currentOpenFile]);
 
   async function handleSend(): Promise<void> {
-    const formattedInput = await formatInput();
-    const isSendSuccessful = await onSendClicked(selectedFiles, formattedInput);
+    const isSendSuccessful = await onSendClicked(selectedFiles, input);
     if (!isSendSuccessful) {
       return;
     }
 
     setInput('');
     dispatch(setPreviewVisibleForFileID(null));
-  }
-
-  async function formatInput(): Promise<string> {
-    let formattedUserSelectedCodeInput = '';
-
-    const currentOpenFile = selectedFiles.find((f) => f.isCurrentOpenFile);
-    if (currentOpenFile) {
-      const fileExtension = currentOpenFile.relativePath.split('.').pop();
-      const content = await fetchFileContent(currentOpenFile);
-
-      formattedUserSelectedCodeInput = `- The content of the user's currently open file:
-      <current_open_file>\n\`\`\`${fileExtension} file="${currentOpenFile.relativePath}"\n${content}\n\`\`\`\n</current_open_file>\n\n`;
-    }
-
-    const selectedCode = selectedFiles.filter((f) => f.endLine);
-    if (selectedCode.length > 0) {
-      formattedUserSelectedCodeInput +=
-        '- The specific code snippets selected by the user:\n' +
-        '<selected_code_snippets>\n' +
-        selectedCode
-          .map((item) => {
-            const fileExtension = item.relativePath.split('.').pop();
-            return `\`\`\`${fileExtension} file="${item.relativePath}#${item.startLine}-${item.endLine}"\n${item.content}\n\`\`\``;
-          })
-          .join('\n\n') +
-        '\n</selected_code_snippets>\n\n';
-    }
-
-    return formattedUserSelectedCodeInput + input;
   }
 
   const togglePreview = (file: FilePayload): void => {

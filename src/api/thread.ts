@@ -72,16 +72,15 @@ async function sendThreadMessage({
   messages,
 }: SendThreadMessageArgs): Promise<ThreadRunStream> {
   try {
-    // We don't want to send the current open file, and code snippets to the server
-    // We are submitting them separately as user message
-    const filesToSend = files.filter((file) => !file.endLine && !file.isCurrentOpenFile);
-
     const response = await Api.post(
       `/repos/${owner}/${repo}/threads/${threadID}/runs`,
       {
-        files: filesToSend.map((file) => ({
+        files: files.map((file) => ({
           path: file.relativePath,
           content: fs.readFileSync(file.path).toString(),
+          start_line: file.startLine,
+          end_line: file.endLine,
+          is_current_open_file: file.isCurrentOpenFile,
         })),
         messages: messages.map((msg) => {
           if (msg.type === MessageType.Figma) {
