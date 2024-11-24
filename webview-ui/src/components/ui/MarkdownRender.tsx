@@ -1,7 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css';
-import styled from 'styled-components';
 import ReactMarkdown from 'react-markdown';
 import Editor from 'react-simple-code-editor';
 import CopyToClipboard from 'react-copy-to-clipboard';
@@ -9,34 +8,9 @@ import { DocumentDuplicateIcon, DocumentCheckIcon } from '@heroicons/react/24/ou
 
 import { Role } from '../../../../shared/model';
 import { cn } from '../../common/utils';
-import { VscThemeContext } from '../../context/VscTheme';
 import { Button } from './Button';
 import { FileIcon } from './FileIcon';
 
-const StyledPre = styled.pre<{ theme: Record<string, string> }>`
-  & .hljs {
-    color: var(--vscode-editor-foreground);
-  }
-
-  margin-top: 0;
-  margin-bottom: 0;
-  border-radius: 0 0 5px 5px !important;
-
-  ${({ theme }) =>
-    Object.entries(theme)
-      .map(([key, value]) => `& ${key} { color: ${value}; }`)
-      .join('\n')}
-`;
-
-interface SyntaxHighlightedPreProps extends React.HTMLAttributes<HTMLPreElement> {
-  className?: string;
-}
-
-export const SyntaxHighlightedPre: React.FC<SyntaxHighlightedPreProps> = ({ className, ...props }) => {
-  const currentTheme = useContext(VscThemeContext);
-
-  return <StyledPre className={className} theme={currentTheme} {...props} />;
-};
 interface MarkdownRenderProps {
   role: Role;
   mdString: string;
@@ -133,12 +107,7 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
                 <Editor
                   value={codeProp}
                   onValueChange={() => {}}
-                  highlight={(code) =>
-                    // <SyntaxHighlightedPre>
-                    //   <div dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />
-                    // </SyntaxHighlightedPre>
-                    hljs.highlightAuto(code).value
-                  }
+                  highlight={(code) => hljs.highlightAuto(code).value}
                   padding={10}
                   style={{
                     fontFamily: '"Fira code", "Fira Mono", monospace',

@@ -4,7 +4,6 @@ import 'highlight.js/styles/vs2015.css';
 import Editor from 'react-simple-code-editor';
 
 import { FilePayload } from '../../../../shared/protocol';
-import { SyntaxHighlightedPre } from '../ui/MarkdownRender';
 
 interface FilePreviewProps {
   file: FilePayload;
@@ -32,11 +31,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, fetchFileContent
         value={content}
         disabled
         onValueChange={() => {}} // Not editable
-        highlight={(code) => (
-          <SyntaxHighlightedPre>
-            <div dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />
-          </SyntaxHighlightedPre>
-        )}
+        highlight={(code) => hljs.highlightAuto(code).value}
         padding={10}
         style={{ overflowY: 'auto' }}
       />

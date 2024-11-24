@@ -1,6 +1,5 @@
 import path from "path";
 import * as vscode from "vscode";
-import { v4 as uuidv4 } from "uuid";
 
 import {
   EventMessage,
