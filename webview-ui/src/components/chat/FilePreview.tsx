@@ -35,6 +35,49 @@ const defineVSCodeTheme = (monaco: any) => {
   });
 };
 
+const getLanguageFromPath = (filePath: string): string => {
+  const extension = filePath.split('.').pop()?.toLowerCase() ?? '';
+
+  const languageMap: Record<string, string> = {
+    // JavaScript/TypeScript
+    js: 'javascript',
+    jsx: 'javascript',
+    ts: 'typescript',
+    tsx: 'typescript',
+
+    // Styling
+    css: 'css',
+    scss: 'scss',
+    sass: 'scss',
+    less: 'less',
+    stylus: 'stylus',
+
+    // Markup/Template
+    html: 'html',
+    htm: 'html',
+    vue: 'vue',
+    svelte: 'svelte',
+
+    // Config files
+    json: 'json',
+    yaml: 'yaml',
+    yml: 'yaml',
+    toml: 'toml',
+    env: 'plaintext',
+
+    // Package managers
+    lock: 'yaml',
+    packagejson: 'json',
+
+    // Other web technologies
+    md: 'markdown',
+    graphql: 'graphql',
+    gql: 'graphql'
+  };
+
+  return languageMap[extension] || 'plaintext';
+};
+
 export const FilePreview: React.FC<FilePreviewProps> = ({ file, fetchFileContent }) => {
   const [content, setContent] = useState(file?.content ?? '');
   const [themeVersion, setThemeVersion] = useState(0);
@@ -48,6 +91,8 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, fetchFileContent
   const beforeMount = (monaco: any) => {
     defineVSCodeTheme(monaco);
   };
+
+  const fileLanguage = useMemo(() => getLanguageFromPath(file.relativePath), [file.relativePath]);
 
   useEffect(() => {
     if (!file.endLine) {
@@ -83,7 +128,7 @@ export const FilePreview: React.FC<FilePreviewProps> = ({ file, fetchFileContent
           key={themeVersion}
           className="p-2"
           height={`${calculatedHeight}px`}
-          defaultLanguage="typescript"
+          defaultLanguage={fileLanguage}
           value={content}
           beforeMount={beforeMount}
           theme="vscode-theme"
