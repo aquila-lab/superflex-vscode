@@ -7,12 +7,6 @@ declare global {
   }
 }
 
-interface EditorProps {
-  content: string;
-  filePath: string;
-  maxHeight?: number;
-}
-
 const defineVSCodeTheme = (monaco: any) => {
   monaco.editor.defineTheme('vscode-theme', {
     base: 'vs-dark',
@@ -77,7 +71,13 @@ const getLanguageFromPath = (filePath: string): string => {
   return languageMap[extension] || 'plaintext';
 };
 
-export const Editor: React.FC<EditorProps> = ({ content, filePath, maxHeight }) => {
+interface EditorProps {
+  path: string;
+  content: string;
+  maxHeight?: number;
+}
+
+export const Editor: React.FC<EditorProps> = ({ path, content, maxHeight }) => {
   const [themeVersion, setThemeVersion] = useState(0);
 
   const calculatedHeight = useMemo(() => {
@@ -90,7 +90,7 @@ export const Editor: React.FC<EditorProps> = ({ content, filePath, maxHeight }) 
     return lineCount * lineHeight + 18;
   }, [content]);
 
-  const fileLanguage = useMemo(() => getLanguageFromPath(filePath), [filePath]);
+  const fileLanguage = useMemo(() => getLanguageFromPath(path), [path]);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
