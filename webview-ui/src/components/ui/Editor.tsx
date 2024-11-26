@@ -72,12 +72,12 @@ const getLanguageFromPath = (filePath: string): string => {
 };
 
 interface EditorProps {
-  path: string;
+  filePath: string;
   content: string;
   maxHeight?: number;
 }
 
-export const Editor: React.FC<EditorProps> = ({ path, content, maxHeight }) => {
+export const Editor: React.FC<EditorProps> = ({ filePath, content, maxHeight }) => {
   const [themeVersion, setThemeVersion] = useState(0);
 
   const calculatedHeight = useMemo(() => {
@@ -90,7 +90,7 @@ export const Editor: React.FC<EditorProps> = ({ path, content, maxHeight }) => {
     return lineCount * lineHeight + 18;
   }, [content]);
 
-  const fileLanguage = useMemo(() => getLanguageFromPath(path), [path]);
+  const fileLanguage = useMemo(() => getLanguageFromPath(filePath), [filePath]);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -126,7 +126,7 @@ export const Editor: React.FC<EditorProps> = ({ path, content, maxHeight }) => {
         readOnly: true,
         minimap: { enabled: false },
         scrollBeyondLastLine: false,
-        scrollbar: { vertical: 'hidden' },
+        scrollbar: { useShadows: false, vertical: 'hidden' },
         fontSize: 12,
         lineNumbers: 'off',
         folding: false,
@@ -141,7 +141,9 @@ export const Editor: React.FC<EditorProps> = ({ path, content, maxHeight }) => {
         lineNumbersMinChars: 0,
         glyphMargin: false,
         fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-        fontLigatures: false
+        fontLigatures: false,
+        showUnused: false,
+        hover: { enabled: false }
       }}
     />
   );

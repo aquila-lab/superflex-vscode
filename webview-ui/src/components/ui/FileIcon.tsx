@@ -1,10 +1,10 @@
 import React from 'react';
 import DOMPurify from 'dompurify';
 import { themeIcons } from 'seti-file-icons';
-import { cn } from '../../common/utils';
+import { cn, getFileName } from '../../common/utils';
 
 interface FileIconProps {
-  filename: string;
+  filePath: string;
   className?: string;
 }
 
@@ -22,12 +22,10 @@ const iconColors = {
   ignore: '#586e75'
 };
 
-export const FileIcon: React.FC<FileIconProps> = ({ filename, className }) => {
-  const filenameParts = filename.includes(' (') ? filename.split(' ') : [filename, ''];
-  filenameParts.pop();
-
+export const FileIcon: React.FC<FileIconProps> = ({ filePath, className }) => {
+  const filename = getFileName(filePath);
   const getIcon = themeIcons(iconColors);
-  const { svg, color } = getIcon(filenameParts.join(' '));
+  const { svg, color } = getIcon(filename);
   const sanitizedSVG = DOMPurify.sanitize(svg);
 
   return (

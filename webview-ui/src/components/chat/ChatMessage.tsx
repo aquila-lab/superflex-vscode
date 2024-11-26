@@ -44,10 +44,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleFeedbac
         {message.role === Role.User && userInfo.picture && (
           <Avatar className="mr-2 size-5">
             <AvatarImage src={userInfo.picture} alt="Superflex Logo" />
-            <AvatarFallback>Y</AvatarFallback>
+            <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
         )}
-        <p className="text-sm font-medium text-primary">{message.role === Role.User ? 'You' : 'Superflex'}</p>
+        <p className="text-sm font-medium text-primary">{message.role === Role.User ? user.username : 'Superflex'}</p>
       </div>
 
       {message.content.type === MessageType.Text && (
