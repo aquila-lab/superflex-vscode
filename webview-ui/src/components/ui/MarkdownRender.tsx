@@ -19,13 +19,13 @@ export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, content }) => 
   const [copyTip, setCopyTip] = useState('Copy code');
 
   return (
-    <div className="flex items-center justify-between gap-4 px-1.5 border-b border-border bg-background/50">
+    <div className="flex items-center justify-between gap-4 px-1.5 border-b border-border bg-background/50 h-6">
       <div className="flex items-center gap-1 min-w-0">
         <FileIcon filePath={filePath} className="size-5" />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <p className="text-xs text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0 py-1">
+              <p className="text-xs text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0">
                 {getFileName(filePath)}
               </p>
             </TooltipTrigger>
@@ -55,15 +55,20 @@ export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, content }) => 
 };
 
 interface CodeBlockProps {
-  filePath: string;
+  codeBlock?: CodeBlockInfo;
   code: string;
 }
 
-export const CodeBlock = memo(({ filePath, code }: CodeBlockProps) => {
+export const CodeBlock = memo(({ codeBlock, code }: CodeBlockProps) => {
   return (
-    <div className="rounded-md border border-border bg-background">
-      <FileHeader filePath={filePath} content={code} />
-      <Editor filePath={filePath} content={code} />
+    <div className="rounded-md border border-border bg-background mt-1">
+      {codeBlock?.filePath && <FileHeader filePath={codeBlock.filePath} content={code} />}
+      <Editor
+        extension={codeBlock?.extension}
+        language={codeBlock?.language}
+        filePath={codeBlock?.filePath}
+        content={code}
+      />
     </div>
   );
 });
@@ -71,38 +76,26 @@ export const CodeBlock = memo(({ filePath, code }: CodeBlockProps) => {
 CodeBlock.displayName = 'CodeBlock';
 
 interface CodeBlockInfo {
-  filePath: string;
+  extension: string;
+  language?: string;
+  filePath?: string;
   startLine?: number;
   endLine?: number;
 }
-
-export const parseCodeBlockInfo = (fileAttribute: string): CodeBlockInfo => {
-  if (!fileAttribute) {
-    return { filePath: '' };
-  }
-
-  const [filePath, lineNumbers] = fileAttribute.split('#');
-  if (!lineNumbers) {
-    return { filePath };
-  }
-
-  const [start, end] = lineNumbers.split('-').map(Number);
-  return {
-    filePath,
-    startLine: start,
-    endLine: end
-  };
-};
 
 export const extractCodeBlockDetails = (mdString: string): { codeBlocks: CodeBlockInfo[] } => {
   const codeBlocks: CodeBlockInfo[] = [];
   const lines = mdString.split('\n');
 
   lines.forEach((line) => {
-    const fileMatch = line.match(/file="([^"]+)"/);
-    if (fileMatch) {
-      const fileInfo = parseCodeBlockInfo(fileMatch[1]);
-      codeBlocks.push(fileInfo);
+    // \`\`\`file_extension file="file_path" type="language"
+    const codeBlockMatch = line.match(/```(\w+)?(?:\s+(?:file="([^"]+)"))?(?:\s+(?:type="([^"]+)")?)?/);
+
+    if (codeBlockMatch) {
+      const [, extension, filePath, language] = codeBlockMatch;
+      if (extension) {
+        codeBlocks.push({ extension, language, filePath });
+      }
     }
   });
 
@@ -134,35 +127,13 @@ export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ r
           const codeProp = String(props.children).replace(/\n$/, '');
 
           if (!inline && hasLang) {
-            if (role === Role.Assistant) {
-              const currentBlock = codeBlocks[codeBlockIndex];
-              codeBlockIndex += 1;
-
-              return <CodeBlock filePath={currentBlock.filePath} code={codeProp} />;
-            }
-
-            const currentBlock = codeBlocks[codeBlockIndex];
+            const currentBlock = codeBlocks?.[codeBlockIndex];
             codeBlockIndex += 1;
 
-            return (
-              <div className="flex items-center gap-1 bg-background rounded-md px-1.5 py-[1px]">
-                <div className="flex flex-row items-center gap-1 hover:cursor-pointer">
-                  <FileIcon filePath={currentBlock.filePath} className="size-5" />
-                  <p className="text-xs text-muted-foreground truncate max-w-36">
-                    {getFileName(currentBlock.filePath)}
-                  </p>
-                  {currentBlock.startLine && currentBlock.endLine && (
-                    <p className="text-xs text-muted-foreground truncate max-w-36">
-                      ({currentBlock.startLine}-{currentBlock.endLine})
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-secondary-foreground">File</p>
-                </div>
-              </div>
-            );
+            return <CodeBlock codeBlock={currentBlock} code={codeProp} />;
           }
 
-          return <code className={cn('text-sm', className)} {...props} />;
+          return <code className={cn('text-sm text-button-background', className)} {...props} />;
         }
       }}>
       {cleanedMdString}

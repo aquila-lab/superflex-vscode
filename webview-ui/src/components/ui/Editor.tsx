@@ -62,6 +62,10 @@ const getLanguageFromPath = (filePath: string): string => {
     lock: 'yaml',
     packagejson: 'json',
 
+    // Shell scripts
+    sh: 'shell',
+    bash: 'shell',
+
     // Other web technologies
     md: 'markdown',
     graphql: 'graphql',
@@ -72,12 +76,14 @@ const getLanguageFromPath = (filePath: string): string => {
 };
 
 interface EditorProps {
-  filePath: string;
+  extension?: string;
+  language?: string;
+  filePath?: string;
   content: string;
   maxHeight?: number;
 }
 
-export const Editor: React.FC<EditorProps> = ({ filePath, content, maxHeight }) => {
+export const Editor: React.FC<EditorProps> = ({ extension, language, filePath, content, maxHeight }) => {
   const [themeVersion, setThemeVersion] = useState(0);
 
   const calculatedHeight = useMemo(() => {
@@ -90,7 +96,12 @@ export const Editor: React.FC<EditorProps> = ({ filePath, content, maxHeight }) 
     return lineCount * lineHeight + 18;
   }, [content]);
 
-  const fileLanguage = useMemo(() => getLanguageFromPath(filePath), [filePath]);
+  const fileLanguage = useMemo(() => {
+    if (!filePath && !extension) {
+      return language ?? 'plaintext';
+    }
+    return getLanguageFromPath(filePath ?? extension ?? '');
+  }, [filePath, extension]);
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -116,17 +127,23 @@ export const Editor: React.FC<EditorProps> = ({ filePath, content, maxHeight }) 
   return (
     <MonacoEditor
       key={themeVersion}
-      className="p-2"
+      className="px-2"
       height={calculatedHeight}
       defaultLanguage={fileLanguage}
       value={content}
       beforeMount={beforeMount}
       theme="vscode-theme"
       options={{
+        padding: { top: 8, bottom: 8 },
         readOnly: true,
         minimap: { enabled: false },
+        scrollbar: {
+          useShadows: false,
+          vertical: 'hidden',
+          horizontalScrollbarSize: 8,
+          alwaysConsumeMouseWheel: false
+        },
         scrollBeyondLastLine: false,
-        scrollbar: { useShadows: false, vertical: 'hidden' },
         fontSize: 12,
         lineNumbers: 'off',
         folding: false,
@@ -143,7 +160,12 @@ export const Editor: React.FC<EditorProps> = ({ filePath, content, maxHeight }) 
         fontFamily: 'Menlo, Monaco, "Courier New", monospace',
         fontLigatures: false,
         showUnused: false,
-        hover: { enabled: false }
+        hover: { enabled: false },
+        contextmenu: false,
+        quickSuggestions: false,
+        parameterHints: { enabled: false },
+        tabCompletion: 'off',
+        mouseWheelZoom: false
       }}
     />
   );
