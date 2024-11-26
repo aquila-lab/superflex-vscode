@@ -63,12 +63,7 @@ export const CodeBlock = memo(({ codeBlock, code }: CodeBlockProps) => {
   return (
     <div className="rounded-md border border-border bg-background mt-1">
       {codeBlock?.filePath && <FileHeader filePath={codeBlock.filePath} content={code} />}
-      <Editor
-        extension={codeBlock?.extension}
-        language={codeBlock?.language}
-        filePath={codeBlock?.filePath}
-        content={code}
-      />
+      <Editor extension={codeBlock?.extension} filePath={codeBlock?.filePath} content={code} />
     </div>
   );
 });
@@ -77,7 +72,6 @@ CodeBlock.displayName = 'CodeBlock';
 
 interface CodeBlockInfo {
   extension: string;
-  language?: string;
   filePath?: string;
   startLine?: number;
   endLine?: number;
@@ -88,13 +82,13 @@ export const extractCodeBlockDetails = (mdString: string): { codeBlocks: CodeBlo
   const lines = mdString.split('\n');
 
   lines.forEach((line) => {
-    // \`\`\`file_extension file="file_path" type="language"
-    const codeBlockMatch = line.match(/```(\w+)?(?:\s+(?:file="([^"]+)"))?(?:\s+(?:type="([^"]+)")?)?/);
+    // \`\`\`file_extension file="file_path"
+    const codeBlockMatch = line.match(/```(\w+)?(?:\s+(?:file="([^"]+)"))?/);
 
     if (codeBlockMatch) {
-      const [, extension, filePath, language] = codeBlockMatch;
+      const [, extension, filePath] = codeBlockMatch;
       if (extension) {
-        codeBlocks.push({ extension, language, filePath });
+        codeBlocks.push({ extension, filePath });
       }
     }
   });

@@ -77,13 +77,12 @@ const getLanguageFromPath = (filePath: string): string => {
 
 interface EditorProps {
   extension?: string;
-  language?: string;
   filePath?: string;
   content: string;
   maxHeight?: number;
 }
 
-export const Editor: React.FC<EditorProps> = ({ extension, language, filePath, content, maxHeight }) => {
+export const Editor: React.FC<EditorProps> = ({ extension, filePath, content, maxHeight }) => {
   const [themeVersion, setThemeVersion] = useState(0);
 
   const calculatedHeight = useMemo(() => {
@@ -98,7 +97,7 @@ export const Editor: React.FC<EditorProps> = ({ extension, language, filePath, c
 
   const fileLanguage = useMemo(() => {
     if (!filePath && !extension) {
-      return language ?? 'plaintext';
+      return 'plaintext';
     }
     return getLanguageFromPath(filePath ?? extension ?? '');
   }, [filePath, extension]);
