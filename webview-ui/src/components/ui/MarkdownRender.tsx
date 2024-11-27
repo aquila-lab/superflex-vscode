@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
@@ -64,7 +64,7 @@ interface CodeBlockProps extends React.PropsWithChildren {
   codeBlock?: CodeBlockInfo;
 }
 
-export const CodeBlock = memo(({ codeBlock, children }: CodeBlockProps) => {
+export const CodeBlock = ({ codeBlock, children }: CodeBlockProps) => {
   return (
     <div className="rounded-md border border-border bg-background mt-1">
       {codeBlock?.filePath && <FileHeader filePath={codeBlock.filePath}>{children}</FileHeader>}
@@ -73,9 +73,7 @@ export const CodeBlock = memo(({ codeBlock, children }: CodeBlockProps) => {
       </Editor>
     </div>
   );
-});
-
-CodeBlock.displayName = 'CodeBlock';
+};
 
 const Code = ({ inline, className, children, ...props }: any) => {
   const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
