@@ -25,11 +25,13 @@ const defaultMessages: Message[] = [
 type ChatState = {
   init: InitChatState;
   messages: Message[];
+  streamTextDelta: string;
   isMessageStreaming: boolean;
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
   files: FilePayload[];
   selectedFiles: FilePayload[];
+  previewVisibleForFileID: string | null;
 };
 
 const initialState: ChatState = {
@@ -38,11 +40,13 @@ const initialState: ChatState = {
     isFigmaAuthenticated: false
   },
   messages: defaultMessages,
+  streamTextDelta: '',
   isMessageStreaming: false,
   isMessageProcessing: false,
   isProjectSyncing: false,
   files: [],
-  selectedFiles: []
+  selectedFiles: [],
+  previewVisibleForFileID: null
 };
 
 const chatSlice = createSlice({
@@ -67,29 +71,12 @@ const chatSlice = createSlice({
       state.messages = defaultMessages;
     },
     updateMessageTextDelta: (state, action: PayloadAction<TextDelta>) => {
-      const lastMessage = state.messages[state.messages.length - 1];
-      if (lastMessage.content.type !== MessageType.TextDelta) {
-        state.messages = [
-          ...state.messages,
-          {
-            id: uuidv4(),
-            threadID: uuidv4(),
-            role: Role.Assistant,
-            content: {
-              type: MessageType.TextDelta,
-              value: action.payload.value
-            },
-            feedback: 'none',
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        ];
-        return;
-      }
-
-      lastMessage.content.value += action.payload.value;
+      state.streamTextDelta = state.streamTextDelta + action.payload.value;
     },
     setIsMessageStreaming: (state, action: PayloadAction<boolean>) => {
+      if (!action.payload) {
+        state.streamTextDelta = '';
+      }
       state.isMessageStreaming = action.payload;
     },
     setIsMessageProcessing: (state, action: PayloadAction<boolean>) => {
@@ -104,22 +91,29 @@ const chatSlice = createSlice({
     setSelectedFiles: (state, action: PayloadAction<FilePayload[]>) => {
       state.selectedFiles = action.payload;
     },
-    addSelectedFile: (state, action: PayloadAction<FilePayload>) => {
-      if (action.payload.isCurrentOpenFile) {
-        state.selectedFiles = [
-          action.payload,
-          ...state.selectedFiles.filter((f) => !f.isCurrentOpenFile && f.relativePath !== action.payload.relativePath)
-        ];
-        return;
-      }
-      if (state.selectedFiles.find((f) => f.relativePath === action.payload.relativePath)) {
-        return;
-      }
+    addSelectedFile: (state, action) => {
+      const file = action.payload;
 
-      state.selectedFiles = [...state.selectedFiles, action.payload];
+      // Check if file is already in selectedFiles by matching id or unique identifier
+      const existingFileIndex = state.selectedFiles.findIndex((f) => f.id === file.id);
+
+      if (existingFileIndex !== -1) {
+        // File already exists, so update selections instead of adding a new entry
+        state.selectedFiles[existingFileIndex] = {
+          ...state.selectedFiles[existingFileIndex],
+          // Merge any additional fields if necessary, such as code selections
+          ...file
+        };
+      } else {
+        // If file doesn't exist, add it to the selectedFiles array
+        state.selectedFiles.push(file);
+      }
     },
     removeSelectedFile: (state, action: PayloadAction<FilePayload>) => {
-      state.selectedFiles = state.selectedFiles.filter((file) => file.relativePath !== action.payload.relativePath);
+      state.selectedFiles = state.selectedFiles.filter((file) => file.id !== action.payload.id);
+    },
+    setPreviewVisibleForFileID: (state, action: PayloadAction<string | null>) => {
+      state.previewVisibleForFileID = action.payload;
     }
   }
 });
@@ -135,7 +129,8 @@ export const {
   setProjectFiles,
   setSelectedFiles,
   addSelectedFile,
-  removeSelectedFile
+  removeSelectedFile,
+  setPreviewVisibleForFileID
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

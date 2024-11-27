@@ -78,6 +78,9 @@ async function sendThreadMessage({
         files: files.map((file) => ({
           path: file.relativePath,
           content: fs.readFileSync(file.path).toString(),
+          start_line: file.startLine,
+          end_line: file.endLine,
+          is_current_open_file: file.isCurrentOpenFile,
         })),
         messages: messages.map((msg) => {
           if (msg.type === MessageType.Figma) {

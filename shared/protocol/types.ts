@@ -23,10 +23,14 @@ export type SyncProjectProgressPayload = {
 };
 
 export type FilePayload = {
+  id: string;
   name: string;
   path: string;
   relativePath: string;
   isCurrentOpenFile?: boolean;
+  startLine?: number;
+  endLine?: number;
+  content?: string;
 };
 
 export type SendMessagesRequestPayload = {

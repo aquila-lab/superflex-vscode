@@ -30,12 +30,38 @@ export async function findFiles(baseUri: string, globPatterns: string[], ignore:
  * @param {string} workspaceDirPath - The path to the workspace directory.
  * @return {Promise<string[]>} An array of file paths for the project files found.
  */
-export async function findWorkspaceFiles(workspaceDirPath: string): Promise<string[]> {
-  const documentsUri: string[] = await findFiles(
-    workspaceDirPath,
-    SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`),
-    ["**/node_modules/**", "**/build/**", "**/out/**", "**/dist/**"]
-  );
+export async function findWorkspaceFiles(
+  workspaceDirPath: string,
+  globPatterns?: string[],
+  ignore?: string[]
+): Promise<string[]> {
+  if (!globPatterns) {
+    globPatterns = SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`);
+  }
+  if (!ignore) {
+    ignore = [
+      "**/node_modules/**",
+      "**/build/**",
+      "**/out/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/.git/**",
+      "**/coverage/**",
+      "**/test/**",
+      "**/public/**",
+      "**/.cache/**",
+      "**/storybook-static/**",
+      "**/.storybook/**",
+      "**/cypress/**",
+      "**/__tests__/**",
+      "**/__mocks__/**",
+      "**/e2e/**",
+      "**/.docz/**",
+      "**/static/**",
+      "**/.DS_Store/**",
+      ".env",
+    ];
+  }
 
-  return documentsUri;
+  return findFiles(workspaceDirPath, globPatterns, ignore);
 }

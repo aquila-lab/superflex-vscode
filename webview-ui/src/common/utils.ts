@@ -18,3 +18,7 @@ export async function readImageFileAsBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+export const getFileName = (filePath: string): string => {
+  return filePath.split(/[/\\]/g).pop() ?? '';
+};

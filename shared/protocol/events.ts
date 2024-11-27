@@ -37,7 +37,11 @@ export enum EventType {
   MESSAGE_TEXT_DELTA = "message_text_delta",
   UPDATE_MESSAGE = "update_message",
   FETCH_FILES = "fetch_files",
+  FETCH_FILE_CONTENT = "fetch_file_content",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
+  ADD_SELECTED_CODE = "add_selected_code",
+  PASTE_COPIED_CODE = "paste_copied_code",
+  FOCUS_CHAT_INPUT = "focus_chat_input",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -74,7 +78,11 @@ export interface EventPayloads {
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
+  [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
+  [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
+  [EventType.PASTE_COPIED_CODE]: { request: { text: string }; response: FilePayload | null };
+  [EventType.FOCUS_CHAT_INPUT]: { request: void; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };

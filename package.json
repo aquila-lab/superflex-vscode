@@ -239,7 +239,25 @@
         "command": "superflex.chat.focus-input",
         "key": "cmd+;",
         "mac": "cmd+;",
+        "win": "ctrl+;",
+        "linux": "ctrl+;",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "superflex.add-selection-to-chat",
+        "key": "cmd+m",
+        "mac": "cmd+m",
+        "win": "ctrl+m",
+        "linux": "ctrl+m",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "superflex.add-copy-to-chat",
+        "key": "cmd+c",
+        "mac": "cmd+c",
+        "win": "ctrl+c",
+        "linux": "ctrl+c",
+        "when": "editorHasSelection"
       }
     ]
   },

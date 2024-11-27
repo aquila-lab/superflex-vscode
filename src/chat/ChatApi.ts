@@ -3,18 +3,19 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { ImageContent, Message, MessageType, Thread } from "../../shared/model";
+import { Message, Thread } from "../../shared/model";
 import {
   EventMessage,
   EventPayloads,
   EventType,
   FigmaFile,
+  FilePayload,
   newEventResponse,
   SendMessagesRequestPayload,
 } from "../../shared/protocol";
 import * as api from "../api";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { decodeUriAndRemoveFilePrefix, getOpenWorkspace, toKebabCase } from "../common/utils";
+import { decodeUriAndRemoveFilePrefix, generateFileID, getOpenWorkspace, toKebabCase } from "../common/utils";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
@@ -28,6 +29,7 @@ import { findWorkspaceFiles } from "../scanner";
  */
 export class ChatAPI {
   private _assistant?: Assistant;
+  private _isReady = false;
   private _ready = new vscode.EventEmitter<void>();
   private _isInitialized = false;
   private _initializedMutex = new Mutex();
@@ -44,7 +46,7 @@ export class ChatAPI {
        */
       .registerEvent(EventType.READY, () => {
         this._ready.fire();
-
+        this._isReady = true;
         Telemetry.capture("ready", {});
       })
 
@@ -220,18 +222,38 @@ export class ChatAPI {
         }
 
         const workspaceDirPath = this._workspaceDirPath;
-        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath);
+        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath, ["**/*"]);
         return documentPaths
           .sort((a, b) => {
             const statA = fs.statSync(a);
             const statB = fs.statSync(b);
             return statB.mtime.getTime() - statA.mtime.getTime();
           })
-          .map((docPath) => ({
-            name: path.basename(docPath),
-            path: docPath,
-            relativePath: path.relative(workspaceDirPath, docPath),
-          }));
+          .map((docPath) => {
+            const relativePath = path.relative(workspaceDirPath, docPath);
+            return {
+              id: generateFileID(relativePath),
+              name: path.basename(docPath),
+              path: docPath,
+              relativePath,
+            } as FilePayload;
+          });
+      })
+
+      /**
+       * Event (fetch_file_content): This event is fired when the webview needs to fetch the content of a file.
+       * It is used to fetch the content of a file from the workspace directory.
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves with the file content.
+       * @throws An error if the file content cannot be fetched.
+       */
+      .registerEvent(EventType.FETCH_FILE_CONTENT, (payload: FilePayload) => {
+        if (!this._isInitialized || !this._workspaceDirPath) {
+          return "";
+        }
+
+        return fs.readFileSync(payload.path, "utf8");
       })
 
       /**
@@ -277,6 +299,10 @@ export class ChatAPI {
    * Returns a Promise that resolves when the ChatAPI is ready.
    */
   onReady(): Promise<void> {
+    if (this._isReady) {
+      return Promise.resolve();
+    }
+
     return new Promise((resolve) => {
       this._ready.event(resolve);
     });

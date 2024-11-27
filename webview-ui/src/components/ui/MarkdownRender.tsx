@@ -1,91 +1,113 @@
-import React, { useState } from 'react';
-
+import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
-import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-import tsx from 'react-syntax-highlighter/dist/cjs/languages/prism/tsx';
-import jsx from 'react-syntax-highlighter/dist/cjs/languages/prism/jsx';
-import typescript from 'react-syntax-highlighter/dist/cjs/languages/prism/typescript';
-import javascript from 'react-syntax-highlighter/dist/cjs/languages/prism/javascript';
-import css from 'react-syntax-highlighter/dist/cjs/languages/prism/css';
-import scss from 'react-syntax-highlighter/dist/cjs/languages/prism/scss';
-import cssextras from 'react-syntax-highlighter/dist/cjs/languages/prism/css-extras';
-import sass from 'react-syntax-highlighter/dist/cjs/languages/prism/sass';
-import less from 'react-syntax-highlighter/dist/cjs/languages/prism/less';
-import stylus from 'react-syntax-highlighter/dist/cjs/languages/prism/stylus';
-import bash from 'react-syntax-highlighter/dist/cjs/languages/prism/bash';
-import markdown from 'react-syntax-highlighter/dist/cjs/languages/prism/markdown';
-import json from 'react-syntax-highlighter/dist/cjs/languages/prism/json';
+import { DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
-import { cn } from '../../common/utils';
+import { Role } from '../../../../shared/model';
+import { cn, getFileName } from '../../common/utils';
+import { Editor } from './Editor';
+import { Button } from './Button';
+import { FileIcon } from './FileIcon';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
 
-SyntaxHighlighter.registerLanguage('tsx', tsx);
-SyntaxHighlighter.registerLanguage('jsx', jsx);
-SyntaxHighlighter.registerLanguage('typescript', typescript);
-SyntaxHighlighter.registerLanguage('javascript', javascript);
-SyntaxHighlighter.registerLanguage('css', css);
-SyntaxHighlighter.registerLanguage('scss', scss);
-SyntaxHighlighter.registerLanguage('css-extras', cssextras);
-SyntaxHighlighter.registerLanguage('sass', sass);
-SyntaxHighlighter.registerLanguage('less', less);
-SyntaxHighlighter.registerLanguage('stylus', stylus);
-SyntaxHighlighter.registerLanguage('bash', bash);
-SyntaxHighlighter.registerLanguage('markdown', markdown);
-SyntaxHighlighter.registerLanguage('json', json);
-
-interface MarkdownRenderProps {
-  mdString: string;
+interface FileHeaderProps extends React.PropsWithChildren {
+  filePath: string;
 }
 
-const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ mdString }) => {
-  return (
-    <ReactMarkdown
-      className="prose prose-sm text-sm dark:prose-invert w-full max-w-none"
-      components={{
-        code({ inline, className, ...props }: any) {
-          const hasLang = /language-(\w+)/.exec(className || '');
-          return !inline && hasLang ? (
-            <SyntaxHighlighter
-              style={oneDark}
-              language={hasLang[1]}
-              PreTag="div"
-              className="text-md mockup-code scrollbar-thin scrollbar-track-base-content/5 scrollbar-thumb-base-content/40 scrollbar-track-rounded-md scrollbar-thumb-rounded"
-              showLineNumbers={true}
-              useInlineStyles={true}
-              customStyle={{ margin: '0px', paddingLeft: '0px' }}>
-              {String(props.children).replace(/\n$/, '')}
-            </SyntaxHighlighter>
-          ) : (
-            <code className={cn('text-sm', className)} {...props} />
-          );
-        },
-        pre: (pre) => {
-          const codeChunk = (pre as any).node.children[0].children[0].value as string;
-          const [copyTip, setCopyTip] = useState('Copy code');
+export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, children }) => {
+  const [copyTip, setCopyTip] = useState('Copy code');
 
-          return (
-            <div className="relative overflow-x-auto">
-              <button className="absolute top-3 right-3 z-10 tooltip tooltip-left" data-tip={copyTip}>
-                <CopyToClipboard
-                  text={codeChunk}
-                  onCopy={async () => {
-                    setCopyTip('Copied');
-                    await new Promise((resolve) => setTimeout(resolve, 500));
-                    setCopyTip(`Copy code`);
-                  }}>
-                  <DocumentDuplicateIcon className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-                </CopyToClipboard>
-              </button>
-              <pre className="p-0 m-0 rounded-md" {...pre}></pre>
-            </div>
-          );
-        }
-      }}>
-      {mdString}
-    </ReactMarkdown>
+  return (
+    <div className="flex items-center justify-between gap-4 px-1.5 border-b border-border bg-background/50 h-6">
+      <div className="flex items-center gap-1 min-w-0">
+        <FileIcon filePath={filePath} className="size-5" />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-xs text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0">
+                {getFileName(filePath)}
+              </p>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs m-0 text-muted-foreground">{filePath}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
+      <CopyToClipboard
+        text={String(children)}
+        onCopy={async () => {
+          setCopyTip('Copied');
+          setTimeout(() => setCopyTip('Copy code'), 5000);
+        }}>
+        {copyTip === 'Copied' ? (
+          <DocumentCheckIcon className="size-4 text-muted-foreground hover:text-foreground" />
+        ) : (
+          <Button size="xs" variant="text" className="p-0">
+            <DocumentDuplicateIcon className="size-4 text-muted-foreground hover:text-foreground" />
+          </Button>
+        )}
+      </CopyToClipboard>
+    </div>
   );
 };
 
-export { MarkdownRender };
+interface CodeBlockInfo {
+  extension: string;
+  filePath?: string;
+  startLine?: number;
+  endLine?: number;
+}
+
+interface CodeBlockProps extends React.PropsWithChildren {
+  codeBlock?: CodeBlockInfo;
+}
+
+export const CodeBlock = ({ codeBlock, children }: CodeBlockProps) => {
+  return (
+    <div className="rounded-md border border-border bg-background mt-1">
+      {codeBlock?.filePath && <FileHeader filePath={codeBlock.filePath}>{children}</FileHeader>}
+      <Editor extension={codeBlock?.extension} filePath={codeBlock?.filePath}>
+        {children}
+      </Editor>
+    </div>
+  );
+};
+
+const Code = ({ inline, className, children, ...props }: any) => {
+  const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
+  if (!inline && hasLang) {
+    const [, extension, filePath, startLine, endLine] = hasLang;
+
+    const codeBlock = useMemo(
+      () => ({
+        extension,
+        ...(filePath && { filePath: filePath.trim() }),
+        ...(startLine && { startLine: parseInt(startLine, 10) }),
+        ...(endLine && { endLine: parseInt(endLine, 10) })
+      }),
+      [extension, filePath, startLine, endLine]
+    );
+
+    return <CodeBlock codeBlock={codeBlock}>{String(children).replace(/\n$/, '')}</CodeBlock>;
+  }
+
+  return <code className={cn('text-sm text-button-background', className)} {...props} />;
+};
+
+interface MarkdownRenderProps extends React.PropsWithChildren {
+  role: Role;
+}
+
+export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ role, children }) => {
+  return (
+    <ReactMarkdown
+      className={
+        role !== Role.Assistant ? 'flex gap-2 flex-wrap' : 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
+      }
+      components={{ code: Code }}>
+      {String(children)}
+    </ReactMarkdown>
+  );
+};

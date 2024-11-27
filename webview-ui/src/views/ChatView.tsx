@@ -20,13 +20,16 @@ import {
   SendMessagesRequestPayload
 } from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
+import { sendEventWithResponse } from '../api/eventUtils';
 import {
   addMessages,
+  addSelectedFile,
   clearMessages,
   setInitState,
   setIsMessageProcessing,
   setIsMessageStreaming,
   setIsProjectSyncing,
+  setPreviewVisibleForFileID,
   setProjectFiles,
   setSelectedFiles,
   updateMessageTextDelta
@@ -173,6 +176,10 @@ const ChatView: React.FunctionComponent<{
           dispatch(updateMessageTextDelta(delta));
           break;
         }
+        case EventType.FOCUS_CHAT_INPUT: {
+          inputRef.current?.focus();
+          break;
+        }
         case EventType.CMD_NEW_THREAD: {
           dispatch(clearMessages());
           vscodeAPI.postMessage(newEventRequest(EventType.NEW_THREAD));
@@ -194,6 +201,12 @@ const ChatView: React.FunctionComponent<{
         }
         case EventType.SHOW_SOFT_PAYWALL_MODAL: {
           setIsPremiumRequestModalOpen(true);
+          break;
+        }
+        case EventType.ADD_SELECTED_CODE: {
+          const selectedCode = payload as EventPayloads[typeof command]['request'];
+          dispatch(addSelectedFile(selectedCode));
+          dispatch(setPreviewVisibleForFileID(selectedCode.id));
           break;
         }
       }
@@ -343,12 +356,47 @@ const ChatView: React.FunctionComponent<{
     vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
   }
 
+  async function fetchFileContent(file: FilePayload): Promise<string> {
+    try {
+      const content = await sendEventWithResponse<EventType.FETCH_FILE_CONTENT>(
+        vscodeAPI,
+        EventType.FETCH_FILE_CONTENT,
+        file
+      );
+      if (!content) {
+        return '';
+      }
+      return content;
+    } catch (err) {
+      return '';
+    }
+  }
+
   function handleMessageFeedback(message: Message, feedback: string): void {
     vscodeAPI.postMessage(newEventRequest(EventType.UPDATE_MESSAGE, { ...message, feedback }));
   }
 
   function handleSubscribe(): void {
     vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
+  }
+
+  async function handlePaste(text: string): Promise<boolean> {
+    try {
+      const selectedCode = await sendEventWithResponse<EventType.PASTE_COPIED_CODE>(
+        vscodeAPI,
+        EventType.PASTE_COPIED_CODE,
+        { text }
+      );
+      if (!selectedCode) {
+        return false;
+      }
+
+      dispatch(addSelectedFile(selectedCode));
+      dispatch(setPreviewVisibleForFileID(selectedCode.id));
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   const disableIteractions = isMessageProcessing || isProjectSyncing || !initState.isInitialized;
@@ -407,7 +455,9 @@ const ChatView: React.FunctionComponent<{
           inputRef={inputRef}
           disabled={disableIteractions || isFigmaFileLoading}
           currentOpenFile={currentOpenFile}
+          onPaste={handlePaste}
           fetchFiles={fetchFiles}
+          fetchFileContent={fetchFileContent}
           onSendClicked={async (selectedFiles, textContent) =>
             handleSend(selectedFiles, textContent, chatImageAttachment, chatFigmaAttachment)
           }
@@ -418,7 +468,6 @@ const ChatView: React.FunctionComponent<{
           onFigmaButtonClicked={handleFigmaButtonClicked}
         />
       </div>
-
       <FigmaFilePickerModal
         open={openFigmaFilePickerModal}
         onClose={() => setOpenFigmaFilePickerModal(false)}

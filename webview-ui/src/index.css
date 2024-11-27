@@ -44,3 +44,11 @@ code {
 .logo {
   background-image: url('./assets/logo.png');
 }
+
+.npm__react-simple-code-editor__textarea:focus {
+  outline: none;
+}
+
+.prose pre {
+  padding: 0;
+}

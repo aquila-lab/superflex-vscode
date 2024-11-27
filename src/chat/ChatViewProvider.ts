@@ -1,8 +1,15 @@
 import path from "path";
 import * as vscode from "vscode";
 
-import { EventMessage, EventPayloads, EventType, newEventRequest, newEventResponse } from "../../shared/protocol";
-import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace } from "../common/utils";
+import {
+  EventMessage,
+  EventPayloads,
+  EventType,
+  FilePayload,
+  newEventRequest,
+  newEventResponse,
+} from "../../shared/protocol";
+import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace, debounce, generateFileID } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -13,9 +20,55 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
   private _chatWebview?: vscode.Webview;
   private _workspaceDirPath?: string;
   private _currentOpenFile?: string;
+  private _copiedText: FilePayload | null = null;
+  private _decorationType: vscode.TextEditorDecorationType;
+  private debouncedShowInlineTip: (editor: vscode.TextEditor, selection: vscode.Selection) => void;
 
   constructor(private context: vscode.ExtensionContext, private chatApi: ChatAPI) {
     this._extensionUri = context.extensionUri;
+
+    this._decorationType = vscode.window.createTextEditorDecorationType({
+      after: {
+        contentText: "Superflex: Add to Chat (⌘+M)",
+        color: new vscode.ThemeColor("editorCodeLens.foreground"),
+        margin: "0 0 0 6em",
+      },
+    });
+
+    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 100);
+
+    // Register the commands
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.chat.focus-input", () => {
+        this.focusChatInput();
+      })
+    );
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.add-selection-to-chat", async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+          return;
+        }
+
+        const selection = editor.selection;
+        if (selection.isEmpty || selection.end.line === selection.start.line) {
+          return;
+        }
+
+        await this.focusChatInput();
+        this.handleAddSelectionToChat(editor, selection);
+      })
+    );
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.add-copy-to-chat", async () => {
+        // Execute the default copy command first
+        await vscode.commands.executeCommand("editor.action.clipboardCopyAction");
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        this.handleCopySelectionToChat();
+      })
+    );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
@@ -37,6 +90,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     // Subscribe to the active text editor change event
     vscode.window.onDidChangeActiveTextEditor(this.handleActiveEditorChange.bind(this));
+
+    // Subscribe to the selection change event
+    context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(this.handleSelectionChange.bind(this)));
   }
 
   private init() {
@@ -62,6 +118,27 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         }
 
         try {
+          if (command === EventType.PASTE_COPIED_CODE) {
+            const paste = payload as EventPayloads[typeof command]["request"];
+
+            let eventResponse = newEventResponse(command, null);
+            eventResponse.id = message.id;
+
+            if (!this._copiedText || paste.text !== this._copiedText.content) {
+              this.sendEventMessage(eventResponse);
+              return;
+            }
+            if (this._copiedText.startLine === this._copiedText.endLine) {
+              this.sendEventMessage(eventResponse);
+              return;
+            }
+
+            eventResponse.payload = this._copiedText;
+            this.sendEventMessage(eventResponse);
+            this._copiedText = null;
+            return;
+          }
+
           const resonsePayload = await this.chatApi.handleEvent(
             command,
             payload as EventPayloads[typeof command]["request"],
@@ -107,10 +184,16 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     void this._chatWebview.postMessage(msg);
   }
 
-  async focusChatInput() {
+  async focusChatInput(): Promise<void> {
+    if (this._chatWebviewView?.visible) {
+      void this._chatWebview?.postMessage(newEventRequest(EventType.FOCUS_CHAT_INPUT));
+      return Promise.resolve();
+    }
+
     void vscode.commands.executeCommand("workbench.view.extension.superflex");
     await this.chatApi.onReady();
     void this._chatWebviewView?.show(true);
+    void this._chatWebview?.postMessage(newEventRequest(EventType.FOCUS_CHAT_INPUT));
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
@@ -172,12 +255,15 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy"
               content="default-src 'none';
-                       connect-src 'self' http://localhost:3000 https://us.posthog.com/ https://app.posthog.com/ https://us.i.posthog.com/ https://www.youtube.com/;
-                       style-src ${webview.cspSource} 'unsafe-inline';
-                       font-src ${webview.cspSource};
-                       img-src ${webview.cspSource} https://*.amazonaws.com blob: data:;
-                       script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/ https://us-assets.i.posthog.com/;
-                       frame-src https://www.youtube.com/;">
+                       connect-src 'self' http://localhost:3000 https://us.posthog.com/ https://app.posthog.com/ https://us.i.posthog.com/ https://www.youtube.com/ https://cdn.jsdelivr.net/;
+                       style-src ${webview.cspSource} 'unsafe-inline' https://cdn.jsdelivr.net/;
+                       font-src ${webview.cspSource} https://cdn.jsdelivr.net/;
+                       img-src ${
+                         webview.cspSource
+                       } https://*.amazonaws.com https://lh3.googleusercontent.com blob: data:;
+                       script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/ https://us-assets.i.posthog.com/ https://cdn.jsdelivr.net/;
+                       frame-src https://www.youtube.com/;
+                       worker-src blob:;">
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
           <title>Superflex</title>
 
@@ -215,13 +301,98 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._currentOpenFile = newCurrentOpenFile;
 
+    const relativePath = path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile);
     this.sendEventMessage(
       newEventRequest(EventType.SET_CURRENT_OPEN_FILE, {
+        id: generateFileID(relativePath),
         name: path.basename(newCurrentOpenFile),
         path: newCurrentOpenFile,
-        relativePath: path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile),
+        relativePath,
         isCurrentOpenFile: true,
-      })
+      } as FilePayload)
     );
+  }
+
+  private handleSelectionChange(event: vscode.TextEditorSelectionChangeEvent): void {
+    const editor = event.textEditor;
+    const selection = editor.selection;
+    editor.setDecorations(this._decorationType, []);
+
+    // Show tip only if selection spans multiple lines
+    if (!selection.isEmpty && selection.end.line > selection.start.line) {
+      this.debouncedShowInlineTip(editor, selection);
+    }
+  }
+
+  private showInlineTip(editor: vscode.TextEditor, selection: vscode.Selection): void {
+    const lineAbove = Math.max(selection.start.line - 1, 0);
+
+    // Position the tip at the end of the line above the selected text
+    const prevLine = editor.document.lineAt(lineAbove);
+    const position = prevLine.isEmptyOrWhitespace
+      ? new vscode.Position(lineAbove, 0) // Start of the line if it's empty
+      : new vscode.Position(lineAbove, prevLine.text.length); // End of the text if line has content
+
+    const range = new vscode.Range(position, position);
+    editor.setDecorations(this._decorationType, [
+      {
+        range,
+      },
+    ]);
+  }
+
+  private handleAddSelectionToChat(editor: vscode.TextEditor, selection: vscode.Selection): void {
+    if (!this._workspaceDirPath) {
+      return;
+    }
+
+    const document = editor.document;
+    const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
+
+    const relativePath = path.relative(this._workspaceDirPath, filePath);
+    const startPos = new vscode.Position(selection.start.line, 0);
+    const endPos = new vscode.Position(selection.end.line, document.lineAt(selection.end.line).text.length);
+    const fullLineSelection = new vscode.Range(startPos, endPos);
+
+    const codeSelection: FilePayload = {
+      id: generateFileID(relativePath, selection.start.line + 1, selection.end.line + 1),
+      name: path.basename(filePath),
+      path: filePath,
+      relativePath,
+      startLine: selection.start.line + 1,
+      endLine: selection.end.line + 1,
+      content: document.getText(fullLineSelection),
+    };
+
+    // Send to webview
+    this.sendEventMessage(newEventRequest(EventType.ADD_SELECTED_CODE, codeSelection));
+  }
+
+  private async handleCopySelectionToChat(): Promise<void> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor || !this._workspaceDirPath) {
+      return;
+    }
+
+    const selection = editor.selection;
+    if (selection.isEmpty) {
+      return;
+    }
+
+    const document = editor.document;
+    const filePath = decodeUriAndRemoveFilePrefix(document.uri.path);
+
+    const relativePath = path.relative(this._workspaceDirPath, filePath);
+    const codeSelection: FilePayload = {
+      id: generateFileID(relativePath, selection.start.line + 1, selection.end.line + 1),
+      name: path.basename(filePath),
+      path: filePath,
+      relativePath,
+      startLine: selection.start.line + 1,
+      endLine: selection.end.line + 1,
+      content: document.getText(selection),
+    };
+
+    this._copiedText = codeSelection;
   }
 }
