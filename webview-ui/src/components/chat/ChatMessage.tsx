@@ -5,7 +5,7 @@ import { cn } from '../../common/utils';
 import { useAppSelector } from '../../core/store';
 import { ImagePreview } from '../ui/ImagePreview';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
-import { MarkdownRender, StreamingMarkdownRender } from '../ui/MarkdownRender';
+import { MarkdownRender } from '../ui/MarkdownRender';
 import FeedbackDialog from './FeedbackDialog';
 
 declare global {
@@ -13,6 +13,11 @@ declare global {
     superflexLogoUri: string;
   }
 }
+
+const StreamingChatMessage: React.FC = () => {
+  const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
+  return <MarkdownRender role={Role.Assistant}>{streamTextDelta}</MarkdownRender>;
+};
 
 interface ChatMessageProps {
   message?: Message;
@@ -31,11 +36,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isStreaming =
 
   const renderContent = () => {
     if (isStreaming) {
-      return <StreamingMarkdownRender />;
+      return <StreamingChatMessage />;
     }
 
     if (message?.content.type === MessageType.Text) {
-      return <MarkdownRender role={message.role} mdString={message.content.text} />;
+      return <MarkdownRender role={message.role}>{message.content.text}</MarkdownRender>;
     }
 
     if (message?.content.type === MessageType.Image || message?.content.type === MessageType.Figma) {

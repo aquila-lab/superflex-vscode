@@ -75,25 +75,24 @@ const getLanguageFromPath = (filePath: string): string => {
   return languageMap[extension] || 'plaintext';
 };
 
-interface EditorProps {
+interface EditorProps extends React.PropsWithChildren {
   extension?: string;
   filePath?: string;
-  content: string;
   maxHeight?: number;
 }
 
-export const Editor: React.FC<EditorProps> = ({ extension, filePath, content, maxHeight }) => {
+export const Editor = ({ extension, filePath, maxHeight, children }: EditorProps) => {
   const [themeVersion, setThemeVersion] = useState(0);
+
+  const lineCount = useMemo(() => String(children).split('\n').length, [children]);
 
   const calculatedHeight = useMemo(() => {
     const lineHeight = 18;
-    const lineCount = content.split('\n').length;
-
     if (maxHeight) {
       return Math.min(lineCount * lineHeight + 18, maxHeight);
     }
     return lineCount * lineHeight + 18;
-  }, [content]);
+  }, [lineCount, maxHeight]);
 
   const fileLanguage = useMemo(() => {
     if (!filePath && !extension) {
@@ -129,7 +128,7 @@ export const Editor: React.FC<EditorProps> = ({ extension, filePath, content, ma
       className="px-2"
       height={calculatedHeight}
       defaultLanguage={fileLanguage}
-      value={content}
+      value={String(children)}
       beforeMount={beforeMount}
       theme="vscode-theme"
       options={{
@@ -164,7 +163,9 @@ export const Editor: React.FC<EditorProps> = ({ extension, filePath, content, ma
         quickSuggestions: false,
         parameterHints: { enabled: false },
         tabCompletion: 'off',
-        mouseWheelZoom: false
+        mouseWheelZoom: false,
+        renderValidationDecorations: 'off',
+        renderFinalNewline: 'off'
       }}
     />
   );
