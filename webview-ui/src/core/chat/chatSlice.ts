@@ -25,6 +25,7 @@ const defaultMessages: Message[] = [
 type ChatState = {
   init: InitChatState;
   messages: Message[];
+  streamTextDelta: string;
   isMessageStreaming: boolean;
   isMessageProcessing: boolean;
   isProjectSyncing: boolean;
@@ -39,6 +40,7 @@ const initialState: ChatState = {
     isFigmaAuthenticated: false
   },
   messages: defaultMessages,
+  streamTextDelta: '',
   isMessageStreaming: false,
   isMessageProcessing: false,
   isProjectSyncing: false,
@@ -69,29 +71,12 @@ const chatSlice = createSlice({
       state.messages = defaultMessages;
     },
     updateMessageTextDelta: (state, action: PayloadAction<TextDelta>) => {
-      const lastMessage = state.messages[state.messages.length - 1];
-      if (lastMessage.content.type !== MessageType.TextDelta) {
-        state.messages = [
-          ...state.messages,
-          {
-            id: uuidv4(),
-            threadID: uuidv4(),
-            role: Role.Assistant,
-            content: {
-              type: MessageType.TextDelta,
-              value: action.payload.value
-            },
-            feedback: 'none',
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        ];
-        return;
-      }
-
-      lastMessage.content.value += action.payload.value;
+      state.streamTextDelta = state.streamTextDelta + action.payload.value;
     },
     setIsMessageStreaming: (state, action: PayloadAction<boolean>) => {
+      if (!action.payload) {
+        state.streamTextDelta = '';
+      }
       state.isMessageStreaming = action.payload;
     },
     setIsMessageProcessing: (state, action: PayloadAction<boolean>) => {

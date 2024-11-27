@@ -1,9 +1,10 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState, useMemo, memo, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
 import { Role } from '../../../../shared/model';
+import { useAppSelector } from '../../core/store';
 import { cn, getFileName } from '../../common/utils';
 import { Editor } from './Editor';
 import { Button } from './Button';
@@ -102,34 +103,76 @@ interface MarkdownRenderProps {
 }
 
 export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ role, mdString }) => {
-  const cleanedMdString = useMemo(() => {
-    return mdString.trimStart().trimEnd();
-  }, [mdString]);
-
+  const cleanedMdString = useMemo(() => mdString.trimStart().trimEnd(), [mdString]);
   const { codeBlocks } = useMemo(() => extractCodeBlockDetails(cleanedMdString), [cleanedMdString]);
 
-  let codeBlockIndex = 0;
+  // Use useRef to maintain the index between renders
+  const codeBlockIndex = useRef(0);
+
+  // Reset index when mdString changes
+  useEffect(() => {
+    codeBlockIndex.current = 0;
+  }, [mdString]);
+
+  const Code = useCallback(
+    ({ inline, className, ...props }: any) => {
+      const hasLang = /language-(\w+)/.exec(className || '');
+      const codeProp = String(props.children).replace(/\n$/, '');
+
+      if (!inline && hasLang) {
+        // Only increment index when we actually use a code block
+        const codeBlock = codeBlocks?.[codeBlockIndex.current++];
+        return <CodeBlock codeBlock={codeBlock} code={codeProp} />;
+      }
+
+      return <code className={cn('text-sm text-button-background', className)} {...props} />;
+    },
+    [codeBlocks]
+  );
 
   return (
     <ReactMarkdown
       className={
         role !== Role.Assistant ? 'flex gap-2 flex-wrap' : 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
       }
-      components={{
-        code({ inline, className, ...props }: any) {
-          const hasLang = /language-(\w+)/.exec(className || '');
-          const codeProp = String(props.children).replace(/\n$/, '');
+      components={{ code: Code }}>
+      {cleanedMdString}
+    </ReactMarkdown>
+  );
+};
 
-          if (!inline && hasLang) {
-            const currentBlock = codeBlocks?.[codeBlockIndex];
-            codeBlockIndex += 1;
+export const StreamingMarkdownRender: React.FunctionComponent = () => {
+  const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
+  const cleanedMdString = useMemo(() => streamTextDelta.trimStart().trimEnd(), [streamTextDelta]);
 
-            return <CodeBlock codeBlock={currentBlock} code={codeProp} />;
-          }
+  const { codeBlocks } = useMemo(() => extractCodeBlockDetails(cleanedMdString), [cleanedMdString]);
 
-          return <code className={cn('text-sm text-button-background', className)} {...props} />;
-        }
-      }}>
+  // Use useRef to maintain the index between renders
+  const codeBlockIndex = useRef(0);
+
+  // Reset index when mdString changes
+  useEffect(() => {
+    codeBlockIndex.current = 0;
+  }, [cleanedMdString]);
+
+  const Code = useCallback(
+    ({ inline, className, ...props }: any) => {
+      const hasLang = /language-(\w+)/.exec(className || '');
+      const codeProp = String(props.children).replace(/\n$/, '');
+
+      if (!inline && hasLang) {
+        // Only increment index when we actually use a code block
+        const codeBlock = codeBlocks?.[codeBlockIndex.current++];
+        return <CodeBlock codeBlock={codeBlock} code={codeProp} />;
+      }
+
+      return <code className={cn('text-sm text-button-background', className)} {...props} />;
+    },
+    [codeBlocks]
+  );
+
+  return (
+    <ReactMarkdown className={'prose prose-sm text-sm dark:prose-invert w-full max-w-none'} components={{ code: Code }}>
       {cleanedMdString}
     </ReactMarkdown>
   );
