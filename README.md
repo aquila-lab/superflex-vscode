@@ -7,62 +7,95 @@
 [downloads-shield]: https://img.shields.io/visual-studio-marketplace/d/aquilalabs.superflex?style=social
 [downloads-url]: https://marketplace.visualstudio.com/items?itemName=aquilalabs.superflex
 [youtube-shield]: https://img.shields.io/badge/Demo-Video-red?style=flat&logo=youtube
-[youtube-url]: https://youtu.be/YFcTjJDFsbg?si=WQVteFa4UK9_bynz
+[youtube-url]: https://youtu.be/pP25PXwV_60?si=Piz20NC4R0hWXSSS
 
 [![Github Repo][github-shield]][github-url] [![VSCode Plugin][vscode-shield]][vscode-url] [![Downloads][downloads-shield]][downloads-url] [![Twitter Follow][twitter-shield]][twitter-url] [![Demo Video][youtube-shield]][youtube-url]
 
-# Superflex: Your AI-Powered Frontend Development Assistant
+# Superflex: AI Frontend Assistant
 
-## Convert Figma, Images & Prompts Into Production-Ready Code
+## Turn Figma Designs, Images & Prompts into Production-Ready Code – in Seconds
 
-![Superflex Product Overview](./docs/superflex-product-overview.gif)
+![Superflex Overview](./docs/superflex-overview.gif)
 
-Superflex is an AI-powered front-end assistant that turns your ideas into production-ready code in seconds. It builds features from Figma designs, images, or text prompts while adhering to your code style, design standards, and existing UI components. Build better frontend faster with Superflex, the ultimate AI code companion for Visual Studio Code.
+Superflex is your ultimate frontend assistant that makes frontend development seamless. From transforming Figma designs to coding entire pages in seconds, Superflex ensures your design standards and coding style are always maintained.
 
-## Get started with Superflex in seconds:
+## 🌟 **New in Superflex v0.2.0**
+
+- **Full Page from Figma to Code**: Generate entire page layouts from Figma in seconds!
+- **New Chat UI**: Clean, intuitive chat interface that follows your VSCode theme colors.
+- **Enhanced Usability**: Copy text during generation and hover to preview full file paths.
+- **Shortcuts & Profiles**: Accelerate workflows with keyboard shortcuts and monitor your usage.
+
+## 🚀 Get Started with Superflex
+
+### In Visual Studio Code
 
 1. Install Superflex from the [Visual Studio Code Marketplace][vscode-url].
 2. Open your project in VSCode.
-3. Access Superflex through the command palette or sidebar.
-4. For better accessibility to Superflex and file system at the same time, move Superflex to the secondary sidebar. \
-   ![Superflex Sidebar Setup](./docs/superflex-sidebar-setup.png)
+3. Access Superflex from the sidebar or press **[⌘;]** to open Superflex.
+4. Move Superflex to the secondary sidebar for better multitasking.  
+   ![VSCode Sidebar Setup](./docs/superflex-sidebar-setup.png)
 5. Start coding at superhuman speed!
 
-## Key Features
+### In Cursor
 
-- **Figma-to-Code Integration**: Import your Figma designs and Superflex will translate them into production-ready code. \
-  ![Figma-to-Code Integration](./docs/superflex-figma-to-code-showcase.gif)
+1. Open Extensions **[⇧⌘X]** in Cursor and type _"Superflex"_, then click on install.
+2. Open your project and open Superflex through the sidebar or press **[⌘;]** to open Superflex.
+3. Use the intuitive chat interface to build, refactor, and enhance your UI components.
+4. Experience AI-driven productivity for seamless coding.
 
-- **Image-to-Code Conversion**: Upload any UI component image/screenshot and Superflex will generate code that will match your design-system.
+## 🚀 **Core Features**
 
-- **Sketch-to-Code**: Upload hand-drawn sketches and see them transformed into functional code, following your design system and coding style. \
-  ![Sketch-to-Code](./docs/superflex-sketch-to-code-showcase.gif)
+### 🖌️ **Figma-to-Code**
 
-- **Chat with your codebase**: Chat with Superflex if you need help building new features.
+Upload Figma designs, and Superflex delivers responsive, production-ready code tailored to your design system.  
+![Figma-to-Code GIF](./docs/superflex-figma-to-code.gif)
 
-- **Refactoring within a file**: Leverage our AI to refactor your components and pages for optimal performance and code quality.
+### 🎨 **Image-to-Code**
 
-## Chat Interface Overview
+Convert any UI screenshot into functional components, adhering to your design standards.  
+![Image-to-Code GIF](./docs/superflex-image-to-code.gif)
 
-Superflex provides an intuitive chat interface to streamline your development process:
+### ✍️ **Sketch-to-Code**
 
-- **Start new chat thread**: Begin a fresh conversation with Superflex.
-- **Sync project**: Instantly update Superflex with your latest code changes.
-- **Logout**: Sign out of your Superflex session.
+Even hand-drawn sketches can be turned into polished code, fast and efficiently.  
+![Sketch-to-Code GIF](./docs/superflex-sketch-to-code.gif)
 
-  ![Superflex Chat Interface](./docs/superflex-chat-interface.png)
+Here’s an updated section explaining the new functionality for adding any selection or file to chat seamlessly:
 
-## Dedicated Support
+### 🛠 Add Any Selection or File to Chat
 
-We're committed to your success:
+Superflex now lets you add any selected code or entire files into the chat context seamlessly:
 
-- Report issues on our [GitHub repository][github-url]
-- Get personalized help at [boris@superflex.ai](mailto:boris@superflex.ai)
+1. **Select a Code Snippet**: Highlight any portion of code in your editor then click **[⌘M]** to add to chat.
+2. **Select Files from Project**: Click on **+** inside chat to select files from your project to add to chat.
 
-## License
+![Add Any Selection or File to Chat](./docs/superflex-add-selection-to-chat.gif)
 
-Superflex is proudly released under the [MIT License](LICENSE).
+### 💬 **Codebase Chat**
 
----
+Ask questions, generate features, or get instant help navigating your codebase.
 
-Experience the future of frontend development with Superflex - Where AI and human creativity combine to produce extraordinary results.
+### ♻️ **Smart Refactoring**
+
+Refactor your components or pages for clean, maintainable code without breaking functionality.
+
+## ⚡ **Why Superflex?**
+
+- **Save Hours**: Automate repetitive coding tasks.
+- **Code Consistency**: Adheres to your team’s design system and coding conventions.
+- **Beginner-Friendly**: Perfect for designers or developers new to front-end work.
+
+## 📖 **How to Get Started**
+
+1. Install Superflex from the [Visual Studio Marketplace][vscode-url].
+2. Open your project and activate Superflex from the command palette.
+3. Drag the Superflex panel to the secondary sidebar for seamless multitasking.
+4. Start building at **superhuman speed**!
+
+## 🔗 **Stay Connected**
+
+- 💬 Questions? Contact us at [boris@superflex.ai](mailto:boris@superflex.ai).
+- 🔧 Report issues on [GitHub](https://github.com/aquila-lab/superflex-vscode/issues).
+
+Discover more at [superflex.ai](https://superflex.ai)
