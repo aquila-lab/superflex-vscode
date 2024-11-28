@@ -75,7 +75,7 @@ export const CodeBlock = ({ codeBlock, children }: CodeBlockProps) => {
   );
 };
 
-const Code = ({ inline, className, children, ...props }: any) => {
+const Code = ({ inline, className, ...props }: any) => {
   const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
   if (!inline && hasLang) {
     const [, extension, filePath, startLine, endLine] = hasLang;
@@ -90,7 +90,7 @@ const Code = ({ inline, className, children, ...props }: any) => {
       [extension, filePath, startLine, endLine]
     );
 
-    return <CodeBlock codeBlock={codeBlock}>{String(children).replace(/\n$/, '')}</CodeBlock>;
+    return <CodeBlock codeBlock={codeBlock}>{String(props.children).replace(/\n$/, '')}</CodeBlock>;
   }
 
   return <code className={cn('text-sm text-button-background', className)} {...props} />;
