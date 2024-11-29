@@ -14,18 +14,32 @@ declare global {
   }
 }
 
-const StreamingChatMessage: React.FC = () => {
+interface StreamingChatMessageProps {
+  onFileNameClick: (filePath: string) => void;
+}
+
+const StreamingChatMessage = ({ onFileNameClick }: StreamingChatMessageProps) => {
   const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
-  return <MarkdownRender role={Role.Assistant}>{streamTextDelta}</MarkdownRender>;
+  return (
+    <MarkdownRender role={Role.Assistant} onFileNameClick={onFileNameClick}>
+      {streamTextDelta}
+    </MarkdownRender>
+  );
 };
 
 interface ChatMessageProps {
   message?: Message;
   isStreaming?: boolean;
   handleFeedback: (message: Message, feedback: string) => void;
+  onFileNameClick: (filePath: string) => void;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isStreaming = false, handleFeedback }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({
+  message,
+  isStreaming = false,
+  handleFeedback,
+  onFileNameClick
+}) => {
   const user = useAppSelector((state) => state.user);
 
   const [userInfo, setUserInfo] = useState({ picture: user.picture });
@@ -36,11 +50,15 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isStreaming =
 
   const renderContent = () => {
     if (isStreaming) {
-      return <StreamingChatMessage />;
+      return <StreamingChatMessage onFileNameClick={onFileNameClick} />;
     }
 
     if (message?.content.type === MessageType.Text) {
-      return <MarkdownRender role={message.role}>{message.content.text}</MarkdownRender>;
+      return (
+        <MarkdownRender role={message.role} onFileNameClick={onFileNameClick}>
+          {message.content.text}
+        </MarkdownRender>
+      );
     }
 
     if (message?.content.type === MessageType.Image || message?.content.type === MessageType.Figma) {

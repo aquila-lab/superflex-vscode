@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
@@ -12,9 +12,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tool
 
 interface FileHeaderProps extends React.PropsWithChildren {
   filePath: string;
+  onFileNameClick?: (filePath: string) => void;
 }
 
-export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, children }) => {
+export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, onFileNameClick = () => {}, children }) => {
   const [copyTip, setCopyTip] = useState('Copy code');
 
   return (
@@ -24,7 +25,9 @@ export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, children }) =>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <p className="text-xs text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0">
+              <p
+                className="text-xs text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0 cursor-pointer"
+                onClick={() => onFileNameClick(filePath)}>
                 {getFileName(filePath)}
               </p>
             </TooltipTrigger>
@@ -62,12 +65,17 @@ interface CodeBlockInfo {
 
 interface CodeBlockProps extends React.PropsWithChildren {
   codeBlock?: CodeBlockInfo;
+  onFileNameClick?: (filePath: string) => void;
 }
 
-export const CodeBlock = ({ codeBlock, children }: CodeBlockProps) => {
+export const CodeBlock = ({ codeBlock, onFileNameClick, children }: CodeBlockProps) => {
   return (
     <div className="rounded-md border border-border bg-background mt-1">
-      {codeBlock?.filePath && <FileHeader filePath={codeBlock.filePath}>{children}</FileHeader>}
+      {codeBlock?.filePath && (
+        <FileHeader filePath={codeBlock.filePath} onFileNameClick={onFileNameClick}>
+          {children}
+        </FileHeader>
+      )}
       <Editor extension={codeBlock?.extension} filePath={codeBlock?.filePath}>
         {children}
       </Editor>
@@ -75,32 +83,40 @@ export const CodeBlock = ({ codeBlock, children }: CodeBlockProps) => {
   );
 };
 
-const Code = ({ inline, className, ...props }: any) => {
-  const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
-  if (!inline && hasLang) {
-    const [, extension, filePath, startLine, endLine] = hasLang;
-
-    const codeBlock = useMemo(
-      () => ({
-        extension,
-        ...(filePath && { filePath: filePath.trim() }),
-        ...(startLine && { startLine: parseInt(startLine, 10) }),
-        ...(endLine && { endLine: parseInt(endLine, 10) })
-      }),
-      [extension, filePath, startLine, endLine]
-    );
-
-    return <CodeBlock codeBlock={codeBlock}>{String(props.children).replace(/\n$/, '')}</CodeBlock>;
-  }
-
-  return <code className={cn('text-sm text-button-background', className)} {...props} />;
-};
-
 interface MarkdownRenderProps extends React.PropsWithChildren {
   role: Role;
+  onFileNameClick?: (filePath: string) => void;
 }
 
-export const MarkdownRender: React.FunctionComponent<MarkdownRenderProps> = ({ role, children }) => {
+export const MarkdownRender = ({ role, onFileNameClick, children }: MarkdownRenderProps) => {
+  const Code = useCallback(
+    ({ inline, className, ...props }: any) => {
+      const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
+      if (!inline && hasLang) {
+        const [, extension, filePath, startLine, endLine] = hasLang;
+
+        const codeBlock = useMemo(
+          () => ({
+            extension,
+            ...(filePath && { filePath: filePath.trim() }),
+            ...(startLine && { startLine: parseInt(startLine, 10) }),
+            ...(endLine && { endLine: parseInt(endLine, 10) })
+          }),
+          [extension, filePath, startLine, endLine]
+        );
+
+        return (
+          <CodeBlock codeBlock={codeBlock} onFileNameClick={onFileNameClick}>
+            {String(props.children).replace(/\n$/, '')}
+          </CodeBlock>
+        );
+      }
+
+      return <code className={cn('text-sm text-button-background', className)} {...props} />;
+    },
+    [onFileNameClick]
+  );
+
   return (
     <ReactMarkdown
       className={

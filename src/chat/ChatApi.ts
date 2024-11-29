@@ -292,6 +292,26 @@ export class ChatAPI {
         }
 
         return await api.getUserSubscription();
+      })
+
+      /**
+       * Event (open_file): This event is fired when the user clicks on a file in the webview.
+       * It is used to open the file in the VS Code editor.
+       *
+       * @param payload - Payload containing the relative file path.
+       */
+      .registerEvent(EventType.OPEN_FILE, async (payload: { filePath: string }) => {
+        if (!this._isInitialized || !this._workspaceDirPath) {
+          return;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        if (!fs.existsSync(resolvedPath)) {
+          return;
+        }
+
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
       });
   }
 
