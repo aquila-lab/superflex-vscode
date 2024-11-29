@@ -74,6 +74,10 @@ const chatSlice = createSlice({
       state.streamTextDelta = state.streamTextDelta + action.payload.value;
     },
     setIsMessageStreaming: (state, action: PayloadAction<boolean>) => {
+      if (state.isMessageStreaming === action.payload) {
+        return;
+      }
+
       if (!action.payload) {
         state.streamTextDelta = '';
       }

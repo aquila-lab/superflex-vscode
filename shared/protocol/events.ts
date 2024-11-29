@@ -42,6 +42,7 @@ export enum EventType {
   ADD_SELECTED_CODE = "add_selected_code",
   PASTE_COPIED_CODE = "paste_copied_code",
   FOCUS_CHAT_INPUT = "focus_chat_input",
+  OPEN_FILE = "open_file",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -83,6 +84,7 @@ export interface EventPayloads {
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
   [EventType.PASTE_COPIED_CODE]: { request: { text: string }; response: FilePayload | null };
   [EventType.FOCUS_CHAT_INPUT]: { request: void; response: void };
+  [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };

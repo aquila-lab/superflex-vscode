@@ -1,5 +1,9 @@
 import { EventMessage } from '../../../shared/protocol';
 
+export type VSCodeApiProps = {
+  vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
+};
+
 declare const acquireVsCodeApi: () => VSCodeApi;
 
 interface VSCodeApi {
