@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { Message, TextDelta, User, UserSubscription } from "../model";
 import {
+  ApplyCodePayload,
   AuthLinkPayload,
   ConfigPayload,
   CreateAuthLinkPayload,
@@ -36,13 +37,15 @@ export enum EventType {
   NEW_MESSAGE = "new_message",
   MESSAGE_TEXT_DELTA = "message_text_delta",
   UPDATE_MESSAGE = "update_message",
+  APPLY_CODE = "apply_code",
+  OPEN_FILE = "open_file",
   FETCH_FILES = "fetch_files",
   FETCH_FILE_CONTENT = "fetch_file_content",
+  CHECK_FILE_EXISTS = "check_file_exists",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
   ADD_SELECTED_CODE = "add_selected_code",
   PASTE_COPIED_CODE = "paste_copied_code",
   FOCUS_CHAT_INPUT = "focus_chat_input",
-  OPEN_FILE = "open_file",
 
   // Commands that are sent from the extension to the webview usually to trigger an action
   CMD_NEW_THREAD = "cmd_new_thread",
@@ -78,13 +81,15 @@ export interface EventPayloads {
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
+  [EventType.APPLY_CODE]: { request: ApplyCodePayload; response: void };
+  [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };
+  [EventType.CHECK_FILE_EXISTS]: { request: { filePath: string }; response: boolean };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
   [EventType.PASTE_COPIED_CODE]: { request: { text: string }; response: FilePayload | null };
   [EventType.FOCUS_CHAT_INPUT]: { request: void; response: void };
-  [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.CMD_NEW_THREAD]: { request: void; response: void };
   [EventType.CMD_SYNC_PROJECT]: { request: void; response: void };
   [EventType.SHOW_LOGIN_VIEW]: { request: void; response: void };
