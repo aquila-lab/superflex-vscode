@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { CheckIcon, DocumentDuplicateIcon, PlayIcon } from '@heroicons/react/24/outline';
@@ -26,34 +26,14 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
   onApplyCodeClick,
   children
 }) => {
-  const contentRef = useRef<string>('');
-
   const [copyTip, setCopyTip] = useState('Copy code');
   const [isFileExists, setIsFileExists] = useState(true);
-  const [isContentComplete, setIsContentComplete] = useState(!isStreaming);
 
   useEffect(() => {
     if (filePath && checkFileExists) {
       checkFileExists(filePath).then(setIsFileExists);
     }
   }, [isStreaming, filePath, checkFileExists]);
-
-  // Track content changes to determine when streaming is complete
-  useEffect(() => {
-    if (!isStreaming) {
-      return;
-    }
-
-    const currentContent = String(children);
-    if (currentContent !== contentRef.current) {
-      contentRef.current = currentContent;
-      setIsContentComplete(false);
-      return;
-    }
-
-    const timeoutID = setTimeout(() => setIsContentComplete(true), 300);
-    return () => clearTimeout(timeoutID);
-  }, [isStreaming, children]);
 
   return (
     <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
@@ -93,7 +73,7 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
           )}
         </CopyToClipboard>
 
-        {!isFileExists && isContentComplete && onApplyCodeClick && (
+        {!isFileExists && onApplyCodeClick && (
           <Button
             size="xs"
             variant="text"
