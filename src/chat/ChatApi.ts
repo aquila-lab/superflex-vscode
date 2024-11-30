@@ -210,6 +210,59 @@ export class ChatAPI {
       })
 
       /**
+       * Event (apply_code): This event is used to apply the code to the file in the workspace.
+       * Limited functionality for now: Only supports writing to the new file.
+       *
+       * @param payload - Payload containing the file path and code.
+       * @returns A promise that resolves when the code is applied.
+       * @throws An error if the code cannot be applied.
+       */
+      .registerEvent(EventType.APPLY_CODE, async (payload: { filePath: string; code: string }) => {
+        if (!this._workspaceDirPath) {
+          return;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+
+        // Limited functionality for now: Only supports writing to the new file.
+        // If the file already exists, we do not overwrite it.
+        if (fs.existsSync(resolvedPath)) {
+          return;
+        }
+
+        // Create the directory and write the file content
+        const directory = path.dirname(resolvedPath);
+        if (!fs.existsSync(directory)) {
+          fs.mkdirSync(directory, { recursive: true });
+        }
+        fs.writeFileSync(resolvedPath, payload.code, "utf8");
+
+        // Open the file in the VS Code editor
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+      })
+
+      /**
+       * Event (open_file): This event is fired when the user clicks on a file in the webview.
+       * It is used to open the file in the VS Code editor.
+       *
+       * @param payload - Payload containing the relative file path.
+       */
+      .registerEvent(EventType.OPEN_FILE, async (payload: { filePath: string }) => {
+        if (!this._workspaceDirPath) {
+          return;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        if (!fs.existsSync(resolvedPath)) {
+          return;
+        }
+
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+      })
+
+      /**
        * Event (fetch_files): This event is fired when the webview needs to fetch the project files.
        * It is used to fetch the project files from the workspace directory.
        *
@@ -217,7 +270,7 @@ export class ChatAPI {
        * @throws An error if the project files cannot be fetched.
        */
       .registerEvent(EventType.FETCH_FILES, async () => {
-        if (!this._isInitialized || !this._assistant || !this._workspaceDirPath) {
+        if (!this._workspaceDirPath) {
           return [];
         }
 
@@ -257,6 +310,21 @@ export class ChatAPI {
       })
 
       /**
+       * Event (check_file_exists): This event checks if a file exists in the workspace
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves with the file existence status.
+       */
+      .registerEvent(EventType.CHECK_FILE_EXISTS, async (payload: { filePath: string }) => {
+        if (!this._workspaceDirPath) {
+          return false;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        return fs.existsSync(resolvedPath);
+      })
+
+      /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
        * It is used to update the message with the feedback.
        *
@@ -292,26 +360,6 @@ export class ChatAPI {
         }
 
         return await api.getUserSubscription();
-      })
-
-      /**
-       * Event (open_file): This event is fired when the user clicks on a file in the webview.
-       * It is used to open the file in the VS Code editor.
-       *
-       * @param payload - Payload containing the relative file path.
-       */
-      .registerEvent(EventType.OPEN_FILE, async (payload: { filePath: string }) => {
-        if (!this._isInitialized || !this._workspaceDirPath) {
-          return;
-        }
-
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-        if (!fs.existsSync(resolvedPath)) {
-          return;
-        }
-
-        const document = await vscode.workspace.openTextDocument(resolvedPath);
-        await vscode.window.showTextDocument(document);
       });
   }
 

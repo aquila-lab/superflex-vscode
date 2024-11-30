@@ -25,6 +25,7 @@ export default {
         border: 'var(--vscode-dropdown-border)',
         input: 'var(--vscode-input-background)',
         ring: 'var(--vscode-focusBorder)',
+        sidebar: 'var(--vscode-sideBar-background)',
         background: 'var(--vscode-editor-background)',
         foreground: 'var(--vscode-foreground)',
         destructive: {

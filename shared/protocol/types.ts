@@ -47,3 +47,8 @@ export type FigmaFile = {
 export type SendNotificationPayload = {
   message: string;
 };
+
+export type ApplyCodePayload = {
+  filePath: string;
+  code: string;
+};

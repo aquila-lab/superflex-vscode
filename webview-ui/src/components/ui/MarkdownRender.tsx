@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { DocumentCheckIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, DocumentDuplicateIcon, PlayIcon } from '@heroicons/react/24/outline';
 
 import { Role } from '../../../../shared/model';
 import { cn, getFileName } from '../../common/utils';
@@ -12,14 +12,31 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tool
 
 interface FileHeaderProps extends React.PropsWithChildren {
   filePath: string;
+  isStreaming?: boolean;
+  checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
+  onApplyCodeClick?: (filePath: string, code: string) => void;
 }
 
-export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, onFileNameClick = () => {}, children }) => {
+export const FileHeader: React.FC<FileHeaderProps> = ({
+  filePath,
+  isStreaming,
+  checkFileExists,
+  onFileNameClick = () => {},
+  onApplyCodeClick,
+  children
+}) => {
   const [copyTip, setCopyTip] = useState('Copy code');
+  const [isFileExists, setIsFileExists] = useState(true);
+
+  useEffect(() => {
+    if (!isStreaming && filePath && checkFileExists) {
+      checkFileExists(filePath).then(setIsFileExists);
+    }
+  }, [isStreaming, filePath, checkFileExists]);
 
   return (
-    <div className="flex items-center justify-between gap-4 px-1.5 border-b border-border bg-background/50 h-6">
+    <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
       <div className="flex items-center gap-1 min-w-0">
         <FileIcon filePath={filePath} className="size-5" />
         <TooltipProvider>
@@ -38,20 +55,35 @@ export const FileHeader: React.FC<FileHeaderProps> = ({ filePath, onFileNameClic
         </TooltipProvider>
       </div>
 
-      <CopyToClipboard
-        text={String(children)}
-        onCopy={async () => {
-          setCopyTip('Copied');
-          setTimeout(() => setCopyTip('Copy code'), 5000);
-        }}>
-        {copyTip === 'Copied' ? (
-          <DocumentCheckIcon className="size-4 text-muted-foreground hover:text-foreground" />
-        ) : (
-          <Button size="xs" variant="text" className="p-0">
-            <DocumentDuplicateIcon className="size-4 text-muted-foreground hover:text-foreground" />
+      <div className="flex flex-row items-center">
+        <CopyToClipboard
+          text={String(children)}
+          onCopy={async () => {
+            setCopyTip('Copied');
+            setTimeout(() => setCopyTip('Copy code'), 5000);
+          }}>
+          {copyTip === 'Copied' ? (
+            <div className="text-muted-foreground px-1 py-0.5 rounded-md hover:bg-muted">
+              <CheckIcon className="size-3.5" />
+            </div>
+          ) : (
+            <Button size="xs" variant="text" className="px-1 py-0.5 hover:bg-muted">
+              <DocumentDuplicateIcon className="size-3.5" />
+            </Button>
+          )}
+        </CopyToClipboard>
+
+        {!isFileExists && onApplyCodeClick && (
+          <Button
+            size="xs"
+            variant="text"
+            className="text-[11px] px-1 py-0 hover:bg-muted"
+            onClick={() => onApplyCodeClick(filePath, String(children))}>
+            <PlayIcon className="size-3.5" />
+            Apply
           </Button>
         )}
-      </CopyToClipboard>
+      </div>
     </div>
   );
 };
@@ -65,14 +97,29 @@ interface CodeBlockInfo {
 
 interface CodeBlockProps extends React.PropsWithChildren {
   codeBlock?: CodeBlockInfo;
+  isStreaming?: boolean;
+  checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
+  onApplyCodeClick?: (filePath: string, code: string) => void;
 }
 
-export const CodeBlock = ({ codeBlock, onFileNameClick, children }: CodeBlockProps) => {
+export const CodeBlock = ({
+  codeBlock,
+  isStreaming,
+  checkFileExists,
+  onFileNameClick,
+  onApplyCodeClick,
+  children
+}: CodeBlockProps) => {
   return (
     <div className="rounded-md border border-border bg-background mt-1">
       {codeBlock?.filePath && (
-        <FileHeader filePath={codeBlock.filePath} onFileNameClick={onFileNameClick}>
+        <FileHeader
+          filePath={codeBlock.filePath}
+          isStreaming={isStreaming}
+          checkFileExists={checkFileExists}
+          onFileNameClick={onFileNameClick}
+          onApplyCodeClick={onApplyCodeClick}>
           {children}
         </FileHeader>
       )}
@@ -85,10 +132,20 @@ export const CodeBlock = ({ codeBlock, onFileNameClick, children }: CodeBlockPro
 
 interface MarkdownRenderProps extends React.PropsWithChildren {
   role: Role;
+  isStreaming?: boolean;
+  checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
+  onApplyCodeClick?: (filePath: string, code: string) => void;
 }
 
-export const MarkdownRender = ({ role, onFileNameClick, children }: MarkdownRenderProps) => {
+export const MarkdownRender = ({
+  role,
+  isStreaming = false,
+  checkFileExists,
+  onFileNameClick,
+  onApplyCodeClick,
+  children
+}: MarkdownRenderProps) => {
   const Code = useCallback(
     ({ inline, className, ...props }: any) => {
       const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
@@ -106,7 +163,12 @@ export const MarkdownRender = ({ role, onFileNameClick, children }: MarkdownRend
         );
 
         return (
-          <CodeBlock codeBlock={codeBlock} onFileNameClick={onFileNameClick}>
+          <CodeBlock
+            codeBlock={codeBlock}
+            isStreaming={isStreaming}
+            checkFileExists={checkFileExists}
+            onFileNameClick={onFileNameClick}
+            onApplyCodeClick={onApplyCodeClick}>
             {String(props.children).replace(/\n$/, '')}
           </CodeBlock>
         );
@@ -114,7 +176,7 @@ export const MarkdownRender = ({ role, onFileNameClick, children }: MarkdownRend
 
       return <code className={cn('text-sm text-button-background', className)} {...props} />;
     },
-    [onFileNameClick]
+    [isStreaming, checkFileExists, onFileNameClick, onApplyCodeClick]
   );
 
   return (

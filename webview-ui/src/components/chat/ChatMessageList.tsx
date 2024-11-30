@@ -8,10 +8,17 @@ import { ChatMessage } from './ChatMessage';
 
 interface ChatMessageListProps {
   handleMessageFeedback: (message: Message, feedback: string) => void;
+  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
+  onApplyCodeClick: (filePath: string, code: string) => void;
 }
 
-export const ChatMessageList: React.FC<ChatMessageListProps> = ({ handleMessageFeedback, onFileNameClick }) => {
+export const ChatMessageList: React.FC<ChatMessageListProps> = ({
+  handleMessageFeedback,
+  checkFileExists,
+  onFileNameClick,
+  onApplyCodeClick
+}) => {
   const messages = useAppSelector((state) => state.chat.messages);
   const isMessageStreaming = useAppSelector((state) => state.chat.isMessageStreaming);
   const isMessageProcessing = useAppSelector((state) => state.chat.isMessageProcessing);
@@ -24,13 +31,25 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({ handleMessageF
         followButtonClassName="!bg-muted/50 hover:!bg-muted/80">
         {messages.map((message) => (
           <div key={message.id}>
-            <ChatMessage message={message} handleFeedback={handleMessageFeedback} onFileNameClick={onFileNameClick} />
+            <ChatMessage
+              message={message}
+              handleFeedback={handleMessageFeedback}
+              checkFileExists={checkFileExists}
+              onFileNameClick={onFileNameClick}
+              onApplyCodeClick={onApplyCodeClick}
+            />
           </div>
         ))}
 
         {isMessageStreaming && (
           <div>
-            <ChatMessage isStreaming={true} handleFeedback={handleMessageFeedback} onFileNameClick={onFileNameClick} />
+            <ChatMessage
+              isStreaming={true}
+              handleFeedback={handleMessageFeedback}
+              checkFileExists={checkFileExists}
+              onFileNameClick={onFileNameClick}
+              onApplyCodeClick={onApplyCodeClick}
+            />
           </div>
         )}
       </ScrollToBottom>

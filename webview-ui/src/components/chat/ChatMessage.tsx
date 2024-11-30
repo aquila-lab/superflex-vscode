@@ -15,13 +15,20 @@ declare global {
 }
 
 interface StreamingChatMessageProps {
+  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
+  onApplyCodeClick: (filePath: string, code: string) => void;
 }
 
-const StreamingChatMessage = ({ onFileNameClick }: StreamingChatMessageProps) => {
+const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onApplyCodeClick }: StreamingChatMessageProps) => {
   const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
   return (
-    <MarkdownRender role={Role.Assistant} onFileNameClick={onFileNameClick}>
+    <MarkdownRender
+      role={Role.Assistant}
+      isStreaming
+      checkFileExists={checkFileExists}
+      onFileNameClick={onFileNameClick}
+      onApplyCodeClick={onApplyCodeClick}>
       {streamTextDelta}
     </MarkdownRender>
   );
@@ -31,14 +38,18 @@ interface ChatMessageProps {
   message?: Message;
   isStreaming?: boolean;
   handleFeedback: (message: Message, feedback: string) => void;
+  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
+  onApplyCodeClick: (filePath: string, code: string) => void;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   isStreaming = false,
   handleFeedback,
-  onFileNameClick
+  checkFileExists,
+  onFileNameClick,
+  onApplyCodeClick
 }) => {
   const user = useAppSelector((state) => state.user);
 
@@ -50,12 +61,22 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const renderContent = () => {
     if (isStreaming) {
-      return <StreamingChatMessage onFileNameClick={onFileNameClick} />;
+      return (
+        <StreamingChatMessage
+          checkFileExists={checkFileExists}
+          onFileNameClick={onFileNameClick}
+          onApplyCodeClick={onApplyCodeClick}
+        />
+      );
     }
 
     if (message?.content.type === MessageType.Text) {
       return (
-        <MarkdownRender role={message.role} onFileNameClick={onFileNameClick}>
+        <MarkdownRender
+          role={message.role}
+          checkFileExists={checkFileExists}
+          onFileNameClick={onFileNameClick}
+          onApplyCodeClick={onApplyCodeClick}>
           {message.content.text}
         </MarkdownRender>
       );
