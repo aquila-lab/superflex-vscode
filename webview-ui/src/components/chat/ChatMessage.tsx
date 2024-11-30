@@ -25,6 +25,7 @@ const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onApplyCodeCli
   return (
     <MarkdownRender
       role={Role.Assistant}
+      isStreaming
       checkFileExists={checkFileExists}
       onFileNameClick={onFileNameClick}
       onApplyCodeClick={onApplyCodeClick}>
