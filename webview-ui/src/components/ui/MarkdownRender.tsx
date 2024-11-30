@@ -12,7 +12,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tool
 
 interface FileHeaderProps extends React.PropsWithChildren {
   filePath: string;
-  isStreaming?: boolean;
   checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
   onApplyCodeClick?: (filePath: string, code: string) => void;
@@ -20,7 +19,6 @@ interface FileHeaderProps extends React.PropsWithChildren {
 
 export const FileHeader: React.FC<FileHeaderProps> = ({
   filePath,
-  isStreaming,
   checkFileExists,
   onFileNameClick = () => {},
   onApplyCodeClick,
@@ -33,7 +31,7 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
     if (filePath && checkFileExists) {
       checkFileExists(filePath).then(setIsFileExists);
     }
-  }, [isStreaming, filePath, checkFileExists]);
+  }, [filePath, checkFileExists]);
 
   return (
     <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
@@ -97,7 +95,6 @@ interface CodeBlockInfo {
 
 interface CodeBlockProps extends React.PropsWithChildren {
   codeBlock?: CodeBlockInfo;
-  isStreaming?: boolean;
   checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
   onApplyCodeClick?: (filePath: string, code: string) => void;
@@ -105,7 +102,6 @@ interface CodeBlockProps extends React.PropsWithChildren {
 
 export const CodeBlock = ({
   codeBlock,
-  isStreaming,
   checkFileExists,
   onFileNameClick,
   onApplyCodeClick,
@@ -116,7 +112,6 @@ export const CodeBlock = ({
       {codeBlock?.filePath && (
         <FileHeader
           filePath={codeBlock.filePath}
-          isStreaming={isStreaming}
           checkFileExists={checkFileExists}
           onFileNameClick={onFileNameClick}
           onApplyCodeClick={onApplyCodeClick}>
@@ -132,7 +127,6 @@ export const CodeBlock = ({
 
 interface MarkdownRenderProps extends React.PropsWithChildren {
   role: Role;
-  isStreaming?: boolean;
   checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
   onApplyCodeClick?: (filePath: string, code: string) => void;
@@ -140,7 +134,6 @@ interface MarkdownRenderProps extends React.PropsWithChildren {
 
 export const MarkdownRender = ({
   role,
-  isStreaming = false,
   checkFileExists,
   onFileNameClick,
   onApplyCodeClick,
@@ -165,7 +158,6 @@ export const MarkdownRender = ({
         return (
           <CodeBlock
             codeBlock={codeBlock}
-            isStreaming={isStreaming}
             checkFileExists={checkFileExists}
             onFileNameClick={onFileNameClick}
             onApplyCodeClick={onApplyCodeClick}>
@@ -176,7 +168,7 @@ export const MarkdownRender = ({
 
       return <code className={cn('text-sm text-button-background', className)} {...props} />;
     },
-    [isStreaming, checkFileExists, onFileNameClick, onApplyCodeClick]
+    [checkFileExists, onFileNameClick, onApplyCodeClick]
   );
 
   return (
