@@ -38,12 +38,12 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
   return (
     <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
       <div className="flex items-center gap-1 min-w-0">
-        <FileIcon filePath={filePath} className="size-5" />
+        <FileIcon filePath={filePath} className="size-4" />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <p
-                className="text-xs text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0 cursor-pointer"
+                className="text-[11px] text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0 cursor-pointer"
                 onClick={() => onFileNameClick(filePath)}>
                 {getFileName(filePath)}
               </p>
