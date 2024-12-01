@@ -77,7 +77,7 @@ export interface EventPayloads {
   [EventType.FIGMA_OAUTH_CONNECT]: { request: void; response: boolean };
   [EventType.FIGMA_OAUTH_DISCONNECT]: { request: void; response: void };
   [EventType.FIGMA_FILE_SELECTED]: { request: FigmaFile; response: FigmaFile };
-  [EventType.NEW_THREAD]: { request: void; response: void };
+  [EventType.NEW_THREAD]: { request: void; response: boolean };
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };

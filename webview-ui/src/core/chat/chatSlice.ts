@@ -67,9 +67,6 @@ const chatSlice = createSlice({
 
       state.messages = [...state.messages, ...action.payload];
     },
-    clearMessages(state) {
-      state.messages = defaultMessages;
-    },
     updateMessageTextDelta: (state, action: PayloadAction<TextDelta>) => {
       state.streamTextDelta = state.streamTextDelta + action.payload.value;
     },
@@ -118,6 +115,14 @@ const chatSlice = createSlice({
     },
     setPreviewVisibleForFileID: (state, action: PayloadAction<string | null>) => {
       state.previewVisibleForFileID = action.payload;
+    },
+    resetAllStates: (state) => {
+      state.messages = defaultMessages;
+      state.streamTextDelta = '';
+      state.isMessageStreaming = false;
+      state.isMessageProcessing = false;
+      state.selectedFiles = [];
+      state.previewVisibleForFileID = null;
     }
   }
 });
@@ -125,7 +130,6 @@ const chatSlice = createSlice({
 export const {
   setInitState,
   addMessages,
-  clearMessages,
   updateMessageTextDelta,
   setIsMessageStreaming,
   setIsMessageProcessing,
@@ -134,7 +138,8 @@ export const {
   setSelectedFiles,
   addSelectedFile,
   removeSelectedFile,
-  setPreviewVisibleForFileID
+  setPreviewVisibleForFileID,
+  resetAllStates
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

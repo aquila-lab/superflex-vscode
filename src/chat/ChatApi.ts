@@ -129,7 +129,7 @@ export class ChatAPI {
        */
       .registerEvent(EventType.NEW_THREAD, async () => {
         if (!this._isInitialized || !this._assistant) {
-          return;
+          return false;
         }
 
         this._thread = await this._assistant.createThread();
@@ -137,6 +137,8 @@ export class ChatAPI {
         Telemetry.capture("new_thread", {
           threadID: this._thread?.id ?? "",
         });
+
+        return true;
       })
 
       /**
@@ -192,6 +194,9 @@ export class ChatAPI {
         const threadRun = await this._assistant.sendMessage(thread.id, files, messages, (delta) => {
           sendEventMessageCb(newEventResponse(EventType.MESSAGE_TEXT_DELTA, delta));
         });
+        if (!threadRun) {
+          return undefined;
+        }
 
         Telemetry.capture("new_message", {
           threadID: thread.id,

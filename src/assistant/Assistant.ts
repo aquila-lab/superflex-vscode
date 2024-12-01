@@ -17,14 +17,14 @@ export interface Assistant {
    * @param files - The files to send to the assistant.
    * @param messages - The messages to send to the assistant.
    * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
-   * @returns A promise that resolves with the response message.
+   * @returns A promise that resolves with the response message or null if the request is aborted.
    */
   sendMessage(
     threadID: string,
     files: FilePayload[],
     messages: MessageContent[],
     streamResponse?: (event: TextDelta) => void
-  ): Promise<ThreadRun>;
+  ): Promise<ThreadRun | null>;
 
   /**
    * Update a message in a chat thread.

@@ -6,7 +6,7 @@ import { useAppDispatch } from '../core/store';
 import {
   addMessages,
   addSelectedFile,
-  clearMessages,
+  resetAllStates,
   setInitState,
   setIsMessageProcessing,
   setIsMessageStreaming,
@@ -141,8 +141,11 @@ export function useVSCodeEvents({
           break;
         }
         case EventType.CMD_NEW_THREAD: {
-          dispatch(clearMessages());
           vscodeAPI.postMessage(newEventRequest(EventType.NEW_THREAD));
+          break;
+        }
+        case EventType.NEW_THREAD: {
+          dispatch(resetAllStates());
           break;
         }
         case EventType.CMD_SYNC_PROJECT: {

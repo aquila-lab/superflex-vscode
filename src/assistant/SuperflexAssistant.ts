@@ -20,6 +20,7 @@ export default class SuperflexAssistant implements Assistant {
   readonly owner: string;
   readonly repo: string;
   readonly cacheFileName: string;
+  private _currentStream?: AbortController;
 
   constructor(workspaceDirPath: string, owner: string, repo: string) {
     if (!fs.existsSync(workspaceDirPath)) {
@@ -36,6 +37,12 @@ export default class SuperflexAssistant implements Assistant {
   }
 
   async createThread(title?: string): Promise<Thread> {
+    // Abort any ongoing message stream first
+    if (this._currentStream) {
+      this._currentStream.abort();
+      this._currentStream = undefined;
+    }
+
     const thread = await api.createThread({ owner: this.owner, repo: this.repo, title });
     return thread;
   }
@@ -45,15 +52,52 @@ export default class SuperflexAssistant implements Assistant {
     files: FilePayload[],
     messages: MessageContent[],
     streamResponse?: (event: TextDelta) => void
-  ): Promise<ThreadRun> {
-    const stream = await api.sendThreadMessage({ owner: this.owner, repo: this.repo, threadID, files, messages });
-
-    if (streamResponse) {
-      stream.on("textDelta", streamResponse);
+  ): Promise<ThreadRun | null> {
+    // Cancel any existing stream
+    if (this._currentStream) {
+      this._currentStream.abort();
+      this._currentStream = undefined;
     }
 
-    const message = await stream.final();
-    return message;
+    // Create new abort controller for this stream
+    this._currentStream = new AbortController();
+
+    try {
+      const stream = await api.sendThreadMessage({
+        owner: this.owner,
+        repo: this.repo,
+        threadID,
+        files,
+        messages,
+        signal: this._currentStream.signal,
+      });
+
+      // Create a promise that will reject if the stream is aborted
+      const streamPromise = new Promise<ThreadRun>((resolve, reject) => {
+        if (streamResponse) {
+          stream.on("textDelta", (delta) => {
+            // Check if stream was aborted
+            if (this._currentStream?.signal.aborted) {
+              reject(new Error("canceled"));
+              return;
+            }
+            streamResponse(delta);
+          });
+        }
+
+        stream.final().then(resolve).catch(reject);
+      });
+
+      const message = await streamPromise;
+      this._currentStream = undefined;
+      return message;
+    } catch (err) {
+      this._currentStream = undefined;
+      if (err instanceof Error && err.message === "canceled") {
+        return null;
+      }
+      throw err;
+    }
   }
 
   async updateMessage(message: Message): Promise<void> {
@@ -235,6 +279,14 @@ export default class SuperflexAssistant implements Assistant {
         throw err;
       }
       console.error(`Failed to delete files: ${err?.message}`);
+    }
+  }
+
+  // Add method to explicitly abort current stream
+  abortCurrentStream(): void {
+    if (this._currentStream) {
+      this._currentStream.abort();
+      this._currentStream = undefined;
     }
   }
 }

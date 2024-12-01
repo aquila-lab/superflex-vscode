@@ -57,6 +57,7 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
 export type SendThreadMessageArgs = GetThreadArgs & {
   files: FilePayload[];
   messages: MessageContent[];
+  signal?: AbortSignal;
 };
 
 interface ThreadRunStream {
@@ -70,6 +71,7 @@ async function sendThreadMessage({
   threadID,
   files,
   messages,
+  signal,
 }: SendThreadMessageArgs): Promise<ThreadRunStream> {
   try {
     const response = await Api.post(
@@ -96,6 +98,7 @@ async function sendThreadMessage({
       {
         headers: { "x-is-stream": "true" },
         responseType: "stream",
+        signal,
       }
     );
 
