@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import fg from "fast-glob";
 
@@ -24,6 +25,22 @@ export async function findFiles(baseUri: string, globPatterns: string[], ignore:
   return relativePaths.map((rp) => decodeUriAndRemoveFilePrefix(path.join(baseUri, rp)));
 }
 
+function readIgnoreFile(filePath: string): string[] {
+  try {
+    if (!fs.existsSync(filePath)) {
+      return [];
+    }
+
+    const content = fs.readFileSync(filePath, "utf-8");
+    return content
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"));
+  } catch {
+    return [];
+  }
+}
+
 /**
  * Finds all project files in the given workspace directory.
  *
@@ -38,30 +55,37 @@ export async function findWorkspaceFiles(
   if (!globPatterns) {
     globPatterns = SUPPORTED_FILE_EXTENSIONS.map((ext) => `**/*${ext}`);
   }
-  if (!ignore) {
-    ignore = [
-      "**/node_modules/**",
-      "**/build/**",
-      "**/out/**",
-      "**/dist/**",
-      "**/.next/**",
-      "**/.git/**",
-      "**/coverage/**",
-      "**/test/**",
-      "**/public/**",
-      "**/.cache/**",
-      "**/storybook-static/**",
-      "**/.storybook/**",
-      "**/cypress/**",
-      "**/__tests__/**",
-      "**/__mocks__/**",
-      "**/e2e/**",
-      "**/.docz/**",
-      "**/static/**",
-      "**/.DS_Store/**",
-      ".env",
-    ];
-  }
 
-  return findFiles(workspaceDirPath, globPatterns, ignore);
+  // Default ignore patterns
+  const defaultIgnore = [
+    "**/node_modules/**",
+    "**/build/**",
+    "**/out/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/.git/**",
+    "**/coverage/**",
+    "**/test/**",
+    "**/public/**",
+    "**/.cache/**",
+    "**/storybook-static/**",
+    "**/.storybook/**",
+    "**/cypress/**",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/e2e/**",
+    "**/.docz/**",
+    "**/static/**",
+    "**/.DS_Store/**",
+    ".env",
+  ];
+
+  // Read .gitignore and .superflexignore
+  const gitignorePatterns = readIgnoreFile(path.join(workspaceDirPath, ".gitignore"));
+  const superflexignorePatterns = readIgnoreFile(path.join(workspaceDirPath, ".superflexignore"));
+
+  // Combine all ignore patterns
+  const combinedIgnore = [...(ignore || []), ...defaultIgnore, ...gitignorePatterns, ...superflexignorePatterns];
+
+  return findFiles(workspaceDirPath, globPatterns, combinedIgnore);
 }

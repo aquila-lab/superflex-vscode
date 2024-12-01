@@ -111,6 +111,11 @@ export default class SuperflexAssistant implements Assistant {
   }
 
   async syncFiles(progressCb?: (current: number, isFirstTimeSync?: boolean) => void): Promise<void> {
+    const packageJsonPath = path.join(this.workspaceDirPath, "package.json");
+    if (!fs.existsSync(packageJsonPath)) {
+      return;
+    }
+
     if (!SuperflexCache.storagePath) {
       throw new Error("Storage path is not set");
     }
