@@ -36,6 +36,7 @@ import { readImageFileAsBase64 } from '../common/utils';
 import ChatViewAttachment from '../components/chat/ChatViewAttachment';
 import { useVSCodeEvents } from '../hooks/useVSCodeEvents';
 import { useProjectSync } from '../hooks/useProjectSync';
+import { FigmaSubscribeModal } from '../components/figma/FigmaSubscribeModal';
 
 const ChatView = React.memo<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -51,7 +52,8 @@ const ChatView = React.memo<{
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [isFigmaFileLoading, setIsFigmaFileLoading] = useState(false);
-  const [openFigmaFilePickerModal, setOpenFigmaFilePickerModal] = useState(false);
+  const [isFigmaFilePickerModalOpen, setIsFigmaFilePickerModalOpen] = useState(false);
+  const [isFigmaSubscribeModalOpen, setIsFigmaSubscribeModalOpen] = useState(false);
   const [currentOpenFile, setCurrentOpenFile] = useState<FilePayload | null>(null);
   const [chatImageAttachment, setChatImageAttachment] = useState<File>();
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
@@ -146,12 +148,18 @@ const ChatView = React.memo<{
   );
 
   const handleFigmaButtonClicked = useCallback(() => {
+    if (userSubscription?.plan?.name.toLowerCase().includes('free')) {
+      setIsFigmaSubscribeModalOpen(true);
+      return;
+    }
+
     if (!initState.isFigmaAuthenticated) {
       vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_OAUTH_CONNECT));
       return;
     }
-    setOpenFigmaFilePickerModal(true);
-  }, [initState.isFigmaAuthenticated, vscodeAPI]);
+
+    setIsFigmaFilePickerModalOpen(true);
+  }, [initState.isFigmaAuthenticated, userSubscription?.plan, vscodeAPI]);
 
   const handleFigmaFileSelected = useCallback(
     (figmaSelectionLink: string) => {
@@ -299,9 +307,14 @@ const ChatView = React.memo<{
       </div>
 
       <FigmaFilePickerModal
-        open={openFigmaFilePickerModal}
-        onClose={() => setOpenFigmaFilePickerModal(false)}
+        open={isFigmaFilePickerModalOpen}
+        onClose={() => setIsFigmaFilePickerModalOpen(false)}
         onSubmit={handleFigmaFileSelected}
+      />
+      <FigmaSubscribeModal
+        isOpen={isFigmaSubscribeModalOpen}
+        onClose={() => setIsFigmaSubscribeModalOpen(false)}
+        onSubscribe={handleSubscribe}
       />
       <SoftLimitModal
         isOpen={isPremiumRequestModalOpen}

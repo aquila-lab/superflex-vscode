@@ -1,8 +1,9 @@
 import React from 'react';
 import { FaFigma } from 'react-icons/fa';
+
 import { cn } from '../../common/utils';
-import { Button } from '../ui/Button';
 import { useAppSelector } from '../../core/store';
+import { Button } from '../ui/Button';
 
 interface FigmaButtonProps {
   onClick: () => void;
