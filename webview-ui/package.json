@@ -25,7 +25,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "dompurify": "^3.1.7",
-    "posthog-js": "^1.177.0",
+    "posthog-js": "^1.194.5",
     "react": "^18.3.1",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.3.1",
