@@ -286,12 +286,4 @@ export default class SuperflexAssistant implements Assistant {
       console.error(`Failed to delete files: ${err?.message}`);
     }
   }
-
-  // Add method to explicitly abort current stream
-  abortCurrentStream(): void {
-    if (this._currentStream) {
-      this._currentStream.abort();
-      this._currentStream = undefined;
-    }
-  }
 }
