@@ -224,15 +224,21 @@ export class ChatAPI {
        * @throws An error if the code cannot be applied.
        */
       .registerEvent(EventType.FAST_APPLY, async (payload: FastApplyPayload) => {
-        if (!this._workspaceDirPath) {
+        if (!this._workspaceDirPath || !this._assistant) {
           return;
         }
 
         const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
 
-        // Limited functionality for now: Only supports writing to the new file.
-        // If the file already exists, we do not overwrite it.
+        // If the file already exists, use fast apply to update the file
         if (fs.existsSync(resolvedPath)) {
+          const document = await vscode.workspace.openTextDocument(resolvedPath);
+          await vscode.window.showTextDocument(document);
+
+          const originalCode = fs.readFileSync(resolvedPath, "utf8");
+          const result = await this._assistant.fastApply(originalCode, payload.edits);
+
+          fs.writeFileSync(resolvedPath, result, "utf8");
           return;
         }
 
