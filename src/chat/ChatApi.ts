@@ -316,21 +316,6 @@ export class ChatAPI {
       })
 
       /**
-       * Event (check_file_exists): This event checks if a file exists in the workspace
-       *
-       * @param payload - Payload containing the file path.
-       * @returns A promise that resolves with the file existence status.
-       */
-      .registerEvent(EventType.CHECK_FILE_EXISTS, async (payload: { filePath: string }) => {
-        if (!this._workspaceDirPath) {
-          return false;
-        }
-
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-        return fs.existsSync(resolvedPath);
-      })
-
-      /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
        * It is used to update the message with the feedback.
        *

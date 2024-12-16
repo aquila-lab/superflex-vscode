@@ -43,7 +43,6 @@ export enum EventType {
   OPEN_FILE = "open_file",
   FETCH_FILES = "fetch_files",
   FETCH_FILE_CONTENT = "fetch_file_content",
-  CHECK_FILE_EXISTS = "check_file_exists",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
   ADD_SELECTED_CODE = "add_selected_code",
   PASTE_COPIED_CODE = "paste_copied_code",
@@ -89,7 +88,6 @@ export interface EventPayloads {
   [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };
-  [EventType.CHECK_FILE_EXISTS]: { request: { filePath: string }; response: boolean };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
   [EventType.PASTE_COPIED_CODE]: { request: { text: string }; response: FilePayload | null };

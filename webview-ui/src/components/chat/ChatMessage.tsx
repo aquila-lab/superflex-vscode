@@ -15,20 +15,14 @@ declare global {
 }
 
 interface StreamingChatMessageProps {
-  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
   onFastApplyClick: (filePath: string, edits: string) => void;
 }
 
-const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onFastApplyClick }: StreamingChatMessageProps) => {
+const StreamingChatMessage = ({ onFileNameClick, onFastApplyClick }: StreamingChatMessageProps) => {
   const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
   return (
-    <MarkdownRender
-      role={Role.Assistant}
-      isStreaming
-      checkFileExists={checkFileExists}
-      onFileNameClick={onFileNameClick}
-      onFastApplyClick={onFastApplyClick}>
+    <MarkdownRender role={Role.Assistant} onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick}>
       {streamTextDelta}
     </MarkdownRender>
   );
@@ -38,7 +32,6 @@ interface ChatMessageProps {
   message?: Message;
   isStreaming?: boolean;
   handleFeedback: (message: Message, feedback: string) => void;
-  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
   onFastApplyClick: (filePath: string, edits: string) => void;
 }
@@ -47,7 +40,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   isStreaming = false,
   handleFeedback,
-  checkFileExists,
   onFileNameClick,
   onFastApplyClick
 }) => {
@@ -61,22 +53,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const renderContent = () => {
     if (isStreaming) {
-      return (
-        <StreamingChatMessage
-          checkFileExists={checkFileExists}
-          onFileNameClick={onFileNameClick}
-          onFastApplyClick={onFastApplyClick}
-        />
-      );
+      return <StreamingChatMessage onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick} />;
     }
 
     if (message?.content.type === MessageType.Text) {
       return (
-        <MarkdownRender
-          role={message.role}
-          checkFileExists={checkFileExists}
-          onFileNameClick={onFileNameClick}
-          onFastApplyClick={onFastApplyClick}>
+        <MarkdownRender role={message.role} onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick}>
           {message.content.text}
         </MarkdownRender>
       );

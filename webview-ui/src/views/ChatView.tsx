@@ -220,22 +220,6 @@ const ChatView = React.memo<{
     [vscodeAPI]
   );
 
-  const checkFileExists = useCallback(
-    async (filePath: string): Promise<boolean> => {
-      try {
-        const exists = await sendEventWithResponse<EventType.CHECK_FILE_EXISTS>(
-          vscodeAPI,
-          EventType.CHECK_FILE_EXISTS,
-          { filePath }
-        );
-        return exists ?? false;
-      } catch (err) {
-        return false;
-      }
-    },
-    [vscodeAPI]
-  );
-
   const fetchFiles = useCallback(() => {
     vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
   }, [vscodeAPI]);
@@ -274,7 +258,6 @@ const ChatView = React.memo<{
       <div className="flex flex-col h-full p-2 pt-0">
         <ChatMessageList
           handleMessageFeedback={handleMessageFeedback}
-          checkFileExists={checkFileExists}
           onFileNameClick={handleFileNameClick}
           onFastApplyClick={handleFastApplyClick}
         />

@@ -8,14 +8,12 @@ import { ChatMessage } from './ChatMessage';
 
 interface ChatMessageListProps {
   handleMessageFeedback: (message: Message, feedback: string) => void;
-  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
   onFastApplyClick: (filePath: string, edits: string) => void;
 }
 
 export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   handleMessageFeedback,
-  checkFileExists,
   onFileNameClick,
   onFastApplyClick
 }) => {
@@ -34,7 +32,6 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             <ChatMessage
               message={message}
               handleFeedback={handleMessageFeedback}
-              checkFileExists={checkFileExists}
               onFileNameClick={onFileNameClick}
               onFastApplyClick={onFastApplyClick}
             />
@@ -46,7 +43,6 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             <ChatMessage
               isStreaming={true}
               handleFeedback={handleMessageFeedback}
-              checkFileExists={checkFileExists}
               onFileNameClick={onFileNameClick}
               onFastApplyClick={onFastApplyClick}
             />
