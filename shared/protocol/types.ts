@@ -48,7 +48,7 @@ export type SendNotificationPayload = {
   message: string;
 };
 
-export type ApplyCodePayload = {
+export type FastApplyPayload = {
   filePath: string;
-  code: string;
+  edits: string;
 };

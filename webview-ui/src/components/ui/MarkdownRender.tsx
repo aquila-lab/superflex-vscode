@@ -15,7 +15,7 @@ interface FileHeaderProps extends React.PropsWithChildren {
   isStreaming?: boolean;
   checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
-  onApplyCodeClick?: (filePath: string, code: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => void;
 }
 
 export const FileHeader: React.FC<FileHeaderProps> = ({
@@ -23,7 +23,7 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
   isStreaming,
   checkFileExists,
   onFileNameClick = () => {},
-  onApplyCodeClick,
+  onFastApplyClick,
   children
 }) => {
   const [copyTip, setCopyTip] = useState('Copy code');
@@ -73,12 +73,12 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
           )}
         </CopyToClipboard>
 
-        {!isFileExists && onApplyCodeClick && (
+        {!isFileExists && onFastApplyClick && (
           <Button
             size="xs"
             variant="text"
             className="text-[11px] px-1 py-0 hover:bg-muted"
-            onClick={() => onApplyCodeClick(filePath, String(children))}>
+            onClick={() => onFastApplyClick(filePath, String(children))}>
             <PlayIcon className="size-3.5" />
             Apply
           </Button>
@@ -100,7 +100,7 @@ interface CodeBlockProps extends React.PropsWithChildren {
   isStreaming?: boolean;
   checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
-  onApplyCodeClick?: (filePath: string, code: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => void;
 }
 
 export const CodeBlock = ({
@@ -108,7 +108,7 @@ export const CodeBlock = ({
   isStreaming,
   checkFileExists,
   onFileNameClick,
-  onApplyCodeClick,
+  onFastApplyClick,
   children
 }: CodeBlockProps) => {
   return (
@@ -119,7 +119,7 @@ export const CodeBlock = ({
           isStreaming={isStreaming}
           checkFileExists={checkFileExists}
           onFileNameClick={onFileNameClick}
-          onApplyCodeClick={onApplyCodeClick}>
+          onFastApplyClick={onFastApplyClick}>
           {children}
         </FileHeader>
       )}
@@ -135,7 +135,7 @@ interface MarkdownRenderProps extends React.PropsWithChildren {
   isStreaming?: boolean;
   checkFileExists?: (filePath: string) => Promise<boolean>;
   onFileNameClick?: (filePath: string) => void;
-  onApplyCodeClick?: (filePath: string, code: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => void;
 }
 
 export const MarkdownRender = ({
@@ -143,7 +143,7 @@ export const MarkdownRender = ({
   isStreaming = false,
   checkFileExists,
   onFileNameClick,
-  onApplyCodeClick,
+  onFastApplyClick,
   children
 }: MarkdownRenderProps) => {
   const Code = useCallback(
@@ -168,7 +168,7 @@ export const MarkdownRender = ({
             isStreaming={isStreaming}
             checkFileExists={checkFileExists}
             onFileNameClick={onFileNameClick}
-            onApplyCodeClick={onApplyCodeClick}>
+            onFastApplyClick={onFastApplyClick}>
             {String(props.children).replace(/\n$/, '')}
           </CodeBlock>
         );
@@ -176,7 +176,7 @@ export const MarkdownRender = ({
 
       return <code className={cn('text-sm text-button-background', className)} {...props} />;
     },
-    [isStreaming, checkFileExists, onFileNameClick, onApplyCodeClick]
+    [isStreaming, checkFileExists, onFileNameClick, onFastApplyClick]
   );
 
   return (

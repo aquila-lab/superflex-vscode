@@ -213,9 +213,9 @@ const ChatView = React.memo<{
     [vscodeAPI]
   );
 
-  const handleApplyCodeClick = useCallback(
-    (filePath: string, code: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.APPLY_CODE, { filePath, code }));
+  const handleFastApplyClick = useCallback(
+    (filePath: string, edits: string) => {
+      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY, { filePath, edits }));
     },
     [vscodeAPI]
   );
@@ -276,7 +276,7 @@ const ChatView = React.memo<{
           handleMessageFeedback={handleMessageFeedback}
           checkFileExists={checkFileExists}
           onFileNameClick={handleFileNameClick}
-          onApplyCodeClick={handleApplyCodeClick}
+          onFastApplyClick={handleFastApplyClick}
         />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <ChatViewAttachment

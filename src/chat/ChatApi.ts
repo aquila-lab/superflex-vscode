@@ -8,6 +8,7 @@ import {
   EventMessage,
   EventPayloads,
   EventType,
+  FastApplyPayload,
   FigmaFile,
   FilePayload,
   newEventResponse,
@@ -215,14 +216,14 @@ export class ChatAPI {
       })
 
       /**
-       * Event (apply_code): This event is used to apply the code to the file in the workspace.
+       * Event (fast_apply): This event is used to apply the code to the file in the workspace.
        * Limited functionality for now: Only supports writing to the new file.
        *
        * @param payload - Payload containing the file path and code.
        * @returns A promise that resolves when the code is applied.
        * @throws An error if the code cannot be applied.
        */
-      .registerEvent(EventType.APPLY_CODE, async (payload: { filePath: string; code: string }) => {
+      .registerEvent(EventType.FAST_APPLY, async (payload: FastApplyPayload) => {
         if (!this._workspaceDirPath) {
           return;
         }
@@ -240,7 +241,7 @@ export class ChatAPI {
         if (!fs.existsSync(directory)) {
           fs.mkdirSync(directory, { recursive: true });
         }
-        fs.writeFileSync(resolvedPath, payload.code, "utf8");
+        fs.writeFileSync(resolvedPath, payload.edits, "utf8");
 
         // Open the file in the VS Code editor
         const document = await vscode.workspace.openTextDocument(resolvedPath);

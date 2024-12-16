@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { Message, TextDelta, User, UserSubscription } from "../model";
 import {
-  ApplyCodePayload,
   AuthLinkPayload,
   ConfigPayload,
   CreateAuthLinkPayload,
+  FastApplyPayload,
   FigmaFile,
   FilePayload,
   InitChatState,
@@ -37,7 +37,9 @@ export enum EventType {
   NEW_MESSAGE = "new_message",
   MESSAGE_TEXT_DELTA = "message_text_delta",
   UPDATE_MESSAGE = "update_message",
-  APPLY_CODE = "apply_code",
+  FAST_APPLY = "fast_apply",
+  FAST_APPLY_ACCEPT = "fast_apply_accept",
+  FAST_APPLY_REJECT = "fast_apply_reject",
   OPEN_FILE = "open_file",
   FETCH_FILES = "fetch_files",
   FETCH_FILE_CONTENT = "fetch_file_content",
@@ -81,7 +83,9 @@ export interface EventPayloads {
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
-  [EventType.APPLY_CODE]: { request: ApplyCodePayload; response: void };
+  [EventType.FAST_APPLY]: { request: FastApplyPayload; response: void };
+  [EventType.FAST_APPLY_ACCEPT]: { request: FastApplyPayload; response: void };
+  [EventType.FAST_APPLY_REJECT]: { request: FastApplyPayload; response: void };
   [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };

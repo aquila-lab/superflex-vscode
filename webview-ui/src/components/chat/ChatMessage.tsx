@@ -17,10 +17,10 @@ declare global {
 interface StreamingChatMessageProps {
   checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
-  onApplyCodeClick: (filePath: string, code: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => void;
 }
 
-const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onApplyCodeClick }: StreamingChatMessageProps) => {
+const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onFastApplyClick }: StreamingChatMessageProps) => {
   const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
   return (
     <MarkdownRender
@@ -28,7 +28,7 @@ const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onApplyCodeCli
       isStreaming
       checkFileExists={checkFileExists}
       onFileNameClick={onFileNameClick}
-      onApplyCodeClick={onApplyCodeClick}>
+      onFastApplyClick={onFastApplyClick}>
       {streamTextDelta}
     </MarkdownRender>
   );
@@ -40,7 +40,7 @@ interface ChatMessageProps {
   handleFeedback: (message: Message, feedback: string) => void;
   checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
-  onApplyCodeClick: (filePath: string, code: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => void;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -49,7 +49,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   handleFeedback,
   checkFileExists,
   onFileNameClick,
-  onApplyCodeClick
+  onFastApplyClick
 }) => {
   const user = useAppSelector((state) => state.user);
 
@@ -65,7 +65,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         <StreamingChatMessage
           checkFileExists={checkFileExists}
           onFileNameClick={onFileNameClick}
-          onApplyCodeClick={onApplyCodeClick}
+          onFastApplyClick={onFastApplyClick}
         />
       );
     }
@@ -76,7 +76,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           role={message.role}
           checkFileExists={checkFileExists}
           onFileNameClick={onFileNameClick}
-          onApplyCodeClick={onApplyCodeClick}>
+          onFastApplyClick={onFastApplyClick}>
           {message.content.text}
         </MarkdownRender>
       );

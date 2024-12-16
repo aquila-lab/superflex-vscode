@@ -9,3 +9,4 @@ export * from "./message";
 export * from "./repo";
 export * from "./thread";
 export * from "./user";
+export * from "./fastapply";
