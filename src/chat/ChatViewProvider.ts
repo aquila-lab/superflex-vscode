@@ -255,13 +255,13 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy"
               content="default-src 'none';
-                       connect-src 'self' http://localhost:3000 https://us.posthog.com/ https://app.posthog.com/ https://us.i.posthog.com/ https://www.youtube.com/ https://cdn.jsdelivr.net/;
+                       connect-src 'self' http://localhost:3000 https://*.posthog.com https://www.youtube.com/ https://cdn.jsdelivr.net/;
                        style-src ${webview.cspSource} 'unsafe-inline' https://cdn.jsdelivr.net/;
                        font-src ${webview.cspSource} https://cdn.jsdelivr.net/;
                        img-src ${
                          webview.cspSource
                        } https://*.amazonaws.com https://lh3.googleusercontent.com blob: data:;
-                       script-src 'nonce-${nonce}' https://us.posthog.com/ https://app.posthog.com/ https://us-assets.i.posthog.com/ https://cdn.jsdelivr.net/;
+                       script-src 'nonce-${nonce}' 'unsafe-inline' https://*.posthog.com https://cdn.jsdelivr.net/;
                        frame-src https://www.youtube.com/;
                        worker-src blob:;">
           <link rel="stylesheet" type="text/css" href="${stylesUri}" />
