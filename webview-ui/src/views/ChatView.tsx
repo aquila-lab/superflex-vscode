@@ -36,7 +36,6 @@ import { readImageFileAsBase64 } from '../common/utils';
 import ChatViewAttachment from '../components/chat/ChatViewAttachment';
 import { useVSCodeEvents } from '../hooks/useVSCodeEvents';
 import { useProjectSync } from '../hooks/useProjectSync';
-import { FigmaSubscribeModal } from '../components/figma/FigmaSubscribeModal';
 
 const ChatView = React.memo<{
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -53,7 +52,6 @@ const ChatView = React.memo<{
   const [projectSyncProgress, setProjectSyncProgress] = useState(0);
   const [isFigmaFileLoading, setIsFigmaFileLoading] = useState(false);
   const [isFigmaFilePickerModalOpen, setIsFigmaFilePickerModalOpen] = useState(false);
-  const [isFigmaSubscribeModalOpen, setIsFigmaSubscribeModalOpen] = useState(false);
   const [currentOpenFile, setCurrentOpenFile] = useState<FilePayload | null>(null);
   const [chatImageAttachment, setChatImageAttachment] = useState<File>();
   const [chatFigmaAttachment, setChatFigmaAttachment] = useState<FigmaFile>();
@@ -148,11 +146,6 @@ const ChatView = React.memo<{
   );
 
   const handleFigmaButtonClicked = useCallback(() => {
-    if (userSubscription?.plan?.name.toLowerCase().includes('free')) {
-      setIsFigmaSubscribeModalOpen(true);
-      return;
-    }
-
     if (!initState.isFigmaAuthenticated) {
       vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_OAUTH_CONNECT));
       return;
@@ -182,9 +175,16 @@ const ChatView = React.memo<{
     [vscodeAPI]
   );
 
-  const handleSubscribe = useCallback(() => {
-    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
-  }, [vscodeAPI]);
+  const handleSubscribe = useCallback(
+    (source?: string) => {
+      vscodeAPI.postMessage(
+        newEventRequest(EventType.OPEN_EXTERNAL_URL, {
+          url: source ? `https://app.superflex.ai/pricing?source=${source}` : 'https://app.superflex.ai/pricing'
+        })
+      );
+    },
+    [vscodeAPI]
+  );
 
   const handlePaste = useCallback(
     async (text: string): Promise<boolean> => {
@@ -286,6 +286,7 @@ const ChatView = React.memo<{
             inputRef.current?.focus();
           }}
           onFigmaButtonClicked={handleFigmaButtonClicked}
+          onSubscribe={handleSubscribe}
         />
       </div>
 
@@ -293,11 +294,6 @@ const ChatView = React.memo<{
         open={isFigmaFilePickerModalOpen}
         onClose={() => setIsFigmaFilePickerModalOpen(false)}
         onSubmit={handleFigmaFileSelected}
-      />
-      <FigmaSubscribeModal
-        isOpen={isFigmaSubscribeModalOpen}
-        onClose={() => setIsFigmaSubscribeModalOpen(false)}
-        onSubscribe={handleSubscribe}
       />
       <SoftLimitModal
         isOpen={isPremiumRequestModalOpen}
