@@ -9,6 +9,7 @@ import {
   newEventRequest,
   newEventResponse,
 } from "../../shared/protocol";
+import { getMetaKeyLabel } from "../common/operatingSystem";
 import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace, debounce, generateFileID } from "../common/utils";
 import { ChatAPI } from "./ChatApi";
 
@@ -29,7 +30,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     this._decorationType = vscode.window.createTextEditorDecorationType({
       after: {
-        contentText: "Superflex: Add to Chat (⌘+M)",
+        contentText: `Superflex: Add to Chat (${getMetaKeyLabel()}+M)`,
         color: new vscode.ThemeColor("editorCodeLens.foreground"),
         margin: "0 0 0 6em",
       },
@@ -79,6 +80,22 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         "superflex.project.sync",
         () => this._chatWebview && this.sendEventMessage(newEventRequest(EventType.CMD_SYNC_PROJECT))
       )
+    );
+
+    // Register diff-related commands
+    context.subscriptions.push(
+      vscode.commands.registerCommand("superflex.acceptDiff", async (newFileUri?: string) => {
+        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(true, newFileUri);
+      }),
+      vscode.commands.registerCommand("superflex.rejectDiff", async (newFileUri?: string) => {
+        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(false, newFileUri);
+      }),
+      vscode.commands.registerCommand("superflex.acceptVerticalDiffBlock", async (fileUri?: string, index?: number) => {
+        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(true, fileUri, index);
+      }),
+      vscode.commands.registerCommand("superflex.rejectVerticalDiffBlock", async (fileUri?: string, index?: number) => {
+        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(false, fileUri, index);
+      })
     );
 
     const openWorkspace = getOpenWorkspace();

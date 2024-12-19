@@ -24,6 +24,8 @@ import { extractFigmaSelectionUrl } from "../../shared/model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
 import { findWorkspaceFiles } from "../scanner";
+import { VerticalDiffManager } from "../diff/vertical/manager";
+import { myersDiff, createDiffStream } from "../diff/myers";
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -39,8 +41,11 @@ export class ChatAPI {
   private _thread?: Thread;
   private _workspaceDirPath?: string;
   private _isPremiumGeneration = true;
+  public verticalDiffManager: VerticalDiffManager;
 
-  constructor() {
+  constructor(verticalDiffManager: VerticalDiffManager) {
+    this.verticalDiffManager = verticalDiffManager;
+
     this._chatEventRegistry
       /**
        * Event (ready): This event is fired when the webview is ready to receive events.
@@ -230,28 +235,29 @@ export class ChatAPI {
 
         const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
 
-        // If the file already exists, use fast apply to update the file
         if (fs.existsSync(resolvedPath)) {
           const document = await vscode.workspace.openTextDocument(resolvedPath);
+          const originalCode = fs.readFileSync(resolvedPath, "utf8");
+          const modifiedCode = await this._assistant.fastApply(originalCode, payload.edits);
+
+          // Create diff lines using Myers diff algorithm
+          const diffLines = myersDiff(originalCode, modifiedCode);
+
+          // Show the document
           await vscode.window.showTextDocument(document);
 
-          const originalCode = fs.readFileSync(resolvedPath, "utf8");
-          const result = await this._assistant.fastApply(originalCode, payload.edits);
-
-          fs.writeFileSync(resolvedPath, result, "utf8");
-          return;
+          // Stream the diffs
+          await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), false);
+        } else {
+          // Handle new file creation
+          const directory = path.dirname(resolvedPath);
+          if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, { recursive: true });
+          }
+          fs.writeFileSync(resolvedPath, payload.edits, "utf8");
+          const document = await vscode.workspace.openTextDocument(resolvedPath);
+          await vscode.window.showTextDocument(document);
         }
-
-        // Create the directory and write the file content
-        const directory = path.dirname(resolvedPath);
-        if (!fs.existsSync(directory)) {
-          fs.mkdirSync(directory, { recursive: true });
-        }
-        fs.writeFileSync(resolvedPath, payload.edits, "utf8");
-
-        // Open the file in the VS Code editor
-        const document = await vscode.workspace.openTextDocument(resolvedPath);
-        await vscode.window.showTextDocument(document);
       })
 
       /**

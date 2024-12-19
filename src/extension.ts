@@ -12,8 +12,11 @@ import FigmaAuthenticationService from "./authentication/FigmaAuthenticationServ
 import FigmaAuthenticationProvider from "./authentication/FigmaAuthenticationProvider";
 import SuperflexAuthenticationService from "./authentication/SuperflexAuthenticationService";
 import SuperflexAuthenticationProvider from "./authentication/SuperflexAuthenticationProvider";
+import { registerAllCodeLensProviders } from "./lang-server/codeLens/registerAllCodeLensProviders";
+import { VerticalDiffManager } from "./diff/vertical/manager";
 
 type AppState = {
+  verticalDiffManager: VerticalDiffManager;
   chatApi: ChatAPI;
   authService: SuperflexAuthenticationService;
   authProvider: SuperflexAuthenticationProvider;
@@ -23,12 +26,14 @@ type AppState = {
 };
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  const chatApi = new ChatAPI();
+  const verticalDiffManager = new VerticalDiffManager();
+  const chatApi = new ChatAPI(verticalDiffManager);
   const chatWebviewProvider = new ChatViewProvider(context, chatApi);
   const authService = new SuperflexAuthenticationService(chatWebviewProvider);
   const figmaAuthProvider = new FigmaAuthenticationProvider(context);
 
   const appState: AppState = {
+    verticalDiffManager: verticalDiffManager,
     chatApi: chatApi,
     authService: authService,
     authProvider: new SuperflexAuthenticationProvider(context, authService),
@@ -51,6 +56,12 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   registerSuperflexCache(context);
   registerAuthenticationProviders(context, appState);
   registerChatWidgetWebview(context, appState.chatViewProvider);
+
+  const { verticalDiffCodeLens } = registerAllCodeLensProviders(
+    context,
+    appState.verticalDiffManager.fileUriToCodeLens
+  );
+  appState.verticalDiffManager.refreshCodeLens = verticalDiffCodeLens.refresh.bind(verticalDiffCodeLens);
 
   appState.chatApi.registerEvent(EventType.SEND_NOTIFICATION, (payload) => {
     vscode.window.showInformationMessage(payload.message);
