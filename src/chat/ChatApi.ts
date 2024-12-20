@@ -264,6 +264,50 @@ export class ChatAPI {
       })
 
       /**
+       * Event (fast_apply_accept): This event is used to accept all changes in the streaming fast apply.
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves when the changes are accepted.
+       * @throws An error if the changes cannot be accepted.
+       */
+      .registerEvent(EventType.FAST_APPLY_ACCEPT, async (payload: { filePath: string }) => {
+        if (!this._workspaceDirPath) {
+          return false;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        if (!fs.existsSync(resolvedPath)) {
+          return false;
+        }
+
+        // Accept all changes in the current diff
+        await this.verticalDiffManager.acceptRejectVerticalDiffBlock(true, resolvedPath);
+        return true;
+      })
+
+      /**
+       * Event (fast_apply_reject): This event is used to reject all changes in the streaming fast apply.
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves when the changes are rejected.
+       * @throws An error if the changes cannot be rejected.
+       */
+      .registerEvent(EventType.FAST_APPLY_REJECT, async (payload: { filePath: string }) => {
+        if (!this._workspaceDirPath) {
+          return false;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        if (!fs.existsSync(resolvedPath)) {
+          return false;
+        }
+
+        // Reject all changes in the current diff
+        await this.verticalDiffManager.acceptRejectVerticalDiffBlock(false, resolvedPath);
+        return true;
+      })
+
+      /**
        * Event (open_file): This event is fired when the user clicks on a file in the webview.
        * It is used to open the file in the VS Code editor.
        *
