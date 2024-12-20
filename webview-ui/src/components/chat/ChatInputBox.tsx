@@ -217,11 +217,20 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
           setShowPremiumModal(false);
           setPremiumFeature(null);
         }}
-        onSubscribe={() => {
+        onSubscribe={(link) => {
           posthog.capture('upgrade_to_premium', {
             feature: `${premiumFeature}-to-code`
           });
-          onSubscribe(`${premiumFeature}`);
+
+          if (link) {
+            onSubscribe(link);
+            return;
+          }
+
+          const url = premiumFeature
+            ? `https://app.superflex.ai/pricing?source=${premiumFeature}`
+            : 'https://app.superflex.ai/pricing';
+          onSubscribe(url);
         }}
         title={`Upgrade to Access ${premiumFeature === 'figma' ? 'Figma' : 'Screenshot'} to Code`}
         description={
