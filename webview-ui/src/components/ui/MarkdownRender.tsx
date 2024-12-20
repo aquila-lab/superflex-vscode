@@ -9,20 +9,49 @@ import { Editor } from './Editor';
 import { Button } from './Button';
 import { FileIcon } from './FileIcon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
+import { Spinner } from './Spinner';
+import { Separator } from './Separator';
 
 interface FileHeaderProps extends React.PropsWithChildren {
   filePath: string;
+  isStreaming: boolean;
   onFileNameClick?: (filePath: string) => void;
-  onFastApplyClick?: (filePath: string, edits: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges?: (filePath: string) => void;
+  onRejectAllChanges?: (filePath: string) => void;
 }
+
+type ApplyState = 'idle' | 'applying' | 'applied';
 
 export const FileHeader: React.FC<FileHeaderProps> = ({
   filePath,
+  isStreaming,
   onFileNameClick = () => {},
   onFastApplyClick,
+  onAcceptAllChanges = () => {},
+  onRejectAllChanges = () => {},
   children
 }) => {
   const [copyTip, setCopyTip] = useState('Copy code');
+  const [applyState, setApplyState] = useState<ApplyState>('idle');
+
+  async function handleApplyClick() {
+    if (!onFastApplyClick) return;
+
+    setApplyState('applying');
+    await onFastApplyClick(filePath, String(children));
+    setApplyState('applied');
+  }
+
+  const handleAcceptAll = () => {
+    onAcceptAllChanges(filePath);
+    setApplyState('idle');
+  };
+
+  const handleRejectAll = () => {
+    onRejectAllChanges(filePath);
+    setApplyState('idle');
+  };
 
   return (
     <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
@@ -62,15 +91,45 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
           )}
         </CopyToClipboard>
 
-        {onFastApplyClick && (
-          <Button
-            size="xs"
-            variant="text"
-            className="text-[11px] px-1 py-0 hover:bg-muted"
-            onClick={() => onFastApplyClick(filePath, String(children))}>
-            <PlayIcon className="size-3.5" />
-            Apply
-          </Button>
+        {!isStreaming && onFastApplyClick && (
+          <>
+            {applyState === 'idle' && (
+              <Button
+                size="xs"
+                variant="text"
+                className="text-[11px] px-1 py-0 hover:bg-muted"
+                onClick={handleApplyClick}>
+                <PlayIcon className="size-3.5" />
+                Apply
+              </Button>
+            )}
+
+            {applyState === 'applying' && (
+              <div className="text-muted-foreground px-1 py-0.5">
+                <Spinner size="xs" />
+              </div>
+            )}
+
+            {applyState === 'applied' && (
+              <div className="flex items-center gap-1 ml-2">
+                <Button
+                  size="xs"
+                  variant="text"
+                  className="text-[11px] px-1 py-0 hover:bg-muted"
+                  onClick={handleAcceptAll}>
+                  Accept All
+                </Button>
+                <Separator orientation="vertical" className="h-4" />
+                <Button
+                  size="xs"
+                  variant="text"
+                  className="text-[11px] px-1 py-0 hover:bg-muted"
+                  onClick={handleRejectAll}>
+                  Reject All
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -86,15 +145,32 @@ interface CodeBlockInfo {
 
 interface CodeBlockProps extends React.PropsWithChildren {
   codeBlock?: CodeBlockInfo;
+  isStreaming: boolean;
   onFileNameClick?: (filePath: string) => void;
-  onFastApplyClick?: (filePath: string, edits: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges?: (filePath: string) => void;
+  onRejectAllChanges?: (filePath: string) => void;
 }
 
-export const CodeBlock = ({ codeBlock, onFileNameClick, onFastApplyClick, children }: CodeBlockProps) => {
+export const CodeBlock = ({
+  codeBlock,
+  isStreaming,
+  onFileNameClick,
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges,
+  children
+}: CodeBlockProps) => {
   return (
     <div className="rounded-md border border-border bg-background mt-1">
       {codeBlock?.filePath && (
-        <FileHeader filePath={codeBlock.filePath} onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick}>
+        <FileHeader
+          filePath={codeBlock.filePath}
+          isStreaming={isStreaming}
+          onFileNameClick={onFileNameClick}
+          onFastApplyClick={onFastApplyClick}
+          onAcceptAllChanges={onAcceptAllChanges}
+          onRejectAllChanges={onRejectAllChanges}>
           {children}
         </FileHeader>
       )}
@@ -107,11 +183,22 @@ export const CodeBlock = ({ codeBlock, onFileNameClick, onFastApplyClick, childr
 
 interface MarkdownRenderProps extends React.PropsWithChildren {
   role: Role;
+  isStreaming: boolean;
   onFileNameClick?: (filePath: string) => void;
-  onFastApplyClick?: (filePath: string, edits: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges?: (filePath: string) => void;
+  onRejectAllChanges?: (filePath: string) => void;
 }
 
-export const MarkdownRender = ({ role, onFileNameClick, onFastApplyClick, children }: MarkdownRenderProps) => {
+export const MarkdownRender = ({
+  role,
+  isStreaming,
+  onFileNameClick,
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges,
+  children
+}: MarkdownRenderProps) => {
   const Code = useCallback(
     ({ inline, className, ...props }: any) => {
       const hasLang = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className || '');
@@ -129,7 +216,13 @@ export const MarkdownRender = ({ role, onFileNameClick, onFastApplyClick, childr
         );
 
         return (
-          <CodeBlock codeBlock={codeBlock} onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick}>
+          <CodeBlock
+            codeBlock={codeBlock}
+            isStreaming={isStreaming}
+            onFileNameClick={onFileNameClick}
+            onFastApplyClick={onFastApplyClick}
+            onAcceptAllChanges={onAcceptAllChanges}
+            onRejectAllChanges={onRejectAllChanges}>
             {String(props.children).replace(/\n$/, '')}
           </CodeBlock>
         );

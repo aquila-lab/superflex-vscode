@@ -230,7 +230,7 @@ export class ChatAPI {
        */
       .registerEvent(EventType.FAST_APPLY, async (payload: FastApplyPayload) => {
         if (!this._workspaceDirPath || !this._assistant) {
-          return;
+          return false;
         }
 
         const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
@@ -248,16 +248,19 @@ export class ChatAPI {
 
           // Stream the diffs
           await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), false);
-        } else {
-          // Handle new file creation
-          const directory = path.dirname(resolvedPath);
-          if (!fs.existsSync(directory)) {
-            fs.mkdirSync(directory, { recursive: true });
-          }
-          fs.writeFileSync(resolvedPath, payload.edits, "utf8");
-          const document = await vscode.workspace.openTextDocument(resolvedPath);
-          await vscode.window.showTextDocument(document);
+          return true;
         }
+
+        // Handle new file creation
+        const directory = path.dirname(resolvedPath);
+        if (!fs.existsSync(directory)) {
+          fs.mkdirSync(directory, { recursive: true });
+        }
+        fs.writeFileSync(resolvedPath, payload.edits, "utf8");
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+
+        return true;
       })
 
       /**

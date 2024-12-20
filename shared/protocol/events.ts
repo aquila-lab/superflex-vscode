@@ -82,9 +82,9 @@ export interface EventPayloads {
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
-  [EventType.FAST_APPLY]: { request: FastApplyPayload; response: void };
-  [EventType.FAST_APPLY_ACCEPT]: { request: FastApplyPayload; response: void };
-  [EventType.FAST_APPLY_REJECT]: { request: FastApplyPayload; response: void };
+  [EventType.FAST_APPLY]: { request: FastApplyPayload; response: boolean };
+  [EventType.FAST_APPLY_ACCEPT]: { request: { filePath: string }; response: void };
+  [EventType.FAST_APPLY_REJECT]: { request: { filePath: string }; response: void };
   [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };

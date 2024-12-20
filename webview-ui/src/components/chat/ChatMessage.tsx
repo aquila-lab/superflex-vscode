@@ -16,13 +16,26 @@ declare global {
 
 interface StreamingChatMessageProps {
   onFileNameClick: (filePath: string) => void;
-  onFastApplyClick: (filePath: string, edits: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges: (filePath: string) => void;
+  onRejectAllChanges: (filePath: string) => void;
 }
 
-const StreamingChatMessage = ({ onFileNameClick, onFastApplyClick }: StreamingChatMessageProps) => {
+const StreamingChatMessage = ({
+  onFileNameClick,
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges
+}: StreamingChatMessageProps) => {
   const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
   return (
-    <MarkdownRender role={Role.Assistant} onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick}>
+    <MarkdownRender
+      role={Role.Assistant}
+      isStreaming={true}
+      onFileNameClick={onFileNameClick}
+      onFastApplyClick={onFastApplyClick}
+      onAcceptAllChanges={onAcceptAllChanges}
+      onRejectAllChanges={onRejectAllChanges}>
       {streamTextDelta}
     </MarkdownRender>
   );
@@ -33,7 +46,9 @@ interface ChatMessageProps {
   isStreaming?: boolean;
   handleFeedback: (message: Message, feedback: string) => void;
   onFileNameClick: (filePath: string) => void;
-  onFastApplyClick: (filePath: string, edits: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges: (filePath: string) => void;
+  onRejectAllChanges: (filePath: string) => void;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
@@ -41,7 +56,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   isStreaming = false,
   handleFeedback,
   onFileNameClick,
-  onFastApplyClick
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges
 }) => {
   const user = useAppSelector((state) => state.user);
 
@@ -53,12 +70,25 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const renderContent = () => {
     if (isStreaming) {
-      return <StreamingChatMessage onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick} />;
+      return (
+        <StreamingChatMessage
+          onFileNameClick={onFileNameClick}
+          onFastApplyClick={onFastApplyClick}
+          onAcceptAllChanges={onAcceptAllChanges}
+          onRejectAllChanges={onRejectAllChanges}
+        />
+      );
     }
 
     if (message?.content.type === MessageType.Text) {
       return (
-        <MarkdownRender role={message.role} onFileNameClick={onFileNameClick} onFastApplyClick={onFastApplyClick}>
+        <MarkdownRender
+          role={message.role}
+          isStreaming={false}
+          onFileNameClick={onFileNameClick}
+          onFastApplyClick={onFastApplyClick}
+          onAcceptAllChanges={onAcceptAllChanges}
+          onRejectAllChanges={onRejectAllChanges}>
           {message.content.text}
         </MarkdownRender>
       );

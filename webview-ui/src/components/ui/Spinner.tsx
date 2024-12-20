@@ -6,6 +6,7 @@ import { cn } from '../../common/utils';
 const spinnerVariants = cva('animate-spin text-foreground', {
   variants: {
     size: {
+      xs: 'size-3',
       sm: 'size-4',
       default: 'size-6',
       lg: 'size-8',
@@ -40,7 +41,7 @@ const Spinner = ({ size, className }: SpinnerProps): React.ReactNode => {
         strokeWidth="5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-muted-foreground"></path>
+        className="text-muted-secondary-foreground"></path>
     </svg>
   );
 };

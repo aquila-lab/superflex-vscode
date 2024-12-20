@@ -214,8 +214,22 @@ const ChatView = React.memo<{
   );
 
   const handleFastApplyClick = useCallback(
-    (filePath: string, edits: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY, { filePath, edits }));
+    async (filePath: string, edits: string) => {
+      await sendEventWithResponse<EventType.FAST_APPLY>(vscodeAPI, EventType.FAST_APPLY, { filePath, edits });
+    },
+    [vscodeAPI]
+  );
+
+  const handleAcceptAllChanges = useCallback(
+    (filePath: string) => {
+      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY_ACCEPT, { filePath }));
+    },
+    [vscodeAPI]
+  );
+
+  const handleRejectAllChanges = useCallback(
+    (filePath: string) => {
+      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY_REJECT, { filePath }));
     },
     [vscodeAPI]
   );
@@ -260,6 +274,8 @@ const ChatView = React.memo<{
           handleMessageFeedback={handleMessageFeedback}
           onFileNameClick={handleFileNameClick}
           onFastApplyClick={handleFastApplyClick}
+          onAcceptAllChanges={handleAcceptAllChanges}
+          onRejectAllChanges={handleRejectAllChanges}
         />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <ChatViewAttachment
