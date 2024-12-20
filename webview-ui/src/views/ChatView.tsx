@@ -176,12 +176,12 @@ const ChatView = React.memo<{
   );
 
   const handleSubscribe = useCallback(
-    (source?: string) => {
-      vscodeAPI.postMessage(
-        newEventRequest(EventType.OPEN_EXTERNAL_URL, {
-          url: source ? `https://app.superflex.ai/pricing?source=${source}` : 'https://app.superflex.ai/pricing'
-        })
-      );
+    (openLink?: string) => {
+      if (!openLink) {
+        openLink = 'https://app.superflex.ai/pricing';
+      }
+
+      vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: openLink }));
     },
     [vscodeAPI]
   );
