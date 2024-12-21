@@ -280,8 +280,12 @@ export class ChatAPI {
           return false;
         }
 
+        // Show the document first
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+
         // Accept all changes in the current diff
-        await this.verticalDiffManager.acceptRejectVerticalDiffBlock(true, resolvedPath);
+        await this.verticalDiffManager.acceptRejectAllChanges(true, document.uri.toString());
         return true;
       })
 
@@ -302,8 +306,12 @@ export class ChatAPI {
           return false;
         }
 
+        // Show the document first
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+
         // Reject all changes in the current diff
-        await this.verticalDiffManager.acceptRejectVerticalDiffBlock(false, resolvedPath);
+        await this.verticalDiffManager.acceptRejectAllChanges(false, document.uri.toString());
         return true;
       })
 

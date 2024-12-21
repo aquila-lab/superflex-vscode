@@ -84,17 +84,17 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
     // Register diff-related commands
     context.subscriptions.push(
-      vscode.commands.registerCommand("superflex.acceptDiff", async (newFileUri?: string) => {
-        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(true, newFileUri);
+      vscode.commands.registerCommand("superflex.acceptDiff", (fileUri: string) => {
+        this.chatApi.verticalDiffManager.acceptRejectAllChanges(true, fileUri);
       }),
-      vscode.commands.registerCommand("superflex.rejectDiff", async (newFileUri?: string) => {
-        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(false, newFileUri);
+      vscode.commands.registerCommand("superflex.rejectDiff", (fileUri: string) => {
+        this.chatApi.verticalDiffManager.acceptRejectAllChanges(false, fileUri);
       }),
-      vscode.commands.registerCommand("superflex.acceptVerticalDiffBlock", async (fileUri?: string, index?: number) => {
-        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(true, fileUri, index);
+      vscode.commands.registerCommand("superflex.acceptVerticalDiffBlock", (fileUri: string, index: number) => {
+        this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(true, fileUri, index);
       }),
-      vscode.commands.registerCommand("superflex.rejectVerticalDiffBlock", async (fileUri?: string, index?: number) => {
-        await this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(false, fileUri, index);
+      vscode.commands.registerCommand("superflex.rejectVerticalDiffBlock", (fileUri: string, index: number) => {
+        this.chatApi.verticalDiffManager.acceptRejectVerticalDiffBlock(false, fileUri, index);
       })
     );
 

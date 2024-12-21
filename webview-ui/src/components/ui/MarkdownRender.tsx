@@ -117,7 +117,7 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
                   variant="text"
                   className="text-[11px] px-1 py-0 hover:bg-muted"
                   onClick={handleAcceptAll}>
-                  Accept All
+                  ✅ Accept
                 </Button>
                 <Separator orientation="vertical" className="h-4" />
                 <Button
@@ -125,7 +125,7 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
                   variant="text"
                   className="text-[11px] px-1 py-0 hover:bg-muted"
                   onClick={handleRejectAll}>
-                  Reject All
+                  ❌ Reject
                 </Button>
               </div>
             )}

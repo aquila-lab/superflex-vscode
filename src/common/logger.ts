@@ -15,8 +15,8 @@ export const Logger = new (class Logger implements vscode.Disposable {
   private showLogsDisposable: vscode.Disposable;
 
   constructor() {
-    this.outputChannel = vscode.window.createOutputChannel("Tabnine");
-    this.showLogsDisposable = vscode.commands.registerCommand("tabnine.logs", () => this.show());
+    this.outputChannel = vscode.window.createOutputChannel("Superflex");
+    this.showLogsDisposable = vscode.commands.registerCommand("superflex.logs", () => this.show());
   }
 
   init(context: vscode.ExtensionContext) {

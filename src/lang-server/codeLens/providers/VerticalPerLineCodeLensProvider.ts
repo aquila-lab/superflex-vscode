@@ -33,12 +33,12 @@ export class VerticalDiffCodeLensProvider implements vscode.CodeLensProvider {
 
       codeLenses.push(
         new vscode.CodeLens(range, {
-          title: `Accept`,
+          title: `✅ Accept`,
           command: "superflex.acceptVerticalDiffBlock",
           arguments: [uri, i],
         }),
         new vscode.CodeLens(range, {
-          title: `Reject`,
+          title: `❌ Reject`,
           command: "superflex.rejectVerticalDiffBlock",
           arguments: [uri, i],
         })

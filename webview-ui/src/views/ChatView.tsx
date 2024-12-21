@@ -215,7 +215,12 @@ const ChatView = React.memo<{
 
   const handleFastApplyClick = useCallback(
     async (filePath: string, edits: string) => {
-      await sendEventWithResponse<EventType.FAST_APPLY>(vscodeAPI, EventType.FAST_APPLY, { filePath, edits });
+      await sendEventWithResponse<EventType.FAST_APPLY>(
+        vscodeAPI,
+        EventType.FAST_APPLY,
+        { filePath, edits },
+        { timeout: 60000 }
+      );
     },
     [vscodeAPI]
   );

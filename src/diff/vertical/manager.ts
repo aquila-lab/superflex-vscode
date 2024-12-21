@@ -210,4 +210,27 @@ export class VerticalDiffManager {
       vscode.commands.executeCommand("setContext", "superflex.streamingDiff", false);
     }
   }
+
+  async acceptRejectAllChanges(accept: boolean, fileUri?: string) {
+    if (!fileUri) {
+      const activeEditor = vscode.window.activeTextEditor;
+      if (!activeEditor) {
+        return;
+      }
+      fileUri = activeEditor.document.uri.toString();
+    }
+
+    const blocks = this.fileUriToCodeLens.get(fileUri);
+    if (!blocks || blocks.length === 0) {
+      return;
+    }
+
+    // Process all blocks in the file
+    for (let i = 0; i < blocks.length; i++) {
+      await this.acceptRejectVerticalDiffBlock(accept, fileUri, i);
+    }
+
+    // Clear the diff manager for this file
+    this.clearForfileUri(fileUri, accept);
+  }
 }
