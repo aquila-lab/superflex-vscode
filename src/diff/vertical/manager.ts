@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as URI from "uri-js";
 
+import { decodeUriAndRemoveFilePrefix } from "../../common/utils";
 import { DiffLine } from "../types";
 import { VerticalDiffHandler, VerticalDiffHandlerOptions } from "./handler";
 
@@ -232,5 +233,9 @@ export class VerticalDiffManager {
 
     // Clear the diff manager for this file
     this.clearForfileUri(fileUri, accept);
+
+    // Save the file
+    const document = await vscode.workspace.openTextDocument(decodeUriAndRemoveFilePrefix(fileUri));
+    document.save();
   }
 }
