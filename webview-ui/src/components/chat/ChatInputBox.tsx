@@ -53,7 +53,6 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
 
   const [input, setInput] = useState('');
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const [premiumFeature, setPremiumFeature] = useState<'figma' | 'image' | null>(null);
 
   useEffect(() => {
     if (!currentOpenFile) {
@@ -82,18 +81,11 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
   };
 
   function handleImageSelected(file: File): void {
-    if (subscriptionPlan?.name.toLowerCase().includes('free')) {
-      setPremiumFeature('image');
-      setShowPremiumModal(true);
-      return;
-    }
-
     onImageSelected(file);
   }
 
   function handleFigmaButtonClicked(): void {
     if (subscriptionPlan?.name.toLowerCase().includes('free')) {
-      setPremiumFeature('figma');
       setShowPremiumModal(true);
       return;
     }
@@ -215,11 +207,10 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
         isOpen={showPremiumModal}
         onClose={() => {
           setShowPremiumModal(false);
-          setPremiumFeature(null);
         }}
         onSubscribe={(link) => {
           posthog.capture('upgrade_to_premium', {
-            feature: `${premiumFeature}-to-code`
+            feature: 'figma-to-code'
           });
 
           if (link) {
@@ -227,17 +218,11 @@ const ChatInputBox: React.FunctionComponent<ChatInputBoxProps> = ({
             return;
           }
 
-          const url = premiumFeature
-            ? `https://app.superflex.ai/pricing?source=${premiumFeature}`
-            : 'https://app.superflex.ai/pricing';
+          const url = 'https://app.superflex.ai/pricing?source=figma';
           onSubscribe(url);
         }}
-        title={`Upgrade to Access ${premiumFeature === 'figma' ? 'Figma' : 'Screenshot'} to Code`}
-        description={
-          premiumFeature === 'figma'
-            ? 'Figma integration is a premium feature. Upgrade your plan to connect your Figma account and unlock powerful design-to-code capabilities!'
-            : 'Screenshot integration is a premium feature. Upgrade your plan convert your screenshots into clean production ready code!'
-        }
+        title="Upgrade to Access Figma to Code"
+        description="Figma integration is a premium feature. Upgrade your plan to connect your Figma account and unlock powerful design-to-code capabilities!"
       />
     </>
   );
