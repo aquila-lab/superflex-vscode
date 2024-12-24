@@ -24,6 +24,8 @@ import { extractFigmaSelectionUrl } from "../../shared/model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
 import { findWorkspaceFiles } from "../scanner";
+import { VerticalDiffManager } from "../diff/vertical/manager";
+import { myersDiff, createDiffStream } from "../diff/myers";
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -39,8 +41,11 @@ export class ChatAPI {
   private _thread?: Thread;
   private _workspaceDirPath?: string;
   private _isPremiumGeneration = true;
+  public verticalDiffManager: VerticalDiffManager;
 
-  constructor() {
+  constructor(verticalDiffManager: VerticalDiffManager) {
+    this.verticalDiffManager = verticalDiffManager;
+
     this._chatEventRegistry
       /**
        * Event (ready): This event is fired when the webview is ready to receive events.
@@ -224,28 +229,90 @@ export class ChatAPI {
        * @throws An error if the code cannot be applied.
        */
       .registerEvent(EventType.FAST_APPLY, async (payload: FastApplyPayload) => {
-        if (!this._workspaceDirPath) {
-          return;
+        if (!this._workspaceDirPath || !this._assistant) {
+          return false;
         }
 
         const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
 
-        // Limited functionality for now: Only supports writing to the new file.
-        // If the file already exists, we do not overwrite it.
         if (fs.existsSync(resolvedPath)) {
-          return;
+          const document = await vscode.workspace.openTextDocument(resolvedPath);
+          const originalCode = fs.readFileSync(resolvedPath, "utf8");
+          const modifiedCode = await this._assistant.fastApply(originalCode, payload.edits);
+
+          // Create diff lines using Myers diff algorithm
+          const diffLines = myersDiff(originalCode, modifiedCode);
+
+          // Show the document
+          await vscode.window.showTextDocument(document);
+
+          // Stream the diffs
+          await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), false);
+          return true;
         }
 
-        // Create the directory and write the file content
+        // Handle new file creation
         const directory = path.dirname(resolvedPath);
         if (!fs.existsSync(directory)) {
           fs.mkdirSync(directory, { recursive: true });
         }
         fs.writeFileSync(resolvedPath, payload.edits, "utf8");
-
-        // Open the file in the VS Code editor
         const document = await vscode.workspace.openTextDocument(resolvedPath);
         await vscode.window.showTextDocument(document);
+
+        return true;
+      })
+
+      /**
+       * Event (fast_apply_accept): This event is used to accept all changes in the streaming fast apply.
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves when the changes are accepted.
+       * @throws An error if the changes cannot be accepted.
+       */
+      .registerEvent(EventType.FAST_APPLY_ACCEPT, async (payload: { filePath: string }) => {
+        if (!this._workspaceDirPath) {
+          return false;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        if (!fs.existsSync(resolvedPath)) {
+          return false;
+        }
+
+        // Show the document first
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+
+        // Accept all changes in the current diff
+        await this.verticalDiffManager.acceptRejectAllChanges(true, document.uri.toString());
+        return true;
+      })
+
+      /**
+       * Event (fast_apply_reject): This event is used to reject all changes in the streaming fast apply.
+       *
+       * @param payload - Payload containing the file path.
+       * @returns A promise that resolves when the changes are rejected.
+       * @throws An error if the changes cannot be rejected.
+       */
+      .registerEvent(EventType.FAST_APPLY_REJECT, async (payload: { filePath: string }) => {
+        if (!this._workspaceDirPath) {
+          return false;
+        }
+
+        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
+        if (!fs.existsSync(resolvedPath)) {
+          return false;
+        }
+
+        // Show the document first
+        const document = await vscode.workspace.openTextDocument(resolvedPath);
+        await vscode.window.showTextDocument(document);
+
+        // Reject all changes in the current diff
+        await this.verticalDiffManager.acceptRejectAllChanges(false, document.uri.toString());
+        return true;
       })
 
       /**
@@ -313,21 +380,6 @@ export class ChatAPI {
         }
 
         return fs.readFileSync(payload.path, "utf8");
-      })
-
-      /**
-       * Event (check_file_exists): This event checks if a file exists in the workspace
-       *
-       * @param payload - Payload containing the file path.
-       * @returns A promise that resolves with the file existence status.
-       */
-      .registerEvent(EventType.CHECK_FILE_EXISTS, async (payload: { filePath: string }) => {
-        if (!this._workspaceDirPath) {
-          return false;
-        }
-
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-        return fs.existsSync(resolvedPath);
       })
 
       /**

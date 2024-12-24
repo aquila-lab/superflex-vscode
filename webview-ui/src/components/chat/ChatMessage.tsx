@@ -15,20 +15,27 @@ declare global {
 }
 
 interface StreamingChatMessageProps {
-  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
-  onFastApplyClick: (filePath: string, edits: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges: (filePath: string) => void;
+  onRejectAllChanges: (filePath: string) => void;
 }
 
-const StreamingChatMessage = ({ checkFileExists, onFileNameClick, onFastApplyClick }: StreamingChatMessageProps) => {
+const StreamingChatMessage = ({
+  onFileNameClick,
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges
+}: StreamingChatMessageProps) => {
   const streamTextDelta = useAppSelector((state) => state.chat.streamTextDelta);
   return (
     <MarkdownRender
       role={Role.Assistant}
-      isStreaming
-      checkFileExists={checkFileExists}
+      isStreaming={true}
       onFileNameClick={onFileNameClick}
-      onFastApplyClick={onFastApplyClick}>
+      onFastApplyClick={onFastApplyClick}
+      onAcceptAllChanges={onAcceptAllChanges}
+      onRejectAllChanges={onRejectAllChanges}>
       {streamTextDelta}
     </MarkdownRender>
   );
@@ -38,18 +45,20 @@ interface ChatMessageProps {
   message?: Message;
   isStreaming?: boolean;
   handleFeedback: (message: Message, feedback: string) => void;
-  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
-  onFastApplyClick: (filePath: string, edits: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges: (filePath: string) => void;
+  onRejectAllChanges: (filePath: string) => void;
 }
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   isStreaming = false,
   handleFeedback,
-  checkFileExists,
   onFileNameClick,
-  onFastApplyClick
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges
 }) => {
   const user = useAppSelector((state) => state.user);
 
@@ -63,9 +72,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     if (isStreaming) {
       return (
         <StreamingChatMessage
-          checkFileExists={checkFileExists}
           onFileNameClick={onFileNameClick}
           onFastApplyClick={onFastApplyClick}
+          onAcceptAllChanges={onAcceptAllChanges}
+          onRejectAllChanges={onRejectAllChanges}
         />
       );
     }
@@ -74,9 +84,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       return (
         <MarkdownRender
           role={message.role}
-          checkFileExists={checkFileExists}
+          isStreaming={false}
           onFileNameClick={onFileNameClick}
-          onFastApplyClick={onFastApplyClick}>
+          onFastApplyClick={onFastApplyClick}
+          onAcceptAllChanges={onAcceptAllChanges}
+          onRejectAllChanges={onRejectAllChanges}>
           {message.content.text}
         </MarkdownRender>
       );

@@ -43,7 +43,6 @@ export enum EventType {
   OPEN_FILE = "open_file",
   FETCH_FILES = "fetch_files",
   FETCH_FILE_CONTENT = "fetch_file_content",
-  CHECK_FILE_EXISTS = "check_file_exists",
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
   ADD_SELECTED_CODE = "add_selected_code",
   PASTE_COPIED_CODE = "paste_copied_code",
@@ -83,13 +82,12 @@ export interface EventPayloads {
   [EventType.NEW_MESSAGE]: { request: SendMessagesRequestPayload; response: Message | null };
   [EventType.MESSAGE_TEXT_DELTA]: { request: void; response: TextDelta };
   [EventType.UPDATE_MESSAGE]: { request: Message; response: Message | null };
-  [EventType.FAST_APPLY]: { request: FastApplyPayload; response: void };
-  [EventType.FAST_APPLY_ACCEPT]: { request: FastApplyPayload; response: void };
-  [EventType.FAST_APPLY_REJECT]: { request: FastApplyPayload; response: void };
+  [EventType.FAST_APPLY]: { request: FastApplyPayload; response: boolean };
+  [EventType.FAST_APPLY_ACCEPT]: { request: { filePath: string }; response: void };
+  [EventType.FAST_APPLY_REJECT]: { request: { filePath: string }; response: void };
   [EventType.OPEN_FILE]: { request: { filePath: string }; response: void };
   [EventType.FETCH_FILES]: { request: void; response: FilePayload[] };
   [EventType.FETCH_FILE_CONTENT]: { request: FilePayload; response: string };
-  [EventType.CHECK_FILE_EXISTS]: { request: { filePath: string }; response: boolean };
   [EventType.SET_CURRENT_OPEN_FILE]: { request: FilePayload | null; response: void };
   [EventType.ADD_SELECTED_CODE]: { request: FilePayload; response: void };
   [EventType.PASTE_COPIED_CODE]: { request: { text: string }; response: FilePayload | null };

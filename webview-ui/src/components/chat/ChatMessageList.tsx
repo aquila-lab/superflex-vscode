@@ -8,16 +8,18 @@ import { ChatMessage } from './ChatMessage';
 
 interface ChatMessageListProps {
   handleMessageFeedback: (message: Message, feedback: string) => void;
-  checkFileExists: (filePath: string) => Promise<boolean>;
   onFileNameClick: (filePath: string) => void;
-  onFastApplyClick: (filePath: string, edits: string) => void;
+  onFastApplyClick: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges: (filePath: string) => void;
+  onRejectAllChanges: (filePath: string) => void;
 }
 
 export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   handleMessageFeedback,
-  checkFileExists,
   onFileNameClick,
-  onFastApplyClick
+  onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges
 }) => {
   const messages = useAppSelector((state) => state.chat.messages);
   const isMessageStreaming = useAppSelector((state) => state.chat.isMessageStreaming);
@@ -34,9 +36,10 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             <ChatMessage
               message={message}
               handleFeedback={handleMessageFeedback}
-              checkFileExists={checkFileExists}
               onFileNameClick={onFileNameClick}
               onFastApplyClick={onFastApplyClick}
+              onAcceptAllChanges={onAcceptAllChanges}
+              onRejectAllChanges={onRejectAllChanges}
             />
           </div>
         ))}
@@ -46,9 +49,10 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             <ChatMessage
               isStreaming={true}
               handleFeedback={handleMessageFeedback}
-              checkFileExists={checkFileExists}
               onFileNameClick={onFileNameClick}
               onFastApplyClick={onFastApplyClick}
+              onAcceptAllChanges={onAcceptAllChanges}
+              onRejectAllChanges={onRejectAllChanges}
             />
           </div>
         )}

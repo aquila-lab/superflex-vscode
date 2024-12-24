@@ -35,6 +35,15 @@ export interface Assistant {
   updateMessage(message: Message): Promise<void>;
 
   /**
+   * Apply the code to the file in the workspace.
+   *
+   * @param code - The original content of the file.
+   * @param edits - The code to apply to the file.
+   * @returns A promise that resolves when the code is applied to the file.
+   */
+  fastApply(code: string, edits: string): Promise<string>;
+
+  /**
    * Sync files parse and upload small bites of project files to the vector store.
    * NOTE: If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
    * NOTE: The files that are uploaded but missing from the filePaths input will be removed.

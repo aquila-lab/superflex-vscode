@@ -214,24 +214,27 @@ const ChatView = React.memo<{
   );
 
   const handleFastApplyClick = useCallback(
-    (filePath: string, edits: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY, { filePath, edits }));
+    async (filePath: string, edits: string) => {
+      await sendEventWithResponse<EventType.FAST_APPLY>(
+        vscodeAPI,
+        EventType.FAST_APPLY,
+        { filePath, edits },
+        { timeout: 60000 }
+      );
     },
     [vscodeAPI]
   );
 
-  const checkFileExists = useCallback(
-    async (filePath: string): Promise<boolean> => {
-      try {
-        const exists = await sendEventWithResponse<EventType.CHECK_FILE_EXISTS>(
-          vscodeAPI,
-          EventType.CHECK_FILE_EXISTS,
-          { filePath }
-        );
-        return exists ?? false;
-      } catch (err) {
-        return false;
-      }
+  const handleAcceptAllChanges = useCallback(
+    (filePath: string) => {
+      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY_ACCEPT, { filePath }));
+    },
+    [vscodeAPI]
+  );
+
+  const handleRejectAllChanges = useCallback(
+    (filePath: string) => {
+      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY_REJECT, { filePath }));
     },
     [vscodeAPI]
   );
@@ -274,9 +277,10 @@ const ChatView = React.memo<{
       <div className="flex flex-col h-full p-2 pt-0">
         <ChatMessageList
           handleMessageFeedback={handleMessageFeedback}
-          checkFileExists={checkFileExists}
           onFileNameClick={handleFileNameClick}
           onFastApplyClick={handleFastApplyClick}
+          onAcceptAllChanges={handleAcceptAllChanges}
+          onRejectAllChanges={handleRejectAllChanges}
         />
         <ProjectSyncProgress isFirstTimeSync={isFirstTimeSync} progress={projectSyncProgress} />
         <ChatViewAttachment

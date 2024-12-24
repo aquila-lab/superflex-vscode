@@ -110,6 +110,10 @@ export default class SuperflexAssistant implements Assistant {
     });
   }
 
+  async fastApply(code: string, edits: string): Promise<string> {
+    return api.fastApply({ code, edits });
+  }
+
   async syncFiles(progressCb?: (current: number, isFirstTimeSync?: boolean) => void): Promise<void> {
     const packageJsonPath = path.join(this.workspaceDirPath, "package.json");
     if (!fs.existsSync(packageJsonPath)) {

@@ -222,6 +222,27 @@
         "category": "Superflex",
         "title": "Project Sync",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "superflex.acceptDiff",
+        "category": "Superflex",
+        "title": "Accept Diff"
+      },
+      {
+        "command": "superflex.rejectDiff",
+        "category": "Superflex",
+        "title": "Reject Diff",
+        "icon": "$(stop)"
+      },
+      {
+        "command": "superflex.acceptVerticalDiffBlock",
+        "category": "Superflex",
+        "title": "Accept Vertical Diff Block"
+      },
+      {
+        "command": "superflex.rejectVerticalDiffBlock",
+        "category": "Superflex",
+        "title": "Reject Vertical Diff Block"
       }
     ],
     "configuration": {
@@ -258,11 +279,30 @@
         "win": "ctrl+c",
         "linux": "ctrl+c",
         "when": "editorHasSelection"
+      },
+      {
+        "command": "superflex.acceptDiff",
+        "mac": "shift+cmd+enter",
+        "key": "shift+ctrl+enter",
+        "when": "superflex.diffVisible"
+      },
+      {
+        "command": "superflex.rejectDiff",
+        "mac": "shift+cmd+backspace",
+        "key": "shift+ctrl+backspace",
+        "when": "superflex.diffVisible"
+      },
+      {
+        "command": "superflex.rejectDiff",
+        "mac": "cmd+z",
+        "key": "ctrl+z",
+        "when": "superflex.diffVisible"
       }
     ]
   },
   "devDependencies": {
     "@types/async": "^3.2.24",
+    "@types/diff": "^6.0.0",
     "@types/express": "^4.17.21",
     "@types/mocha": "^10.0.6",
     "@types/node": "20.11.0",
@@ -280,6 +320,7 @@
     "async-mutex": "^0.5.0",
     "axios": "^1.7.7",
     "crypto": "^1.0.1",
+    "diff": "^7.0.0",
     "fast-glob": "^3.3.2",
     "node-machine-id": "^1.1.12",
     "posthog-node": "^4.2.0",

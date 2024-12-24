@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { CheckIcon, DocumentDuplicateIcon, PlayIcon } from '@heroicons/react/24/outline';
@@ -9,31 +9,49 @@ import { Editor } from './Editor';
 import { Button } from './Button';
 import { FileIcon } from './FileIcon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip';
+import { Spinner } from './Spinner';
+import { Separator } from './Separator';
 
 interface FileHeaderProps extends React.PropsWithChildren {
   filePath: string;
-  isStreaming?: boolean;
-  checkFileExists?: (filePath: string) => Promise<boolean>;
+  isStreaming: boolean;
   onFileNameClick?: (filePath: string) => void;
-  onFastApplyClick?: (filePath: string, edits: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges?: (filePath: string) => void;
+  onRejectAllChanges?: (filePath: string) => void;
 }
+
+type ApplyState = 'idle' | 'applying' | 'applied';
 
 export const FileHeader: React.FC<FileHeaderProps> = ({
   filePath,
   isStreaming,
-  checkFileExists,
   onFileNameClick = () => {},
   onFastApplyClick,
+  onAcceptAllChanges = () => {},
+  onRejectAllChanges = () => {},
   children
 }) => {
   const [copyTip, setCopyTip] = useState('Copy code');
-  const [isFileExists, setIsFileExists] = useState(true);
+  const [applyState, setApplyState] = useState<ApplyState>('idle');
 
-  useEffect(() => {
-    if (!isStreaming && filePath && checkFileExists) {
-      checkFileExists(filePath).then(setIsFileExists);
-    }
-  }, [isStreaming, filePath, checkFileExists]);
+  async function handleApplyClick() {
+    if (!onFastApplyClick) return;
+
+    setApplyState('applying');
+    await onFastApplyClick(filePath, String(children));
+    setApplyState('applied');
+  }
+
+  const handleAcceptAll = () => {
+    onAcceptAllChanges(filePath);
+    setApplyState('idle');
+  };
+
+  const handleRejectAll = () => {
+    onRejectAllChanges(filePath);
+    setApplyState('idle');
+  };
 
   return (
     <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
@@ -73,15 +91,45 @@ export const FileHeader: React.FC<FileHeaderProps> = ({
           )}
         </CopyToClipboard>
 
-        {!isFileExists && onFastApplyClick && (
-          <Button
-            size="xs"
-            variant="text"
-            className="text-[11px] px-1 py-0 hover:bg-muted"
-            onClick={() => onFastApplyClick(filePath, String(children))}>
-            <PlayIcon className="size-3.5" />
-            Apply
-          </Button>
+        {!isStreaming && onFastApplyClick && (
+          <>
+            {applyState === 'idle' && (
+              <Button
+                size="xs"
+                variant="text"
+                className="text-[11px] px-1 py-0 hover:bg-muted"
+                onClick={handleApplyClick}>
+                <PlayIcon className="size-3.5" />
+                Apply
+              </Button>
+            )}
+
+            {applyState === 'applying' && (
+              <div className="text-muted-foreground px-1 py-0.5">
+                <Spinner size="xs" />
+              </div>
+            )}
+
+            {applyState === 'applied' && (
+              <div className="flex items-center gap-1 ml-2">
+                <Button
+                  size="xs"
+                  variant="text"
+                  className="text-[11px] px-1 py-0 hover:bg-muted"
+                  onClick={handleAcceptAll}>
+                  ✅ Accept
+                </Button>
+                <Separator orientation="vertical" className="h-4" />
+                <Button
+                  size="xs"
+                  variant="text"
+                  className="text-[11px] px-1 py-0 hover:bg-muted"
+                  onClick={handleRejectAll}>
+                  ❌ Reject
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -97,18 +145,20 @@ interface CodeBlockInfo {
 
 interface CodeBlockProps extends React.PropsWithChildren {
   codeBlock?: CodeBlockInfo;
-  isStreaming?: boolean;
-  checkFileExists?: (filePath: string) => Promise<boolean>;
+  isStreaming: boolean;
   onFileNameClick?: (filePath: string) => void;
-  onFastApplyClick?: (filePath: string, edits: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges?: (filePath: string) => void;
+  onRejectAllChanges?: (filePath: string) => void;
 }
 
 export const CodeBlock = ({
   codeBlock,
   isStreaming,
-  checkFileExists,
   onFileNameClick,
   onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges,
   children
 }: CodeBlockProps) => {
   return (
@@ -117,9 +167,10 @@ export const CodeBlock = ({
         <FileHeader
           filePath={codeBlock.filePath}
           isStreaming={isStreaming}
-          checkFileExists={checkFileExists}
           onFileNameClick={onFileNameClick}
-          onFastApplyClick={onFastApplyClick}>
+          onFastApplyClick={onFastApplyClick}
+          onAcceptAllChanges={onAcceptAllChanges}
+          onRejectAllChanges={onRejectAllChanges}>
           {children}
         </FileHeader>
       )}
@@ -132,18 +183,20 @@ export const CodeBlock = ({
 
 interface MarkdownRenderProps extends React.PropsWithChildren {
   role: Role;
-  isStreaming?: boolean;
-  checkFileExists?: (filePath: string) => Promise<boolean>;
+  isStreaming: boolean;
   onFileNameClick?: (filePath: string) => void;
-  onFastApplyClick?: (filePath: string, edits: string) => void;
+  onFastApplyClick?: (filePath: string, edits: string) => Promise<void>;
+  onAcceptAllChanges?: (filePath: string) => void;
+  onRejectAllChanges?: (filePath: string) => void;
 }
 
 export const MarkdownRender = ({
   role,
-  isStreaming = false,
-  checkFileExists,
+  isStreaming,
   onFileNameClick,
   onFastApplyClick,
+  onAcceptAllChanges,
+  onRejectAllChanges,
   children
 }: MarkdownRenderProps) => {
   const Code = useCallback(
@@ -166,9 +219,10 @@ export const MarkdownRender = ({
           <CodeBlock
             codeBlock={codeBlock}
             isStreaming={isStreaming}
-            checkFileExists={checkFileExists}
             onFileNameClick={onFileNameClick}
-            onFastApplyClick={onFastApplyClick}>
+            onFastApplyClick={onFastApplyClick}
+            onAcceptAllChanges={onAcceptAllChanges}
+            onRejectAllChanges={onRejectAllChanges}>
             {String(props.children).replace(/\n$/, '')}
           </CodeBlock>
         );
@@ -176,7 +230,7 @@ export const MarkdownRender = ({
 
       return <code className={cn('text-sm text-button-background', className)} {...props} />;
     },
-    [isStreaming, checkFileExists, onFileNameClick, onFastApplyClick]
+    [onFileNameClick, onFastApplyClick]
   );
 
   return (

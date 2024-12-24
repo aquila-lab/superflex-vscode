@@ -4,10 +4,10 @@ import * as vscode from "vscode";
 import { machineIdSync } from "node-machine-id";
 
 import { EXTENSION_ID } from "./constants";
-import { runningOnWindows } from "./operatingSystem";
+import { getPlatform } from "./operatingSystem";
 
 export function decodeUriAndRemoveFilePrefix(uri: string): string {
-  if (runningOnWindows() && uri && uri.includes("file:///")) {
+  if (getPlatform() === "windows" && uri && uri.includes("file:///")) {
     uri = uri.replace("file:///", "");
   } else if (uri && uri.includes("file://")) {
     uri = uri.replace("file://", "");
@@ -21,7 +21,7 @@ export function decodeUriAndRemoveFilePrefix(uri: string): string {
   }
 
   // Updating the file path for current open file for wins machine
-  if (runningOnWindows()) {
+  if (getPlatform() === "windows") {
     uri = uri
       .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase()) // Ensure drive letter is lowercase
       .replace(/\//g, "\\") // Convert forward slashes to backslashes
