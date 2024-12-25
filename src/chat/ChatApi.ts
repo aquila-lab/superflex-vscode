@@ -238,7 +238,11 @@ export class ChatAPI {
         if (fs.existsSync(resolvedPath)) {
           const document = await vscode.workspace.openTextDocument(resolvedPath);
           const originalCode = fs.readFileSync(resolvedPath, "utf8");
-          const modifiedCode = await this._assistant.fastApply(originalCode, payload.edits);
+
+          let modifiedCode = payload.edits;
+          if (originalCode !== "") {
+            modifiedCode = await this._assistant.fastApply(originalCode, payload.edits);
+          }
 
           // Create diff lines using Myers diff algorithm
           const diffLines = myersDiff(originalCode, modifiedCode);
@@ -256,9 +260,18 @@ export class ChatAPI {
         if (!fs.existsSync(directory)) {
           fs.mkdirSync(directory, { recursive: true });
         }
-        fs.writeFileSync(resolvedPath, payload.edits, "utf8");
+
+        fs.writeFileSync(resolvedPath, "", "utf8");
         const document = await vscode.workspace.openTextDocument(resolvedPath);
+
+        // Create diff lines using Myers diff algorithm
+        const diffLines = myersDiff("", payload.edits);
+
+        // Show the document
         await vscode.window.showTextDocument(document);
+
+        // Stream the diffs
+        await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), true);
 
         return true;
       })
@@ -312,6 +325,13 @@ export class ChatAPI {
 
         // Reject all changes in the current diff
         await this.verticalDiffManager.acceptRejectAllChanges(false, document.uri.toString());
+
+        const fileContent = fs.readFileSync(resolvedPath, "utf8");
+        if (fileContent.trim() === "") {
+          await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+          fs.unlinkSync(resolvedPath);
+        }
+
         return true;
       })
 

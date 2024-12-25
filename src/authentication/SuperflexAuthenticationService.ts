@@ -27,14 +27,11 @@ export default class SuperflexAuthenticationService {
 
     vscode.window.showInformationMessage(`Signed in as ${session.account.label} 🎉`);
 
-    Telemetry.capture("signin_succeeded", {
-      userID: session.account.id,
-      email: session.account.label,
-    });
-    Telemetry.identify({
-      userID: session.account.id,
-      email: session.account.label,
-    });
+    Telemetry.capture("signin_succeeded", { userID: session.account.id, email: session.account.label });
+    Telemetry.identify({ userID: session.account.id, email: session.account.label });
+
+    this._webviewProvider.sendEventMessage(newEventResponse(EventType.SHOW_CHAT_VIEW));
+    vscode.commands.executeCommand("setContext", "superflex.chat.authenticated", true);
   }
 
   /**

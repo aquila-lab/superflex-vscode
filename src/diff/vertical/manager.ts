@@ -236,6 +236,6 @@ export class VerticalDiffManager {
 
     // Save the file
     const document = await vscode.workspace.openTextDocument(decodeUriAndRemoveFilePrefix(fileUri));
-    document.save();
+    await document.save();
   }
 }
