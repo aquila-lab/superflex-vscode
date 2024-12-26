@@ -11,6 +11,7 @@ import { SuperflexCache } from "../cache/SuperflexCache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
+import { Telemetry } from "src/common/analytics/Telemetry";
 
 const ASSISTENT_NAME = "superflex";
 const FILES_MAP_VERSION = 1; // Increment the version when we need to reindex all files

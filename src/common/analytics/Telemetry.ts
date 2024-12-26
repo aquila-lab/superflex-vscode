@@ -27,12 +27,15 @@ export class Telemetry {
     }
   }
 
-  static async capture(event: string, properties: { [key: string]: any }) {
+  static async capture(event: string, properties?: { [key: string]: any }) {
     if (!IS_PROD) {
       return;
     }
     if (!Telemetry.client) {
       return;
+    }
+    if (!properties) {
+      properties = {};
     }
 
     try {

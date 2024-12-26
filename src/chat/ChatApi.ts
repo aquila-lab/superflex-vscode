@@ -236,6 +236,8 @@ export class ChatAPI {
         const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
 
         if (fs.existsSync(resolvedPath)) {
+          Telemetry.capture("fast_apply_called", { createdFile: false });
+
           const document = await vscode.workspace.openTextDocument(resolvedPath);
           const originalCode = fs.readFileSync(resolvedPath, "utf8");
 
@@ -254,6 +256,8 @@ export class ChatAPI {
           await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), false);
           return true;
         }
+
+        Telemetry.capture("fast_apply_called", { createdFile: true });
 
         // Handle new file creation
         const directory = path.dirname(resolvedPath);
