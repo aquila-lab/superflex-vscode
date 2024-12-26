@@ -201,7 +201,7 @@ export class ChatAPI {
           sendEventMessageCb(newEventResponse(EventType.MESSAGE_TEXT_DELTA, delta));
         });
         if (!threadRun) {
-          return undefined;
+          return null;
         }
 
         Telemetry.capture("new_message", {
