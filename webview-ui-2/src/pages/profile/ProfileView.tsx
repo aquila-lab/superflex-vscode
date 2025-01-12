@@ -1,12 +1,16 @@
-import React from "react";
-import { useUser } from "../../context/UserContext";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../../components/ui/Card";
-import { Button } from "../../components/ui/Button";
-import { Progress } from "@radix-ui/react-progress";
-import { Badge } from "../../components/ui/Badge";
+import React, { useEffect } from 'react';
+import { useUser } from '../../context/UserContext';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Progress } from '@radix-ui/react-progress';
+import { Badge } from '../../components/ui/Badge';
 
 const ProfileView: React.FC = () => {
-  const { user, subscription, loading, handleSubscribe, handleManageBilling } = useUser();
+  const { user, subscription, loading, handleSubscribe, handleManageBilling, fetchSubscription } = useUser();
+
+  useEffect(() => {
+    fetchSubscription();
+  }, [fetchSubscription]);
 
   if (loading) {
     return <div className="p-4">Loading user information...</div>;
@@ -43,8 +47,7 @@ const ProfileView: React.FC = () => {
         <CardContent className="space-y-6">
           {subscription.endDate && (
             <Badge variant="destructive">
-              Your subscription has been canceled and will end on{" "}
-              {new Date(subscription.endDate).toLocaleDateString()}.
+              Your subscription has been canceled and will end on {new Date(subscription.endDate).toLocaleDateString()}.
             </Badge>
           )}
 
@@ -54,7 +57,7 @@ const ProfileView: React.FC = () => {
               <p className="text-lg font-semibold capitalize">{subscription.plan.name}</p>
             </div>
 
-            {user.stripeCustomerID && !subscription.plan.name.toLowerCase().includes("free") ? (
+            {user.stripeCustomerID && !subscription.plan.name.toLowerCase().includes('free') ? (
               <Button onClick={handleManageBilling}>Manage Billing</Button>
             ) : (
               <Button onClick={handleSubscribe}>Subscribe</Button>
@@ -82,7 +85,6 @@ const ProfileView: React.FC = () => {
 
 export default ProfileView;
 
-
 interface UsageDisplayProps {
   label: string;
   used: number;
@@ -94,7 +96,7 @@ const UsageDisplay: React.FC<UsageDisplayProps> = ({ label, used, limit }) => {
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
         <span>{label}</span>
-        <span>{limit > 9999 ? "Unlimited" : `${used} / ${limit}`}</span>
+        <span>{limit > 9999 ? 'Unlimited' : `${used} / ${limit}`}</span>
       </div>
       <Progress value={percentage} />
     </div>

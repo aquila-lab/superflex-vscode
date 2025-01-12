@@ -1,17 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useVSCode } from '../context/VSCodeContext';
 import { useGlobal } from '../context/GlobalContext';
 import { EventMessage, EventType, EventPayloads } from '../../../shared/protocol';
 
 export const ExtensionEventHandler = () => {
-  const { postRequest } = useVSCode();
   const { setIsInitialized, setIsLoggedIn, setConfig, setIsFigmaAuthenticated } = useGlobal();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    postRequest(EventType.READY);
-  }, [postRequest]);
 
   useEffect(() => {
     const onMessage = (evt: MessageEvent<EventMessage<EventType>>) => {
@@ -30,6 +24,7 @@ export const ExtensionEventHandler = () => {
           if (error) return;
           const { isFigmaAuthenticated, isInitialized} = payload as EventPayloads[EventType.INITIALIZED]["response"];
           setIsFigmaAuthenticated(isFigmaAuthenticated);
+          setIsInitialized(true);
 
           if (!isInitialized) {
             navigate("/open-project");

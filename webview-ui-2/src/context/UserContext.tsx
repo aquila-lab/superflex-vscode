@@ -58,6 +58,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [user, subscription]);
 
+  useEffect(() => {
+    postRequest(EventType.INITIALIZED);
+  }, []);
+
   const fetchUserInfo = useCallback(() => {
     console.log("Posting GET_USER_INFO")
     postRequest(EventType.GET_USER_INFO);
@@ -67,12 +71,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     console.log("Posting GET_USER_SUBSCRIPTION")
     postRequest(EventType.GET_USER_SUBSCRIPTION);
   }, [postRequest]);
-
-  useEffect(() => {
-    setLoading(true);
-    fetchUserInfo();
-    fetchSubscription();
-  }, [fetchUserInfo, fetchSubscription]);
 
   const handleSubscribe = useCallback(() => {
     postRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' });
