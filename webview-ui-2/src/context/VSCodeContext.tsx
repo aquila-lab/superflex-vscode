@@ -1,16 +1,15 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback, ReactNode } from 'react';
-import { EventType, newEventRequest, newEventResponse, EventPayloads, EventMessage } from '../../../shared/protocol';
+import { newEventRequest, EventRequestType, EventRequestPayload, EventRequestMessage } from '../../../shared/protocol';
 
 interface VSCodeContextValue {
-  postRequest: <T extends EventType>(command: T, payload?: EventPayloads[T]['request']) => void;
-  postResponse: <T extends EventType>(command: T, payload?: EventPayloads[T]['response']) => void;
+  postMessage: <T extends EventRequestType>(command: T, payload?: EventRequestPayload[T]) => void;
 }
 
 const VSCodeContext = createContext<VSCodeContextValue | null>(null);
 
 export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
   const [vscodeApi, setVscodeApi] = useState<VsCodeApi | null>(null);
-  const [pendingTasks, setPendingTasks] = useState<EventMessage[]>([]);
+  const [pendingTasks, setPendingTasks] = useState<Array<EventRequestMessage<EventRequestType>>>([]);
 
   useEffect(() => {
     if (window?.acquireVsCodeApi) {
@@ -20,16 +19,13 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (vscodeApi) {
-      console.log(vscodeApi)
-      console.log('sending messages')
-      console.log(pendingTasks)
       pendingTasks.forEach((task) => vscodeApi.postMessage(task));
       setPendingTasks([]);
     }
   }, [vscodeApi]);
 
-  const postRequest = useCallback(
-    <T extends EventType>(command: T, payload?: EventPayloads[T]['request']) => {
+  const postMessage = useCallback(
+    <T extends EventRequestType>(command: T, payload?: EventRequestPayload[T]) => {
       const message = newEventRequest(command, payload);
       if (!vscodeApi) {
         setPendingTasks((prev) => [...prev, message]);
@@ -40,25 +36,7 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
     [vscodeApi]
   );
 
-  const postResponse = useCallback(
-    <T extends EventType>(command: T, payload?: EventPayloads[T]['response']) => {
-      const message = newEventResponse(command, payload);
-      if (!vscodeApi) {
-        setPendingTasks((prev) => [...prev, message]);
-      } else {
-        vscodeApi.postMessage(message);
-      }
-    },
-    [vscodeApi]
-  );
-
-  const value: VSCodeContextValue = useMemo(
-    () => ({
-      postRequest,
-      postResponse
-    }),
-    [postRequest, postResponse]
-  );
+  const value: VSCodeContextValue = useMemo(() => ({ postMessage }), [postMessage]);
 
   return <VSCodeContext.Provider value={value}>{children}</VSCodeContext.Provider>;
 };

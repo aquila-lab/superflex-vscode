@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { EventType, EventMessage } from "../../../shared/protocol";
+import { useEffect } from 'react';
+import { EventResponseType, EventResponseMessage } from '../../../shared/protocol';
 
-export function useVSCodeMessage<T extends EventType>(
+export function useVSCodeMessage<T extends EventResponseType>(
   eventType: T | T[],
-  onMessage: (payload: EventMessage<T>["payload"], fullEvent: EventMessage<T>) => void
+  onMessage: (fullEvent: EventResponseMessage<EventResponseType>) => void
 ): void {
   useEffect(() => {
     const typesArray = Array.isArray(eventType) ? eventType : [eventType];
 
-    const handleMessage = (evt: MessageEvent<EventMessage>) => {
+    const handleMessage = (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
       const { command, error } = evt.data || {};
 
       if (!typesArray.includes(command as T)) return;
@@ -16,13 +16,13 @@ export function useVSCodeMessage<T extends EventType>(
         return;
       }
 
-      const typedEvent = evt.data as EventMessage<T>;
-      onMessage(typedEvent.payload, typedEvent);
+      const typedEvent = evt.data as EventResponseMessage<EventResponseType>;
+      onMessage(typedEvent);
     };
 
-    window.addEventListener("message", handleMessage as EventListener);
+    window.addEventListener('message', handleMessage as EventListener);
     return () => {
-      window.removeEventListener("message", handleMessage as EventListener);
+      window.removeEventListener('message', handleMessage as EventListener);
     };
   }, [eventType, onMessage]);
 }

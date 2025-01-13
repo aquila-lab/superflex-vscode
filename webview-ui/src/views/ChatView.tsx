@@ -11,7 +11,8 @@ import {
   extractFigmaSelectionUrl
 } from '../../../shared/model';
 import {
-  EventType,
+  EventRequestType,
+  EventResponseType,
   FigmaFile,
   FilePayload,
   newEventRequest,
@@ -92,7 +93,7 @@ const ChatView = React.memo<{
         const figmaSelection = extractFigmaSelectionUrl(figmaFile.selectionLink);
         if (!figmaSelection) {
           vscodeAPI.postMessage(
-            newEventRequest(EventType.SEND_NOTIFICATION, {
+            newEventRequest(EventRequestType.SEND_NOTIFICATION, {
               message: 'Invalid Figma selection link. Please provide a valid Figma selection url.'
             })
           );
@@ -130,7 +131,7 @@ const ChatView = React.memo<{
           )
         );
 
-        vscodeAPI.postMessage(newEventRequest(EventType.NEW_MESSAGE, eventPayload));
+        vscodeAPI.postMessage(newEventRequest(EventRequestType.SEND_MESSAGE, eventPayload));
         dispatch(setIsMessageProcessing(true));
 
         setChatImageAttachment(undefined);
@@ -147,7 +148,7 @@ const ChatView = React.memo<{
 
   const handleFigmaButtonClicked = useCallback(() => {
     if (!initState.isFigmaAuthenticated) {
-      vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_OAUTH_CONNECT));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.FIGMA_OAUTH_CONNECT));
       return;
     }
 
@@ -161,7 +162,7 @@ const ChatView = React.memo<{
       setChatFigmaAttachment(figmaFile);
       setChatImageAttachment(undefined);
 
-      vscodeAPI.postMessage(newEventRequest(EventType.FIGMA_FILE_SELECTED, figmaFile));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.FIGMA_FILE_SELECTED, figmaFile));
 
       inputRef.current?.focus();
     },
@@ -170,7 +171,7 @@ const ChatView = React.memo<{
 
   const handleMessageFeedback = useCallback(
     (message: Message, feedback: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.UPDATE_MESSAGE, { ...message, feedback }));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.UPDATE_MESSAGE, { ...message, feedback }));
     },
     [vscodeAPI]
   );
@@ -181,7 +182,7 @@ const ChatView = React.memo<{
         openLink = 'https://app.superflex.ai/pricing';
       }
 
-      vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: openLink }));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.OPEN_EXTERNAL_URL, { url: openLink }));
     },
     [vscodeAPI]
   );
@@ -189,11 +190,10 @@ const ChatView = React.memo<{
   const handlePaste = useCallback(
     async (text: string): Promise<boolean> => {
       try {
-        const selectedCode = await sendEventWithResponse<EventType.PASTE_COPIED_CODE>(
-          vscodeAPI,
-          EventType.PASTE_COPIED_CODE,
-          { text }
-        );
+        const selectedCode = await sendEventWithResponse<
+          EventRequestType.PASTE_COPIED_CODE,
+          EventResponseType.PASTE_COPIED_CODE
+        >(vscodeAPI, EventRequestType.PASTE_COPIED_CODE, { text });
         if (!selectedCode) return false;
 
         dispatch(addSelectedFile(selectedCode));
@@ -208,16 +208,16 @@ const ChatView = React.memo<{
 
   const handleFileNameClick = useCallback(
     (filePath: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.OPEN_FILE, { filePath }));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.OPEN_FILE, { filePath }));
     },
     [vscodeAPI]
   );
 
   const handleFastApplyClick = useCallback(
     async (filePath: string, edits: string) => {
-      await sendEventWithResponse<EventType.FAST_APPLY>(
+      await sendEventWithResponse<EventRequestType.FAST_APPLY, EventResponseType.FAST_APPLY>(
         vscodeAPI,
-        EventType.FAST_APPLY,
+        EventRequestType.FAST_APPLY,
         { filePath, edits },
         { timeout: 60000 }
       );
@@ -227,30 +227,29 @@ const ChatView = React.memo<{
 
   const handleAcceptAllChanges = useCallback(
     (filePath: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY_ACCEPT, { filePath }));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.FAST_APPLY_ACCEPT, { filePath }));
     },
     [vscodeAPI]
   );
 
   const handleRejectAllChanges = useCallback(
     (filePath: string) => {
-      vscodeAPI.postMessage(newEventRequest(EventType.FAST_APPLY_REJECT, { filePath }));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.FAST_APPLY_REJECT, { filePath }));
     },
     [vscodeAPI]
   );
 
   const fetchFiles = useCallback(() => {
-    vscodeAPI.postMessage(newEventRequest(EventType.FETCH_FILES));
+    vscodeAPI.postMessage(newEventRequest(EventRequestType.FETCH_FILES));
   }, [vscodeAPI]);
 
   const fetchFileContent = useCallback(
     async (file: FilePayload): Promise<string> => {
       try {
-        const content = await sendEventWithResponse<EventType.FETCH_FILE_CONTENT>(
-          vscodeAPI,
-          EventType.FETCH_FILE_CONTENT,
-          file
-        );
+        const content = await sendEventWithResponse<
+          EventRequestType.FETCH_FILE_CONTENT,
+          EventResponseType.FETCH_FILE_CONTENT
+        >(vscodeAPI, EventRequestType.FETCH_FILE_CONTENT, file);
         return content ?? '';
       } catch (err) {
         return '';

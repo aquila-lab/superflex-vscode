@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { EventType, newEventRequest } from '../../../shared/protocol';
+import { EventRequestType, newEventRequest } from '../../../shared/protocol';
 import { useAppSelector } from '../core/store';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import { Button } from '../components/ui/Button';
@@ -15,7 +15,9 @@ const MainView: React.FunctionComponent<{
   const [activeView, setActiveView] = useState<'chat' | 'profile'>('chat');
 
   function handleSubscribe(): void {
-    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
+    vscodeAPI.postMessage(
+      newEventRequest(EventRequestType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' })
+    );
   }
 
   return (

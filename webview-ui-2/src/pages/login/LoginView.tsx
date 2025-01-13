@@ -1,19 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useVSCode } from '../../context/VSCodeContext';
-import { EventType, EventPayloads } from '../../../../shared/protocol';
+import {
+  EventRequestType,
+  EventResponseType,
+  EventResponsePayload,
+  EventResponseMessage
+} from '../../../../shared/protocol';
 import { LoginAuthLinkView } from './LoginAuthLinkView';
 import { LoginDefaultView } from './LoginDefaultView';
 
 export const LoginView = () => {
-  const { postRequest } = useVSCode();
+  const { postMessage } = useVSCode();
   const [authUniqueLink, setAuthUniqueLink] = useState<string | undefined>();
 
   useEffect(() => {
-    const onMessage = (evt: MessageEvent) => {
+    const onMessage = (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
       const { command, payload, error } = evt.data || {};
-      if (command === EventType.CREATE_AUTH_LINK && !error) {
-        const auth = payload as EventPayloads[EventType.CREATE_AUTH_LINK]['response'];
-        setAuthUniqueLink(auth.uniqueLink);
+
+      if (error) return;
+
+      switch (command) {
+        case EventResponseType.CREATE_AUTH_LINK: {
+          const auth = payload as EventResponsePayload[typeof command];
+          setAuthUniqueLink(auth.uniqueLink);
+          break;
+        }
       }
     };
 
@@ -29,12 +40,12 @@ export const LoginView = () => {
         authUniqueLink={authUniqueLink}
         onCopyLink={() => {
           navigator.clipboard.writeText(authUniqueLink);
-          postRequest(EventType.SEND_NOTIFICATION, { message: 'Link copied to clipboard' });
+          postMessage(EventRequestType.SEND_NOTIFICATION, { message: 'Link copied to clipboard' });
         }}
         onReturnToLogin={() => setAuthUniqueLink(undefined)}
       />
     );
   }
 
-  return <LoginDefaultView onRequest={postRequest} />;
+  return <LoginDefaultView />;
 };

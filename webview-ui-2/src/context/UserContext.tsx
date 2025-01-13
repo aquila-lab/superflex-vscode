@@ -1,12 +1,18 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback, ReactNode } from 'react';
 import { useVSCode } from './VSCodeContext';
-import { EventType, EventMessage, EventPayloads } from '../../../shared/protocol';
 import { User, UserSubscription } from '../../../shared/model/User.model';
+import {
+  EventRequestType,
+  EventResponseType,
+  EventResponseMessage,
+  EventResponsePayload
+} from '../../../shared/protocol';
 
 interface UserContextValue {
   user: User | null;
   subscription: UserSubscription | null;
-  loading: boolean;
+  isUserLoading: boolean;
+  isSubscriptionLoading: boolean;
 
   fetchUserInfo: () => void;
   fetchSubscription: () => void;
@@ -18,35 +24,29 @@ interface UserContextValue {
 const UserContext = createContext<UserContextValue | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const { postRequest } = useVSCode();
+  const { postMessage } = useVSCode();
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isUserLoading, setIsUserLoading] = useState(true);
+  const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
 
   useEffect(() => {
-    const onMessage = (evt: MessageEvent<EventMessage<EventType>>) => {
+    const onMessage = (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
       const { command, payload, error } = evt.data || {};
 
-      console.log("UserContext: onMessage =>", command, payload, error);
-
-      if (!command) return;
-      if (error) {
-        return;
-      }
+      if (error) return;
 
       switch (command) {
-        case EventType.GET_USER_INFO: {
-          const fetchedUser = payload as EventPayloads[EventType.GET_USER_INFO]['response'];
+        case EventResponseType.GET_USER_INFO: {
+          const fetchedUser = payload as EventResponsePayload[typeof command];
           setUser(fetchedUser);
-
-          setLoading((prev) => (subscription ? false : prev));
+          setIsUserLoading(false);
           break;
         }
-        case EventType.GET_USER_SUBSCRIPTION: {
-          const fetchedSub = payload as EventPayloads[EventType.GET_USER_SUBSCRIPTION]['response'];
+        case EventResponseType.GET_USER_SUBSCRIPTION: {
+          const fetchedSub = payload as EventResponsePayload[typeof command];
           setSubscription(fetchedSub);
-
-          setLoading((prev) => (user ? false : prev));
+          setIsSubscriptionLoading(false);
           break;
         }
       }
@@ -56,44 +56,52 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       window.removeEventListener('message', onMessage as EventListener);
     };
-  }, [user, subscription]);
-
-  useEffect(() => {
-    postRequest(EventType.INITIALIZED);
   }, []);
 
+  useEffect(() => {
+    postMessage(EventRequestType.INITIALIZED);
+  }, [postMessage]);
+
   const fetchUserInfo = useCallback(() => {
-    console.log("Posting GET_USER_INFO")
-    postRequest(EventType.GET_USER_INFO);
-  }, [postRequest]);
+    postMessage(EventRequestType.GET_USER_INFO);
+  }, [postMessage]);
 
   const fetchSubscription = useCallback(() => {
-    console.log("Posting GET_USER_SUBSCRIPTION")
-    postRequest(EventType.GET_USER_SUBSCRIPTION);
-  }, [postRequest]);
+    postMessage(EventRequestType.GET_USER_SUBSCRIPTION);
+  }, [postMessage]);
 
   const handleSubscribe = useCallback(() => {
-    postRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' });
-  }, [postRequest]);
+    postMessage(EventRequestType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' });
+  }, [postMessage]);
 
   const handleManageBilling = useCallback(() => {
     if (!user) return;
-    postRequest(EventType.OPEN_EXTERNAL_URL, {
+    postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
       url: `https://billing.stripe.com/p/login/3cs3dQdenfJucIU144?prefilled_email=${encodeURIComponent(user.email)}`
     });
-  }, [postRequest, user]);
+  }, [postMessage, user]);
 
   const value: UserContextValue = useMemo(
     () => ({
       user,
       subscription,
-      loading,
+      isUserLoading,
+      isSubscriptionLoading,
       fetchUserInfo,
       fetchSubscription,
       handleSubscribe,
       handleManageBilling
     }),
-    [user, subscription, loading, fetchUserInfo, fetchSubscription, handleSubscribe, handleManageBilling]
+    [
+      user,
+      subscription,
+      isUserLoading,
+      isSubscriptionLoading,
+      fetchUserInfo,
+      fetchSubscription,
+      handleSubscribe,
+      handleManageBilling
+    ]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

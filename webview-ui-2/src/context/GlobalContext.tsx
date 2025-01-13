@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useMemo, ReactNode, useEffect } from 'react';
 import { useVSCode } from './VSCodeContext';
-import { EventType } from '../../../shared/protocol';
+import { EventRequestType } from '../../../shared/protocol';
 
 export interface GlobalState {
   isInitialized: boolean;
@@ -23,11 +23,11 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [config, setConfig] = useState<Record<string, unknown> | null>(null);
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState(false);
-  const { postRequest } = useVSCode();
+  const { postMessage } = useVSCode();
 
   useEffect(() => {
-    postRequest(EventType.READY);
-  }, [postRequest]);
+    postMessage(EventRequestType.READY);
+  }, [postMessage]);
 
   const value: GlobalContextValue = useMemo(
     () => ({

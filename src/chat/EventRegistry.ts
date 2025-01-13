@@ -1,28 +1,34 @@
-import { EventMessage } from "../../shared/protocol";
+import {
+  EventRequestType,
+  EventResponseType,
+  EventRequestPayload,
+  EventResponsePayload,
+  EventResponseMessage,
+} from "../../shared/protocol";
 
-export type Handler<RequestPayload = unknown, ResponsePayload = unknown> = (
-  payload: RequestPayload,
-  sendEventMessageCb: (msg: EventMessage) => void
-) => Promise<ResponsePayload> | ResponsePayload;
+export type Handler<T extends EventRequestType, R extends EventResponseType> = (
+  payload: EventRequestPayload[T],
+  sendEventMessageCb: (msg: EventResponseMessage<R>) => void
+) => Promise<EventResponsePayload[R]> | EventResponsePayload[R];
 
 export class EventRegistry {
-  private events: { [key: string]: Handler<any, any> };
+  private events: { [key: string]: Handler<EventRequestType, EventResponseType> };
 
   constructor() {
     this.events = {};
   }
 
-  registerEvent<Req, Res>(event: string, handler: Handler<Req, Res>) {
+  registerEvent<T extends EventRequestType, R extends EventResponseType>(event: T, handler: Handler<T, R>) {
     this.events[event] = handler;
     return this;
   }
 
-  async handleEvent<Req, Res>(
-    event: string,
-    requestPayload: Req,
-    sendEventMessageCb: (msg: EventMessage) => void
-  ): Promise<Res> {
-    const handler = this.events[event] as Handler<Req, Res>;
+  async handleEvent<T extends EventRequestType, R extends EventResponseType>(
+    event: T,
+    requestPayload: EventRequestPayload[T],
+    sendEventMessageCb: (msg: EventResponseMessage<R>) => void
+  ): Promise<EventResponsePayload[R]> {
+    const handler = this.events[event] as Handler<T, R>;
     if (handler) {
       return handler(requestPayload, sendEventMessageCb);
     }

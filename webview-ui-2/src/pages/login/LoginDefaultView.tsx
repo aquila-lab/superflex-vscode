@@ -1,24 +1,23 @@
-import { EventPayloads, EventType } from '../../../../shared/protocol';
+import { EventRequestType } from '../../../../shared/protocol';
+import { useVSCode } from '../../context/VSCodeContext';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
 
-export const LoginDefaultView = ({
-  onRequest
-}: {
-  onRequest: <T extends EventType>(command: T, payload?: EventPayloads[T]["request"]) => void
-}) => {
+export const LoginDefaultView = () => {
+  const { postMessage } = useVSCode();
+
   const handleCreateAccount = () => {
-    onRequest(EventType.CREATE_ACCOUNT_CLICKED);
-    onRequest(EventType.CREATE_AUTH_LINK, { action: 'create_account' });
+    postMessage(EventRequestType.CREATE_ACCOUNT);
+    postMessage(EventRequestType.CREATE_AUTH_LINK, { action: 'create_account' });
   };
 
   const handleSignIn = () => {
-    onRequest(EventType.LOGIN_CLICKED);
-    onRequest(EventType.CREATE_AUTH_LINK, { action: 'login' });
+    postMessage(EventRequestType.LOGIN);
+    postMessage(EventRequestType.CREATE_AUTH_LINK, { action: 'login' });
   };
 
   const handleOpenVideo = () => {
-    onRequest(EventType.OPEN_EXTERNAL_URL, {
+    postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
       url: 'https://www.youtube.com/watch?v=hNSYwKTxIP8'
     });
   };

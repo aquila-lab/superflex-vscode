@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 
-import { EventType, newEventRequest } from "../shared/protocol";
+import { newEventResponse, EventRequestType, EventResponseType } from "../shared/protocol";
 import { ChatAPI } from "./chat/ChatApi";
-import { AUTH_PROVIDER_ID, SUPERFLEX_POSTHOG_API_KEY } from "./common/constants";
+import { AUTH_PROVIDER_ID, FIGMA_PROVIDER_ID, SUPERFLEX_POSTHOG_API_KEY } from "./common/constants";
 import { getExtensionVersion, getOpenWorkspace, getUniqueID } from "./common/utils";
 import { Telemetry } from "./common/analytics/Telemetry";
 import ChatViewProvider from "./chat/ChatViewProvider";
@@ -63,10 +63,10 @@ async function backgroundInit(context: vscode.ExtensionContext, appState: AppSta
   );
   appState.verticalDiffManager.refreshCodeLens = verticalDiffCodeLens.refresh.bind(verticalDiffCodeLens);
 
-  appState.chatApi.registerEvent(EventType.SEND_NOTIFICATION, (payload) => {
+  appState.chatApi.registerEvent(EventRequestType.SEND_NOTIFICATION, (payload) => {
     vscode.window.showInformationMessage(payload.message);
   });
-  appState.chatApi.registerEvent(EventType.OPEN_EXTERNAL_URL, (payload) => {
+  appState.chatApi.registerEvent(EventRequestType.OPEN_EXTERNAL_URL, (payload) => {
     vscode.env.openExternal(vscode.Uri.parse(payload.url));
   });
 }
@@ -91,25 +91,25 @@ async function registerAuthenticationProviders(context: vscode.ExtensionContext,
     vscode.commands.registerCommand(`${AUTH_PROVIDER_ID}.signout`, () => state.authService.signOut(state.authProvider)),
 
     // Figma Auth commands
-    vscode.commands.registerCommand("superflex.figma.connect", () => state.figmaAuthService.connect()),
-    vscode.commands.registerCommand("superflex.figma.disconnect", () =>
+    vscode.commands.registerCommand(`${FIGMA_PROVIDER_ID}.connect`, () => state.figmaAuthService.connect()),
+    vscode.commands.registerCommand(`${FIGMA_PROVIDER_ID}.disconnect`, () =>
       state.figmaAuthService.disconnect(state.figmaAuthProvider)
     )
   );
 
-  state.chatApi.registerEvent(EventType.LOGIN_CLICKED, async () => {
+  state.chatApi.registerEvent(EventRequestType.LOGIN, async () => {
     await state.authService.signIn(state.authProvider);
   });
-  state.chatApi.registerEvent(EventType.CREATE_ACCOUNT_CLICKED, async () => {
+  state.chatApi.registerEvent(EventRequestType.CREATE_ACCOUNT, async () => {
     await state.authService.signIn(state.authProvider, true);
   });
-  state.chatApi.registerEvent(EventType.CREATE_AUTH_LINK, async (payload) => {
+  state.chatApi.registerEvent(EventRequestType.CREATE_AUTH_LINK, async (payload) => {
     const { uri } = await state.authProvider.createAuthUniqueLink(payload.action === "create_account");
     await state.authProvider.waitForUserConsentToLogin();
     return { uniqueLink: uri.toString(true) };
   });
 
-  state.chatApi.registerEvent(EventType.FIGMA_OAUTH_CONNECT, async () => {
+  state.chatApi.registerEvent(EventRequestType.FIGMA_OAUTH_CONNECT, async () => {
     const token = await state.figmaAuthService.connect();
     return !!token && !!token.accessToken;
   });
@@ -123,7 +123,7 @@ async function initializeAnalytics(context: vscode.ExtensionContext, appState: A
   const analyticsEnabled = config.get<boolean>("analytics", false);
 
   appState.chatViewProvider.sendEventMessage(
-    newEventRequest(EventType.CONFIG, { allowAnonymousTelemetry: analyticsEnabled })
+    newEventResponse(EventResponseType.CONFIG, { allowAnonymousTelemetry: analyticsEnabled })
   );
 
   if (analyticsEnabled && SUPERFLEX_POSTHOG_API_KEY) {

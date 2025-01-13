@@ -19,5 +19,7 @@ export const BRAND_NAME = "superflex";
 export const AUTH_PROVIDER_ID = `${BRAND_NAME}.auth`;
 export const FIGMA_AUTH_PROVIDER_ID = `${AUTH_PROVIDER_ID}.figma`;
 
+export const FIGMA_PROVIDER_ID = `${BRAND_NAME}.figma`;
+
 // file extensions that are supported by the extension
 export const SUPPORTED_FILE_EXTENSIONS = [".htm", ".html", ".css", ".scss", ".js", ".ts", ".jsx", ".tsx", ".vue"];

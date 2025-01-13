@@ -1,46 +1,48 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { EventResponseType, EventResponseMessage, EventResponsePayload } from '../../../shared/protocol';
 import { useGlobal } from '../context/GlobalContext';
-import { EventMessage, EventType, EventPayloads } from '../../../shared/protocol';
 
 export const ExtensionEventHandler = () => {
-  const { setIsInitialized, setIsLoggedIn, setConfig, setIsFigmaAuthenticated } = useGlobal();
   const navigate = useNavigate();
 
+  const { setIsInitialized, setIsLoggedIn, setConfig, setIsFigmaAuthenticated } = useGlobal();
+
   useEffect(() => {
-    const onMessage = (evt: MessageEvent<EventMessage<EventType>>) => {
+    const onMessage = (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
       const { command, payload, error } = evt.data || {};
-      if (!command) return;
+
+      if (error) return;
 
       switch (command) {
-        case EventType.CONFIG: {
-          if (!error && payload) {
-            setConfig(payload as Record<string, unknown>);
-          }
+        case EventResponseType.CONFIG: {
+          const config = payload as EventResponsePayload[typeof command];
+          setConfig(config);
           break;
         }
 
-        case EventType.INITIALIZED: {
-          if (error) return;
-          const { isFigmaAuthenticated, isInitialized} = payload as EventPayloads[EventType.INITIALIZED]["response"];
+        case EventResponseType.INITIALIZED: {
+          const { isFigmaAuthenticated, isInitialized } = payload as EventResponsePayload[typeof command];
+
           setIsFigmaAuthenticated(isFigmaAuthenticated);
           setIsInitialized(true);
 
           if (!isInitialized) {
-            navigate("/open-project");
+            navigate('/open-project');
             return;
           }
-          
-          navigate("/chat");
+
+          navigate('/chat');
           break;
         }
 
-        case EventType.SHOW_LOGIN_VIEW: {
+        case EventResponseType.SHOW_LOGIN_VIEW: {
           setIsLoggedIn(false);
           break;
         }
 
-        case EventType.SHOW_CHAT_VIEW: {
+        case EventResponseType.SHOW_CHAT_VIEW: {
           setIsLoggedIn(true);
           break;
         }
@@ -54,7 +56,7 @@ export const ExtensionEventHandler = () => {
     return () => {
       window.removeEventListener('message', onMessage as EventListener);
     };
-  }, [setConfig, setIsInitialized, setIsLoggedIn, navigate]);
+  }, [navigate, setConfig, setIsInitialized, setIsLoggedIn]);
 
   return null;
 };

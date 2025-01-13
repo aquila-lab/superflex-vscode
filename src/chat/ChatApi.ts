@@ -5,9 +5,11 @@ import { Mutex } from "async-mutex";
 
 import { Message, Thread } from "../../shared/model";
 import {
-  EventMessage,
-  EventPayloads,
-  EventType,
+  EventRequestPayload,
+  EventRequestType,
+  EventResponseMessage,
+  EventResponsePayload,
+  EventResponseType,
   FastApplyPayload,
   FigmaFile,
   FilePayload,
@@ -50,7 +52,7 @@ export class ChatAPI {
       /**
        * Event (ready): This event is fired when the webview is ready to receive events.
        */
-      .registerEvent(EventType.READY, () => {
+      .registerEvent(EventRequestType.READY, () => {
         this._ready.fire();
         this._isReady = true;
         Telemetry.capture("ready", {});
@@ -64,7 +66,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the initialized state.
        * @throws An error if the project files cannot be synced.
        */
-      .registerEvent(EventType.INITIALIZED, async (_, sendEventMessageCb) => {
+      .registerEvent(EventRequestType.INITIALIZED, async (_, sendEventMessageCb) => {
         const release = await this._initializedMutex.acquire();
 
         try {
@@ -90,10 +92,10 @@ export class ChatAPI {
           Telemetry.capture("initialized", {});
 
           const user = await api.getUserInfo();
-          sendEventMessageCb(newEventResponse(EventType.GET_USER_INFO, user));
+          sendEventMessageCb(newEventResponse(EventResponseType.GET_USER_INFO, user));
 
           const subscription = await api.getUserSubscription();
-          sendEventMessageCb(newEventResponse(EventType.GET_USER_SUBSCRIPTION, subscription));
+          sendEventMessageCb(newEventResponse(EventResponseType.GET_USER_SUBSCRIPTION, subscription));
 
           return { isInitialized: true, isFigmaAuthenticated };
         } catch (err) {
@@ -112,7 +114,7 @@ export class ChatAPI {
        * @returns A promise that resolves when the project files are synced.
        * @throws An error if the project files cannot be synced.
        */
-      .registerEvent(EventType.SYNC_PROJECT, async (_, sendEventMessageCb) => {
+      .registerEvent(EventRequestType.SYNC_PROJECT, async (_, sendEventMessageCb) => {
         // Prevent multiple sync project requests from running concurrently
         if (!this._isInitialized || this._isSyncProjectRunning) {
           return;
@@ -133,7 +135,7 @@ export class ChatAPI {
        * @returns A promise that resolves when the new chat thread is created.
        * @throws An error if the new chat thread cannot be created.
        */
-      .registerEvent(EventType.NEW_THREAD, async () => {
+      .registerEvent(EventRequestType.NEW_THREAD, async () => {
         if (!this._isInitialized || !this._assistant) {
           return false;
         }
@@ -156,7 +158,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the Figma file image URL.
        * @throws An error if the Figma file selection URL is invalid.
        */
-      .registerEvent(EventType.FIGMA_FILE_SELECTED, async (payload: FigmaFile, _) => {
+      .registerEvent(EventRequestType.FIGMA_FILE_SELECTED, async (payload: FigmaFile, _) => {
         if (!this._isInitialized || !this._assistant) {
           return;
         }
@@ -171,7 +173,7 @@ export class ChatAPI {
       })
 
       /**
-       * Event (new_message): This event is fired when the user sends a message in the webview Chat.
+       * Event (send_message): This event is fired when the user sends a message in the webview Chat.
        * It is used to send a message to the AI code assistant, and return the assistant's message response.
        *
        * @param payload - Payload containing the messages to send.
@@ -179,7 +181,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the assistant's message response.
        * @throws An error if the message cannot be sent or processed.
        */
-      .registerEvent(EventType.NEW_MESSAGE, async (payload: SendMessagesRequestPayload, sendEventMessageCb) => {
+      .registerEvent(EventRequestType.SEND_MESSAGE, async (payload: SendMessagesRequestPayload, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
           return null;
         }
@@ -198,7 +200,7 @@ export class ChatAPI {
         }
 
         const threadRun = await this._assistant.sendMessage(thread.id, files, messages, (delta) => {
-          sendEventMessageCb(newEventResponse(EventType.MESSAGE_TEXT_DELTA, delta));
+          sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta));
         });
         if (!threadRun) {
           return null;
@@ -213,7 +215,7 @@ export class ChatAPI {
 
         // Send subscription prompt if user is out of premium requests
         if (!threadRun.isPremium && this._isPremiumGeneration) {
-          sendEventMessageCb(newEventResponse(EventType.SHOW_SOFT_PAYWALL_MODAL));
+          sendEventMessageCb(newEventResponse(EventResponseType.SHOW_SOFT_PAYWALL_MODAL));
         }
         this._isPremiumGeneration = threadRun.isPremium;
 
@@ -228,7 +230,7 @@ export class ChatAPI {
        * @returns A promise that resolves when the code is applied.
        * @throws An error if the code cannot be applied.
        */
-      .registerEvent(EventType.FAST_APPLY, async (payload: FastApplyPayload) => {
+      .registerEvent(EventRequestType.FAST_APPLY, async (payload: FastApplyPayload) => {
         if (!this._workspaceDirPath || !this._assistant) {
           return false;
         }
@@ -287,7 +289,7 @@ export class ChatAPI {
        * @returns A promise that resolves when the changes are accepted.
        * @throws An error if the changes cannot be accepted.
        */
-      .registerEvent(EventType.FAST_APPLY_ACCEPT, async (payload: { filePath: string }) => {
+      .registerEvent(EventRequestType.FAST_APPLY_ACCEPT, async (payload: { filePath: string }) => {
         if (!this._workspaceDirPath) {
           return false;
         }
@@ -313,7 +315,7 @@ export class ChatAPI {
        * @returns A promise that resolves when the changes are rejected.
        * @throws An error if the changes cannot be rejected.
        */
-      .registerEvent(EventType.FAST_APPLY_REJECT, async (payload: { filePath: string }) => {
+      .registerEvent(EventRequestType.FAST_APPLY_REJECT, async (payload: { filePath: string }) => {
         if (!this._workspaceDirPath) {
           return false;
         }
@@ -345,7 +347,7 @@ export class ChatAPI {
        *
        * @param payload - Payload containing the relative file path.
        */
-      .registerEvent(EventType.OPEN_FILE, async (payload: { filePath: string }) => {
+      .registerEvent(EventRequestType.OPEN_FILE, async (payload: { filePath: string }) => {
         if (!this._workspaceDirPath) {
           return;
         }
@@ -366,7 +368,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the project files.
        * @throws An error if the project files cannot be fetched.
        */
-      .registerEvent(EventType.FETCH_FILES, async () => {
+      .registerEvent(EventRequestType.FETCH_FILES, async () => {
         if (!this._workspaceDirPath) {
           return [];
         }
@@ -398,7 +400,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the file content.
        * @throws An error if the file content cannot be fetched.
        */
-      .registerEvent(EventType.FETCH_FILE_CONTENT, (payload: FilePayload) => {
+      .registerEvent(EventRequestType.FETCH_FILE_CONTENT, (payload: FilePayload) => {
         if (!this._isInitialized || !this._workspaceDirPath) {
           return "";
         }
@@ -414,7 +416,7 @@ export class ChatAPI {
        * @returns A promise that resolves when the message is updated.
        * @throws An error if the message cannot be updated.
        */
-      .registerEvent(EventType.UPDATE_MESSAGE, async (payload: Message) => {
+      .registerEvent(EventRequestType.UPDATE_MESSAGE, async (payload: Message) => {
         if (!this._isInitialized || !this._assistant) {
           return;
         }
@@ -425,7 +427,7 @@ export class ChatAPI {
       /**
        * Event (get_user_info): This event is fired when webview requests user info.
        */
-      .registerEvent(EventType.GET_USER_INFO, async () => {
+      .registerEvent(EventRequestType.GET_USER_INFO, async () => {
         if (!this._isInitialized) {
           return;
         }
@@ -436,7 +438,7 @@ export class ChatAPI {
       /**
        * Event (get_user_subscription): This event is fired when webview requests user subscription info.
        */
-      .registerEvent(EventType.GET_USER_SUBSCRIPTION, async () => {
+      .registerEvent(EventRequestType.GET_USER_SUBSCRIPTION, async () => {
         if (!this._isInitialized) {
           return;
         }
@@ -464,10 +466,7 @@ export class ChatAPI {
    * @param command - The command for which to register the event handler.
    * @param handler - The event handler to register.
    */
-  registerEvent<T extends EventType>(
-    command: T,
-    handler: Handler<EventPayloads[T]["request"], EventPayloads[T]["response"]>
-  ): void {
+  registerEvent<T extends EventRequestType, R extends EventResponseType>(command: T, handler: Handler<T, R>): void {
     this._chatEventRegistry.registerEvent(command, handler);
   }
 
@@ -479,11 +478,11 @@ export class ChatAPI {
    * @param sendEventMessageCb - A callback to send event messages to webview.
    * @return A promise that resolves to the result of the event handler.
    */
-  async handleEvent<T extends EventType>(
+  async handleEvent<T extends EventRequestType, R extends EventResponseType>(
     event: T,
-    requestPayload: EventPayloads[T]["request"],
-    sendEventMessageCb: (msg: EventMessage) => void
-  ): Promise<EventPayloads[T]["response"]> {
+    requestPayload: EventRequestPayload[T],
+    sendEventMessageCb: (msg: EventResponseMessage<R>) => void
+  ): Promise<EventResponsePayload[R]> {
     return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
   }
 
@@ -493,14 +492,16 @@ export class ChatAPI {
    * @param sendEventMessageCb - A callback to send event messages to webview.
    * @return A promise that resolves when the synchronization is complete.
    */
-  private async syncProjectFiles(sendEventMessageCb: (msg: EventMessage) => void): Promise<void> {
+  private async syncProjectFiles(
+    sendEventMessageCb: (msg: EventResponseMessage<EventResponseType>) => void
+  ): Promise<void> {
     if (!this._assistant) {
       return;
     }
 
     try {
       await this._assistant.syncFiles((progress, isFirstTimeSync) => {
-        sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
+        sendEventMessageCb(newEventResponse(EventResponseType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
       });
     } catch (err: any) {
       if (err?.statusCode === HttpStatusCode.UNAUTHORIZED) {

@@ -6,13 +6,21 @@ import { Progress } from '@radix-ui/react-progress';
 import { Badge } from '../../components/ui/Badge';
 
 const ProfileView: React.FC = () => {
-  const { user, subscription, loading, handleSubscribe, handleManageBilling, fetchSubscription } = useUser();
+  const {
+    user,
+    subscription,
+    isUserLoading,
+    isSubscriptionLoading,
+    handleSubscribe,
+    handleManageBilling,
+    fetchSubscription
+  } = useUser();
 
   useEffect(() => {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  if (loading) {
+  if (isUserLoading || isSubscriptionLoading) {
     return <div className="p-4">Loading user information...</div>;
   }
 

@@ -2,7 +2,7 @@ import axios from "axios";
 import * as vscode from "vscode";
 
 import { FigmaTokenInformation } from "../../shared/model";
-import { EventType, newEventResponse } from "../../shared/protocol";
+import { newEventResponse, EventResponseType } from "../../shared/protocol";
 import ChatViewProvider from "../chat/ChatViewProvider";
 import { Telemetry } from "../common/analytics/Telemetry";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
@@ -39,12 +39,8 @@ export default class FigmaAuthenticationService {
       refreshToken: session.refreshToken,
     };
 
-    this._webviewProvider.sendEventMessage(newEventResponse(EventType.FIGMA_OAUTH_CONNECT, true));
-
-    Telemetry.capture("figma_connect", {
-      userID: session.account.id,
-      email: session.account.label,
-    });
+    this._webviewProvider.sendEventMessage(newEventResponse(EventResponseType.FIGMA_OAUTH_CONNECT, true));
+    Telemetry.capture("figma_connect", { userID: session.account.id, email: session.account.label });
 
     return figmaTokenInfo;
   }
@@ -61,8 +57,7 @@ export default class FigmaAuthenticationService {
     FigmaApiProvider.setHeader("Authorization", null);
     FigmaApiProvider.removeResponseInterceptor();
 
-    this._webviewProvider.sendEventMessage(newEventResponse(EventType.FIGMA_OAUTH_DISCONNECT));
-
+    this._webviewProvider.sendEventMessage(newEventResponse(EventResponseType.FIGMA_OAUTH_DISCONNECT));
     vscode.commands.executeCommand("setContext", "superflex.figma.authenticated", false);
     vscode.window.showInformationMessage("Disconnected Figma account from Superflex!");
 
