@@ -7,31 +7,49 @@ import { EXTENSION_ID } from "./constants";
 import { getPlatform } from "./operatingSystem";
 
 export function decodeUriAndRemoveFilePrefix(uri: string): string {
-  if (getPlatform() === "windows" && uri && uri.includes("file:///")) {
-    uri = uri.replace("file:///", "");
-  } else if (uri && uri.includes("file://")) {
-    uri = uri.replace("file://", "");
-  }
-  if (uri && uri.includes("vscode-userdata:")) {
-    uri = uri.replace("vscode-userdata:", "");
-  }
+  try {
+    if (getPlatform() === "windows" && uri && uri.includes("file:///")) {
+      uri = uri.replace("file:///", "");
+    } else if (uri && uri.includes("file://")) {
+      uri = uri.replace("file://", "");
+    }
+    if (uri && uri.includes("vscode-userdata:")) {
+      uri = uri.replace("vscode-userdata:", "");
+    }
 
-  if (uri) {
-    uri = decodeURIComponent(uri);
+    if (uri) {
+      try {
+        uri = decodeURIComponent(uri);
+      } catch (e) {
+        // If decoding fails, try to selectively decode only known safe sequences
+        uri = uri
+          .replace(/%20/g, " ")
+          .replace(/%23/g, "#")
+          .replace(/%3F/g, "?")
+          .replace(/%25/g, "%")
+          .replace(/%2B/g, "+")
+          .replace(/%5B/g, "[")
+          .replace(/%5D/g, "]")
+          .replace(/%7B/g, "{")
+          .replace(/%7D/g, "}");
+      }
+    }
+
+    // Updating the file path for current open file for wins machine
+    if (getPlatform() === "windows") {
+      uri = uri
+        .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase()) // Ensure drive letter is lowercase
+        .replace(/\//g, "\\") // Convert forward slashes to backslashes
+        .replace(/^\\+/, "") // Remove leading backslashes
+        .replace(/\\+/g, "\\"); // Replace multiple backslashes with single
+    }
+
+    uri = uri.replace(/\\/g, "/");
+
+    return path.normalize(uri);
+  } catch (e) {
+    return uri;
   }
-
-  // Updating the file path for current open file for wins machine
-  if (getPlatform() === "windows") {
-    uri = uri
-      .replace(/^([A-Z]:)?/i, (match) => match.toLowerCase()) // Ensure drive letter is lowercase
-      .replace(/\//g, "\\") // Convert forward slashes to backslashes
-      .replace(/^\\+/, "") // Remove leading backslashes
-      .replace(/\\+/g, "\\"); // Replace multiple backslashes with single
-  }
-
-  uri = uri.replace(/\\/g, "/");
-
-  return path.normalize(uri);
 }
 
 export function getOpenWorkspace(): vscode.WorkspaceFolder | undefined {
