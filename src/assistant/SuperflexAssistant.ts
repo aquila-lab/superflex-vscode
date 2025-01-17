@@ -48,6 +48,21 @@ export default class SuperflexAssistant implements Assistant {
     return thread;
   }
 
+  async getThreads(): Promise<Thread[]> {
+    return api.getThreads({
+      owner: this.owner,
+      repo: this.repo,
+    });
+  }
+
+  async getThread(threadID: string): Promise<Thread> {
+    return api.getThread({
+      owner: this.owner,
+      repo: this.repo,
+      threadID: threadID,
+    });
+  }
+
   async sendMessage(
     threadID: string,
     files: FilePayload[],

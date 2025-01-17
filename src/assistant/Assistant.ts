@@ -11,6 +11,21 @@ export interface Assistant {
   createThread(title?: string): Promise<Thread>;
 
   /**
+   * Get all threads.
+   *
+   * @returns A promise that resolves with an array of threads.
+   */
+  getThreads(): Promise<Thread[]>;
+
+  /**
+   * Get a specific thread by ID.
+   *
+   * @param threadID - The ID of the thread to fetch.
+   * @returns A promise that resolves with the thread.
+   */
+  getThread(threadID: string): Promise<Thread>;
+
+  /**
    * Send a message in a chat thread. If there is no active thread, a new thread will be created.
    *
    * @param threadID - The ID of the thread to send the message to.

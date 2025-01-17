@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Message, TextDelta, User, UserSubscription } from "../model";
+import { Message, TextDelta, Thread, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
   ConfigPayload,
@@ -95,6 +95,18 @@ export enum EventRequestType {
    * NEW_THREAD will trigger the new thread creation on the extension.
    */
   NEW_THREAD = "new_thread",
+
+  /**
+   * FETCH_THREADS will request all threads from the extension.
+   * @returns {Thread[]}
+   */
+  FETCH_THREADS = "fetch_threads",
+
+  /**
+   * FETCH_THREAD will request a specific thread from the extension.
+   * @returns {Thread}
+   */
+  FETCH_THREAD = "fetch_thread",
 
   /**
    * SEND_MESSAGE will send a message to the extension for processing.
@@ -239,6 +251,18 @@ export enum EventResponseType {
   NEW_THREAD = "new_thread",
 
   /**
+   * @triggered by {EventRequestType.FETCH_THREADS}
+   * FETCH_THREADS will send all threads to the webview.
+   */
+  FETCH_THREADS = "fetch_threads",
+
+  /**
+   * @triggered by {EventRequestType.FETCH_THREAD}
+   * FETCH_THREAD will send the requested thread to the webview.
+   */
+  FETCH_THREAD = "fetch_thread",
+
+  /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
    * SEND_MESSAGE send message response to the webview.
    */
@@ -338,6 +362,8 @@ export const EventRequestToResponseTypeMap: { [key: string]: EventResponseType }
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: EventResponseType.FIGMA_OAUTH_DISCONNECT,
   [EventRequestType.FIGMA_FILE_SELECTED]: EventResponseType.FIGMA_FILE_SELECTED,
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
+  [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
+  [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
   [EventRequestType.SEND_MESSAGE]: EventResponseType.SEND_MESSAGE,
   [EventRequestType.FAST_APPLY]: EventResponseType.FAST_APPLY,
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
@@ -359,6 +385,8 @@ export interface EventRequestPayload {
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: void;
   [EventRequestType.FIGMA_FILE_SELECTED]: FigmaFile;
   [EventRequestType.NEW_THREAD]: void;
+  [EventRequestType.FETCH_THREADS]: void;
+  [EventRequestType.FETCH_THREAD]: { threadID: string };
   [EventRequestType.SEND_MESSAGE]: SendMessagesRequestPayload;
   [EventRequestType.UPDATE_MESSAGE]: Message | null;
   [EventRequestType.FAST_APPLY]: FastApplyPayload;
@@ -383,6 +411,8 @@ export interface EventResponsePayload {
   [EventResponseType.FIGMA_OAUTH_DISCONNECT]: void;
   [EventResponseType.FIGMA_FILE_SELECTED]: FigmaFile;
   [EventResponseType.NEW_THREAD]: boolean;
+  [EventResponseType.FETCH_THREADS]: Thread[];
+  [EventResponseType.FETCH_THREAD]: Thread;
   [EventResponseType.SEND_MESSAGE]: Message | null;
   [EventResponseType.MESSAGE_TEXT_DELTA]: TextDelta;
   [EventResponseType.FAST_APPLY]: boolean;

@@ -444,6 +444,39 @@ export class ChatAPI {
         }
 
         return await api.getUserSubscription();
+      })
+
+      /**
+       * Event (fetch_threads): This event is fired when the webview needs to fetch all threads.
+       * It is used to fetch all threads from the assistant.
+       *
+       * @returns A promise that resolves with all threads.
+       * @throws An error if the threads cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_THREADS, async () => {
+        if (!this._isInitialized || !this._assistant) {
+          return [];
+        }
+
+        const threads = await this._assistant.getThreads();
+        return threads;
+      })
+
+      /**
+       * Event (fetch_thread): This event is fired when the webview needs to fetch a specific thread.
+       * It is used to fetch a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID.
+       * @returns A promise that resolves with the thread.
+       * @throws An error if the thread cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_THREAD, async (payload: { threadID: string }) => {
+        if (!this._isInitialized || !this._assistant) {
+          return null;
+        }
+
+        const thread = await this._assistant.getThread(payload.threadID);
+        return thread;
       });
   }
 
