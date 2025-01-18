@@ -9,5 +9,7 @@ declare global {
 
   interface Window {
     acquireVsCodeApi?: () => VsCodeApi;
+    superflexLogoUri: string;
+    monaco: any;
   }
 }

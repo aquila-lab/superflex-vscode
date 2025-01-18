@@ -1,19 +1,29 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/Button';
+import { useUser } from '../context/UserContext';
 
 export const NavBar = () => {
+  const location = useLocation();
+  const { subscription, handleSubscribe } = useUser();
+  const currentPath = location.pathname.split('/')[1] || 'chat';
+
+  if (!subscription) return null;
+
+  const showUpgradeButton = subscription.plan?.name.toLowerCase().includes('free');
+
   return (
-    <nav className="flex items-center justify-between bg-gray-800 px-4 py-2">
-      <div className="text-xl font-bold">Superflex</div>
-      <div className="space-x-4">
-        <Link to="/chat" className="text-white hover:text-gray-300">
-          Chat
-        </Link>
-        <Link to="/profile" className="text-white hover:text-gray-300">
-          Profile
-        </Link>
-      </div>
-      <Button>Upgrade</Button>
-    </nav>
+    <div className="flex justify-end p-1">
+      <Button size="xs" variant={currentPath === 'chat' ? 'secondary' : 'text'} asChild>
+        <Link to="/chat" className='block'>Chat</Link>
+      </Button>
+      <Button size="xs" variant={currentPath === 'profile' ? 'secondary' : 'text'} asChild>
+        <Link to="/profile" className='block'>Profile</Link>
+      </Button>
+      {showUpgradeButton && (
+        <Button size="xs" className="ml-1" onClick={handleSubscribe}>
+          Upgrade
+        </Button>
+      )}
+    </div>
   );
 };

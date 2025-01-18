@@ -1,26 +1,27 @@
+import { useCallback } from 'react';
 import { EventRequestType } from '../../../../shared/protocol';
-import { useVSCode } from '../../context/VSCodeContext';
+import { usePostMessage } from '../../hooks/usePostMessage';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
 
 export const LoginDefaultView = () => {
-  const { postMessage } = useVSCode();
+  const postMessage = usePostMessage();
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = useCallback(() => {
     postMessage(EventRequestType.CREATE_ACCOUNT);
     postMessage(EventRequestType.CREATE_AUTH_LINK, { action: 'create_account' });
-  };
+  }, [postMessage]);
 
-  const handleSignIn = () => {
+  const handleSignIn = useCallback(() => {
     postMessage(EventRequestType.LOGIN);
     postMessage(EventRequestType.CREATE_AUTH_LINK, { action: 'login' });
-  };
+  }, [postMessage]);
 
-  const handleOpenVideo = () => {
+  const handleOpenVideo = useCallback(() => {
     postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
       url: 'https://www.youtube.com/watch?v=hNSYwKTxIP8'
     });
-  };
+  }, [postMessage]);
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-5 pb-4">

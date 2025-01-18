@@ -1,13 +1,14 @@
 import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthenticatedLayout } from '../layouts/AuthenticatedLayout';
+import { NavigationLayout } from '../layouts/NavigationLayout';
 import { Layout } from '../layouts/Layout';
 import { AuthGuard } from './AuthGuard';
 import { AlreadyLoggedInGuard } from './AlreadyLoggedInGuard';
 import { ExtensionEventHandler } from '../components/ExtensionEventHandler';
 import { LoginView } from '../pages/login/LoginView';
 import ProfileView from '../pages/profile/ProfileView';
+import { ChatView } from '../pages/chat/ChatView';
+import { AuthenticatedProviders } from '../components/AuthenticatedProviders';
 
-const ChatPage = () => <div>Chat Screen</div>;
 const OpenProject = () => <div>Open Project</div>;
 
 export const AppRouter = () => {
@@ -29,10 +30,12 @@ export const AppRouter = () => {
         </Route>
 
         <Route element={<AuthGuard />}>
-          <Route path="/" element={<AuthenticatedLayout />}>
-            <Route index element={<ChatPage />} />
-            <Route path="chat" element={<ChatPage />} />
-            <Route path="profile" element={<ProfileView />} />
+          <Route path="/" element={<AuthenticatedProviders />}>
+            <Route element={<NavigationLayout />}>
+              <Route index element={<ChatView />} />
+              <Route path="chat" element={<ChatView />} />
+              <Route path="profile" element={<ProfileView />} />
+            </Route>
           </Route>
         </Route>
 

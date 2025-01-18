@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useState, useMemo, useCallback, ReactNode } from 'react';
-import { useVSCode } from './VSCodeContext';
+import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from 'react';
+import { usePostMessage } from '../hooks/usePostMessage';
+import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { User, UserSubscription } from '../../../shared/model/User.model';
 import {
   EventRequestType,
   EventResponseType,
-  EventResponseMessage,
-  EventResponsePayload
+  EventResponsePayload,
+  EventResponseMessage
 } from '../../../shared/protocol';
 
 interface UserContextValue {
@@ -24,39 +25,42 @@ interface UserContextValue {
 const UserContext = createContext<UserContextValue | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const { postMessage } = useVSCode();
+  const postMessage = usePostMessage();
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true);
 
-  useEffect(() => {
-    const onMessage = (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
-      const { command, payload, error } = evt.data || {};
+  const handleUserInfo = useCallback((payload: EventResponsePayload[EventResponseType.GET_USER_INFO]) => {
+    setUser(payload);
+    setIsUserLoading(false);
+  }, []);
 
-      if (error) return;
+  const handleUserSubscription = useCallback(
+    (payload: EventResponsePayload[EventResponseType.GET_USER_SUBSCRIPTION]) => {
+      setSubscription(payload);
+      setIsSubscriptionLoading(false);
+    },
+    []
+  );
 
-      switch (command) {
+  const handleMessage = useCallback(
+    (payload: EventResponsePayload[EventResponseType], event: EventResponseMessage<EventResponseType>) => {
+      switch (event.command) {
         case EventResponseType.GET_USER_INFO: {
-          const fetchedUser = payload as EventResponsePayload[typeof command];
-          setUser(fetchedUser);
-          setIsUserLoading(false);
+          handleUserInfo(payload as EventResponsePayload[typeof event.command]);
           break;
         }
         case EventResponseType.GET_USER_SUBSCRIPTION: {
-          const fetchedSub = payload as EventResponsePayload[typeof command];
-          setSubscription(fetchedSub);
-          setIsSubscriptionLoading(false);
+          handleUserSubscription(payload as EventResponsePayload[typeof event.command]);
           break;
         }
       }
-    };
+    },
+    [handleUserInfo, handleUserSubscription]
+  );
 
-    window.addEventListener('message', onMessage as EventListener);
-    return () => {
-      window.removeEventListener('message', onMessage as EventListener);
-    };
-  }, []);
+  useConsumeMessage([EventResponseType.GET_USER_INFO, EventResponseType.GET_USER_SUBSCRIPTION], handleMessage);
 
   useEffect(() => {
     postMessage(EventRequestType.INITIALIZED);

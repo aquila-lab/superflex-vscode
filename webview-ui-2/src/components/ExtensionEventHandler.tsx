@@ -1,62 +1,78 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { EventResponseType, EventResponseMessage, EventResponsePayload } from '../../../shared/protocol';
 import { useGlobal } from '../context/GlobalContext';
+import { useConsumeMessage } from '../hooks/useConsumeMessage';
 
 export const ExtensionEventHandler = () => {
   const navigate = useNavigate();
-
   const { setIsInitialized, setIsLoggedIn, setConfig, setIsFigmaAuthenticated } = useGlobal();
 
-  useEffect(() => {
-    const onMessage = (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
-      const { command, payload, error } = evt.data || {};
+  const handleConfig = useCallback(
+    (payload: EventResponsePayload[EventResponseType.CONFIG]) => {
+      setConfig(payload);
+    },
+    [setConfig]
+  );
 
-      if (error) return;
+  const handleInitialized = useCallback(
+    (payload: EventResponsePayload[EventResponseType.INITIALIZED]) => {
+      const { isFigmaAuthenticated, isInitialized } = payload;
 
-      switch (command) {
-        case EventResponseType.CONFIG: {
-          const config = payload as EventResponsePayload[typeof command];
-          setConfig(config);
-          break;
-        }
+      setIsFigmaAuthenticated(isFigmaAuthenticated);
+      setIsInitialized(true);
 
-        case EventResponseType.INITIALIZED: {
-          const { isFigmaAuthenticated, isInitialized } = payload as EventResponsePayload[typeof command];
-
-          setIsFigmaAuthenticated(isFigmaAuthenticated);
-          setIsInitialized(true);
-
-          if (!isInitialized) {
-            navigate('/open-project');
-            return;
-          }
-
-          navigate('/chat');
-          break;
-        }
-
-        case EventResponseType.SHOW_LOGIN_VIEW: {
-          setIsLoggedIn(false);
-          break;
-        }
-
-        case EventResponseType.SHOW_CHAT_VIEW: {
-          setIsLoggedIn(true);
-          break;
-        }
-
-        default:
-          break;
+      if (!isInitialized) {
+        navigate('/open-project');
+        return;
       }
-    };
 
-    window.addEventListener('message', onMessage as EventListener);
-    return () => {
-      window.removeEventListener('message', onMessage as EventListener);
-    };
-  }, [navigate, setConfig, setIsInitialized, setIsLoggedIn]);
+      navigate('/chat');
+    },
+    [navigate, setIsFigmaAuthenticated, setIsInitialized]
+  );
+
+  const handleShowLoginView = useCallback(() => {
+    setIsLoggedIn(false);
+  }, [setIsLoggedIn]);
+
+  const handleShowChatView = useCallback(() => {
+    setIsLoggedIn(true);
+  }, [setIsLoggedIn]);
+
+  const handleMessage = useCallback(
+    (payload: EventResponsePayload[EventResponseType], event: EventResponseMessage<EventResponseType>) => {
+      switch (event.command) {
+        case EventResponseType.CONFIG: {
+          handleConfig(payload as EventResponsePayload[typeof event.command]);
+          break;
+        }
+        case EventResponseType.INITIALIZED: {
+          handleInitialized(payload as EventResponsePayload[typeof event.command]);
+          break;
+        }
+        case EventResponseType.SHOW_LOGIN_VIEW: {
+          handleShowLoginView();
+          break;
+        }
+        case EventResponseType.SHOW_CHAT_VIEW: {
+          handleShowChatView();
+          break;
+        }
+      }
+    },
+    [handleConfig, handleInitialized, handleShowLoginView, handleShowChatView]
+  );
+
+  useConsumeMessage(
+    [
+      EventResponseType.CONFIG,
+      EventResponseType.INITIALIZED,
+      EventResponseType.SHOW_LOGIN_VIEW,
+      EventResponseType.SHOW_CHAT_VIEW
+    ],
+    handleMessage
+  );
 
   return null;
 };
