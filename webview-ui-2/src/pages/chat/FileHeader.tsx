@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { CheckIcon, DocumentDuplicateIcon, PlayIcon } from '@heroicons/react/24/outline';
 
@@ -9,17 +9,11 @@ import { Spinner } from '../../components/ui/Spinner';
 import { FileIcon } from '../../components/ui/FileIcon';
 import { Separator } from '../../components/ui/Separator';
 
-export const FileHeader = ({
-  filePath,
-  isStreaming,
-  children
-}: {
-  filePath: string;
-  isStreaming: boolean;
-  children: ReactNode;
-}) => {
+export const FileHeader = ({ children }: { children: ReactNode }) => {
   const [copyTip, setCopyTip] = useState('Copy code');
   const [applyState, setApplyState] = useState<ApplyState>('idle');
+
+  const filePath = '';
 
   return (
     <div className="flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6">
@@ -54,33 +48,29 @@ export const FileHeader = ({
           )}
         </CopyToClipboard>
 
-        {!isStreaming && (
-          <>
-            {applyState === 'idle' && (
-              <Button size="xs" variant="text" className="text-[11px] px-1 py-0 hover:bg-muted" onClick={() => {}}>
-                <PlayIcon className="size-3.5" />
-                Apply
-              </Button>
-            )}
+        {applyState === 'idle' && (
+          <Button size="xs" variant="text" className="text-[11px] px-1 py-0 hover:bg-muted" onClick={() => {}}>
+            <PlayIcon className="size-3.5" />
+            Apply
+          </Button>
+        )}
 
-            {applyState === 'applying' && (
-              <div className="text-muted-foreground px-1 py-0.5">
-                <Spinner size="xs" />
-              </div>
-            )}
+        {applyState === 'applying' && (
+          <div className="text-muted-foreground px-1 py-0.5">
+            <Spinner size="xs" />
+          </div>
+        )}
 
-            {applyState === 'applied' && (
-              <div className="flex items-center gap-1 ml-2">
-                <Button size="xs" variant="text" className="text-[11px] px-1 py-0 hover:bg-muted" onClick={() => {}}>
-                  ✅ Accept
-                </Button>
-                <Separator orientation="vertical" className="h-4" />
-                <Button size="xs" variant="text" className="text-[11px] px-1 py-0 hover:bg-muted" onClick={() => {}}>
-                  ❌ Reject
-                </Button>
-              </div>
-            )}
-          </>
+        {applyState === 'applied' && (
+          <div className="flex items-center gap-1 ml-2">
+            <Button size="xs" variant="text" className="text-[11px] px-1 py-0 hover:bg-muted" onClick={() => {}}>
+              ✅ Accept
+            </Button>
+            <Separator orientation="vertical" className="h-4" />
+            <Button size="xs" variant="text" className="text-[11px] px-1 py-0 hover:bg-muted" onClick={() => {}}>
+              ❌ Reject
+            </Button>
+          </div>
         )}
       </div>
     </div>

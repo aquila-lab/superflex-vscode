@@ -1,31 +1,19 @@
 import { ReactNode, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Role } from '../../../../shared/model';
-import { MarkdownCodeProps } from '../../common/utils';
+import { cn, defaultClassName, MarkdownCodeProps, roleClassName } from '../../common/utils';
 import { MarkdownCode } from './MarkdownCode';
 
-export const MarkdownRender = ({
-  role,
-  isStreaming = false,
-  children
-}: {
-  role: Role;
-  isStreaming?: boolean;
-  children: ReactNode;
-}) => {
+export const MarkdownRender = ({ role, children }: { role: Role; children: ReactNode }) => {
   const codeComponents = useMemo(
     () => ({
-      code: (props: MarkdownCodeProps) => <MarkdownCode {...props} isStreaming={isStreaming} />
+      code: (props: MarkdownCodeProps) => <MarkdownCode {...props} />
     }),
-    [isStreaming]
+    []
   );
 
   return (
-    <ReactMarkdown
-      className={
-        role !== Role.Assistant ? 'flex gap-2 flex-wrap' : 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
-      }
-      components={codeComponents}>
+    <ReactMarkdown className={cn(roleClassName[role] ?? defaultClassName)} components={codeComponents}>
       {String(children)}
     </ReactMarkdown>
   );

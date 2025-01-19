@@ -1,5 +1,5 @@
-import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import { Role } from '../../../../shared/model';
+import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/Avatar';
 
 export const ChatMessageHeader = ({
   role,

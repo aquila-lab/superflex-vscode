@@ -74,6 +74,11 @@ export const areMessagePropsEqual = (prevProps: { message: Message }, nextProps:
   );
 };
 
+export const roleClassName: Partial<Record<Role, string>> = {
+  [Role.Assistant]: 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
+};
+export const defaultClassName = 'flex gap-2 flex-wrap';
+
 export type ApplyState = 'idle' | 'applying' | 'applied';
 
 export interface CodeBlockInfo {
@@ -85,9 +90,9 @@ export interface CodeBlockInfo {
 
 export interface MarkdownCodeProps {
   inline?: boolean;
+  isStreaming?: boolean;
   className?: string;
   children?: ReactNode;
-  isStreaming?: boolean;
 }
 
 export interface MarkdownRenderProps {

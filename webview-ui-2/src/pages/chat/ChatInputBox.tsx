@@ -1,44 +1,22 @@
-import { useState } from 'react';
-import TextareaAutosize from 'react-textarea-autosize';
-import { Button } from '../../components/ui/Button';
-import { MessageType } from '../../../../shared/model';
-import { IoIosReturnLeft } from 'react-icons/io';
-import { useNewMessage } from '../../context/NewMessageContext';
+import { useInput } from '../../context/InputContext';
+import { ChatBottomToolbar } from './ChatBottomToolbar';
+import { ChatTextarea } from './ChatTextarea';
+import { ChatTopToolbar } from './ChatTopToolbar';
 
 export const ChatInputBox = () => {
-  const [input, setInput] = useState('');
-  const { sendMessageContent, isMessageProcessing } = useNewMessage();
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const success = await sendMessageContent([{ type: MessageType.Text, text: input.trim() }], []);
-
-    if (success) {
-      setInput('');
-    }
-  };
+  const { isDisabled } = useInput();
 
   return (
-    <div className="border border-border rounded-md p-2 mx-4 mb-4">
-      <TextareaAutosize
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        disabled={isMessageProcessing}
-        placeholder="Ask me anything..."
-        className="w-full resize-none bg-transparent border-0 focus:outline-none"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-          }
-        }}
-      />
-      <div className="flex justify-end mt-2">
-        <Button size="sm" disabled={isMessageProcessing ?? !input.trim()} onClick={handleSend}>
-          <IoIosReturnLeft className="mr-2 h-4 w-4" />
-          Send
-        </Button>
+    <div
+      className={
+        isDisabled
+          ? "relative p-[1px] rounded-md before:content-[''] before:absolute before:inset-0 before:rounded-md before:p-[1px] before:bg-[length:400%_400%] before:bg-[linear-gradient(115deg,#1bbe84_0%,#331bbe_16%,#be1b55_33%,#a6be1b_55%,#be1b55_67%)] before:animate-[gradient_3s_linear_infinite]"
+          : 'border border-border rounded-md overflow-y-auto max-h-96'
+      }>
+      <div className="relative flex flex-col bg-input rounded-md z-10 ">
+        <ChatTopToolbar />
+        <ChatTextarea />
+        <ChatBottomToolbar />
       </div>
     </div>
   );

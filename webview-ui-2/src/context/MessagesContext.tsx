@@ -25,7 +25,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([DEFAULT_WELCOME_MESSAGE]);
 
   const addMessages = useCallback((newMessages: Message[]) => {
-    setMessages((prev) => [...prev, ...newMessages].filter((message) => message.id !== 'welcome'));
+    setMessages((prev) => [...prev, ...newMessages]); // .filter((message) => message.id !== 'welcome')
   }, []);
 
   const updateMessage = useCallback((messageId: string, updates: Partial<Message>) => {

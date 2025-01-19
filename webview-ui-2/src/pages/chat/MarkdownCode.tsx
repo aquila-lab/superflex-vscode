@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { cn, MarkdownCodeProps } from '../../common/utils';
-import { CodeBlock } from './CodeBlock';
+import { FileHeader } from './FileHeader';
+import { Editor } from './Editor';
 
-export const MarkdownCode = ({ inline, className, children, isStreaming }: MarkdownCodeProps) => {
-  const match = /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className ?? '');
+export const MarkdownCode = ({ inline, className, children }: MarkdownCodeProps) => {
+  const match = useMemo(() => /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className ?? ''), [className]);
 
   const codeBlock = useMemo(() => {
     if (!match || inline) return null;
@@ -20,9 +21,14 @@ export const MarkdownCode = ({ inline, className, children, isStreaming }: Markd
     return <code className={cn('text-sm text-button-background', className)}>{children}</code>;
   }
 
+  const draft = String(children).replace(/\n$/, '');
+
   return (
-    <CodeBlock codeBlock={codeBlock} isStreaming={Boolean(isStreaming)}>
-      {String(children).replace(/\n$/, '')}
-    </CodeBlock>
+    <div className="rounded-md border border-border bg-background mt-1">
+      <FileHeader>{draft}</FileHeader>
+      <Editor extension={codeBlock.extension} filePath={codeBlock.filePath}>
+        {draft}
+      </Editor>
+    </div>
   );
 };

@@ -6,11 +6,7 @@ export const AssistantMessage = ({ message }: { message: Message }) => {
     case MessageType.Text:
       return <MarkdownRender role={message.role}>{message.content.text}</MarkdownRender>;
     case MessageType.TextDelta:
-      return (
-        <MarkdownRender role={message.role} isStreaming>
-          {message.content.value}
-        </MarkdownRender>
-      );
+      return <MarkdownRender role={message.role}>{message.content.value}</MarkdownRender>;
     default:
       return null;
   }
