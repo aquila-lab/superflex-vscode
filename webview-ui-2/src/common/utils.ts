@@ -7,8 +7,10 @@ import {
   TextDelta,
   ImageContent,
   FigmaContent,
-  Message
+  Message,
+  Role
 } from '../../../shared/model';
+import { ReactNode } from 'react';
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
@@ -71,3 +73,25 @@ export const areMessagePropsEqual = (prevProps: { message: Message }, nextProps:
     areMessageContentsEqual(prevProps.message.content, nextProps.message.content)
   );
 };
+
+export type ApplyState = 'idle' | 'applying' | 'applied';
+
+export interface CodeBlockInfo {
+  extension: string;
+  filePath?: string;
+  startLine?: number;
+  endLine?: number;
+}
+
+export interface MarkdownCodeProps {
+  inline?: boolean;
+  className?: string;
+  children?: ReactNode;
+  isStreaming?: boolean;
+}
+
+export interface MarkdownRenderProps {
+  role: Role;
+  isStreaming?: boolean;
+  children: ReactNode;
+}
