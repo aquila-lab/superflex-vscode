@@ -186,7 +186,7 @@ export class ChatAPI {
           return null;
         }
 
-        const { files, messages } = payload;
+        const { files, messages, fromMessageID } = payload;
         const timeNow = Date.now();
         // Do not send empty messages
         if (messages.length === 0) {
@@ -199,8 +199,11 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const threadRun = await this._assistant.sendMessage(thread.id, files, messages, (delta) => {
-          sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta));
+        const threadRun = await this._assistant.sendMessage(thread.id, files, messages, {
+          fromMessageID,
+          streamResponse: (delta) => {
+            sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta));
+          },
         });
         if (!threadRun) {
           return null;

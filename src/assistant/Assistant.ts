@@ -31,14 +31,19 @@ export interface Assistant {
    * @param threadID - The ID of the thread to send the message to.
    * @param files - The files to send to the assistant.
    * @param messages - The messages to send to the assistant.
-   * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
+   * @param options - Optional parameters to specify the options for the message.
+   *        - fromMessageID - Optional parameter to specify the message ID to start regenerating from.
+   *        - streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
    * @returns A promise that resolves with the response message or null if the request is aborted.
    */
   sendMessage(
     threadID: string,
     files: FilePayload[],
     messages: MessageContent[],
-    streamResponse?: (event: TextDelta) => void
+    options?: {
+      fromMessageID?: string;
+      streamResponse?: (event: TextDelta) => void;
+    }
   ): Promise<ThreadRun | null>;
 
   /**

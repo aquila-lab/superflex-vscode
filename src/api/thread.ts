@@ -57,7 +57,10 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
 export type SendThreadMessageArgs = GetThreadArgs & {
   files: FilePayload[];
   messages: MessageContent[];
-  signal?: AbortSignal;
+  options: {
+    signal: AbortSignal;
+    fromMessageID?: string;
+  };
 };
 
 interface ThreadRunStream {
@@ -71,36 +74,38 @@ async function sendThreadMessage({
   threadID,
   files,
   messages,
-  signal,
+  options,
 }: SendThreadMessageArgs): Promise<ThreadRunStream> {
   try {
-    const response = await Api.post(
-      `/repos/${owner}/${repo}/threads/${threadID}/runs`,
-      {
-        files: files.map((file) => ({
-          path: file.relativePath,
-          content: fs.readFileSync(file.path).toString(),
-          start_line: file.startLine,
-          end_line: file.endLine,
-          is_current_open_file: file.isCurrentOpenFile,
-        })),
-        messages: messages.map((msg) => {
-          if (msg.type === MessageType.Figma) {
-            return {
-              type: msg.type,
-              file_id: msg.fileID,
-              node_id: msg.nodeID,
-            };
-          }
-          return msg;
-        }),
-      },
-      {
-        headers: { "x-is-stream": "true" },
-        responseType: "stream",
-        signal,
-      }
-    );
+    const reqBody: Record<string, any> = {
+      files: files.map((file) => ({
+        path: file.relativePath,
+        content: fs.readFileSync(file.path).toString(),
+        start_line: file.startLine,
+        end_line: file.endLine,
+        is_current_open_file: file.isCurrentOpenFile,
+      })),
+      messages: messages.map((msg) => {
+        if (msg.type === MessageType.Figma) {
+          return {
+            type: msg.type,
+            file_id: msg.fileID,
+            node_id: msg.nodeID,
+          };
+        }
+        return msg;
+      }),
+    };
+
+    if (options.fromMessageID) {
+      reqBody.from_message_id = options.fromMessageID;
+    }
+
+    const response = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, reqBody, {
+      headers: { "x-is-stream": "true" },
+      responseType: "stream",
+      signal: options.signal,
+    });
 
     const listeners = new Set<(delta: TextDelta) => void>();
 

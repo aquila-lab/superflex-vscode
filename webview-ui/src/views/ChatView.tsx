@@ -131,6 +131,7 @@ const ChatView = React.memo<{
           )
         );
 
+        // TODO: Add fromMessageID to the event payload when we are doing regenerating messages
         vscodeAPI.postMessage(newEventRequest(EventRequestType.SEND_MESSAGE, eventPayload));
         dispatch(setIsMessageProcessing(true));
 
