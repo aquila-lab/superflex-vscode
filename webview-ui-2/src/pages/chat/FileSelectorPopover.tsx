@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
-import { FilePayload } from '../../../../shared/protocol';
+import { EventResponsePayload, EventResponseType, FilePayload } from '../../../../shared/protocol';
 import {
   Command,
   CommandEmpty,
@@ -12,14 +12,20 @@ import {
 import { Button } from '../../components/ui/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/Popover';
 import { FileIcon } from '../../components/ui/FileIcon';
+import { useFiles } from '../../context/FilesProvider';
+import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 
-const FileSelectorPopover = ({ selectedFiles }: { selectedFiles: FilePayload[] }) => {
+const FileSelectorPopover = () => {
+  const { selectedFiles, fetchFiles, selectFile } = useFiles();
   const [open, setOpen] = useState(false);
-  const files: FilePayload[] = [];
+  const [files, setFiles] = useState<FilePayload[]>([]);
 
-  const fetchFiles = useCallback(() => {}, []);
+  const handleFetchFiles = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILES]) => {
+    console.log(payload);
+    setFiles(payload);
+  }, []);
 
-  const handleFileSelected = useCallback((file: FilePayload) => {}, []);
+  useConsumeMessage(EventResponseType.FETCH_FILES, handleFetchFiles);
 
   useEffect(() => {
     if (!open) {
@@ -29,19 +35,23 @@ const FileSelectorPopover = ({ selectedFiles }: { selectedFiles: FilePayload[] }
     fetchFiles();
   }, [open]);
 
-  const customFilter = (value: string, search: string): number => {
+  const handleFileSelected = useCallback(
+    (file: FilePayload) => {
+      selectFile(file);
+    },
+    [selectFile]
+  );
+
+  const customFilter = useCallback((value: string, search: string): number => {
     const searchTerms = search
       .toLowerCase()
       .split(/\s+/)
       .filter((term) => term.length > 0);
     const valueLower = value.toLowerCase();
-
-    // Check if all search terms are included in the value
     const matches = searchTerms.every((term) => valueLower.includes(term));
 
-    // Return 1 if all terms match, otherwise 0
     return matches ? 1 : 0;
-  };
+  }, []);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

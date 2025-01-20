@@ -26,7 +26,7 @@ const InputContext = createContext<InputContextValue | null>(null);
 export const InputProvider = ({ children }: { children: ReactNode }) => {
   const [input, setInput] = useState('');
   const { sendMessageContent, isMessageProcessing } = useNewMessage();
-  const isDisabled = isMessageProcessing; // || isProjectSyncing || !initState.isInitialized || isFigmaFileLoading
+  const isDisabled = isMessageProcessing; // TODO || isProjectSyncing || !initState.isInitialized || isFigmaFileLoading
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const sendUserMessage = useCallback(async () => {
@@ -40,19 +40,7 @@ export const InputProvider = ({ children }: { children: ReactNode }) => {
   }, [input, sendMessageContent]);
 
   const replaceWithPaste = useCallback(async (text: string) => {
-    //   try {
-    //     const selectedCode = await sendEventWithResponse<
-    //       EventRequestType.PASTE_COPIED_CODE,
-    //       EventResponseType.PASTE_COPIED_CODE
-    //     >(vscodeAPI, EventRequestType.PASTE_COPIED_CODE, { text });
-    //     if (!selectedCode) return false;
-
-    //     dispatch(addSelectedFile(selectedCode));
-    //     dispatch(setPreviewVisibleForFileID(selectedCode.id));
-    //     return true;
-    //   } catch (err) {
-    //     return false;
-    //   }
+    // TODO
     return true;
   }, []);
 

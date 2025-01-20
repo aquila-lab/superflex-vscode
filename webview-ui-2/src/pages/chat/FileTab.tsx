@@ -4,11 +4,10 @@ import { FilePayload } from '../../../../shared/protocol';
 import { cn } from '../../common/utils';
 import { FileIcon } from '../../components/ui/FileIcon';
 import { Button } from '../../components/ui/Button';
+import { useFiles } from '../../context/FilesProvider';
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
-  const previewVisibleForFileID = null;
-
-  const handleRemoveFile = useCallback((file: FilePayload) => {}, []);
+  const { previewedFile, deselectFile } = useFiles();
 
   const handleTogglePreview = useCallback(() => {}, []);
 
@@ -19,12 +18,12 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
     [handleTogglePreview]
   );
 
-  const handleRemoveClicked = useCallback(
+  const handleRemoveFile = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-      handleRemoveFile(file);
+      deselectFile(file);
     },
-    [handleRemoveFile, file]
+    [deselectFile, file]
   );
 
   return (
@@ -32,7 +31,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
       <div
         className={cn(
           'flex items-center gap-1 bg-background rounded-md pl-0.5 pr-1.5 cursor-pointer',
-          previewVisibleForFileID === file.id ? 'border border-accent' : 'border border-border'
+          previewedFile?.id === file.id ? 'border border-accent' : 'border border-border'
         )}
         onClick={handlePreviewClicked}>
         <div className="flex flex-row items-center gap-1">
@@ -50,7 +49,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             size="xs"
             variant="text"
             className="p-0"
-            onClick={handleRemoveClicked}
+            onClick={handleRemoveFile}
             aria-label={`remove-${file.name}`}>
             <Cross2Icon className="size-3.5" />
           </Button>

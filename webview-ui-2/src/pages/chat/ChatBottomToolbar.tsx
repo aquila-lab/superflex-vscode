@@ -24,7 +24,7 @@ export const ChatBottomToolbar = () => {
           size="xs"
           variant="text"
           active={!isDisabled && input.length > 0 ? 'active' : 'none'}
-          disabled={isDisabled}
+          disabled={isDisabled || !input.length}
           className={isDisabled ? 'opacity-60' : ''}
           onClick={handleButtonClicked}>
           <span className="sr-only">Enter</span>

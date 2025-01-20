@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FilePayload } from '../../../../shared/protocol';
 import { Editor } from './Editor';
+import { useFiles } from '../../context/FilesProvider';
 
-export const FilePreview = ({ file }: { file: FilePayload }) => {
+export const FilePreview = () => {
+  const { previewedFile: file } = useFiles();
+
+  if (!file) return null;
+
   const [content, setContent] = useState(file?.content ?? '');
 
   const fetchFileContent = useCallback(async (file: FilePayload) => {
