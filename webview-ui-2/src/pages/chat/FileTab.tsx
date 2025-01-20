@@ -7,18 +7,18 @@ import { Button } from '../../components/ui/Button';
 import { useFiles } from '../../context/FilesProvider';
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
-  const { previewedFile, deselectFile } = useFiles();
+  const { previewedFile, deselectFile, setPreviewedFile } = useFiles();
 
   const handleTogglePreview = useCallback(() => {}, []);
 
   const handlePreviewClicked = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
-      handleTogglePreview();
+      setPreviewedFile(file);
     },
-    [handleTogglePreview]
+    [handleTogglePreview, file]
   );
 
-  const handleRemoveFile = useCallback(
+  const handleDeselectFile = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       deselectFile(file);
@@ -49,7 +49,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             size="xs"
             variant="text"
             className="p-0"
-            onClick={handleRemoveFile}
+            onClick={handleDeselectFile}
             aria-label={`remove-${file.name}`}>
             <Cross2Icon className="size-3.5" />
           </Button>

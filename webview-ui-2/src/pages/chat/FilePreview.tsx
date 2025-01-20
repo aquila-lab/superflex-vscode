@@ -1,28 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FilePayload } from '../../../../shared/protocol';
 import { Editor } from './Editor';
 import { useFiles } from '../../context/FilesProvider';
+import { EventResponsePayload, EventResponseType } from '../../../../shared/protocol';
+import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 
 export const FilePreview = () => {
-  const { previewedFile: file } = useFiles();
-
-  if (!file) return null;
-
+  const { previewedFile: file, fetchFileContent } = useFiles();
   const [content, setContent] = useState(file?.content ?? '');
 
-  const fetchFileContent = useCallback(async (file: FilePayload) => {
-    return '';
+  const handleFetchFileContent = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILE_CONTENT]) => {
+    setContent(payload);
   }, []);
 
+  useConsumeMessage(EventResponseType.FETCH_FILE_CONTENT, handleFetchFileContent);
+
   useEffect(() => {
-    if (!file.endLine) {
-      const loadContent = async () => {
-        const newContent = await fetchFileContent(file);
-        setContent(newContent);
-      };
-      loadContent();
+    if (file) {
+      fetchFileContent(file);
     }
   }, [file, fetchFileContent]);
+
+  if (!file || !content) return null;
 
   return (
     <div className="rounded-md -mb-1 mt-1.5 mx-1.5 bg-background border border-accent">
