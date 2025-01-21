@@ -17,7 +17,7 @@ interface NewMessageContextValue {
   message: Message | null;
   isMessageProcessing: boolean;
   isMessageStreaming: boolean;
-  sendMessageContent: (content: MessageContent[], files: FilePayload[]) => Promise<boolean>;
+  sendMessageContent: (content: MessageContent[], files: FilePayload[]) => void;
 }
 
 const NewMessageContext = createContext<NewMessageContextValue | null>(null);
@@ -100,8 +100,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   useConsumeMessage([EventResponseType.MESSAGE_TEXT_DELTA, EventResponseType.SEND_MESSAGE], handleMessage);
 
   const sendMessageContent = useCallback(
-    async (content: MessageContent[], files: FilePayload[]): Promise<boolean> => {
-      if (content.length === 0) return false;
+    (content: MessageContent[], files: FilePayload[]): void => {
+      if (content.length === 0) return;
 
       setIsMessageProcessing(true);
 
@@ -122,7 +122,6 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       };
 
       postMessage(EventRequestType.SEND_MESSAGE, payload);
-      return true;
     },
     [postMessage, messages, addMessages]
   );

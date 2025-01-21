@@ -1,9 +1,17 @@
 import { KeyboardEvent, ClipboardEvent, useCallback, ChangeEvent } from 'react';
 import { TextareaAutosize } from '../../components/ui/TextareaAutosize';
 import { useInput } from '../../context/InputContext';
+import { EventResponsePayload, EventResponseType } from '../../../../shared/protocol';
+import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 
 export const ChatTextarea = () => {
   const { input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste } = useInput();
+
+  const handleFocusChat = useCallback((payload: EventResponsePayload[EventResponseType.FOCUS_CHAT_INPUT]) => {
+    inputRef.current?.focus();
+  }, []);
+
+  useConsumeMessage(EventResponseType.FOCUS_CHAT_INPUT, handleFocusChat);
 
   const handleOnKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -16,13 +24,8 @@ export const ChatTextarea = () => {
   );
 
   const handleOnPaste = useCallback(
-    async (e: ClipboardEvent<HTMLTextAreaElement>) => {
-      const pastedText = e.clipboardData.getData('text');
-      const isPasteSuccessful = await replaceWithPaste(pastedText);
-
-      if (isPasteSuccessful) {
-        setInput(pastedText);
-      }
+    (e: ClipboardEvent<HTMLTextAreaElement>) => {
+      replaceWithPaste(e.clipboardData.getData('text'));
     },
     [replaceWithPaste]
   );

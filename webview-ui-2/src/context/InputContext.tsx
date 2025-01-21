@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { useNewMessage } from './NewMessageContext';
 import { MessageType } from '../../../shared/model';
+import { useSync } from './SyncProvider';
 
 interface InputContextValue {
   input: string;
@@ -18,30 +19,28 @@ interface InputContextValue {
   inputRef: RefObject<HTMLTextAreaElement>;
   setInput: (value: SetStateAction<string>) => void;
   sendUserMessage: () => Promise<void>;
-  replaceWithPaste: (text: string) => Promise<boolean>;
+  replaceWithPaste: (pastedText: string) => void;
 }
 
 const InputContext = createContext<InputContextValue | null>(null);
 
 export const InputProvider = ({ children }: { children: ReactNode }) => {
   const [input, setInput] = useState('');
+  const { isSyncing } = useSync();
   const { sendMessageContent, isMessageProcessing } = useNewMessage();
-  const isDisabled = isMessageProcessing; // TODO || isProjectSyncing || !initState.isInitialized || isFigmaFileLoading
+  const isDisabled = isMessageProcessing || isSyncing; // TODO || !initState.isInitialized || isFigmaFileLoading
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const sendUserMessage = useCallback(async () => {
     if (!input.trim()) return;
 
-    const success = await sendMessageContent([{ type: MessageType.Text, text: input.trim() }], []);
-
-    if (success) {
-      setInput('');
-    }
+    sendMessageContent([{ type: MessageType.Text, text: input.trim() }], []);
+    setInput('');
   }, [input, sendMessageContent]);
 
-  const replaceWithPaste = useCallback(async (text: string) => {
+  const replaceWithPaste = useCallback((pastedText: string) => {
     // TODO
-    return true;
+    setInput(pastedText);
   }, []);
 
   const value: InputContextValue = useMemo(
