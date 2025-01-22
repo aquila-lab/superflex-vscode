@@ -4,9 +4,16 @@ import { useInput } from '../../context/InputContext';
 import { FigmaButton } from './FigmaButton';
 import { FilePicker } from './FilePicker';
 import { IoIosReturnLeft } from 'react-icons/io';
+import { useNewMessage } from '../../context/NewMessageContext';
+import { TrashIcon } from '@radix-ui/react-icons';
 
 export const ChatBottomToolbar = () => {
-  const { isDisabled, input, sendUserMessage } = useInput();
+  const { isDisabled, input, sendUserMessage, stopMessage } = useInput();
+  const { isMessageStreaming } = useNewMessage();
+
+  const handleMessageStopped = useCallback(() => {
+    stopMessage();
+  }, [stopMessage]);
 
   const handleButtonClicked = useCallback(() => {
     sendUserMessage();
@@ -20,17 +27,29 @@ export const ChatBottomToolbar = () => {
       </div>
 
       <div className="flex flex-row items-center gap-1">
-        <Button
-          size="xs"
-          variant="text"
-          active={!isDisabled && input.length > 0 ? 'active' : 'none'}
-          disabled={isDisabled || !input.length}
-          className={isDisabled ? 'opacity-60' : ''}
-          onClick={handleButtonClicked}>
-          <span className="sr-only">Enter</span>
-          <IoIosReturnLeft className="size-4" aria-hidden="true" />
-          <span>send</span>
-        </Button>
+        {!isMessageStreaming && (
+          <Button
+            size="xs"
+            variant="text"
+            active={!isDisabled && input.length > 0 ? 'active' : 'none'}
+            disabled={isDisabled || !input.length}
+            className={isDisabled ? 'opacity-60' : ''}
+            onClick={handleButtonClicked}>
+            <span className="sr-only">Enter</span>
+            <IoIosReturnLeft className="size-4" aria-hidden="true" />
+            <span>send</span>
+          </Button>
+        )}
+        {isMessageStreaming && (
+          <Button
+            size="xs"
+            variant="text"
+            className="text-[11px] px-1 py-0 hover:bg-muted"
+            onClick={handleMessageStopped}>
+            <TrashIcon className="size-3.5" />
+            Stop
+          </Button>
+        )}
       </div>
     </div>
   );

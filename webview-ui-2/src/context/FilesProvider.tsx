@@ -1,4 +1,14 @@
-import { createContext, Dispatch, ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { EventRequestType, EventResponsePayload, EventResponseType, FilePayload } from '../../../shared/protocol';
 import { usePostMessage } from '../hooks/usePostMessage';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
@@ -56,6 +66,10 @@ export const FilesProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchFiles = useCallback(() => {
     postMessage(EventRequestType.FETCH_FILES);
+  }, [postMessage]);
+
+  useEffect(() => {
+    postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE);
   }, [postMessage]);
 
   const fetchFileContent = useCallback(

@@ -17,21 +17,40 @@ interface NewMessageContextValue {
   message: Message | null;
   isMessageProcessing: boolean;
   isMessageStreaming: boolean;
+  hasMessageStopped: boolean;
+  lastUserMessage: string | null;
   sendMessageContent: (content: MessageContent[], files: FilePayload[]) => void;
+  stopStreaming: () => void;
 }
 
 const NewMessageContext = createContext<NewMessageContextValue | null>(null);
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
+  const postMessage = usePostMessage();
   const [message, setMessage] = useState<Message | null>(null);
   const [streamTextDelta, setStreamTextDelta] = useState('');
   const [isMessageProcessing, setIsMessageProcessing] = useState(false);
   const [isMessageStreaming, setIsMessageStreaming] = useState(false);
-  const postMessage = usePostMessage();
-  const { messages, addMessages } = useMessages();
+  const { messages, addMessages, popMessage } = useMessages();
+  const [hasMessageStopped, setHasMessageStopped] = useState(false);
+  const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
+
+  const resetNewMessage = useCallback(() => {
+    setIsMessageStreaming(false);
+    setIsMessageProcessing(false);
+    setMessage(null);
+    setStreamTextDelta('');
+  }, []);
+
+  const stopStreaming = useCallback(() => {
+    postMessage(EventRequestType.STOP_MESSAGE);
+    resetNewMessage();
+    popMessage();
+  }, [postMessage, resetNewMessage]);
 
   const handleMessageDelta = useCallback(
     (payload: TextDelta) => {
+      if (hasMessageStopped) return;
       if (!isMessageStreaming) setIsMessageStreaming(true);
       setStreamTextDelta((prev) => prev + payload.value);
 
@@ -60,7 +79,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         };
       });
     },
-    [messages, streamTextDelta, isMessageStreaming]
+    [messages, streamTextDelta, isMessageStreaming, hasMessageStopped]
   );
 
   const handleSendMessageResponse = useCallback(
@@ -103,6 +122,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     (content: MessageContent[], files: FilePayload[]): void => {
       if (content.length === 0) return;
 
+      setHasMessageStopped(false);
       setIsMessageProcessing(true);
 
       const userMessage: Message = {
@@ -115,6 +135,10 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       };
 
       addMessages([userMessage]);
+
+      if (userMessage.content.type === MessageType.Text) {
+        setLastUserMessage(userMessage.content.text);
+      }
 
       const payload: SendMessagesRequestPayload = {
         messages: content,
@@ -131,9 +155,20 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       message,
       isMessageProcessing,
       isMessageStreaming,
-      sendMessageContent
+      hasMessageStopped,
+      lastUserMessage,
+      sendMessageContent,
+      stopStreaming
     }),
-    [message, isMessageProcessing, isMessageStreaming, sendMessageContent]
+    [
+      message,
+      isMessageProcessing,
+      isMessageStreaming,
+      hasMessageStopped,
+      lastUserMessage,
+      sendMessageContent,
+      stopStreaming
+    ]
   );
 
   return <NewMessageContext.Provider value={value}>{children}</NewMessageContext.Provider>;

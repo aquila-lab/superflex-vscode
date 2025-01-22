@@ -1,7 +1,6 @@
 import { ReactNode, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { CheckIcon, DocumentDuplicateIcon, PlayIcon } from '@heroicons/react/24/outline';
-
 import { ApplyState, getFileName } from '../../common/utils';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@radix-ui/react-tooltip';
 import { Button } from '../../components/ui/Button';

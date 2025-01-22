@@ -6,6 +6,7 @@ interface MessagesContextValue {
   messages: Message[];
   addMessages: (messages: Message[]) => void;
   updateMessage: (messageId: string, updates: Partial<Message>) => void;
+  popMessage: () => void;
 }
 
 const MessagesContext = createContext<MessagesContextValue | null>(null);
@@ -38,9 +39,13 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     }
   }, [currentThread]);
 
+  const popMessage = useCallback(() => {
+    setMessages((prev) => prev.slice(0, -1));
+  }, []);
+
   const addMessages = useCallback((newMessages: Message[]) => {
     setMessages((prev) => {
-      if (prev.length === 0 || (prev.length === 1 && prev[0].id === 'welcome')) {
+      if (prev.length === 0) {
         return newMessages;
       }
       return [...prev, ...newMessages];
@@ -55,9 +60,10 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     () => ({
       messages,
       addMessages,
-      updateMessage
+      updateMessage,
+      popMessage
     }),
-    [messages, addMessages, updateMessage]
+    [messages, addMessages, updateMessage, popMessage]
   );
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

@@ -6,12 +6,12 @@ import { ChatMessageList } from './ChatMessageList';
 export const ChatView = () => {
   return (
     <div className="flex flex-col h-full p-2 pt-0">
-      <ChatMessageList />
-      <SyncProvider>
-        <InputProvider>
+      <InputProvider>
+        <ChatMessageList />
+        <SyncProvider>
           <ChatInputBox />
-        </InputProvider>
-      </SyncProvider>
+        </SyncProvider>
+      </InputProvider>
     </div>
   );
 };

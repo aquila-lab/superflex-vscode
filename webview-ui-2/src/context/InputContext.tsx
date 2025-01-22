@@ -20,6 +20,7 @@ interface InputContextValue {
   setInput: (value: SetStateAction<string>) => void;
   sendUserMessage: () => Promise<void>;
   replaceWithPaste: (pastedText: string) => void;
+  stopMessage: () => void;
 }
 
 const InputContext = createContext<InputContextValue | null>(null);
@@ -27,9 +28,18 @@ const InputContext = createContext<InputContextValue | null>(null);
 export const InputProvider = ({ children }: { children: ReactNode }) => {
   const [input, setInput] = useState('');
   const { isSyncing } = useSync();
-  const { sendMessageContent, isMessageProcessing } = useNewMessage();
+  const { sendMessageContent, isMessageProcessing, stopStreaming, lastUserMessage } =
+    useNewMessage();
   const isDisabled = isMessageProcessing || isSyncing; // TODO || !initState.isInitialized || isFigmaFileLoading
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const stopMessage = useCallback(() => {
+    if (lastUserMessage) {
+      stopStreaming();
+      setInput(lastUserMessage);
+      inputRef.current?.focus();
+    }
+  }, [lastUserMessage]);
 
   const sendUserMessage = useCallback(async () => {
     if (!input.trim()) return;
@@ -50,9 +60,10 @@ export const InputProvider = ({ children }: { children: ReactNode }) => {
       inputRef,
       setInput,
       sendUserMessage,
-      replaceWithPaste
+      replaceWithPaste,
+      stopMessage
     }),
-    [input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste]
+    [input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste, stopMessage]
   );
 
   return <InputContext.Provider value={value}>{children}</InputContext.Provider>;
