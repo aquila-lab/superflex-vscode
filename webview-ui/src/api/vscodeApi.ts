@@ -1,4 +1,9 @@
-import { EventMessage } from '../../../shared/protocol';
+import {
+  EventRequestMessage,
+  EventResponseMessage,
+  EventRequestType,
+  EventResponseType
+} from '../../../shared/protocol';
 
 export type VSCodeApiProps = {
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>;
@@ -12,7 +17,10 @@ interface VSCodeApi {
   postMessage: (message: unknown) => void;
 }
 
-export type VSCodeWrapper = GenericVSCodeWrapper<EventMessage, EventMessage>;
+export type VSCodeWrapper = GenericVSCodeWrapper<
+  EventRequestMessage<EventRequestType>,
+  EventResponseMessage<EventResponseType>
+>;
 
 let api: VSCodeWrapper;
 
@@ -22,7 +30,7 @@ export function getVSCodeAPI(): VSCodeWrapper {
     api = {
       postMessage: (message) => vsCodeApi.postMessage(message),
       onMessage: (callback) => {
-        const listener = (event: MessageEvent<EventMessage>): void => {
+        const listener = (event: MessageEvent<EventResponseMessage<EventResponseType>>): void => {
           callback(event.data);
         };
         window.addEventListener('message', listener);
@@ -39,7 +47,10 @@ export function setVSCodeWrapper(value: VSCodeWrapper): void {
   api = value;
 }
 
-export interface GenericVSCodeWrapper<W, E> {
+export interface GenericVSCodeWrapper<
+  W extends EventRequestMessage<EventRequestType>,
+  E extends EventResponseMessage<EventResponseType>
+> {
   postMessage: (message: W) => void;
   onMessage: (callback: (message: E) => void) => () => void;
   getState: () => unknown;
@@ -48,7 +59,10 @@ export interface GenericVSCodeWrapper<W, E> {
 
 let genericApi: GenericVSCodeWrapper<any, any>;
 
-export function getGenericVSCodeAPI<W, E>(): GenericVSCodeWrapper<W, E> {
+export function getGenericVSCodeAPI<
+  W extends EventRequestMessage<EventRequestType>,
+  E extends EventResponseMessage<EventResponseType>
+>(): GenericVSCodeWrapper<W, E> {
   if (!genericApi) {
     const vsCodeApi = acquireVsCodeApi();
     genericApi = {

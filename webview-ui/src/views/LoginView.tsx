@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol';
+import {
+  EventRequestType,
+  EventResponseMessage,
+  EventResponsePayload,
+  EventResponseType,
+  newEventRequest
+} from '../../../shared/protocol';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/Card';
@@ -13,16 +19,16 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
   const [authUniqueLink, setAuthUniqueLink] = useState<string>();
 
   useEffect(() => {
-    return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
+    return vscodeAPI.onMessage((message: EventResponseMessage<EventResponseType>) => {
       const { command, payload, error } = message;
 
       switch (command) {
-        case EventType.CREATE_AUTH_LINK: {
+        case EventResponseType.CREATE_AUTH_LINK: {
           if (error) {
             return;
           }
 
-          const auth = payload as EventPayloads[typeof command]['response'];
+          const auth = payload as EventResponsePayload[typeof command];
           setAuthUniqueLink(auth.uniqueLink);
           break;
         }
@@ -50,7 +56,7 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
               onClick={() => {
                 navigator.clipboard.writeText(authUniqueLink);
                 vscodeAPI.postMessage(
-                  newEventRequest(EventType.SEND_NOTIFICATION, { message: 'Link copied to clipboard' })
+                  newEventRequest(EventRequestType.SEND_NOTIFICATION, { message: 'Link copied to clipboard' })
                 );
               }}>
               Copy Link
@@ -80,8 +86,8 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
           <Button
             className="w-full"
             onClick={() => {
-              vscodeAPI.postMessage(newEventRequest(EventType.CREATE_ACCOUNT_CLICKED));
-              vscodeAPI.postMessage(newEventRequest(EventType.CREATE_AUTH_LINK, { action: 'create_account' }));
+              vscodeAPI.postMessage(newEventRequest(EventRequestType.CREATE_ACCOUNT));
+              vscodeAPI.postMessage(newEventRequest(EventRequestType.CREATE_AUTH_LINK, { action: 'create_account' }));
             }}>
             Start for Free
           </Button>
@@ -90,8 +96,8 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
           <Button
             variant={'link'}
             onClick={() => {
-              vscodeAPI.postMessage(newEventRequest(EventType.LOGIN_CLICKED));
-              vscodeAPI.postMessage(newEventRequest(EventType.CREATE_AUTH_LINK, { action: 'login' }));
+              vscodeAPI.postMessage(newEventRequest(EventRequestType.LOGIN));
+              vscodeAPI.postMessage(newEventRequest(EventRequestType.CREATE_AUTH_LINK, { action: 'login' }));
             }}>
             Sign In
           </Button>
@@ -104,7 +110,9 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
           className="w-full cursor-pointer relative"
           onClick={() =>
             vscodeAPI.postMessage(
-              newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://www.youtube.com/watch?v=hNSYwKTxIP8' })
+              newEventRequest(EventRequestType.OPEN_EXTERNAL_URL, {
+                url: 'https://www.youtube.com/watch?v=hNSYwKTxIP8'
+              })
             )
           }>
           <div className="absolute inset-0 z-10"></div>

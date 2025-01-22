@@ -1,6 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
+
+import {
+  EventRequestPayload,
+  EventRequestType,
+  EventResponseMessage,
+  EventResponsePayload,
+  EventResponseType,
+  newEventRequest
+} from '../../../shared/protocol';
 import { VSCodeWrapper } from './vscodeApi';
-import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol';
 
 interface RequestOptions {
   timeout?: number;
@@ -14,26 +22,26 @@ interface RequestOptions {
  * @param options - The request options. The default timeout is 5 seconds.
  * @returns A promise that resolves to the response payload.
  */
-export async function sendEventWithResponse<T extends EventType>(
+export async function sendEventWithResponse<T extends EventRequestType, R extends EventResponseType>(
   vscodeAPI: Pick<VSCodeWrapper, 'postMessage' | 'onMessage'>,
   eventType: T,
-  payload?: EventPayloads[T]['request'],
+  payload?: EventRequestPayload[T],
   options: RequestOptions = {}
-): Promise<EventPayloads[T]['response']> {
+): Promise<EventResponsePayload[R]> {
   const messageID = uuidv4();
   let cleanup: () => void = () => {};
 
   try {
-    const promiseResult = new Promise<EventPayloads[T]['response']>((resolve, reject) => {
-      const handleResponse = (message: EventMessage<EventType>) => {
+    const promiseResult = new Promise<EventResponsePayload[R]>((resolve, reject) => {
+      const handleResponse = (message: EventResponseMessage<EventResponseType>) => {
         const { id, command, payload, error } = message;
 
-        if (command === eventType && id === messageID) {
+        if (command.toString() === eventType.toString() && id === messageID) {
           if (error) {
             reject(error);
             return;
           }
-          resolve(payload as EventPayloads[T]['response']);
+          resolve(payload as EventResponsePayload[R]);
         }
       };
 
@@ -47,7 +55,7 @@ export async function sendEventWithResponse<T extends EventType>(
 
     return await Promise.race([
       promiseResult,
-      new Promise<EventPayloads[T]['response']>((resolve, reject) =>
+      new Promise<EventResponsePayload[R]>((resolve, reject) =>
         setTimeout(() => reject(new Error(`Request timeout for event ${eventType}`)), options.timeout ?? 5000)
       )
     ]);

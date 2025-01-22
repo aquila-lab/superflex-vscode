@@ -36,6 +36,7 @@ export type FilePayload = {
 export type SendMessagesRequestPayload = {
   files: FilePayload[];
   messages: MessageContent[];
+  fromMessageID?: string;
 };
 
 export type FigmaFile = {

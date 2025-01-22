@@ -48,11 +48,36 @@ export default class SuperflexAssistant implements Assistant {
     return thread;
   }
 
+  async getThreads(): Promise<Thread[]> {
+    return api.getThreads({
+      owner: this.owner,
+      repo: this.repo,
+    });
+  }
+
+  async getThread(threadID: string): Promise<Thread> {
+    return api.getThread({
+      owner: this.owner,
+      repo: this.repo,
+      threadID: threadID,
+    });
+  }
+
+  async stopMessage(): Promise<void> {
+    if (this._currentStream) {
+      this._currentStream.abort();
+      this._currentStream = undefined;
+    }
+  }
+
   async sendMessage(
     threadID: string,
     files: FilePayload[],
     messages: MessageContent[],
-    streamResponse?: (event: TextDelta) => void
+    options?: {
+      fromMessageID?: string;
+      streamResponse?: (event: TextDelta) => void;
+    }
   ): Promise<ThreadRun | null> {
     // Cancel any existing stream
     if (this._currentStream) {
@@ -70,11 +95,15 @@ export default class SuperflexAssistant implements Assistant {
         threadID,
         files,
         messages,
-        signal: this._currentStream.signal,
+        options: {
+          signal: this._currentStream.signal,
+          fromMessageID: options?.fromMessageID,
+        },
       });
 
       // Create a promise that will reject if the stream is aborted
       const streamPromise = new Promise<ThreadRun>((resolve, reject) => {
+        const streamResponse = options?.streamResponse;
         if (streamResponse) {
           stream.on("textDelta", (delta) => {
             // Check if stream was aborted
@@ -82,6 +111,7 @@ export default class SuperflexAssistant implements Assistant {
               reject(new Error("canceled"));
               return;
             }
+
             streamResponse(delta);
           });
         }

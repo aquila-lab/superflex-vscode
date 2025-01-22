@@ -11,19 +11,44 @@ export interface Assistant {
   createThread(title?: string): Promise<Thread>;
 
   /**
+   * Get all threads.
+   *
+   * @returns A promise that resolves with an array of threads.
+   */
+  getThreads(): Promise<Thread[]>;
+
+  /**
+   * Get a specific thread by ID.
+   *
+   * @param threadID - The ID of the thread to fetch.
+   * @returns A promise that resolves with the thread.
+   */
+  getThread(threadID: string): Promise<Thread>;
+
+  /**
+   * Stop the message generation. It will stop the message stream and remove the message from the thread.
+   */
+  stopMessage(): void;
+
+  /**
    * Send a message in a chat thread. If there is no active thread, a new thread will be created.
    *
    * @param threadID - The ID of the thread to send the message to.
    * @param files - The files to send to the assistant.
    * @param messages - The messages to send to the assistant.
-   * @param streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
+   * @param options - Optional parameters to specify the options for the message.
+   *        - fromMessageID - Optional parameter to specify the message ID to start regenerating from.
+   *        - streamResponse - Optional parameter to specify a callback function that will be called when the assistant sends a response.
    * @returns A promise that resolves with the response message or null if the request is aborted.
    */
   sendMessage(
     threadID: string,
     files: FilePayload[],
     messages: MessageContent[],
-    streamResponse?: (event: TextDelta) => void
+    options?: {
+      fromMessageID?: string;
+      streamResponse?: (event: TextDelta) => void;
+    }
   ): Promise<ThreadRun | null>;
 
   /**

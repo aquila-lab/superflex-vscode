@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
 
-import { EventMessage, EventPayloads, EventType, newEventRequest } from '../../../shared/protocol/events';
+import {
+  EventResponseType,
+  EventResponseMessage,
+  newEventRequest,
+  EventResponsePayload,
+  EventRequestType
+} from '../../../shared/protocol/events';
 import { VSCodeWrapper } from '../api/vscodeApi';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -34,25 +40,25 @@ const ProfileView: React.FunctionComponent<{
   const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    return vscodeAPI.onMessage((message: EventMessage<EventType>) => {
+    return vscodeAPI.onMessage((message: EventResponseMessage<EventResponseType>) => {
       const { command, payload, error } = message;
 
       switch (command) {
-        case EventType.GET_USER_INFO: {
+        case EventResponseType.GET_USER_INFO: {
           if (error) {
             return;
           }
 
-          const user = payload as EventPayloads[typeof command]['response'];
+          const user = payload as EventResponsePayload[typeof command];
           dispatch(setUser(user));
           break;
         }
-        case EventType.GET_USER_SUBSCRIPTION: {
+        case EventResponseType.GET_USER_SUBSCRIPTION: {
           if (error) {
             return;
           }
 
-          const subscription = payload as EventPayloads[typeof command]['response'];
+          const subscription = payload as EventResponsePayload[typeof command];
           dispatch(setUserSubscription(subscription));
           break;
         }
@@ -61,17 +67,19 @@ const ProfileView: React.FunctionComponent<{
   }, [vscodeAPI]);
 
   useEffect(() => {
-    vscodeAPI.postMessage(newEventRequest(EventType.GET_USER_INFO));
-    vscodeAPI.postMessage(newEventRequest(EventType.GET_USER_SUBSCRIPTION));
+    vscodeAPI.postMessage(newEventRequest(EventRequestType.GET_USER_INFO));
+    vscodeAPI.postMessage(newEventRequest(EventRequestType.GET_USER_SUBSCRIPTION));
   }, [vscodeAPI]);
 
   function handleSubscribe(): void {
-    vscodeAPI.postMessage(newEventRequest(EventType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' }));
+    vscodeAPI.postMessage(
+      newEventRequest(EventRequestType.OPEN_EXTERNAL_URL, { url: 'https://app.superflex.ai/pricing' })
+    );
   }
 
   function handleManageBilling(): void {
     vscodeAPI.postMessage(
-      newEventRequest(EventType.OPEN_EXTERNAL_URL, {
+      newEventRequest(EventRequestType.OPEN_EXTERNAL_URL, {
         url: `https://billing.stripe.com/p/login/3cs3dQdenfJucIU144?prefilled_email=${encodeURIComponent(user.email)}`
       })
     );
