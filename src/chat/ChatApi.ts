@@ -430,7 +430,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the current open file.
        * @throws An error if the current open file cannot be fetched.
        */
-      .registerEvent(EventRequestType.FETCH_CURRENT_OPEN_FILE, async () => {
+      .registerEvent(EventRequestType.FETCH_CURRENT_OPEN_FILE, (_, sendEventMessageCb) => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
           return null;
@@ -439,13 +439,15 @@ export class ChatAPI {
         const newCurrentOpenFile = decodeUriAndRemoveFilePrefix(editor.document.uri.path);
         const relativePath = path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile);
 
-        return {
-          id: generateFileID(relativePath),
-          name: path.basename(newCurrentOpenFile),
-          path: newCurrentOpenFile,
-          relativePath,
-          isCurrentOpenFile: true,
-        } as FilePayload;
+        sendEventMessageCb(
+          newEventResponse(EventResponseType.SET_CURRENT_OPEN_FILE, {
+            id: generateFileID(relativePath),
+            name: path.basename(newCurrentOpenFile),
+            path: newCurrentOpenFile,
+            relativePath,
+            isCurrentOpenFile: true,
+          } as FilePayload)
+        );
       })
 
       /**

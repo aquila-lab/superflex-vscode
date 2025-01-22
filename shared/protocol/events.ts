@@ -161,8 +161,7 @@ export enum EventRequestType {
   FETCH_FILE_CONTENT = "fetch_file_content",
 
   /**
-   * FETCH_CURRENT_OPEN_FILE trigger extension to fetch the current open file.
-   * @returns {FilePayload | null} can be null if no file is open.
+   * FETCH_CURRENT_OPEN_FILE trigger extension to send the current open file to the webview via SET_CURRENT_OPEN_FILE event.
    */
   FETCH_CURRENT_OPEN_FILE = "fetch_current_open_file",
 
@@ -313,13 +312,7 @@ export enum EventResponseType {
   FETCH_FILE_CONTENT = "fetch_file_content",
 
   /**
-   * @triggered by {EventRequestType.FETCH_CURRENT_OPEN_FILE}.
-   * FETCH_CURRENT_OPEN_FILE will send the current open file to the webview, if no file is open, it will send null.
-   */
-  FETCH_CURRENT_OPEN_FILE = "fetch_current_open_file",
-
-  /**
-   * @triggered by extension.
+   * @triggered by extension and {EventRequestType.FETCH_CURRENT_OPEN_FILE}.
    * SET_CURRENT_OPEN_FILE will send the current open file in IDE to the webview.
    */
   SET_CURRENT_OPEN_FILE = "set_current_open_file",
@@ -387,7 +380,7 @@ export const EventRequestToResponseTypeMap: { [key: string]: EventResponseType }
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
   [EventRequestType.FETCH_FILES]: EventResponseType.FETCH_FILES,
   [EventRequestType.FETCH_FILE_CONTENT]: EventResponseType.FETCH_FILE_CONTENT,
-  [EventRequestType.FETCH_CURRENT_OPEN_FILE]: EventResponseType.FETCH_CURRENT_OPEN_FILE,
+  [EventRequestType.FETCH_CURRENT_OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
   [EventRequestType.PASTE_COPIED_CODE]: EventResponseType.PASTE_COPIED_CODE,
   [EventRequestType.GET_USER_INFO]: EventResponseType.GET_USER_INFO,
   [EventRequestType.GET_USER_SUBSCRIPTION]: EventResponseType.GET_USER_SUBSCRIPTION,
@@ -439,7 +432,6 @@ export interface EventResponsePayload {
   [EventResponseType.FAST_APPLY]: boolean;
   [EventResponseType.FETCH_FILES]: FilePayload[];
   [EventResponseType.FETCH_FILE_CONTENT]: string;
-  [EventResponseType.FETCH_CURRENT_OPEN_FILE]: FilePayload | null;
   [EventResponseType.SET_CURRENT_OPEN_FILE]: FilePayload | null;
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload;
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null;
