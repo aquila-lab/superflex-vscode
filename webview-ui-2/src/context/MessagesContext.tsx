@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect } from 'react';
 import { Message, MessageType, Role } from '../../../shared/model';
+import { useThreads } from './ThreadsProvider';
 
 interface MessagesContextValue {
   messages: Message[];
@@ -21,11 +22,29 @@ const DEFAULT_WELCOME_MESSAGE: Message = {
   updatedAt: new Date()
 };
 
-export const MessagesProvider = ({ children }: { children: ReactNode }) => {
+interface MessagesProviderProps {
+  children: ReactNode;
+}
+
+export const MessagesProvider = ({ children }: MessagesProviderProps) => {
+  const { currentThread } = useThreads();
   const [messages, setMessages] = useState<Message[]>([DEFAULT_WELCOME_MESSAGE]);
 
+  useEffect(() => {
+    if (currentThread) {
+      setMessages(currentThread.messages);
+    } else {
+      setMessages([DEFAULT_WELCOME_MESSAGE]);
+    }
+  }, [currentThread]);
+
   const addMessages = useCallback((newMessages: Message[]) => {
-    setMessages((prev) => [...prev, ...newMessages]); // .filter((message) => message.id !== 'welcome')
+    setMessages((prev) => {
+      if (prev.length === 0 || (prev.length === 1 && prev[0].id === 'welcome')) {
+        return newMessages;
+      }
+      return [...prev, ...newMessages];
+    });
   }, []);
 
   const updateMessage = useCallback((messageId: string, updates: Partial<Message>) => {
