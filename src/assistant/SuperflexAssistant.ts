@@ -63,6 +63,13 @@ export default class SuperflexAssistant implements Assistant {
     });
   }
 
+  async stopMessage(): Promise<void> {
+    if (this._currentStream) {
+      this._currentStream.abort();
+      this._currentStream = undefined;
+    }
+  }
+
   async sendMessage(
     threadID: string,
     files: FilePayload[],

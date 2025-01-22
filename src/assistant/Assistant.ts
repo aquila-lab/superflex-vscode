@@ -26,6 +26,11 @@ export interface Assistant {
   getThread(threadID: string): Promise<Thread>;
 
   /**
+   * Stop the message generation. It will stop the message stream and remove the message from the thread.
+   */
+  stopMessage(): void;
+
+  /**
    * Send a message in a chat thread. If there is no active thread, a new thread will be created.
    *
    * @param threadID - The ID of the thread to send the message to.

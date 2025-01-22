@@ -93,6 +93,7 @@ export enum EventRequestType {
 
   /**
    * NEW_THREAD will trigger the new thread creation on the extension.
+   * @returns {Thread}
    */
   NEW_THREAD = "new_thread",
 
@@ -107,6 +108,11 @@ export enum EventRequestType {
    * @returns {Thread}
    */
   FETCH_THREAD = "fetch_thread",
+
+  /**
+   * STOP_MESSAGE will stop the message stream.
+   */
+  STOP_MESSAGE = "stop_message",
 
   /**
    * SEND_MESSAGE will send a message to the extension for processing.
@@ -153,6 +159,12 @@ export enum EventRequestType {
    * @returns {string} file content
    */
   FETCH_FILE_CONTENT = "fetch_file_content",
+
+  /**
+   * FETCH_CURRENT_OPEN_FILE trigger extension to fetch the current open file.
+   * @returns {FilePayload | null} can be null if no file is open.
+   */
+  FETCH_CURRENT_OPEN_FILE = "fetch_current_open_file",
 
   /**
    * PASTE_COPIED_CODE trigger extension to return FilePayload of selected text if it is part of the user project.
@@ -301,6 +313,12 @@ export enum EventResponseType {
   FETCH_FILE_CONTENT = "fetch_file_content",
 
   /**
+   * @triggered by {EventRequestType.FETCH_CURRENT_OPEN_FILE}.
+   * FETCH_CURRENT_OPEN_FILE will send the current open file to the webview, if no file is open, it will send null.
+   */
+  FETCH_CURRENT_OPEN_FILE = "fetch_current_open_file",
+
+  /**
    * @triggered by extension.
    * SET_CURRENT_OPEN_FILE will send the current open file in IDE to the webview.
    */
@@ -369,6 +387,7 @@ export const EventRequestToResponseTypeMap: { [key: string]: EventResponseType }
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
   [EventRequestType.FETCH_FILES]: EventResponseType.FETCH_FILES,
   [EventRequestType.FETCH_FILE_CONTENT]: EventResponseType.FETCH_FILE_CONTENT,
+  [EventRequestType.FETCH_CURRENT_OPEN_FILE]: EventResponseType.FETCH_CURRENT_OPEN_FILE,
   [EventRequestType.PASTE_COPIED_CODE]: EventResponseType.PASTE_COPIED_CODE,
   [EventRequestType.GET_USER_INFO]: EventResponseType.GET_USER_INFO,
   [EventRequestType.GET_USER_SUBSCRIPTION]: EventResponseType.GET_USER_SUBSCRIPTION,
@@ -387,6 +406,7 @@ export interface EventRequestPayload {
   [EventRequestType.NEW_THREAD]: void;
   [EventRequestType.FETCH_THREADS]: void;
   [EventRequestType.FETCH_THREAD]: { threadID: string };
+  [EventRequestType.STOP_MESSAGE]: void;
   [EventRequestType.SEND_MESSAGE]: SendMessagesRequestPayload;
   [EventRequestType.UPDATE_MESSAGE]: Message | null;
   [EventRequestType.FAST_APPLY]: FastApplyPayload;
@@ -395,6 +415,7 @@ export interface EventRequestPayload {
   [EventRequestType.OPEN_FILE]: { filePath: string };
   [EventRequestType.FETCH_FILES]: void;
   [EventRequestType.FETCH_FILE_CONTENT]: FilePayload;
+  [EventRequestType.FETCH_CURRENT_OPEN_FILE]: void;
   [EventRequestType.PASTE_COPIED_CODE]: { text: string };
   [EventRequestType.GET_USER_INFO]: void;
   [EventRequestType.GET_USER_SUBSCRIPTION]: void;
@@ -410,7 +431,7 @@ export interface EventResponsePayload {
   [EventResponseType.FIGMA_OAUTH_CONNECT]: boolean;
   [EventResponseType.FIGMA_OAUTH_DISCONNECT]: void;
   [EventResponseType.FIGMA_FILE_SELECTED]: FigmaFile;
-  [EventResponseType.NEW_THREAD]: boolean;
+  [EventResponseType.NEW_THREAD]: Thread;
   [EventResponseType.FETCH_THREADS]: Thread[];
   [EventResponseType.FETCH_THREAD]: Thread;
   [EventResponseType.SEND_MESSAGE]: Message | null;
@@ -418,6 +439,7 @@ export interface EventResponsePayload {
   [EventResponseType.FAST_APPLY]: boolean;
   [EventResponseType.FETCH_FILES]: FilePayload[];
   [EventResponseType.FETCH_FILE_CONTENT]: string;
+  [EventResponseType.FETCH_CURRENT_OPEN_FILE]: FilePayload | null;
   [EventResponseType.SET_CURRENT_OPEN_FILE]: FilePayload | null;
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload;
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null;

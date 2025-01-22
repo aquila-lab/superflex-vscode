@@ -146,7 +146,7 @@ export class ChatAPI {
           threadID: this._thread?.id ?? "",
         });
 
-        return true;
+        return this._thread;
       })
 
       /**
@@ -170,6 +170,18 @@ export class ChatAPI {
 
         const imageUrl = await getFigmaSelectionImageUrl(figma);
         return { ...payload, imageUrl, isLoading: false } as FigmaFile;
+      })
+
+      /**
+       * Event (stop_message): This event is fired when the user clicks the "Stop" button in the webview Chat.
+       * It is used to stop the message stream.
+       */
+      .registerEvent(EventRequestType.STOP_MESSAGE, async () => {
+        if (!this._isInitialized || !this._assistant) {
+          return;
+        }
+
+        this._assistant.stopMessage();
       })
 
       /**
@@ -412,6 +424,31 @@ export class ChatAPI {
       })
 
       /**
+       * Event (fetch_current_open_file): This event is fired when the webview needs to fetch the current open file.
+       * It is used to fetch the current open file from the extension.
+       *
+       * @returns A promise that resolves with the current open file.
+       * @throws An error if the current open file cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_CURRENT_OPEN_FILE, async () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+          return null;
+        }
+
+        const newCurrentOpenFile = decodeUriAndRemoveFilePrefix(editor.document.uri.path);
+        const relativePath = path.relative(this._workspaceDirPath ?? "", newCurrentOpenFile);
+
+        return {
+          id: generateFileID(relativePath),
+          name: path.basename(newCurrentOpenFile),
+          path: newCurrentOpenFile,
+          relativePath,
+          isCurrentOpenFile: true,
+        } as FilePayload;
+      })
+
+      /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
        * It is used to update the message with the feedback.
        *
@@ -435,7 +472,7 @@ export class ChatAPI {
           return;
         }
 
-        return await api.getUserInfo();
+        return api.getUserInfo();
       })
 
       /**
@@ -446,7 +483,7 @@ export class ChatAPI {
           return;
         }
 
-        return await api.getUserSubscription();
+        return api.getUserSubscription();
       })
 
       /**
@@ -461,8 +498,7 @@ export class ChatAPI {
           return [];
         }
 
-        const threads = await this._assistant.getThreads();
-        return threads;
+        return this._assistant.getThreads();
       })
 
       /**
@@ -478,8 +514,9 @@ export class ChatAPI {
           return null;
         }
 
-        const thread = await this._assistant.getThread(payload.threadID);
-        return thread;
+        this._thread = await this._assistant.getThread(payload.threadID);
+
+        return this._thread;
       });
   }
 
