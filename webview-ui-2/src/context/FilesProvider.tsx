@@ -1,14 +1,4 @@
-import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { createContext, Dispatch, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { EventRequestType, EventResponsePayload, EventResponseType, FilePayload } from '../../../shared/protocol';
 import { usePostMessage } from '../hooks/usePostMessage';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';

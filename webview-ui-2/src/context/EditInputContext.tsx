@@ -1,16 +1,16 @@
 import {
   createContext,
-  useContext,
   useMemo,
   ReactNode,
   useState,
   useCallback,
   useRef,
   RefObject,
-  SetStateAction
+  SetStateAction,
+  useContext
 } from 'react';
 
-export interface InputContextValue {
+export interface EditInputContextValue {
   input: string;
   isDisabled: boolean;
   inputRef: RefObject<HTMLTextAreaElement>;
@@ -20,10 +20,10 @@ export interface InputContextValue {
   stopMessage: () => void;
 }
 
-export const InputContext = createContext<InputContextValue | null>(null);
+export const EditInputContext = createContext<EditInputContextValue | null>(null);
 
-export const InputProvider = ({
-  isDisabled,
+export const EditInputProvider = ({
+  isDisabled: _isDisabled,
   stopMessage: _stopMessage,
   sendUserMessage: _sendUserMessage,
   replaceWithPaste: _replaceWithPaste,
@@ -35,6 +35,7 @@ export const InputProvider = ({
   replaceWithPaste: (setInput: (value: SetStateAction<string>) => void, pastedText: string) => void;
   children: ReactNode;
 }) => {
+  const isDisabled = false;
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -50,7 +51,7 @@ export const InputProvider = ({
     _replaceWithPaste(setInput, pastedText);
   }, []);
 
-  const value: InputContextValue = useMemo(
+  const value: EditInputContextValue = useMemo(
     () => ({
       input,
       isDisabled,
@@ -63,14 +64,14 @@ export const InputProvider = ({
     [input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste, stopMessage]
   );
 
-  return <InputContext.Provider value={value}>{children}</InputContext.Provider>;
+  return <EditInputContext.Provider value={value}>{children}</EditInputContext.Provider>;
 };
 
-export function useInput() {
-  const context = useContext(InputContext);
+export function useEditInput() {
+  const context = useContext(EditInputContext);
 
   if (!context) {
-    throw new Error('Input context provider not set');
+    throw new Error('EditInput context provider not set');
   }
 
   return context;

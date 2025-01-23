@@ -11,6 +11,8 @@ import {
   Role
 } from '../../../shared/model';
 import { ReactNode } from 'react';
+import { InputContextValue } from '../context/InputContext';
+import { EditInputContextValue } from '../context/EditInputContext';
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
@@ -104,3 +106,5 @@ export interface MarkdownRenderProps {
   isStreaming?: boolean;
   children: ReactNode;
 }
+
+export type InputContext = InputContextValue | EditInputContextValue;

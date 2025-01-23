@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 import { Button } from '../../components/ui/Button';
-import { useInput } from '../../context/InputContext';
 import { FigmaButton } from './FigmaButton';
 import { FilePicker } from './FilePicker';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { useNewMessage } from '../../context/NewMessageContext';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { InputContext } from '../../common/utils';
 
-export const ChatBottomToolbar = () => {
-  const { isDisabled, input, sendUserMessage, stopMessage } = useInput();
+export const ChatBottomToolbar = ({ context }: { context: InputContext }) => {
+  const { isDisabled, input, sendUserMessage, stopMessage } = context;
   const { isMessageStreaming } = useNewMessage();
 
   const handleMessageStopped = useCallback(() => {
