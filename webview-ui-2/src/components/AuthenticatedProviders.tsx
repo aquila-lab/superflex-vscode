@@ -4,6 +4,7 @@ import { MessagesProvider } from '../context/MessagesContext';
 import { NewMessageProvider } from '../context/NewMessageContext';
 import { ThreadsProvider } from '../context/ThreadsProvider';
 import { InputController } from '../pages/chat/InputController';
+import { SyncProvider } from '../context/SyncProvider';
 
 export const AuthenticatedProviders = () => {
   return (
@@ -11,9 +12,11 @@ export const AuthenticatedProviders = () => {
       <ThreadsProvider>
         <MessagesProvider>
           <NewMessageProvider>
-            <InputController>
-              <Outlet />
-            </InputController>
+            <SyncProvider>
+              <InputController>
+                <Outlet />
+              </InputController>
+            </SyncProvider>
           </NewMessageProvider>
         </MessagesProvider>
       </ThreadsProvider>

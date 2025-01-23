@@ -10,9 +10,7 @@ import {
   Message,
   Role
 } from '../../../shared/model';
-import { ReactNode } from 'react';
-import { InputContextValue } from '../context/InputContext';
-import { EditInputContextValue } from '../context/EditInputContext';
+import { ReactNode, RefObject, SetStateAction } from 'react';
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
@@ -107,4 +105,12 @@ export interface MarkdownRenderProps {
   children: ReactNode;
 }
 
-export type InputContext = InputContextValue | EditInputContextValue;
+export interface InputContextValue {
+  input: string;
+  isDisabled: boolean;
+  inputRef: RefObject<HTMLTextAreaElement>;
+  setInput: (value: SetStateAction<string>) => void;
+  sendUserMessage: () => Promise<void>;
+  replaceWithPaste: (pastedText: string) => void;
+  stopMessage: () => void;
+}

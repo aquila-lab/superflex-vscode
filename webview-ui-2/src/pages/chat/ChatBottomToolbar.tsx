@@ -5,9 +5,9 @@ import { FilePicker } from './FilePicker';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { useNewMessage } from '../../context/NewMessageContext';
 import { TrashIcon } from '@radix-ui/react-icons';
-import { InputContext } from '../../common/utils';
+import { InputContextValue } from '../../common/utils';
 
-export const ChatBottomToolbar = ({ context }: { context: InputContext }) => {
+export const ChatBottomToolbar = ({ context }: { context: InputContextValue }) => {
   const { isDisabled, input, sendUserMessage, stopMessage } = context;
   const { isMessageStreaming } = useNewMessage();
 

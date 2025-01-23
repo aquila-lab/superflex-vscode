@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { cn, chatInputDisabledClasses, chatInputEnabledClasses, InputContext } from '../../common/utils';
+import { cn, chatInputDisabledClasses, chatInputEnabledClasses, InputContextValue } from '../../common/utils';
 
-export const ChatInputBoxContainer = ({ children, context }: { children: ReactNode, context: InputContext }) => {
+export const ChatInputBoxContainer = ({ children, context }: { children: ReactNode, context: InputContextValue }) => {
   const { isDisabled } = context;
 
   return (

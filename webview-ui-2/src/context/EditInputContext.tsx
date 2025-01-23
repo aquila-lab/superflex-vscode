@@ -9,18 +9,9 @@ import {
   SetStateAction,
   useContext
 } from 'react';
+import { InputContextValue } from '../common/utils';
 
-export interface EditInputContextValue {
-  input: string;
-  isDisabled: boolean;
-  inputRef: RefObject<HTMLTextAreaElement>;
-  setInput: (value: SetStateAction<string>) => void;
-  sendUserMessage: () => Promise<void>;
-  replaceWithPaste: (pastedText: string) => void;
-  stopMessage: () => void;
-}
-
-export const EditInputContext = createContext<EditInputContextValue | null>(null);
+export const EditInputContext = createContext<InputContextValue | null>(null);
 
 export const EditInputProvider = ({
   isDisabled: _isDisabled,
@@ -51,7 +42,7 @@ export const EditInputProvider = ({
     _replaceWithPaste(setInput, pastedText);
   }, []);
 
-  const value: EditInputContextValue = useMemo(
+  const value: InputContextValue = useMemo(
     () => ({
       input,
       isDisabled,

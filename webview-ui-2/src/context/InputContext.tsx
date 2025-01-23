@@ -9,16 +9,7 @@ import {
   RefObject,
   SetStateAction
 } from 'react';
-
-export interface InputContextValue {
-  input: string;
-  isDisabled: boolean;
-  inputRef: RefObject<HTMLTextAreaElement>;
-  setInput: (value: SetStateAction<string>) => void;
-  sendUserMessage: () => Promise<void>;
-  replaceWithPaste: (pastedText: string) => void;
-  stopMessage: () => void;
-}
+import { InputContextValue } from '../common/utils';
 
 export const InputContext = createContext<InputContextValue | null>(null);
 

@@ -3,9 +3,9 @@ import { TextareaAutosize } from '../../components/ui/TextareaAutosize';
 import { EventResponsePayload, EventResponseType } from '../../../../shared/protocol';
 import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 import { EditModeContext } from '../../context/EditModeContext';
-import { InputContext } from '../../common/utils';
+import { InputContextValue } from '../../common/utils';
 
-export const ChatTextarea = ({ context }: { context: InputContext }) => {
+export const ChatTextarea = ({ context }: { context: InputContextValue }) => {
   const { input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste } = context;
   const editModeContext = useContext(EditModeContext);
 

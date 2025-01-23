@@ -6,10 +6,13 @@ import { EditModeProvider } from '../../context/EditModeContext';
 export const ChatMessages = () => {
   const { messages } = useMessages();
 
-  const renderMessages = useMemo(
-    () => messages.map((message) => <ChatMessage key={message.id} message={message} />),
+  return useMemo(
+    () =>
+      messages.map((message) => (
+        <EditModeProvider key={message.id}>
+          <ChatMessage message={message} />
+        </EditModeProvider>
+      )),
     [messages]
-  );
-
-  return <EditModeProvider>{renderMessages}</EditModeProvider>;
+  )
 };
