@@ -6,7 +6,7 @@ export const ChatView = () => {
   const context = useInput();
 
   return (
-    <div className="flex flex-col h-full p-2 pt-0">
+    <div className="flex flex-col h-full p-2 pt-0 overflow-auto">
       <ChatMessageList />
       <ChatInputBox context={context} />
     </div>
