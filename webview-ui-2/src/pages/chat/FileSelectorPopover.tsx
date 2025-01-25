@@ -21,7 +21,6 @@ const FileSelectorPopover = () => {
   const [files, setFiles] = useState<FilePayload[]>([]);
 
   const handleFetchFiles = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILES]) => {
-    console.log(payload);
     setFiles(payload);
   }, []);
 

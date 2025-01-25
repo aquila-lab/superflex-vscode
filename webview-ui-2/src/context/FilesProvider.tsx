@@ -51,6 +51,7 @@ export const FilesProvider = ({ children }: { children: ReactNode }) => {
 
   const deselectFile = useCallback((file: FilePayload) => {
     setManuallySelectedFiles((prevSelectedFiles) => prevSelectedFiles.filter((selected) => selected.id !== file.id));
+    setCurrentFile((curr) => (curr?.id === file.id ? null : curr));
     setPreviewedFile((curr) => (curr?.id === file.id ? null : curr));
   }, []);
 

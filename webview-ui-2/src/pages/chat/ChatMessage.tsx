@@ -13,6 +13,7 @@ const ChatMessageComponent = ({ message }: { message: Message }) => {
   const { user } = useUser();
   const editModeContext = useContext(EditModeContext);
   const context = useEditInput();
+  
   if (!user) return null;
 
   const textContent = useMemo(() => {
