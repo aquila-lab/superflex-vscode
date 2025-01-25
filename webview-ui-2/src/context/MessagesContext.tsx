@@ -5,8 +5,9 @@ import { useThreads } from './ThreadsProvider';
 interface MessagesContextValue {
   messages: Message[];
   addMessages: (messages: Message[]) => void;
-  updateMessage: (messageId: string, updates: Partial<Message>) => void;
+  updateUserMessage: (messageId: string, text: string) => void;
   popMessage: () => void;
+  getMessage: (messageId: string) => Message | undefined;
 }
 
 const MessagesContext = createContext<MessagesContextValue | null>(null);
@@ -39,6 +40,13 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     }
   }, [currentThread]);
 
+  const getMessage = useCallback(
+    (messageId: string) => {
+      return messages.find((message) => message.id === messageId);
+    },
+    [messages]
+  );
+
   const popMessage = useCallback(() => {
     setMessages((prev) => prev.slice(0, -1));
   }, []);
@@ -52,18 +60,33 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     });
   }, []);
 
-  const updateMessage = useCallback((messageId: string, updates: Partial<Message>) => {
-    setMessages((prev) => prev.map((msg) => (msg.id === messageId ? { ...msg, ...updates } : msg)));
+  const updateUserMessage = useCallback((messageId: string, text: string) => {
+    setMessages((prev) =>
+      prev.map((message) => {
+        if (message.id === messageId && message.role === Role.User) {
+          return {
+            ...message,
+            content: {
+              type: MessageType.Text,
+              text
+            },
+            updatedAt: new Date()
+          };
+        }
+        return message;
+      })
+    );
   }, []);
 
   const value = useMemo(
     () => ({
       messages,
       addMessages,
-      updateMessage,
-      popMessage
+      updateUserMessage,
+      popMessage,
+      getMessage
     }),
-    [messages, addMessages, updateMessage, popMessage]
+    [messages, addMessages, updateUserMessage, popMessage, getMessage]
   );
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

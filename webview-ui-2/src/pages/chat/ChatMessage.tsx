@@ -38,11 +38,11 @@ const ChatMessageComponent = ({ message }: { message: Message }) => {
       return (
         <div onClick={handleMessageClicked}>
           {editModeContext?.isEditMode && message.role === Role.User ? (
-            <ChatInputBox context={context} />
+            <ChatInputBox context={context} messageId={message.id} />
           ) : (
             <ChatMessageContainer role={message.role}>
               {/* <ImagePreview alt="preview image" className="mt-2" src={message.content.image} />; */}
-              <ChatMessageHeader role={message.role} picture={user.picture} username={user.username} />
+              <ChatMessageHeader role={message.role} picture={user.picture} username={user.username} isDraft={Boolean(editModeContext?.isDraft)} />
               <MarkdownRender role={message.role}>{textContent}</MarkdownRender>
             </ChatMessageContainer>
           )}

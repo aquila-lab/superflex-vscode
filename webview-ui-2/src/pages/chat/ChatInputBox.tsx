@@ -6,9 +6,9 @@ import { ChatTextarea } from './ChatTextarea';
 import { ChatTopToolbar } from './ChatTopToolbar';
 import { FilePreview } from './FilePreview';
 
-export const ChatInputBox = ({ context }: { context: InputContextValue }) => {
+export const ChatInputBox = ({ context, messageId }: { context: InputContextValue, messageId?: string }) => {
   return (
-    <ChatInputBoxContainer context={context}>
+    <ChatInputBoxContainer context={context} messageId={messageId}>
       <FilesProvider>
         <FilePreview />
         <ChatTopToolbar />
