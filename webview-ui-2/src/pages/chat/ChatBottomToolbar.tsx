@@ -3,21 +3,19 @@ import { Button } from '../../components/ui/Button';
 import { FigmaButton } from './FigmaButton';
 import { FilePicker } from './FilePicker';
 import { IoIosReturnLeft } from 'react-icons/io';
-import { useNewMessage } from '../../context/NewMessageContext';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { InputContextValue } from '../../common/utils';
 
-export const ChatBottomToolbar = ({ context }: { context: InputContextValue }) => {
+export const ChatBottomToolbar = ({ context, messageId }: { context: InputContextValue; messageId?: string }) => {
   const { isDisabled, input, sendUserMessage, stopMessage } = context;
-  const { isMessageStreaming } = useNewMessage();
 
   const handleMessageStopped = useCallback(() => {
     stopMessage();
   }, [stopMessage]);
 
   const handleButtonClicked = useCallback(() => {
-    sendUserMessage();
-  }, [sendUserMessage]);
+    sendUserMessage(messageId);
+  }, [sendUserMessage, messageId]);
 
   return (
     <div className="flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2">
@@ -27,7 +25,7 @@ export const ChatBottomToolbar = ({ context }: { context: InputContextValue }) =
       </div>
 
       <div className="flex flex-row items-center gap-1">
-        {!isMessageStreaming && (
+        {!isDisabled && (
           <Button
             size="xs"
             variant="text"
@@ -40,7 +38,7 @@ export const ChatBottomToolbar = ({ context }: { context: InputContextValue }) =
             <span>send</span>
           </Button>
         )}
-        {isMessageStreaming && (
+        {isDisabled && (
           <Button
             size="xs"
             variant="text"

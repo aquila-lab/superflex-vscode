@@ -1,13 +1,13 @@
 import { KeyboardEvent, ClipboardEvent, useCallback, ChangeEvent } from 'react';
 import { TextareaAutosize } from '../../components/ui/TextareaAutosize';
-import { EventResponsePayload, EventResponseType } from '../../../../shared/protocol';
+import { EventResponseType } from '../../../../shared/protocol';
 import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 import { InputContextValue } from '../../common/utils';
 
-export const ChatTextarea = ({ context }: { context: InputContextValue }) => {
+export const ChatTextarea = ({ context, messageId }: { context: InputContextValue; messageId?: string }) => {
   const { input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste } = context;
 
-  const handleFocusChat = useCallback((payload: EventResponsePayload[EventResponseType.FOCUS_CHAT_INPUT]) => {
+  const handleFocusChat = useCallback(() => {
     inputRef.current?.focus();
   }, []);
 
@@ -17,10 +17,10 @@ export const ChatTextarea = ({ context }: { context: InputContextValue }) => {
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (!isDisabled && e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendUserMessage();
+        sendUserMessage(messageId);
       }
     },
-    [isDisabled, sendUserMessage]
+    [isDisabled, sendUserMessage, messageId]
   );
 
   const handleOnPaste = useCallback(

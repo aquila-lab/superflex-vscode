@@ -22,7 +22,7 @@ export const EditInputProvider = ({
 }: {
   isDisabled: boolean;
   stopMessage: (setInput: (value: SetStateAction<string>) => void, inputRef: RefObject<HTMLTextAreaElement>) => void;
-  sendUserMessage: (input: string, setInput: (value: SetStateAction<string>) => void) => Promise<void>;
+  sendUserMessage: (input: string, setInput: (value: SetStateAction<string>) => void, messageId?: string) => Promise<void>;
   replaceWithPaste: (setInput: (value: SetStateAction<string>) => void, pastedText: string) => void;
   children: ReactNode;
 }) => {
@@ -34,8 +34,8 @@ export const EditInputProvider = ({
     _stopMessage(setInput, inputRef);
   }, []);
 
-  const sendUserMessage = useCallback(async () => {
-    _sendUserMessage(input, setInput);
+  const sendUserMessage = useCallback(async (messageId?: string) => {
+    _sendUserMessage(input, setInput, messageId);
   }, [input]);
 
   const replaceWithPaste = useCallback((pastedText: string) => {

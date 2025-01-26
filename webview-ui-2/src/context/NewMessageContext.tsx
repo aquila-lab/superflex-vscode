@@ -19,7 +19,7 @@ interface NewMessageContextValue {
   isMessageStreaming: boolean;
   hasMessageStopped: boolean;
   lastUserMessage: string | null;
-  sendMessageContent: (content: MessageContent[], files: FilePayload[]) => void;
+  sendMessageContent: (content: MessageContent[], files: FilePayload[], fromMessageID?: string) => void;
   stopStreaming: () => void;
 }
 
@@ -27,11 +27,11 @@ const NewMessageContext = createContext<NewMessageContextValue | null>(null);
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
+  const { messages, addMessages, popMessage, removeMessagesFrom } = useMessages();
   const [message, setMessage] = useState<Message | null>(null);
   const [streamTextDelta, setStreamTextDelta] = useState('');
   const [isMessageProcessing, setIsMessageProcessing] = useState(false);
   const [isMessageStreaming, setIsMessageStreaming] = useState(false);
-  const { messages, addMessages, popMessage } = useMessages();
   const [hasMessageStopped, setHasMessageStopped] = useState(false);
   const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
 
@@ -119,11 +119,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   useConsumeMessage([EventResponseType.MESSAGE_TEXT_DELTA, EventResponseType.SEND_MESSAGE], handleMessage);
 
   const sendMessageContent = useCallback(
-    (content: MessageContent[], files: FilePayload[]): void => {
+    (content: MessageContent[], files: FilePayload[], fromMessageID?: string): void => {
       if (content.length === 0) return;
-
-      setHasMessageStopped(false);
-      setIsMessageProcessing(true);
 
       const userMessage: Message = {
         id: uuidv4(),
@@ -133,6 +130,14 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         createdAt: new Date(),
         updatedAt: new Date()
       };
+
+      if (fromMessageID) {
+        stopStreaming();
+        removeMessagesFrom(fromMessageID);
+      }
+
+      setHasMessageStopped(false);
+      setIsMessageProcessing(true);
 
       addMessages([userMessage]);
 

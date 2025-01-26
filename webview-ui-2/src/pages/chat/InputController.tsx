@@ -22,10 +22,10 @@ export const InputController = ({ children }: { children: ReactNode }) => {
   );
 
   const sendUserMessage = useCallback(
-    async (input: string, setInput: (value: SetStateAction<string>) => void) => {
+    async (input: string, setInput: (value: SetStateAction<string>) => void, messageId?: string) => {
       if (!input.trim()) return;
 
-      sendMessageContent([{ type: MessageType.Text, text: input.trim() }], []);
+      sendMessageContent([{ type: MessageType.Text, text: input.trim() }], [], messageId);
       setInput('');
     },
     [sendMessageContent]

@@ -8,6 +8,7 @@ interface MessagesContextValue {
   updateUserMessage: (messageId: string, text: string) => void;
   popMessage: () => void;
   getMessage: (messageId: string) => Message | undefined;
+  removeMessagesFrom: (messageId: string) => void;
 }
 
 const MessagesContext = createContext<MessagesContextValue | null>(null);
@@ -39,6 +40,14 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       setMessages([DEFAULT_WELCOME_MESSAGE]);
     }
   }, [currentThread]);
+
+  const removeMessagesFrom = useCallback((messageId: string) => {
+    setMessages((prev) => {
+      const messageIndex = prev.findIndex((msg) => msg.id === messageId);
+      if (messageIndex === -1) return prev;
+      return prev.slice(0, messageIndex);
+    });
+  }, []);
 
   const getMessage = useCallback(
     (messageId: string) => {
@@ -84,9 +93,10 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       addMessages,
       updateUserMessage,
       popMessage,
-      getMessage
+      getMessage,
+      removeMessagesFrom
     }),
-    [messages, addMessages, updateUserMessage, popMessage, getMessage]
+    [messages, addMessages, updateUserMessage, popMessage, getMessage, removeMessagesFrom]
   );
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>;

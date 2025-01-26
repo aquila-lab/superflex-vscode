@@ -13,8 +13,8 @@ export const ChatInputBox = ({ context, messageId }: { context: InputContextValu
         <FilePreview />
         <ChatTopToolbar />
       </FilesProvider>
-      <ChatTextarea context={context} />
-      <ChatBottomToolbar context={context} />
+      <ChatTextarea context={context} messageId={messageId} />
+      <ChatBottomToolbar context={context} messageId={messageId} />
     </ChatInputBoxContainer>
   );
 };

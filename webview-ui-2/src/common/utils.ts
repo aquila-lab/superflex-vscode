@@ -110,7 +110,7 @@ export interface InputContextValue {
   isDisabled: boolean;
   inputRef: RefObject<HTMLTextAreaElement>;
   setInput: (value: SetStateAction<string>) => void;
-  sendUserMessage: () => Promise<void>;
+  sendUserMessage: (messageId?: string) => Promise<void>;
   replaceWithPaste: (pastedText: string) => void;
   stopMessage: () => void;
 }
