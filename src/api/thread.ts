@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import { FilePayload } from "../../shared/protocol";
-import { MessageContent, MessageType, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
 import { Logger } from "../common/logger";
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
@@ -55,11 +55,9 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
 }
 
 export type SendThreadMessageArgs = GetThreadArgs & {
-  files: FilePayload[];
-  messages: MessageContent[];
+  message: MessageContent;
   options: {
     signal: AbortSignal;
-    fromMessageID?: string;
   };
 };
 
@@ -72,33 +70,50 @@ async function sendThreadMessage({
   owner,
   repo,
   threadID,
-  files,
-  messages,
+  message,
   options,
 }: SendThreadMessageArgs): Promise<ThreadRunStream> {
   try {
     const reqBody: Record<string, any> = {
-      files: files.map((file) => ({
-        path: file.relativePath,
-        content: fs.readFileSync(file.path).toString(),
+      text: message.text,
+      files: [],
+    };
+
+    for (const file of message.files) {
+      if (!fs.existsSync(file.path)) {
+        continue;
+      }
+
+      if (!file.startLine && !file.endLine) {
+        file.content = fs.readFileSync(file.path).toString();
+      }
+
+      reqBody.files.push({
+        path: file.path,
+        content: file.content,
         start_line: file.startLine,
         end_line: file.endLine,
         is_current_open_file: file.isCurrentOpenFile,
-      })),
-      messages: messages.map((msg) => {
-        if (msg.type === MessageType.Figma) {
-          return {
-            type: msg.type,
-            file_id: msg.fileID,
-            node_id: msg.nodeID,
-          };
-        }
-        return msg;
-      }),
-    };
+      });
+    }
 
-    if (options.fromMessageID) {
-      reqBody.from_message_id = options.fromMessageID;
+    if (message.attachment) {
+      if (message.attachment.image) {
+        reqBody.attachment = {
+          image: message.attachment.image,
+        };
+      } else if (message.attachment.figma) {
+        reqBody.attachment = {
+          figma: {
+            file_id: message.attachment.figma.fileID,
+            node_id: message.attachment.figma.nodeID,
+          },
+        };
+      }
+    }
+
+    if (message.fromMessageID) {
+      reqBody.from_message_id = message.fromMessageID;
     }
 
     const response = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, reqBody, {
@@ -137,7 +152,7 @@ async function sendThreadMessage({
           return;
         }
 
-        listeners.forEach((listener) => listener({ type: MessageType.TextDelta, value: data.text_delta }));
+        listeners.forEach((listener) => listener({ textDelta: data.text_delta }));
       } catch (err) {
         Logger.warn("failed to parse chunk:", err);
       }

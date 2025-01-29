@@ -11,10 +11,8 @@ import {
   EventResponsePayload,
   EventResponseType,
   FastApplyPayload,
-  FigmaFile,
   FilePayload,
   newEventResponse,
-  SendMessagesRequestPayload,
 } from "../../shared/protocol";
 import * as api from "../api";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
@@ -158,7 +156,7 @@ export class ChatAPI {
        * @returns A promise that resolves with the Figma file image URL.
        * @throws An error if the Figma file selection URL is invalid.
        */
-      .registerEvent(EventRequestType.FIGMA_FILE_SELECTED, async (payload: FigmaFile, _) => {
+      .registerEvent(EventRequestType.FETCH_FIGMA_SELECTION_IMAGE, async (payload: FigmaFile, _) => {
         if (!this._isInitialized || !this._assistant) {
           return;
         }

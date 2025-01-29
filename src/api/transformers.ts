@@ -1,4 +1,4 @@
-import { User, Message, Thread, Plan, UserSubscription, MessageType, MessageContent } from "../../shared/model";
+import { User, Message, Thread, Plan, UserSubscription, MessageContent } from "../../shared/model";
 
 export function buildUserFromResponse(res: any): User {
   return {
@@ -30,13 +30,34 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
 }
 
 function buildMessageContentFromResponse(res: any): MessageContent {
-  if (res.type === MessageType.Figma) {
-    return { type: MessageType.Figma, fileID: res.file_id, nodeID: res.node_id, image: res.image };
+  const content: MessageContent = {
+    text: res.text,
+    files: res.files.map((file: any) => ({
+      path: file.path,
+      content: file.content ?? "",
+      startLine: file.start_line,
+      endLine: file.end_line,
+      isCurrentOpenFile: file.is_current_open_file,
+    })),
+  };
+
+  if (res.attachment) {
+    if (res.attachment.image) {
+      content.attachment = {
+        image: res.attachment.image,
+      };
+    } else if (res.attachment.figma) {
+      content.attachment = {
+        figma: {
+          fileID: res.attachment.figma.file_id,
+          nodeID: res.attachment.figma.node_id,
+          imageUrl: res.attachment.figma.image_url,
+        },
+      };
+    }
   }
-  if (res.type === MessageType.Image) {
-    return { type: MessageType.Image, image: res.image };
-  }
-  return { type: MessageType.Text, text: res.text };
+
+  return content;
 }
 
 export function buildMessageFromResponse(res: any): Message {

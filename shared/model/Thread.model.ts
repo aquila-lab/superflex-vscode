@@ -12,6 +12,6 @@ export type Thread = {
 };
 
 export type ThreadRun = {
-  message: Message;
+  messages: Message[];
   isPremium: boolean;
 };

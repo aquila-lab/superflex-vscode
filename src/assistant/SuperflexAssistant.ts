@@ -11,7 +11,6 @@ import { SuperflexCache } from "../cache/SuperflexCache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
-import { Telemetry } from "src/common/analytics/Telemetry";
 
 const ASSISTENT_NAME = "superflex";
 const FILES_MAP_VERSION = 1; // Increment the version when we need to reindex all files
@@ -72,10 +71,8 @@ export default class SuperflexAssistant implements Assistant {
 
   async sendMessage(
     threadID: string,
-    files: FilePayload[],
-    messages: MessageContent[],
+    message: MessageContent,
     options?: {
-      fromMessageID?: string;
       streamResponse?: (event: TextDelta) => void;
     }
   ): Promise<ThreadRun | null> {
@@ -93,11 +90,9 @@ export default class SuperflexAssistant implements Assistant {
         owner: this.owner,
         repo: this.repo,
         threadID,
-        files,
-        messages,
+        message,
         options: {
           signal: this._currentStream.signal,
-          fromMessageID: options?.fromMessageID,
         },
       });
 
@@ -119,9 +114,9 @@ export default class SuperflexAssistant implements Assistant {
         stream.final().then(resolve).catch(reject);
       });
 
-      const message = await streamPromise;
+      const streamResult = await streamPromise;
       this._currentStream = undefined;
-      return message;
+      return streamResult;
     } catch (err) {
       this._currentStream = undefined;
       if (err instanceof Error && err.message === "canceled") {
