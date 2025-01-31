@@ -133,7 +133,7 @@ export function useVSCodeEvents({
           dispatch(addMessages([newMessage]));
           break;
         }
-        case EventResponseType.MESSAGE_TEXT_DELTA: {
+        case EventResponseType.MESSAGE_STREAM: {
           if (error) {
             dispatch(setIsMessageStreaming(false));
             dispatch(setIsMessageProcessing(false));

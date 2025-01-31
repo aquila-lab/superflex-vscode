@@ -1,3 +1,5 @@
+import fs from "fs";
+
 import { User, Message, Thread, Plan, UserSubscription, MessageContent } from "../../shared/model";
 
 export function buildUserFromResponse(res: any): User {
@@ -80,4 +82,50 @@ export function buildThreadFromResponse(res: any): Thread {
     createdAt: new Date(res.created_at),
     messages: (res.messages ?? []).map((msg: any) => buildMessageFromResponse(msg)),
   };
+}
+
+export function buildThreadRunRequest(message: MessageContent): Record<string, any> {
+  const reqBody: Record<string, any> = {
+    text: message.text,
+    files: [],
+  };
+
+  for (const file of message.files) {
+    if (!fs.existsSync(file.path)) {
+      continue;
+    }
+
+    if (!file.startLine && !file.endLine) {
+      file.content = fs.readFileSync(file.path).toString();
+    }
+
+    reqBody.files.push({
+      path: file.path,
+      content: file.content,
+      start_line: file.startLine,
+      end_line: file.endLine,
+      is_current_open_file: file.isCurrentOpenFile,
+    });
+  }
+
+  if (message.attachment) {
+    if (message.attachment.image) {
+      reqBody.attachment = {
+        image: message.attachment.image,
+      };
+    } else if (message.attachment.figma) {
+      reqBody.attachment = {
+        figma: {
+          file_id: message.attachment.figma.fileID,
+          node_id: message.attachment.figma.nodeID,
+        },
+      };
+    }
+  }
+
+  if (message.fromMessageID) {
+    reqBody.from_message_id = message.fromMessageID;
+  }
+
+  return reqBody;
 }

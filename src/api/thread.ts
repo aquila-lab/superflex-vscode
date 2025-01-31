@@ -1,12 +1,9 @@
-import fs from "fs";
-
-import { FilePayload } from "../../shared/protocol";
-import { MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, Thread, ThreadRun } from "../../shared/model";
 import { Logger } from "../common/logger";
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
 import { parseError } from "./error";
-import { buildMessageFromResponse, buildThreadFromResponse } from "./transformers";
+import { buildMessageFromResponse, buildThreadFromResponse, buildThreadRunRequest } from "./transformers";
 
 export type CreateThreadArgs = RepoArgs & {
   title?: string;
@@ -61,123 +58,67 @@ export type SendThreadMessageArgs = GetThreadArgs & {
   };
 };
 
-interface ThreadRunStream {
-  on(event: "textDelta", callback: (delta: TextDelta) => void): void;
-  final(): Promise<ThreadRun>;
-}
-
 async function sendThreadMessage({
   owner,
   repo,
   threadID,
   message,
   options,
-}: SendThreadMessageArgs): Promise<ThreadRunStream> {
+}: SendThreadMessageArgs): Promise<ThreadRun> {
   try {
-    const reqBody: Record<string, any> = {
-      text: message.text,
-      files: [],
-    };
-
-    for (const file of message.files) {
-      if (!fs.existsSync(file.path)) {
-        continue;
-      }
-
-      if (!file.startLine && !file.endLine) {
-        file.content = fs.readFileSync(file.path).toString();
-      }
-
-      reqBody.files.push({
-        path: file.path,
-        content: file.content,
-        start_line: file.startLine,
-        end_line: file.endLine,
-        is_current_open_file: file.isCurrentOpenFile,
-      });
-    }
-
-    if (message.attachment) {
-      if (message.attachment.image) {
-        reqBody.attachment = {
-          image: message.attachment.image,
-        };
-      } else if (message.attachment.figma) {
-        reqBody.attachment = {
-          figma: {
-            file_id: message.attachment.figma.fileID,
-            node_id: message.attachment.figma.nodeID,
-          },
-        };
-      }
-    }
-
-    if (message.fromMessageID) {
-      reqBody.from_message_id = message.fromMessageID;
-    }
-
+    const reqBody = buildThreadRunRequest(message);
     const response = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, reqBody, {
       headers: { "x-is-stream": "true" },
       responseType: "stream",
       signal: options.signal,
     });
 
-    const listeners = new Set<(delta: TextDelta) => void>();
-
-    const cleanup = () => {
-      listeners.clear();
-      response.data.removeAllListeners();
-    };
-
     let buffer = "";
-    response.data.on("data", (chunk: Buffer) => {
-      try {
-        let chunkStr = chunk.toString();
-        if (!chunkStr.endsWith("}")) {
-          buffer += chunkStr;
-          return;
-        }
-        if (!chunkStr.startsWith("{")) {
-          chunkStr = buffer + chunkStr;
-          buffer = "";
-        }
-
-        const data = JSON.parse(chunkStr);
-        if (data.is_complete) {
-          response.data.emit("complete", {
-            message: buildMessageFromResponse(data.message),
-            isPremium: response.headers["x-is-premium-request"] === "true",
-          });
-          cleanup();
-          return;
-        }
-
-        listeners.forEach((listener) => listener({ textDelta: data.text_delta }));
-      } catch (err) {
-        Logger.warn("failed to parse chunk:", err);
-      }
-    });
-
-    response.data.on("error", (err: any) => {
-      cleanup();
-      Logger.error("stream error:", err);
-    });
+    let streamError: Error | null = null;
+    let messages: Message[] = [];
 
     return {
-      on: (event: "textDelta", callback: (delta: TextDelta) => void) => {
-        listeners.add(callback);
-      },
-      final: () => {
-        return new Promise((resolve, reject) => {
-          response.data.on("complete", (result: ThreadRun) => {
-            cleanup();
-            resolve(result);
-          });
-          response.data.on("error", (err: any) => {
-            cleanup();
-            reject(err);
-          });
-        });
+      stream: (async function* () {
+        for await (const chunk of response.data) {
+          try {
+            let chunkStr = chunk.toString();
+            if (!chunkStr.endsWith("}")) {
+              buffer += chunkStr;
+              continue;
+            }
+            if (!chunkStr.startsWith("{")) {
+              chunkStr = buffer + chunkStr;
+              buffer = "";
+            }
+
+            const data = JSON.parse(chunkStr);
+            if (data.is_complete) {
+              const message = buildMessageFromResponse(data.message);
+              messages.push(message);
+              yield { type: "complete", message };
+              continue;
+            }
+
+            yield { type: "delta", textDelta: data.text_delta };
+          } catch (err) {
+            Logger.warn("failed to parse chunk:", err);
+            streamError = err as Error;
+            throw streamError;
+          }
+        }
+      })(),
+
+      async response(): Promise<{ messages: Message[]; isPremium: boolean }> {
+        // Wait for all chunks to be processed
+        for await (const _ of this.stream) {
+          // Consume the iterator
+        }
+
+        if (streamError) {
+          throw streamError;
+        }
+
+        return { messages, isPremium: response.headers["x-is-premium-request"] === "true" };
       },
     };
   } catch (err) {

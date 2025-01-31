@@ -48,8 +48,10 @@ export interface MessageContent {
   files: AttachedFile[];
 }
 
-export interface TextDelta {
-  textDelta: string;
+export interface MessageStream {
+  type: "delta" | "complete";
+  textDelta?: string;
+  message?: Message;
 }
 
 export interface Message {

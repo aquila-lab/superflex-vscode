@@ -2,8 +2,7 @@ import fs from "fs";
 import path from "path";
 import asyncQ from "async";
 
-import { FilePayload } from "../../shared/protocol";
-import { Message, MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, MessageStream, Thread, ThreadRun } from "../../shared/model";
 import * as api from "../api";
 import { findWorkspaceFiles } from "../scanner";
 import { jsonToMap, mapToJson } from "../common/utils";
@@ -73,7 +72,7 @@ export default class SuperflexAssistant implements Assistant {
     threadID: string,
     message: MessageContent,
     options?: {
-      streamResponse?: (event: TextDelta) => void;
+      streamResponse?: (event: MessageStream) => void;
     }
   ): Promise<ThreadRun | null> {
     // Cancel any existing stream
@@ -86,7 +85,7 @@ export default class SuperflexAssistant implements Assistant {
     this._currentStream = new AbortController();
 
     try {
-      const stream = await api.sendThreadMessage({
+      const { stream } = await api.sendThreadMessage({
         owner: this.owner,
         repo: this.repo,
         threadID,

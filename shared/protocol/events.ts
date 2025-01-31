@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { FigmaAttachment, Message, MessageContent, TextDelta, Thread, User, UserSubscription } from "../model";
+import { FigmaAttachment, Message, MessageContent, MessageStream, Thread, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
   ConfigPayload,
@@ -279,9 +279,9 @@ export enum EventResponseType {
 
   /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
-   * MESSAGE_TEXT_DELTA is used to stream the response message text delta to the webview before the message is fully sent with SEND_MESSAGE event.
+   * MESSAGE_STREAM is used to stream the response message text delta to the webview before the message is fully sent with SEND_MESSAGE event.
    */
-  MESSAGE_TEXT_DELTA = "message_text_delta",
+  MESSAGE_STREAM = "message_stream",
 
   /**
    * @triggered by {EventRequestType.FAST_APPLY}
@@ -426,7 +426,7 @@ export interface EventResponsePayload {
   [EventResponseType.FETCH_THREADS]: Thread[];
   [EventResponseType.FETCH_THREAD]: Thread;
   [EventResponseType.SEND_MESSAGE]: Message[] | null;
-  [EventResponseType.MESSAGE_TEXT_DELTA]: TextDelta;
+  [EventResponseType.MESSAGE_STREAM]: MessageStream;
   [EventResponseType.FAST_APPLY]: boolean;
   [EventResponseType.FETCH_FILES]: FilePayload[];
   [EventResponseType.FETCH_FILE_CONTENT]: string;

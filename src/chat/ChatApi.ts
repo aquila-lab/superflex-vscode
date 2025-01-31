@@ -212,7 +212,7 @@ export class ChatAPI {
         const threadRun = await this._assistant.sendMessage(thread.id, files, messages, {
           fromMessageID,
           streamResponse: (delta) => {
-            sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta));
+            sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_STREAM, delta));
           },
         });
         if (!threadRun) {
