@@ -1,4 +1,4 @@
-import { Message } from "./Message.model";
+import { Message, MessageStream } from "./Message.model";
 
 export type Thread = {
   /** @type {Generics.UUID} */
@@ -12,6 +12,6 @@ export type Thread = {
 };
 
 export type ThreadRun = {
-  message: Message;
-  isPremium: boolean;
+  stream: AsyncIterable<MessageStream>;
+  response(): Promise<{ messages: Message[]; isPremium: boolean }>;
 };

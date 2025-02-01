@@ -1,14 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
-import { Message, TextDelta, Thread, User, UserSubscription } from "../model";
+import { FigmaAttachment, Message, MessageContent, MessageStream, Thread, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
   ConfigPayload,
   CreateAuthLinkPayload,
   FastApplyPayload,
-  FigmaFile,
   FilePayload,
   InitChatState,
-  SendMessagesRequestPayload,
   SendNotificationPayload,
   SyncProjectProgressPayload,
 } from "./types";
@@ -84,10 +82,10 @@ export enum EventRequestType {
   FIGMA_OAUTH_DISCONNECT = "figma_oauth_disconnect",
 
   /**
-   * FIGMA_FILE_SELECTED will send Figma selection link to the extension.
-   * @returns {FigmaFile} with image url.
+   * FETCH_FIGMA_SELECTION_IMAGE will ask extension to fetch the Figma selection image.
+   * @returns {string} - image url.
    */
-  FIGMA_FILE_SELECTED = "figma_file_selected",
+  FETCH_FIGMA_SELECTION_IMAGE = "fetch_figma_selection_image",
 
   // ---------------- CHAT EVENTS ----------------
 
@@ -116,7 +114,7 @@ export enum EventRequestType {
 
   /**
    * SEND_MESSAGE will send a message to the extension for processing.
-   * @returns {Message}
+   * @returns {Message[] | null}
    */
   SEND_MESSAGE = "send_message",
 
@@ -248,10 +246,10 @@ export enum EventResponseType {
   FIGMA_OAUTH_DISCONNECT = "figma_oauth_disconnect",
 
   /**
-   * @triggered by {EventRequestType.FIGMA_FILE_SELECTED}
-   * FIGMA_FILE_SELECTED will send the Figma selection image to the webview.
+   * @triggered by {EventRequestType.FETCH_FIGMA_SELECTION_IMAGE}
+   * FETCH_FIGMA_SELECTION_IMAGE will send the Figma selection image to the webview.
    */
-  FIGMA_FILE_SELECTED = "figma_file_selected",
+  FETCH_FIGMA_SELECTION_IMAGE = "fetch_figma_selection_image",
 
   // ---------------- CHAT EVENTS ----------------
 
@@ -281,9 +279,9 @@ export enum EventResponseType {
 
   /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
-   * MESSAGE_TEXT_DELTA is used to stream the response message text delta to the webview before the message is fully sent with SEND_MESSAGE event.
+   * MESSAGE_STREAM is used to stream the response message text delta to the webview before the message is fully sent with SEND_MESSAGE event.
    */
-  MESSAGE_TEXT_DELTA = "message_text_delta",
+  MESSAGE_STREAM = "message_stream",
 
   /**
    * @triggered by {EventRequestType.FAST_APPLY}
@@ -371,7 +369,7 @@ export const EventRequestToResponseTypeMap: { [key: string]: EventResponseType }
   [EventRequestType.CREATE_AUTH_LINK]: EventResponseType.CREATE_AUTH_LINK,
   [EventRequestType.FIGMA_OAUTH_CONNECT]: EventResponseType.FIGMA_OAUTH_CONNECT,
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: EventResponseType.FIGMA_OAUTH_DISCONNECT,
-  [EventRequestType.FIGMA_FILE_SELECTED]: EventResponseType.FIGMA_FILE_SELECTED,
+  [EventRequestType.FETCH_FIGMA_SELECTION_IMAGE]: EventResponseType.FETCH_FIGMA_SELECTION_IMAGE,
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
   [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
   [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
@@ -395,12 +393,12 @@ export interface EventRequestPayload {
   [EventRequestType.SYNC_PROJECT]: void;
   [EventRequestType.FIGMA_OAUTH_CONNECT]: void;
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: void;
-  [EventRequestType.FIGMA_FILE_SELECTED]: FigmaFile;
+  [EventRequestType.FETCH_FIGMA_SELECTION_IMAGE]: FigmaAttachment;
   [EventRequestType.NEW_THREAD]: void;
   [EventRequestType.FETCH_THREADS]: void;
   [EventRequestType.FETCH_THREAD]: { threadID: string };
   [EventRequestType.STOP_MESSAGE]: void;
-  [EventRequestType.SEND_MESSAGE]: SendMessagesRequestPayload;
+  [EventRequestType.SEND_MESSAGE]: MessageContent;
   [EventRequestType.UPDATE_MESSAGE]: Message | null;
   [EventRequestType.FAST_APPLY]: FastApplyPayload;
   [EventRequestType.FAST_APPLY_ACCEPT]: { filePath: string };
@@ -423,12 +421,12 @@ export interface EventResponsePayload {
   [EventResponseType.SYNC_PROJECT_PROGRESS]: SyncProjectProgressPayload;
   [EventResponseType.FIGMA_OAUTH_CONNECT]: boolean;
   [EventResponseType.FIGMA_OAUTH_DISCONNECT]: void;
-  [EventResponseType.FIGMA_FILE_SELECTED]: FigmaFile;
+  [EventResponseType.FETCH_FIGMA_SELECTION_IMAGE]: string;
   [EventResponseType.NEW_THREAD]: Thread;
   [EventResponseType.FETCH_THREADS]: Thread[];
   [EventResponseType.FETCH_THREAD]: Thread;
-  [EventResponseType.SEND_MESSAGE]: Message | null;
-  [EventResponseType.MESSAGE_TEXT_DELTA]: TextDelta;
+  [EventResponseType.SEND_MESSAGE]: Message[] | null;
+  [EventResponseType.MESSAGE_STREAM]: MessageStream;
   [EventResponseType.FAST_APPLY]: boolean;
   [EventResponseType.FETCH_FILES]: FilePayload[];
   [EventResponseType.FETCH_FILE_CONTENT]: string;

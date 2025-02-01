@@ -3,38 +3,58 @@ export enum Role {
   Assistant = "assistant",
 }
 
-export enum MessageType {
-  Text = "text",
-  TextDelta = "text_delta",
-  Image = "image",
-  Figma = "figma",
-}
-
-export type TextDelta = {
-  type: MessageType.TextDelta;
-  value: string;
-};
-
-export interface TextContent {
-  type: MessageType.Text;
-  text: string;
-}
-
-export interface ImageContent {
-  type: MessageType.Image;
-  image: string;
-}
-
-export interface FigmaContent {
-  type: MessageType.Figma;
+export interface FigmaAttachment {
   fileID: string;
   nodeID: string;
-  image: string;
+  imageUrl?: string;
 }
 
-export type MessageContent = TextContent | TextDelta | ImageContent | FigmaContent;
+export interface MessageAttachment {
+  image?: string;
+  figma?: FigmaAttachment;
+}
 
-export type Message = {
+export interface AttachedFile {
+  path: string;
+  content: string;
+  startLine?: number;
+  endLine?: number;
+  isCurrentOpenFile?: boolean;
+}
+
+export interface MessageContent {
+  /**
+   * Optional ID reference to a previous message. Used when regenerating/editing
+   * responses to maintain conversation context.
+   */
+  fromMessageID?: string;
+
+  /**
+   * The main text of the message. This contains the actual message text
+   * that will be displayed to the user.
+   */
+  text: string;
+
+  /**
+   * Optional attachment for the message. Can include either an Image or Figma.
+   * See MessageAttachment interface for details.
+   */
+  attachment?: MessageAttachment;
+
+  /**
+   * Array of files that user has attached to this message. These files are used
+   * to give the AI additional context about the codebase when processing the message.
+   */
+  files: AttachedFile[];
+}
+
+export interface MessageStream {
+  type: "delta" | "complete";
+  textDelta?: string;
+  message?: Message;
+}
+
+export interface Message {
   /** @type {Generics.UUID} */
   id: string;
   /** @type {Generics.UUID} */
@@ -47,4 +67,4 @@ export type Message = {
 
   updatedAt: Date;
   createdAt: Date;
-};
+}

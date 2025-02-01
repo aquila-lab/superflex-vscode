@@ -3,7 +3,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { Message, Thread } from "../../shared/model";
+import { FigmaAttachment, Message, MessageContent, Thread } from "../../shared/model";
 import {
   EventRequestPayload,
   EventRequestType,
@@ -11,10 +11,8 @@ import {
   EventResponsePayload,
   EventResponseType,
   FastApplyPayload,
-  FigmaFile,
   FilePayload,
   newEventResponse,
-  SendMessagesRequestPayload,
 } from "../../shared/protocol";
 import * as api from "../api";
 import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
@@ -22,7 +20,6 @@ import { decodeUriAndRemoveFilePrefix, generateFileID, getOpenWorkspace, toKebab
 import { Telemetry } from "../common/analytics/Telemetry";
 import { EventRegistry, Handler } from "./EventRegistry";
 import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
-import { extractFigmaSelectionUrl } from "../../shared/model/Figma.model";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
 import { findWorkspaceFiles } from "../scanner";
@@ -153,23 +150,15 @@ export class ChatAPI {
        * Event (figma_file_selected): This event is fired when the user selects a Figma file in the webview.
        * It is used to extract the Figma selection URL get image url and send it back to the webview.
        *
-       * @param payload - Payload containing the Figma file selection URL.
-       * @param sendEventMessageCb - Callback function to send event messages to the webview.
+       * @param payload - Payload containing the Figma file nodeID and fileID.
        * @returns A promise that resolves with the Figma file image URL.
-       * @throws An error if the Figma file selection URL is invalid.
        */
-      .registerEvent(EventRequestType.FIGMA_FILE_SELECTED, async (payload: FigmaFile, _) => {
+      .registerEvent(EventRequestType.FETCH_FIGMA_SELECTION_IMAGE, async (payload: FigmaAttachment, _) => {
         if (!this._isInitialized || !this._assistant) {
           return;
         }
 
-        const figma = extractFigmaSelectionUrl(payload.selectionLink);
-        if (!figma) {
-          throw new Error("Invalid figma link: Please provide a valid Figma selection url.");
-        }
-
-        const imageUrl = await getFigmaSelectionImageUrl(figma);
-        return { ...payload, imageUrl, isLoading: false } as FigmaFile;
+        return getFigmaSelectionImageUrl(payload);
       })
 
       /**
@@ -193,17 +182,12 @@ export class ChatAPI {
        * @returns A promise that resolves with the assistant's message response.
        * @throws An error if the message cannot be sent or processed.
        */
-      .registerEvent(EventRequestType.SEND_MESSAGE, async (payload: SendMessagesRequestPayload, sendEventMessageCb) => {
+      .registerEvent(EventRequestType.SEND_MESSAGE, async (payload: MessageContent, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
           return null;
         }
 
-        const { files, messages, fromMessageID } = payload;
         const timeNow = Date.now();
-        // Do not send empty messages
-        if (messages.length === 0) {
-          return null;
-        }
 
         let thread = this._thread;
         if (!thread) {
@@ -211,30 +195,29 @@ export class ChatAPI {
           this._thread = thread;
         }
 
-        const threadRun = await this._assistant.sendMessage(thread.id, files, messages, {
-          fromMessageID,
-          streamResponse: (delta) => {
-            sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta));
-          },
-        });
-        if (!threadRun) {
-          return null;
+        const { stream, response } = await this._assistant.sendMessage(thread.id, payload);
+
+        for await (const delta of stream) {
+          sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_STREAM, delta));
         }
+
+        const { messages, isPremium } = await response();
 
         Telemetry.capture("new_message", {
           threadID: thread.id,
-          customSelectedFiles: files.length,
-          assistantMessageID: threadRun.message.id,
+          numberOfSelectedFiles: payload.files.length,
+          isFigmaFileAttached: payload.attachment?.figma !== undefined,
+          isImageFileAttached: payload.attachment?.image !== undefined,
           processingDeltaTimeMs: Date.now() - timeNow,
         });
 
         // Send subscription prompt if user is out of premium requests
-        if (!threadRun.isPremium && this._isPremiumGeneration) {
+        if (!isPremium && this._isPremiumGeneration) {
           sendEventMessageCb(newEventResponse(EventResponseType.SHOW_SOFT_PAYWALL_MODAL));
         }
-        this._isPremiumGeneration = threadRun.isPremium;
+        this._isPremiumGeneration = isPremium;
 
-        return threadRun.message;
+        return messages;
       })
 
       /**

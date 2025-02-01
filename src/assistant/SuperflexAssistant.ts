@@ -2,8 +2,7 @@ import fs from "fs";
 import path from "path";
 import asyncQ from "async";
 
-import { FilePayload } from "../../shared/protocol";
-import { Message, MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, MessageStream, Thread, ThreadRun } from "../../shared/model";
 import * as api from "../api";
 import { findWorkspaceFiles } from "../scanner";
 import { jsonToMap, mapToJson } from "../common/utils";
@@ -11,7 +10,6 @@ import { SuperflexCache } from "../cache/SuperflexCache";
 import { SUPPORTED_FILE_EXTENSIONS } from "../common/constants";
 import { Assistant } from "./Assistant";
 import { createFilesMapName } from "./common";
-import { Telemetry } from "src/common/analytics/Telemetry";
 
 const ASSISTENT_NAME = "superflex";
 const FILES_MAP_VERSION = 1; // Increment the version when we need to reindex all files
@@ -70,15 +68,7 @@ export default class SuperflexAssistant implements Assistant {
     }
   }
 
-  async sendMessage(
-    threadID: string,
-    files: FilePayload[],
-    messages: MessageContent[],
-    options?: {
-      fromMessageID?: string;
-      streamResponse?: (event: TextDelta) => void;
-    }
-  ): Promise<ThreadRun | null> {
+  async sendMessage(threadID: string, message: MessageContent): Promise<ThreadRun> {
     // Cancel any existing stream
     if (this._currentStream) {
       this._currentStream.abort();
@@ -88,47 +78,15 @@ export default class SuperflexAssistant implements Assistant {
     // Create new abort controller for this stream
     this._currentStream = new AbortController();
 
-    try {
-      const stream = await api.sendThreadMessage({
-        owner: this.owner,
-        repo: this.repo,
-        threadID,
-        files,
-        messages,
-        options: {
-          signal: this._currentStream.signal,
-          fromMessageID: options?.fromMessageID,
-        },
-      });
-
-      // Create a promise that will reject if the stream is aborted
-      const streamPromise = new Promise<ThreadRun>((resolve, reject) => {
-        const streamResponse = options?.streamResponse;
-        if (streamResponse) {
-          stream.on("textDelta", (delta) => {
-            // Check if stream was aborted
-            if (this._currentStream?.signal.aborted) {
-              reject(new Error("canceled"));
-              return;
-            }
-
-            streamResponse(delta);
-          });
-        }
-
-        stream.final().then(resolve).catch(reject);
-      });
-
-      const message = await streamPromise;
-      this._currentStream = undefined;
-      return message;
-    } catch (err) {
-      this._currentStream = undefined;
-      if (err instanceof Error && err.message === "canceled") {
-        return null;
-      }
-      throw err;
-    }
+    return api.sendThreadMessage({
+      owner: this.owner,
+      repo: this.repo,
+      threadID,
+      message,
+      options: {
+        signal: this._currentStream.signal,
+      },
+    });
   }
 
   async updateMessage(message: Message): Promise<void> {

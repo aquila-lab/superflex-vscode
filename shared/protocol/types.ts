@@ -1,5 +1,3 @@
-import { MessageContent } from "../model";
-
 export type ConfigPayload = {
   allowAnonymousTelemetry: boolean;
 };
@@ -27,22 +25,10 @@ export type FilePayload = {
   name: string;
   path: string;
   relativePath: string;
-  isCurrentOpenFile?: boolean;
+  content?: string;
   startLine?: number;
   endLine?: number;
-  content?: string;
-};
-
-export type SendMessagesRequestPayload = {
-  files: FilePayload[];
-  messages: MessageContent[];
-  fromMessageID?: string;
-};
-
-export type FigmaFile = {
-  selectionLink: string;
-  imageUrl: string;
-  isLoading: boolean;
+  isCurrentOpenFile?: boolean;
 };
 
 export type SendNotificationPayload = {

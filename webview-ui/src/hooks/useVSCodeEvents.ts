@@ -102,7 +102,7 @@ export function useVSCodeEvents({
           dispatch(setInitState({ isFigmaAuthenticated: false }));
           break;
         }
-        case EventResponseType.FIGMA_FILE_SELECTED: {
+        case EventResponseType.FETCH_FIGMA_SELECTION_IMAGE: {
           if (error) {
             setChatFigmaAttachment(undefined);
             setIsFigmaFileLoading(false);
@@ -133,7 +133,7 @@ export function useVSCodeEvents({
           dispatch(addMessages([newMessage]));
           break;
         }
-        case EventResponseType.MESSAGE_TEXT_DELTA: {
+        case EventResponseType.MESSAGE_STREAM: {
           if (error) {
             dispatch(setIsMessageStreaming(false));
             dispatch(setIsMessageProcessing(false));

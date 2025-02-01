@@ -163,7 +163,7 @@ const ChatView = React.memo<{
       setChatFigmaAttachment(figmaFile);
       setChatImageAttachment(undefined);
 
-      vscodeAPI.postMessage(newEventRequest(EventRequestType.FIGMA_FILE_SELECTED, figmaFile));
+      vscodeAPI.postMessage(newEventRequest(EventRequestType.FETCH_FIGMA_SELECTION_IMAGE, figmaFile));
 
       inputRef.current?.focus();
     },

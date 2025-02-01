@@ -1,12 +1,8 @@
-import fs from "fs";
-
-import { FilePayload } from "../../shared/protocol";
-import { MessageContent, MessageType, TextDelta, Thread, ThreadRun } from "../../shared/model";
-import { Logger } from "../common/logger";
+import { Message, MessageContent, Thread, ThreadRun } from "../../shared/model";
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
 import { parseError } from "./error";
-import { buildMessageFromResponse, buildThreadFromResponse } from "./transformers";
+import { buildMessageFromResponse, buildThreadFromResponse, buildThreadRunRequest } from "./transformers";
 
 export type CreateThreadArgs = RepoArgs & {
   title?: string;
@@ -55,114 +51,144 @@ async function deleteThread({ owner, repo, threadID }: GetThreadArgs): Promise<v
 }
 
 export type SendThreadMessageArgs = GetThreadArgs & {
-  files: FilePayload[];
-  messages: MessageContent[];
+  message: MessageContent;
   options: {
     signal: AbortSignal;
-    fromMessageID?: string;
   };
 };
-
-interface ThreadRunStream {
-  on(event: "textDelta", callback: (delta: TextDelta) => void): void;
-  final(): Promise<ThreadRun>;
-}
 
 async function sendThreadMessage({
   owner,
   repo,
   threadID,
-  files,
-  messages,
+  message,
   options,
-}: SendThreadMessageArgs): Promise<ThreadRunStream> {
+}: SendThreadMessageArgs): Promise<ThreadRun> {
   try {
-    const reqBody: Record<string, any> = {
-      files: files.map((file) => ({
-        path: file.relativePath,
-        content: fs.readFileSync(file.path).toString(),
-        start_line: file.startLine,
-        end_line: file.endLine,
-        is_current_open_file: file.isCurrentOpenFile,
-      })),
-      messages: messages.map((msg) => {
-        if (msg.type === MessageType.Figma) {
-          return {
-            type: msg.type,
-            file_id: msg.fileID,
-            node_id: msg.nodeID,
-          };
-        }
-        return msg;
-      }),
-    };
-
-    if (options.fromMessageID) {
-      reqBody.from_message_id = options.fromMessageID;
-    }
-
+    const reqBody = buildThreadRunRequest(message);
     const response = await Api.post(`/repos/${owner}/${repo}/threads/${threadID}/runs`, reqBody, {
       headers: { "x-is-stream": "true" },
       responseType: "stream",
       signal: options.signal,
     });
 
-    const listeners = new Set<(delta: TextDelta) => void>();
-
-    const cleanup = () => {
-      listeners.clear();
-      response.data.removeAllListeners();
-    };
-
-    let buffer = "";
-    response.data.on("data", (chunk: Buffer) => {
-      try {
-        let chunkStr = chunk.toString();
-        if (!chunkStr.endsWith("}")) {
-          buffer += chunkStr;
-          return;
-        }
-        if (!chunkStr.startsWith("{")) {
-          chunkStr = buffer + chunkStr;
-          buffer = "";
-        }
-
-        const data = JSON.parse(chunkStr);
-        if (data.is_complete) {
-          response.data.emit("complete", {
-            message: buildMessageFromResponse(data.message),
-            isPremium: response.headers["x-is-premium-request"] === "true",
-          });
-          cleanup();
-          return;
-        }
-
-        listeners.forEach((listener) => listener({ type: MessageType.TextDelta, value: data.text_delta }));
-      } catch (err) {
-        Logger.warn("failed to parse chunk:", err);
-      }
-    });
-
-    response.data.on("error", (err: any) => {
-      cleanup();
-      Logger.error("stream error:", err);
-    });
+    let messages: Message[] = [];
+    let streamError: Error | null = null;
 
     return {
-      on: (event: "textDelta", callback: (delta: TextDelta) => void) => {
-        listeners.add(callback);
-      },
-      final: () => {
-        return new Promise((resolve, reject) => {
-          response.data.on("complete", (result: ThreadRun) => {
-            cleanup();
-            resolve(result);
-          });
-          response.data.on("error", (err: any) => {
-            cleanup();
-            reject(err);
-          });
-        });
+      stream: (async function* () {
+        let buffer = "";
+
+        for await (const chunk of response.data) {
+          try {
+            // Convert chunk to string and append to existing buffer
+            buffer += chunk.toString();
+
+            // Process buffer as long as we can find complete JSON objects
+            while (true) {
+              // Find the first complete JSON object
+              const openBraceIndex = buffer.indexOf("{");
+              if (openBraceIndex === -1) {
+                break; // No JSON object starts, keep buffer
+              }
+
+              // Find matching closing brace by counting braces
+              let braceCount = 0;
+              let closeBraceIndex = -1;
+              let inString = false;
+              let escapeNext = false;
+
+              for (let i = openBraceIndex; i < buffer.length; i++) {
+                const char = buffer[i];
+
+                if (escapeNext) {
+                  escapeNext = false;
+                  continue;
+                }
+
+                if (char === "\\") {
+                  escapeNext = true;
+                  continue;
+                }
+
+                if (char === '"') {
+                  inString = !inString;
+                  continue;
+                }
+
+                if (!inString) {
+                  if (char === "{") braceCount++;
+                  if (char === "}") braceCount--;
+                  if (braceCount === 0) {
+                    closeBraceIndex = i;
+                    break;
+                  }
+                }
+              }
+
+              if (closeBraceIndex === -1) {
+                break; // No complete JSON object yet, keep buffer
+              }
+
+              // Extract the potential JSON string
+              const jsonStr = buffer.slice(openBraceIndex, closeBraceIndex + 1);
+
+              try {
+                const data = JSON.parse(jsonStr);
+
+                // Handle complete message with nested structure
+                if (data.is_complete && data.message) {
+                  const message = buildMessageFromResponse(data.message);
+                  messages.push(message);
+                  yield { type: "complete", message };
+                }
+                // Handle delta update
+                else if (data.text_delta !== undefined) {
+                  yield { type: "delta", textDelta: data.text_delta };
+                }
+
+                // Remove processed JSON from buffer
+                buffer = buffer.slice(closeBraceIndex + 1);
+              } catch (parseError) {
+                // If parsing fails, it might be incomplete. Keep in buffer.
+                break;
+              }
+            }
+          } catch (err) {
+            streamError = err as Error;
+            throw streamError;
+          }
+        }
+
+        // Handle any remaining buffer data at end of stream
+        if (buffer.length > 0) {
+          try {
+            const data = JSON.parse(buffer);
+            if (data.is_complete && data.message) {
+              const message = buildMessageFromResponse(data.message);
+              messages.push(message);
+              yield { type: "complete", message };
+            }
+          } catch (err) {
+            // Ignore parsing errors for final buffer
+          }
+        }
+      })(),
+
+      async response(): Promise<{ messages: Message[]; isPremium: boolean }> {
+        // Wait for all chunks to be processed
+        for await (const _ of this.stream) {
+          // Consume the iterator
+        }
+
+        if (streamError) {
+          throw streamError;
+        }
+
+        return {
+          messages,
+          isPremium: response.headers["x-is-premium-request"] === "true",
+        };
       },
     };
   } catch (err) {
