@@ -1,5 +1,4 @@
 import { Message, MessageContent, Thread, ThreadRun } from "../../shared/model";
-import { Logger } from "../common/logger";
 import { Api } from "./api";
 import { RepoArgs } from "./repo";
 import { parseError } from "./error";
@@ -73,37 +72,105 @@ async function sendThreadMessage({
       signal: options.signal,
     });
 
-    let buffer = "";
-    let streamError: Error | null = null;
     let messages: Message[] = [];
+    let streamError: Error | null = null;
 
     return {
       stream: (async function* () {
+        let buffer = "";
+
         for await (const chunk of response.data) {
           try {
-            let chunkStr = chunk.toString();
-            if (!chunkStr.endsWith("}")) {
-              buffer += chunkStr;
-              continue;
-            }
-            if (!chunkStr.startsWith("{")) {
-              chunkStr = buffer + chunkStr;
-              buffer = "";
-            }
+            // Convert chunk to string and append to existing buffer
+            buffer += chunk.toString();
 
-            const data = JSON.parse(chunkStr);
-            if (data.is_complete) {
+            // Process buffer as long as we can find complete JSON objects
+            while (true) {
+              // Find the first complete JSON object
+              const openBraceIndex = buffer.indexOf("{");
+              if (openBraceIndex === -1) {
+                break; // No JSON object starts, keep buffer
+              }
+
+              // Find matching closing brace by counting braces
+              let braceCount = 0;
+              let closeBraceIndex = -1;
+              let inString = false;
+              let escapeNext = false;
+
+              for (let i = openBraceIndex; i < buffer.length; i++) {
+                const char = buffer[i];
+
+                if (escapeNext) {
+                  escapeNext = false;
+                  continue;
+                }
+
+                if (char === "\\") {
+                  escapeNext = true;
+                  continue;
+                }
+
+                if (char === '"') {
+                  inString = !inString;
+                  continue;
+                }
+
+                if (!inString) {
+                  if (char === "{") braceCount++;
+                  if (char === "}") braceCount--;
+                  if (braceCount === 0) {
+                    closeBraceIndex = i;
+                    break;
+                  }
+                }
+              }
+
+              if (closeBraceIndex === -1) {
+                break; // No complete JSON object yet, keep buffer
+              }
+
+              // Extract the potential JSON string
+              const jsonStr = buffer.slice(openBraceIndex, closeBraceIndex + 1);
+
+              try {
+                const data = JSON.parse(jsonStr);
+
+                // Handle complete message with nested structure
+                if (data.is_complete && data.message) {
+                  const message = buildMessageFromResponse(data.message);
+                  messages.push(message);
+                  yield { type: "complete", message };
+                }
+                // Handle delta update
+                else if (data.text_delta !== undefined) {
+                  yield { type: "delta", textDelta: data.text_delta };
+                }
+
+                // Remove processed JSON from buffer
+                buffer = buffer.slice(closeBraceIndex + 1);
+              } catch (parseError) {
+                // If parsing fails, it might be incomplete. Keep in buffer.
+                break;
+              }
+            }
+          } catch (err) {
+            streamError = err as Error;
+            throw streamError;
+          }
+        }
+
+        // Handle any remaining buffer data at end of stream
+        if (buffer.length > 0) {
+          try {
+            const data = JSON.parse(buffer);
+            if (data.is_complete && data.message) {
               const message = buildMessageFromResponse(data.message);
               messages.push(message);
               yield { type: "complete", message };
-              continue;
             }
-
-            yield { type: "delta", textDelta: data.text_delta };
           } catch (err) {
-            Logger.warn("failed to parse chunk:", err);
-            streamError = err as Error;
-            throw streamError;
+            // Ignore parsing errors for final buffer
           }
         }
       })(),
@@ -118,7 +185,10 @@ async function sendThreadMessage({
           throw streamError;
         }
 
-        return { messages, isPremium: response.headers["x-is-premium-request"] === "true" };
+        return {
+          messages,
+          isPremium: response.headers["x-is-premium-request"] === "true",
+        };
       },
     };
   } catch (err) {
