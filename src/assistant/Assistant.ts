@@ -1,5 +1,4 @@
-import { FilePayload } from "../../shared/protocol";
-import { Message, MessageContent, TextDelta, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, Thread, ThreadRun } from "../../shared/model";
 
 export interface Assistant {
   /**
@@ -35,9 +34,9 @@ export interface Assistant {
    *
    * @param threadID - The ID of the thread to send the message to.
    * @param message - The message to send to the assistant.
-   * @returns A promise that resolves with the response message or null if the request is aborted.
+   * @returns {ThreadRun} ThreadRun object that contains the stream and the response.
    */
-  sendMessage(threadID: string, message: MessageContent): Promise<ThreadRun | null>;
+  sendMessage(threadID: string, message: MessageContent): Promise<ThreadRun>;
 
   /**
    * Update a message in a chat thread.

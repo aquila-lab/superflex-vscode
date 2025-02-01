@@ -68,13 +68,7 @@ export default class SuperflexAssistant implements Assistant {
     }
   }
 
-  async sendMessage(
-    threadID: string,
-    message: MessageContent,
-    options?: {
-      streamResponse?: (event: MessageStream) => void;
-    }
-  ): Promise<ThreadRun | null> {
+  async sendMessage(threadID: string, message: MessageContent): Promise<ThreadRun> {
     // Cancel any existing stream
     if (this._currentStream) {
       this._currentStream.abort();
@@ -84,45 +78,15 @@ export default class SuperflexAssistant implements Assistant {
     // Create new abort controller for this stream
     this._currentStream = new AbortController();
 
-    try {
-      const { stream } = await api.sendThreadMessage({
-        owner: this.owner,
-        repo: this.repo,
-        threadID,
-        message,
-        options: {
-          signal: this._currentStream.signal,
-        },
-      });
-
-      // Create a promise that will reject if the stream is aborted
-      const streamPromise = new Promise<ThreadRun>((resolve, reject) => {
-        const streamResponse = options?.streamResponse;
-        if (streamResponse) {
-          stream.on("textDelta", (delta) => {
-            // Check if stream was aborted
-            if (this._currentStream?.signal.aborted) {
-              reject(new Error("canceled"));
-              return;
-            }
-
-            streamResponse(delta);
-          });
-        }
-
-        stream.final().then(resolve).catch(reject);
-      });
-
-      const streamResult = await streamPromise;
-      this._currentStream = undefined;
-      return streamResult;
-    } catch (err) {
-      this._currentStream = undefined;
-      if (err instanceof Error && err.message === "canceled") {
-        return null;
-      }
-      throw err;
-    }
+    return api.sendThreadMessage({
+      owner: this.owner,
+      repo: this.repo,
+      threadID,
+      message,
+      options: {
+        signal: this._currentStream.signal,
+      },
+    });
   }
 
   async updateMessage(message: Message): Promise<void> {
