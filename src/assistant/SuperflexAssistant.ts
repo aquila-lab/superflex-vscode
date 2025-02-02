@@ -156,7 +156,7 @@ export default class SuperflexAssistant implements Assistant {
         const relativePath = path.relative(this.workspaceDirPath, documentPath);
         return {
           relativePath,
-          source: fs.readFileSync(documentPath).toString(),
+          source: fs.readFileSync(documentPath, "utf8"),
           modifiedTime: fs.statSync(documentPath).mtime.getTime(),
         };
       });

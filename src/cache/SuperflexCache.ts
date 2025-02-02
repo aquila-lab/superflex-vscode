@@ -51,8 +51,7 @@ class SuperflexCacheClass {
       return undefined;
     }
 
-    const readBuffer = fs.readFileSync(file);
-    return readBuffer.toString();
+    return fs.readFileSync(file, "utf8");
   }
 
   /**
@@ -86,8 +85,7 @@ class SuperflexCacheClass {
       return undefined;
     }
 
-    const readBuffer = fs.readFileSync(file);
-    return readBuffer.toString();
+    return fs.readFileSync(file, "utf8");
   }
 
   /**

@@ -1,3 +1,5 @@
+import { FilePayload } from "../protocol/types";
+
 export enum Role {
   User = "user",
   Assistant = "assistant",
@@ -14,14 +16,6 @@ export interface MessageAttachment {
   figma?: FigmaAttachment;
 }
 
-export interface AttachedFile {
-  path: string;
-  content: string;
-  startLine?: number;
-  endLine?: number;
-  isCurrentOpenFile?: boolean;
-}
-
 export interface MessageContent {
   /**
    * Optional ID reference to a previous message. Used when regenerating/editing
@@ -30,10 +24,10 @@ export interface MessageContent {
   fromMessageID?: string;
 
   /**
-   * The main text of the message. This contains the actual message text
-   * that will be displayed to the user.
+   * Optional if there are attachments.
+   * This contains the actual message text that will be displayed to the user.
    */
-  text: string;
+  text?: string;
 
   /**
    * Optional attachment for the message. Can include either an Image or Figma.
@@ -42,10 +36,10 @@ export interface MessageContent {
   attachment?: MessageAttachment;
 
   /**
-   * Array of files that user has attached to this message. These files are used
+   * Optional array of files that user has attached to this message. These files are used
    * to give the AI additional context about the codebase when processing the message.
    */
-  files: AttachedFile[];
+  files?: FilePayload[];
 }
 
 export interface MessageStream {

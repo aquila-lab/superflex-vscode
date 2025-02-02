@@ -1,6 +1,9 @@
 import fs from "fs";
+import path from "path";
 
+import { FilePayload } from "../../shared/protocol/types";
 import { User, Message, Thread, Plan, UserSubscription, MessageContent } from "../../shared/model";
+import { generateFileID } from "../common/utils";
 
 export function buildUserFromResponse(res: any): User {
   return {
@@ -34,13 +37,16 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
 function buildMessageContentFromResponse(res: any): MessageContent {
   const content: MessageContent = {
     text: res.text,
-    files: res.files.map((file: any) => ({
-      path: file.path,
-      content: file.content ?? "",
-      startLine: file.start_line,
-      endLine: file.end_line,
-      isCurrentOpenFile: file.is_current_open_file,
-    })),
+    files: res.files.map(
+      (file: any) =>
+        ({
+          id: generateFileID(file.path, file.start_line, file.end_line),
+          name: path.basename(file.path),
+          relativePath: file.path,
+          startLine: file.start_line,
+          endLine: file.end_line,
+        } as FilePayload)
+    ),
   };
 
   if (res.attachment) {
@@ -90,17 +96,21 @@ export function buildThreadRunRequest(message: MessageContent): Record<string, a
     files: [],
   };
 
-  for (const file of message.files) {
+  for (const file of message.files ?? []) {
+    if (!file.path) {
+      continue;
+    }
+
     if (!fs.existsSync(file.path)) {
       continue;
     }
 
     if (!file.startLine && !file.endLine) {
-      file.content = fs.readFileSync(file.path).toString();
+      file.content = fs.readFileSync(file.path, "utf8");
     }
 
     reqBody.files.push({
-      path: file.path,
+      path: file.relativePath, // It is important to use the relative path we do not want to send the absolute path to the server
       content: file.content,
       start_line: file.startLine,
       end_line: file.endLine,

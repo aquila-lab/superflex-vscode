@@ -31,7 +31,7 @@ function readIgnoreFile(filePath: string): string[] {
       return [];
     }
 
-    const content = fs.readFileSync(filePath, "utf-8");
+    const content = fs.readFileSync(filePath, "utf8");
     return content
       .split("\n")
       .map((line) => line.trim())

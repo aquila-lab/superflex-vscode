@@ -427,7 +427,7 @@ export interface EventResponsePayload {
   [EventResponseType.MESSAGE_COMPLETE]: Message;
   [EventResponseType.FAST_APPLY]: boolean;
   [EventResponseType.FETCH_FILES]: FilePayload[];
-  [EventResponseType.FETCH_FILE_CONTENT]: string;
+  [EventResponseType.FETCH_FILE_CONTENT]: string | null;
   [EventResponseType.SET_CURRENT_OPEN_FILE]: FilePayload | null;
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload;
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null;

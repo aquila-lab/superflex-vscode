@@ -167,7 +167,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
           // Uncomment the following line to see the event messages in the console, used for debugging
           // console.log({ id: message.id, command: message.command, data: JSON.stringify(payload) });
           const responseCommand = EventRequestToResponseTypeMap[command];
-          if (!responseCommand || resonsePayload === undefined) {
+          if (!responseCommand) {
             return;
           }
 

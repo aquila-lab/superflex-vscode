@@ -23,7 +23,7 @@ export type SyncProjectProgressPayload = {
 export type FilePayload = {
   id: string;
   name: string;
-  path: string;
+  path?: string; // Optional: There will be no absolute path when the file is returned from the server
   relativePath: string;
   content?: string;
   startLine?: number;

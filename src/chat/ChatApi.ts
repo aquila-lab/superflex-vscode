@@ -197,12 +197,32 @@ export class ChatAPI {
 
         for await (const delta of stream) {
           switch (delta.type) {
-            case "delta":
+            case "delta": {
               sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta.textDelta));
               break;
-            case "complete":
+            }
+            case "complete": {
+              /**
+               * Check if the message has files and if the files can be read from the workspace directory.
+               * If so, read the file content and add it to the file payload with the absolute path.
+               */
+              if (delta.message?.content.files && delta.message.content.files.length > 0) {
+                delta.message.content.files = delta.message.content.files.map((file: FilePayload) => {
+                  if (this._workspaceDirPath && file.relativePath) {
+                    const absolutePath = path.resolve(this._workspaceDirPath, file.relativePath);
+                    let content = undefined;
+                    if (fs.existsSync(absolutePath)) {
+                      content = fs.readFileSync(absolutePath, "utf8");
+                    }
+                    return { ...file, path: absolutePath, content };
+                  }
+                  return file;
+                });
+              }
+
               sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_COMPLETE, delta.message));
               break;
+            }
           }
         }
 
@@ -210,7 +230,7 @@ export class ChatAPI {
 
         Telemetry.capture("new_message", {
           threadID: thread.id,
-          numberOfSelectedFiles: payload.files.length,
+          numberOfSelectedFiles: (payload.files ?? []).length,
           isFigmaFileAttached: payload.attachment?.figma !== undefined,
           isImageFileAttached: payload.attachment?.image !== undefined,
           processingDeltaTimeMs: Date.now() - timeNow,
@@ -402,8 +422,8 @@ export class ChatAPI {
        * @throws An error if the file content cannot be fetched.
        */
       .registerEvent(EventRequestType.FETCH_FILE_CONTENT, (payload: FilePayload) => {
-        if (!this._isInitialized || !this._workspaceDirPath) {
-          return "";
+        if (!this._isInitialized || !this._workspaceDirPath || !payload.path || !fs.existsSync(payload.path)) {
+          return null;
         }
 
         return fs.readFileSync(payload.path, "utf8");
