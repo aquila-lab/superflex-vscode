@@ -179,8 +179,6 @@ export class ChatAPI {
        *
        * @param payload - Payload containing the messages to send.
        * @param sendEventMessageCb - Callback function to send event messages to the webview.
-       * @returns A promise that resolves with the assistant's message response.
-       * @throws An error if the message cannot be sent or processed.
        */
       .registerEvent(EventRequestType.SEND_MESSAGE, async (payload: MessageContent, sendEventMessageCb) => {
         if (!this._isInitialized || !this._assistant) {
@@ -198,10 +196,17 @@ export class ChatAPI {
         const { stream, response } = await this._assistant.sendMessage(thread.id, payload);
 
         for await (const delta of stream) {
-          sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_STREAM, delta));
+          switch (delta.type) {
+            case "delta":
+              sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_TEXT_DELTA, delta.textDelta));
+              break;
+            case "complete":
+              sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_COMPLETE, delta.message));
+              break;
+          }
         }
 
-        const { messages, isPremium } = await response();
+        const { isPremium } = await response();
 
         Telemetry.capture("new_message", {
           threadID: thread.id,
@@ -216,8 +221,6 @@ export class ChatAPI {
           sendEventMessageCb(newEventResponse(EventResponseType.SHOW_SOFT_PAYWALL_MODAL));
         }
         this._isPremiumGeneration = isPremium;
-
-        return messages;
       })
 
       /**

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import asyncQ from "async";
 
-import { Message, MessageContent, MessageStream, Thread, ThreadRun } from "../../shared/model";
+import { Message, MessageContent, Thread, ThreadRun } from "../../shared/model";
 import * as api from "../api";
 import { findWorkspaceFiles } from "../scanner";
 import { jsonToMap, mapToJson } from "../common/utils";

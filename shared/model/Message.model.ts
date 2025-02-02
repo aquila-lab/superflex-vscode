@@ -49,8 +49,19 @@ export interface MessageContent {
 }
 
 export interface MessageStream {
+  /**
+   * The type of the message stream can be either "delta" or "complete".
+   */
   type: "delta" | "complete";
+
+  /**
+   * If the type is "delta", this field contains the text delta of the message stream.
+   */
   textDelta?: string;
+
+  /**
+   * If the type is "complete", this field contains the complete message of the message stream.
+   */
   message?: Message;
 }
 

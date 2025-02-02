@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { FigmaAttachment, Message, MessageContent, MessageStream, Thread, User, UserSubscription } from "../model";
+import { FigmaAttachment, Message, MessageContent, Thread, User, UserSubscription } from "../model";
 import {
   AuthLinkPayload,
   ConfigPayload,
@@ -114,7 +114,6 @@ export enum EventRequestType {
 
   /**
    * SEND_MESSAGE will send a message to the extension for processing.
-   * @returns {Message[] | null}
    */
   SEND_MESSAGE = "send_message",
 
@@ -273,15 +272,15 @@ export enum EventResponseType {
 
   /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
-   * SEND_MESSAGE send message response to the webview.
+   * MESSAGE_TEXT_DELTA is used to stream the response message text delta to the webview.
    */
-  SEND_MESSAGE = "send_message",
+  MESSAGE_TEXT_DELTA = "message_text_delta",
 
   /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
-   * MESSAGE_STREAM is used to stream the response message text delta to the webview before the message is fully sent with SEND_MESSAGE event.
+   * MESSAGE_COMPLETE is used to send the complete message to the webview.
    */
-  MESSAGE_STREAM = "message_stream",
+  MESSAGE_COMPLETE = "message_complete",
 
   /**
    * @triggered by {EventRequestType.FAST_APPLY}
@@ -373,7 +372,6 @@ export const EventRequestToResponseTypeMap: { [key: string]: EventResponseType }
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
   [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
   [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
-  [EventRequestType.SEND_MESSAGE]: EventResponseType.SEND_MESSAGE,
   [EventRequestType.FAST_APPLY]: EventResponseType.FAST_APPLY,
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
   [EventRequestType.FETCH_FILES]: EventResponseType.FETCH_FILES,
@@ -425,8 +423,8 @@ export interface EventResponsePayload {
   [EventResponseType.NEW_THREAD]: Thread;
   [EventResponseType.FETCH_THREADS]: Thread[];
   [EventResponseType.FETCH_THREAD]: Thread;
-  [EventResponseType.SEND_MESSAGE]: Message[] | null;
-  [EventResponseType.MESSAGE_STREAM]: MessageStream;
+  [EventResponseType.MESSAGE_TEXT_DELTA]: string;
+  [EventResponseType.MESSAGE_COMPLETE]: Message;
   [EventResponseType.FAST_APPLY]: boolean;
   [EventResponseType.FETCH_FILES]: FilePayload[];
   [EventResponseType.FETCH_FILE_CONTENT]: string;
