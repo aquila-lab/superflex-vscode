@@ -16,7 +16,7 @@ export interface MessageAttachment {
   figma?: FigmaAttachment;
 }
 
-export interface MessageContent {
+export type MessageContent = {
   /**
    * Optional ID reference to a previous message. Used when regenerating/editing
    * responses to maintain conversation context.
@@ -40,7 +40,7 @@ export interface MessageContent {
    * to give the AI additional context about the codebase when processing the message.
    */
   files?: FilePayload[];
-}
+} & ({ text: string } | { attachment: MessageAttachment });
 
 export interface MessageStream {
   /**
