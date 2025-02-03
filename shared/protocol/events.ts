@@ -351,9 +351,9 @@ export enum EventResponseType {
 
   /**
    * @triggered by extension.
-   * CMD_SYNC_PROJECT will trigger the project sync on the webview.
+   * CMD_OPEN_SETTINGS will trigger the settings view on the webview.
    */
-  CMD_SYNC_PROJECT = "cmd_sync_project",
+  CMD_OPEN_SETTINGS = "cmd_open_settings",
 
   // ---------------- HELPERS ----------------
 
@@ -434,7 +434,7 @@ export interface EventResponsePayload {
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null;
   [EventResponseType.FOCUS_CHAT_INPUT]: void;
   [EventResponseType.CMD_NEW_THREAD]: void;
-  [EventResponseType.CMD_SYNC_PROJECT]: void;
+  [EventResponseType.CMD_OPEN_SETTINGS]: void;
   [EventResponseType.SHOW_LOGIN_VIEW]: void;
   [EventResponseType.SHOW_CHAT_VIEW]: void;
   [EventResponseType.GET_USER_INFO]: User;

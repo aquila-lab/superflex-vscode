@@ -137,14 +137,9 @@
           "when": "view == superflex.chat && superflex.chat.authenticated"
         },
         {
-          "command": "superflex.project.sync",
+          "command": "superflex.settings",
           "group": "navigation",
-          "when": "view == superflex.chat && superflex.chat.authenticated"
-        },
-        {
-          "command": "superflex.auth.signout",
-          "group": "navigation",
-          "when": "view == superflex.chat && superflex.chat.authenticated"
+          "when": "superflex.chat.authenticated"
         }
       ]
     },
@@ -188,61 +183,72 @@
       {
         "command": "superflex.auth.signin",
         "category": "Superflex",
-        "title": "Sign In"
+        "title": "Sign In",
+        "enablement": "!superflex.chat.authenticated"
       },
       {
         "command": "superflex.auth.signout",
         "category": "Superflex",
         "title": "Sign Out",
-        "icon": "$(sign-out)"
+        "icon": "$(sign-out)",
+        "enablement": "superflex.chat.authenticated"
+      },
+      {
+        "command": "superflex.settings",
+        "category": "Superflex",
+        "title": "Settings",
+        "icon": "$(settings)",
+        "enablement": "superflex.chat.authenticated"
       },
       {
         "command": "superflex.figma.connect",
         "category": "Superflex",
-        "title": "Connect Figma Account"
+        "title": "Connect Figma Account",
+        "enablement": "!superflex.figma.authenticated"
       },
       {
         "command": "superflex.figma.disconnect",
         "category": "Superflex",
-        "title": "Disconnect Figma Account"
+        "title": "Disconnect Figma Account",
+        "enablement": "superflex.figma.authenticated"
       },
       {
         "command": "superflex.chat.focus-input",
         "category": "Superflex",
-        "title": "Focus chat input"
+        "title": "Focus chat input",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
       },
       {
         "command": "superflex.chat.new-thread",
         "category": "Superflex",
         "title": "New Chat Thread",
-        "icon": "$(plus)"
-      },
-      {
-        "command": "superflex.project.sync",
-        "category": "Superflex",
-        "title": "Project Sync",
-        "icon": "$(refresh)"
+        "icon": "$(plus)",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
       },
       {
         "command": "superflex.acceptDiff",
         "category": "Superflex",
-        "title": "Accept Diff"
+        "title": "Accept Diff",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
       },
       {
         "command": "superflex.rejectDiff",
         "category": "Superflex",
         "title": "Reject Diff",
-        "icon": "$(stop)"
+        "icon": "$(stop)",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
       },
       {
         "command": "superflex.acceptVerticalDiffBlock",
         "category": "Superflex",
-        "title": "Accept Vertical Diff Block"
+        "title": "Accept Vertical Diff Block",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
       },
       {
         "command": "superflex.rejectVerticalDiffBlock",
         "category": "Superflex",
-        "title": "Reject Vertical Diff Block"
+        "title": "Reject Vertical Diff Block",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
       }
     ],
     "configuration": {

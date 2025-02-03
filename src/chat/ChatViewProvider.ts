@@ -78,10 +78,9 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         "superflex.chat.new-thread",
         () => this._chatWebview && this.sendEventMessage(newEventResponse(EventResponseType.CMD_NEW_THREAD))
       ),
-      vscode.commands.registerCommand(
-        "superflex.project.sync",
-        () => this._chatWebview && this.sendEventMessage(newEventResponse(EventResponseType.CMD_SYNC_PROJECT))
-      )
+      vscode.commands.registerCommand("superflex.settings", () => {
+        this._chatWebview && this.sendEventMessage(newEventResponse(EventResponseType.CMD_OPEN_SETTINGS));
+      })
     );
 
     // Register diff-related commands
