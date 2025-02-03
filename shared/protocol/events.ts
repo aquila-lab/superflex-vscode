@@ -453,9 +453,18 @@ export interface EventRequestMessage<T extends EventRequestType> {
 export interface EventResponseMessage<T extends EventResponseType> {
   id: string;
   command: T;
-  payload?: EventResponsePayload[T];
+  payload: EventResponsePayload[T];
   error?: Error;
 }
+
+export type TypedEventResponseMessage = {
+  [K in EventResponseType]: {
+    id: string;
+    command: K;
+    payload: EventResponsePayload[K];
+    error?: Error;
+  };
+}[EventResponseType];
 
 export function newEventRequest<T extends EventRequestType>(
   command: T,
@@ -467,6 +476,6 @@ export function newEventRequest<T extends EventRequestType>(
 export function newEventResponse<T extends EventResponseType>(
   command: T,
   payload?: EventResponsePayload[T]
-): EventResponseMessage<T> {
+): { id: string; command: T; payload?: EventResponsePayload[T]; error?: Error } {
   return { id: uuidv4(), command, payload };
 }
