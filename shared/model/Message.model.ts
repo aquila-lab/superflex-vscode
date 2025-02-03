@@ -8,7 +8,7 @@ export enum Role {
 export interface FigmaAttachment {
   fileID: string;
   nodeID: string;
-  imageUrl?: string;
+  imageUrl: string;
 }
 
 export interface MessageAttachment {

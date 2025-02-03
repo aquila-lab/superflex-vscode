@@ -3,7 +3,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { FigmaAttachment, Message, MessageContent, Thread } from "../../shared/model";
+import { extractFigmaSelectionUrl, FigmaAttachment, Message, MessageContent, Thread } from "../../shared/model";
 import {
   EventRequestPayload,
   EventRequestType,
@@ -147,18 +147,33 @@ export class ChatAPI {
       })
 
       /**
-       * Event (figma_file_selected): This event is fired when the user selects a Figma file in the webview.
+       * Event (create_figma_attachment): This event is fired when the user selects a Figma file in the webview.
        * It is used to extract the Figma selection URL get image url and send it back to the webview.
        *
-       * @param payload - Payload containing the Figma file nodeID and fileID.
-       * @returns A promise that resolves with the Figma file image URL.
+       * @param payload - Payload containing the Figma selection link.
+       * @returns A promise that resolves with the FigmaAttachment.
        */
-      .registerEvent(EventRequestType.FETCH_FIGMA_SELECTION_IMAGE, async (payload: FigmaAttachment, _) => {
-        if (!this._isInitialized || !this._assistant) {
+      .registerEvent(EventRequestType.CREATE_FIGMA_ATTACHMENT, async (payload: string, _) => {
+        if (!this._isInitialized) {
           return;
         }
 
-        return getFigmaSelectionImageUrl(payload);
+        if (!payload) {
+          throw new Error("Figma selection link is required");
+        }
+
+        const figmaSelectionUrl = extractFigmaSelectionUrl(payload);
+        if (!figmaSelectionUrl) {
+          throw new Error("Invalid Figma selection link");
+        }
+
+        const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl);
+
+        return {
+          fileID: figmaSelectionUrl.fileID,
+          nodeID: figmaSelectionUrl.nodeID,
+          imageUrl,
+        };
       })
 
       /**

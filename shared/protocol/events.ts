@@ -82,10 +82,11 @@ export enum EventRequestType {
   FIGMA_OAUTH_DISCONNECT = "figma_oauth_disconnect",
 
   /**
-   * FETCH_FIGMA_SELECTION_IMAGE will ask extension to fetch the Figma selection image.
-   * @returns {string} - image url.
+   * CREATE_FIGMA_ATTACHMENT get figmaSelectionLink and from that extract fileID and nodeID and
+   * then will ask extension to fetch a Figma selection image and create a figma attachment.
+   * @returns {FigmaAttachment}
    */
-  FETCH_FIGMA_SELECTION_IMAGE = "fetch_figma_selection_image",
+  CREATE_FIGMA_ATTACHMENT = "create_figma_attachment",
 
   // ---------------- CHAT EVENTS ----------------
 
@@ -245,10 +246,10 @@ export enum EventResponseType {
   FIGMA_OAUTH_DISCONNECT = "figma_oauth_disconnect",
 
   /**
-   * @triggered by {EventRequestType.FETCH_FIGMA_SELECTION_IMAGE}
-   * FETCH_FIGMA_SELECTION_IMAGE will send the Figma selection image to the webview.
+   * @triggered by {EventRequestType.CREATE_FIGMA_ATTACHMENT}
+   * CREATE_FIGMA_ATTACHMENT will send the Figma attachment to the webview.
    */
-  FETCH_FIGMA_SELECTION_IMAGE = "fetch_figma_selection_image",
+  CREATE_FIGMA_ATTACHMENT = "create_figma_attachment",
 
   // ---------------- CHAT EVENTS ----------------
 
@@ -368,7 +369,7 @@ export const EventRequestToResponseTypeMap: { [key: string]: EventResponseType }
   [EventRequestType.CREATE_AUTH_LINK]: EventResponseType.CREATE_AUTH_LINK,
   [EventRequestType.FIGMA_OAUTH_CONNECT]: EventResponseType.FIGMA_OAUTH_CONNECT,
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: EventResponseType.FIGMA_OAUTH_DISCONNECT,
-  [EventRequestType.FETCH_FIGMA_SELECTION_IMAGE]: EventResponseType.FETCH_FIGMA_SELECTION_IMAGE,
+  [EventRequestType.CREATE_FIGMA_ATTACHMENT]: EventResponseType.CREATE_FIGMA_ATTACHMENT,
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
   [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
   [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
@@ -391,7 +392,7 @@ export interface EventRequestPayload {
   [EventRequestType.SYNC_PROJECT]: void;
   [EventRequestType.FIGMA_OAUTH_CONNECT]: void;
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: void;
-  [EventRequestType.FETCH_FIGMA_SELECTION_IMAGE]: FigmaAttachment;
+  [EventRequestType.CREATE_FIGMA_ATTACHMENT]: string;
   [EventRequestType.NEW_THREAD]: void;
   [EventRequestType.FETCH_THREADS]: void;
   [EventRequestType.FETCH_THREAD]: { threadID: string };
@@ -419,7 +420,7 @@ export interface EventResponsePayload {
   [EventResponseType.SYNC_PROJECT_PROGRESS]: SyncProjectProgressPayload;
   [EventResponseType.FIGMA_OAUTH_CONNECT]: boolean;
   [EventResponseType.FIGMA_OAUTH_DISCONNECT]: void;
-  [EventResponseType.FETCH_FIGMA_SELECTION_IMAGE]: string;
+  [EventResponseType.CREATE_FIGMA_ATTACHMENT]: FigmaAttachment;
   [EventResponseType.NEW_THREAD]: Thread;
   [EventResponseType.FETCH_THREADS]: Thread[];
   [EventResponseType.FETCH_THREAD]: Thread;

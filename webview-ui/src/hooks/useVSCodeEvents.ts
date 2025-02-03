@@ -102,7 +102,7 @@ export function useVSCodeEvents({
           dispatch(setInitState({ isFigmaAuthenticated: false }));
           break;
         }
-        case EventResponseType.FETCH_FIGMA_SELECTION_IMAGE: {
+        case EventResponseType.CREATE_FIGMA_ATTACHMENT: {
           if (error) {
             setChatFigmaAttachment(undefined);
             setIsFigmaFileLoading(false);
