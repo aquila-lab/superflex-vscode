@@ -22,7 +22,6 @@ export const ChatInputBox = ({ message }: { message?: Message }) => {
   const { isEditMode, isDraft } = useEditMode();
   const { user } = useUser();
 
-
   useEffect(() => {
     postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE);
   }, [postMessage]);

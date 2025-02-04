@@ -1,9 +1,7 @@
 import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { NavigationLayout } from '../layouts/NavigationLayout';
 import { Layout } from '../layouts/Layout';
 import { AuthGuard } from './AuthGuard';
 import { AlreadyLoggedInGuard } from './AlreadyLoggedInGuard';
-import { ExtensionEventHandler } from '../components/ExtensionEventHandler';
 import { LoginView } from '../pages/login/LoginView';
 import ProfileView from '../pages/profile/ProfileView';
 import { ChatView } from '../pages/chat/ChatView';
@@ -14,8 +12,6 @@ const OpenProject = () => <div>Open Project</div>;
 export const AppRouter = () => {
   return (
     <MemoryRouter>
-      <ExtensionEventHandler />
-
       <Routes>
         <Route element={<AlreadyLoggedInGuard />}>
           <Route element={<Layout />}>
@@ -31,7 +27,7 @@ export const AppRouter = () => {
 
         <Route element={<AuthGuard />}>
           <Route path="/" element={<AuthenticatedProviders />}>
-            <Route element={<NavigationLayout />}>
+            <Route element={<Layout />}>
               <Route index element={<ChatView />} />
               <Route path="chat" element={<ChatView />} />
               <Route path="profile" element={<ProfileView />} />

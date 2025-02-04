@@ -61,12 +61,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     [handleUserInfo, handleUserSubscription]
   );
 
-  useConsumeMessage([EventResponseType.GET_USER_INFO, EventResponseType.GET_USER_SUBSCRIPTION], handleMessage);
-
-  useEffect(() => {
-    postMessage(EventRequestType.INITIALIZED);
-  }, [postMessage]);
-
   const fetchUserInfo = useCallback(() => {
     postMessage(EventRequestType.GET_USER_INFO);
   }, [postMessage]);
@@ -85,6 +79,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       url: `https://billing.stripe.com/p/login/3cs3dQdenfJucIU144?prefilled_email=${encodeURIComponent(user.email)}`
     });
   }, [postMessage, user]);
+
+  useEffect(() => {
+    postMessage(EventRequestType.INITIALIZED);
+    fetchUserInfo();
+    fetchSubscription();
+  }, [postMessage]);
+
+  useConsumeMessage([EventResponseType.GET_USER_INFO, EventResponseType.GET_USER_SUBSCRIPTION], handleMessage);
 
   const value: UserContextValue = useMemo(
     () => ({
@@ -119,5 +121,23 @@ export function useUser() {
     throw new Error('UserContext is not provided');
   }
 
-  return context;
+  const ensureUser = useMemo(() => {
+    if (!context.isUserLoading && !context.user) {
+      throw new Error('User is required but not found');
+    }
+    return context.user as User;
+  }, [context.isUserLoading, context.user]);
+
+  const ensureSubscription = useMemo(() => {
+    if (!context.isSubscriptionLoading && !context.subscription) {
+      throw new Error('Subscription is required but not found');
+    }
+    return context.subscription as UserSubscription;
+  }, [context.isSubscriptionLoading, context.subscription]);
+
+  return {
+    ...context,
+    user: ensureUser,
+    subscription: ensureSubscription
+  };
 }

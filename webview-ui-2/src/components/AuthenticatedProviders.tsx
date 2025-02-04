@@ -3,23 +3,23 @@ import { UserProvider } from '../context/UserContext';
 import { MessagesProvider } from '../context/MessagesContext';
 import { NewMessageProvider } from '../context/NewMessageContext';
 import { ThreadsProvider } from '../context/ThreadsProvider';
-import { SyncProvider } from '../context/SyncProvider';
 import { ThreadResetWrapper } from './ThreadResetWrapper';
+import { LoadingGuard } from './LoadingGuard';
 
 export const AuthenticatedProviders = () => {
   return (
     <UserProvider>
-      <ThreadsProvider>
-        <ThreadResetWrapper>
-          <MessagesProvider>
-            <NewMessageProvider>
-              <SyncProvider>
+      <LoadingGuard>
+        <ThreadsProvider>
+          <ThreadResetWrapper>
+            <MessagesProvider>
+              <NewMessageProvider>
                 <Outlet />
-              </SyncProvider>
-            </NewMessageProvider>
-          </MessagesProvider>
-        </ThreadResetWrapper>
-      </ThreadsProvider>
+              </NewMessageProvider>
+            </MessagesProvider>
+          </ThreadResetWrapper>
+        </ThreadsProvider>
+      </LoadingGuard>
     </UserProvider>
   );
 };
