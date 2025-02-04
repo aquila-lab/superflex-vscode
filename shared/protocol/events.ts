@@ -254,7 +254,7 @@ export enum EventResponseType {
   // ---------------- CHAT EVENTS ----------------
 
   /**
-   * @triggered by {EventRequestType.NEW_THREAD}
+   * @triggered by {EventRequestType.NEW_THREAD} and extension when user clicks on the new thread navbar button.
    * NEW_THREAD is used to indicate that a new thread was created.
    */
   NEW_THREAD = "new_thread",
@@ -341,19 +341,11 @@ export enum EventResponseType {
    */
   SHOW_CHAT_VIEW = "show_chat_view",
 
-  // ---------------- COMMANDS ----------------
-
   /**
    * @triggered by extension.
-   * CMD_NEW_THREAD will trigger the new thread creation on the webview.
+   * SHOW_SETTINGS_VIEW will show the settings view on the webview.
    */
-  CMD_NEW_THREAD = "cmd_new_thread",
-
-  /**
-   * @triggered by extension.
-   * CMD_OPEN_SETTINGS will trigger the settings view on the webview.
-   */
-  CMD_OPEN_SETTINGS = "cmd_open_settings",
+  SHOW_SETTINGS_VIEW = "show_settings_view",
 
   // ---------------- HELPERS ----------------
 
@@ -433,10 +425,9 @@ export interface EventResponsePayload {
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload;
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null;
   [EventResponseType.FOCUS_CHAT_INPUT]: void;
-  [EventResponseType.CMD_NEW_THREAD]: void;
-  [EventResponseType.CMD_OPEN_SETTINGS]: void;
   [EventResponseType.SHOW_LOGIN_VIEW]: void;
   [EventResponseType.SHOW_CHAT_VIEW]: void;
+  [EventResponseType.SHOW_SETTINGS_VIEW]: void;
   [EventResponseType.GET_USER_INFO]: User;
   [EventResponseType.GET_USER_SUBSCRIPTION]: UserSubscription;
   [EventResponseType.SHOW_SOFT_PAYWALL_MODAL]: void;

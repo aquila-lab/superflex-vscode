@@ -2,14 +2,15 @@ import path from "path";
 import * as vscode from "vscode";
 
 import {
+  newEventRequest,
   newEventResponse,
   EventRequestType,
   EventResponseType,
   EventRequestPayload,
   EventRequestMessage,
   EventResponseMessage,
-  FilePayload,
   EventRequestToResponseTypeMap,
+  FilePayload,
 } from "../../shared/protocol";
 import { getMetaKeyLabel } from "../common/operatingSystem";
 import { decodeUriAndRemoveFilePrefix, getNonce, getOpenWorkspace, debounce, generateFileID } from "../common/utils";
@@ -38,7 +39,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       },
     });
 
-    this.debouncedShowInlineTip = debounce(this.showInlineTip.bind(this), 100);
+    this.debouncedShowInlineTip = debounce(this._showInlineTip.bind(this), 100);
 
     // Register the commands
     context.subscriptions.push(
@@ -59,7 +60,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         }
 
         await this.focusChatInput();
-        this.handleAddSelectionToChat(editor, selection);
+        this._handleAddSelectionToChat(editor, selection);
       })
     );
 
@@ -69,17 +70,17 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
         await vscode.commands.executeCommand("editor.action.clipboardCopyAction");
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        this.handleCopySelectionToChat();
+        this._handleCopySelectionToChat();
       })
     );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
         "superflex.chat.new-thread",
-        () => this._chatWebview && this.sendEventMessage(newEventResponse(EventResponseType.CMD_NEW_THREAD))
+        () => this._chatWebview && this.handleEventMessage(newEventRequest(EventRequestType.NEW_THREAD))
       ),
       vscode.commands.registerCommand("superflex.settings", () => {
-        this._chatWebview && this.sendEventMessage(newEventResponse(EventResponseType.CMD_OPEN_SETTINGS));
+        this._chatWebview && this.sendEventMessage(newEventResponse(EventResponseType.SHOW_SETTINGS_VIEW));
       })
     );
 
@@ -107,95 +108,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this._workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
 
     // Subscribe to the active text editor change event
-    vscode.window.onDidChangeActiveTextEditor(this.handleActiveEditorChange.bind(this));
+    vscode.window.onDidChangeActiveTextEditor(this._handleActiveEditorChange.bind(this));
 
     // Subscribe to the selection change event
-    context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(this.handleSelectionChange.bind(this)));
-  }
-
-  private init() {
-    if (!this._chatWebview) {
-      return;
-    }
-
-    this._chatWebview.onDidReceiveMessage(
-      async (message: EventRequestMessage<EventRequestType>) => {
-        const { command, payload } = message;
-
-        // When webview is ready consume all queued messages
-        if (command === EventRequestType.READY) {
-          while (this._eventMessagesQueue.length) {
-            const msg = this._eventMessagesQueue.shift();
-            void this._chatWebview?.postMessage(msg);
-          }
-        }
-
-        // When webview is initialized we need to set current open file
-        if (command === EventRequestType.INITIALIZED) {
-          this.handleActiveEditorChange(vscode.window.activeTextEditor);
-        }
-
-        try {
-          if (command === EventRequestType.PASTE_COPIED_CODE) {
-            const paste = payload as EventRequestPayload[typeof command];
-
-            let eventResponse = newEventResponse(EventResponseType.PASTE_COPIED_CODE, null);
-            eventResponse.id = message.id;
-
-            if (!this._copiedText || paste.text !== this._copiedText.content) {
-              this.sendEventMessage(eventResponse);
-              return;
-            }
-            if (this._copiedText.startLine === this._copiedText.endLine) {
-              this.sendEventMessage(eventResponse);
-              return;
-            }
-
-            eventResponse.payload = this._copiedText;
-            this.sendEventMessage(eventResponse);
-            this._copiedText = null;
-            return;
-          }
-
-          const resonsePayload = await this.chatApi.handleEvent(
-            command,
-            payload as EventRequestPayload[typeof command],
-            this.sendEventMessage.bind(this)
-          );
-
-          // Uncomment the following line to see the event messages in the console, used for debugging
-          // console.log({ id: message.id, command: message.command, data: JSON.stringify(payload) });
-          const responseCommand = EventRequestToResponseTypeMap[command];
-          if (!responseCommand) {
-            return;
-          }
-
-          const eventResponse = newEventResponse(responseCommand, resonsePayload);
-          eventResponse.id = message.id;
-
-          void this.sendEventMessage(eventResponse);
-        } catch (err) {
-          console.error(
-            `Failed to handle event. message: ${JSON.stringify(message)}, error: ${(err as Error).message}`
-          );
-
-          const responseCommand = EventRequestToResponseTypeMap[command];
-          if (!responseCommand) {
-            return;
-          }
-
-          void this.sendEventMessage({
-            id: message.id,
-            command: responseCommand,
-            error: err as Error,
-          } as EventResponseMessage<typeof responseCommand>);
-
-          vscode.window.showErrorMessage((err as Error).message);
-        }
-      },
-      undefined,
-      this.context.subscriptions
-    );
+    context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(this._handleSelectionChange.bind(this)));
   }
 
   sendEventMessage(msg: EventResponseMessage<EventResponseType>): void {
@@ -206,6 +122,79 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     }
 
     void this._chatWebview.postMessage(msg);
+  }
+
+  async handleEventMessage(message: EventRequestMessage<EventRequestType>): Promise<void> {
+    const { command, payload } = message;
+
+    // When webview is ready consume all queued messages
+    if (command === EventRequestType.READY) {
+      while (this._eventMessagesQueue.length) {
+        const msg = this._eventMessagesQueue.shift();
+        void this._chatWebview?.postMessage(msg);
+      }
+    }
+
+    // When webview is initialized we need to set current open file
+    if (command === EventRequestType.INITIALIZED) {
+      this._handleActiveEditorChange(vscode.window.activeTextEditor);
+    }
+
+    try {
+      if (command === EventRequestType.PASTE_COPIED_CODE) {
+        const paste = payload as EventRequestPayload[typeof command];
+
+        let eventResponse = newEventResponse(EventResponseType.PASTE_COPIED_CODE, null);
+        eventResponse.id = message.id;
+
+        if (!this._copiedText || paste.text !== this._copiedText.content) {
+          this.sendEventMessage(eventResponse);
+          return;
+        }
+        if (this._copiedText.startLine === this._copiedText.endLine) {
+          this.sendEventMessage(eventResponse);
+          return;
+        }
+
+        eventResponse.payload = this._copiedText;
+        this.sendEventMessage(eventResponse);
+        this._copiedText = null;
+        return;
+      }
+
+      const resonsePayload = await this.chatApi.handleEvent(
+        command,
+        payload as EventRequestPayload[typeof command],
+        this.sendEventMessage.bind(this)
+      );
+
+      // Uncomment the following line to see the event messages in the console, used for debugging
+      // console.log({ id: message.id, command: message.command, data: JSON.stringify(payload) });
+      const responseCommand = EventRequestToResponseTypeMap[command];
+      if (!responseCommand) {
+        return;
+      }
+
+      const eventResponse = newEventResponse(responseCommand, resonsePayload);
+      eventResponse.id = message.id;
+
+      void this.sendEventMessage(eventResponse);
+    } catch (err) {
+      console.error(`Failed to handle event. message: ${JSON.stringify(message)}, error: ${(err as Error).message}`);
+
+      const responseCommand = EventRequestToResponseTypeMap[command];
+      if (!responseCommand) {
+        return;
+      }
+
+      void this.sendEventMessage({
+        id: message.id,
+        command: responseCommand,
+        error: err as Error,
+      } as EventResponseMessage<typeof responseCommand>);
+
+      vscode.window.showErrorMessage((err as Error).message);
+    }
   }
 
   async focusChatInput(): Promise<void> {
@@ -236,12 +225,19 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       enableCommandUris: true,
     };
 
-    this.init();
-
-    this.setWebviewHtml(localWebviewView.webview);
+    this._init();
+    this._setWebviewHtml(localWebviewView.webview);
   }
 
-  setWebviewHtml(webview: vscode.Webview): void {
+  private _init() {
+    if (!this._chatWebview) {
+      return;
+    }
+
+    this._chatWebview.onDidReceiveMessage(this.handleEventMessage.bind(this), undefined, this.context.subscriptions);
+  }
+
+  private _setWebviewHtml(webview: vscode.Webview): void {
     const theme = vscode.window.activeColorTheme.kind;
     let themeClassname;
     switch (theme) {
@@ -311,7 +307,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     `;
   }
 
-  private handleActiveEditorChange(editor: vscode.TextEditor | undefined): void {
+  private _handleActiveEditorChange(editor: vscode.TextEditor | undefined): void {
     if (!editor) {
       this._currentOpenFile = undefined;
       this.sendEventMessage(newEventResponse(EventResponseType.SET_CURRENT_OPEN_FILE, null));
@@ -337,7 +333,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     );
   }
 
-  private handleSelectionChange(event: vscode.TextEditorSelectionChangeEvent): void {
+  private _handleSelectionChange(event: vscode.TextEditorSelectionChangeEvent): void {
     const editor = event.textEditor;
     const selection = editor.selection;
     editor.setDecorations(this._decorationType, []);
@@ -348,7 +344,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  private showInlineTip(editor: vscode.TextEditor, selection: vscode.Selection): void {
+  private _showInlineTip(editor: vscode.TextEditor, selection: vscode.Selection): void {
     const lineAbove = Math.max(selection.start.line - 1, 0);
 
     // Position the tip at the end of the line above the selected text
@@ -365,7 +361,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     ]);
   }
 
-  private handleAddSelectionToChat(editor: vscode.TextEditor, selection: vscode.Selection): void {
+  private _handleAddSelectionToChat(editor: vscode.TextEditor, selection: vscode.Selection): void {
     if (!this._workspaceDirPath) {
       return;
     }
@@ -392,7 +388,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     this.sendEventMessage(newEventResponse(EventResponseType.ADD_SELECTED_CODE, codeSelection));
   }
 
-  private async handleCopySelectionToChat(): Promise<void> {
+  private async _handleCopySelectionToChat(): Promise<void> {
     const editor = vscode.window.activeTextEditor;
     if (!editor || !this._workspaceDirPath) {
       return;
