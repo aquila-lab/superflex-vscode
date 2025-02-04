@@ -491,10 +491,6 @@ export class ChatAPI {
        * Event (get_user_info): This event is fired when webview requests user info.
        */
       .registerEvent(EventRequestType.GET_USER_INFO, async () => {
-        if (!this._isInitialized) {
-          return;
-        }
-
         return api.getUserInfo();
       })
 
@@ -502,10 +498,6 @@ export class ChatAPI {
        * Event (get_user_subscription): This event is fired when webview requests user subscription info.
        */
       .registerEvent(EventRequestType.GET_USER_SUBSCRIPTION, async () => {
-        if (!this._isInitialized) {
-          return;
-        }
-
         return api.getUserSubscription();
       })
 
