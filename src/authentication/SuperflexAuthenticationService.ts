@@ -68,6 +68,7 @@ export default class SuperflexAuthenticationService {
     if (!accessToken) {
       const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, [], { createIfNone: false });
       if (!session) {
+        this._webviewProvider.sendEventMessage(newEventResponse(EventResponseType.SHOW_LOGIN_VIEW));
         return;
       }
 
