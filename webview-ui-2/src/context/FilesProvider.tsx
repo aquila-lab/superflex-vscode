@@ -1,7 +1,7 @@
-import { createContext, Dispatch, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { EventRequestType, EventResponsePayload, EventResponseType, FilePayload } from '../../../shared/protocol';
-import { usePostMessage } from '../hooks/usePostMessage';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
+import { usePostMessage } from '../hooks/usePostMessage';
 
 interface FilesContextValue {
   selectedFiles: FilePayload[];
@@ -15,10 +15,10 @@ interface FilesContextValue {
 
 const FilesContext = createContext<FilesContextValue | null>(null);
 
-export const FilesProvider = ({ children }: { children: ReactNode }) => {
+export const FilesProvider = ({ files, children }: { files?: FilePayload[]; children: ReactNode }) => {
   const postMessage = usePostMessage();
-  
-  const [manuallySelectedFiles, setManuallySelectedFiles] = useState<FilePayload[]>([]);
+
+  const [manuallySelectedFiles, setManuallySelectedFiles] = useState<FilePayload[]>(files ?? []);
   const [previewedFile, setPreviewedFile] = useState<FilePayload | null>(null);
   const [currentFile, setCurrentFile] = useState<FilePayload | null>(null);
 
@@ -48,8 +48,6 @@ export const FilesProvider = ({ children }: { children: ReactNode }) => {
     setCurrentFile(payload);
   }, []);
 
-  useConsumeMessage(EventResponseType.SET_CURRENT_OPEN_FILE, handleNewOpenFile);
-
   const deselectFile = useCallback((file: FilePayload) => {
     setManuallySelectedFiles((prevSelectedFiles) => prevSelectedFiles.filter((selected) => selected.id !== file.id));
     setCurrentFile((curr) => (curr?.id === file.id ? null : curr));
@@ -60,16 +58,14 @@ export const FilesProvider = ({ children }: { children: ReactNode }) => {
     postMessage(EventRequestType.FETCH_FILES);
   }, [postMessage]);
 
-  useEffect(() => {
-    postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE);
-  }, [postMessage]);
-
   const fetchFileContent = useCallback(
     (file: FilePayload) => {
       postMessage(EventRequestType.FETCH_FILE_CONTENT, file);
     },
     [postMessage]
   );
+
+  useConsumeMessage(EventResponseType.SET_CURRENT_OPEN_FILE, handleNewOpenFile);
 
   const value: FilesContextValue = useMemo(
     () => ({

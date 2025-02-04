@@ -3,9 +3,7 @@ import { UserProvider } from '../context/UserContext';
 import { MessagesProvider } from '../context/MessagesContext';
 import { NewMessageProvider } from '../context/NewMessageContext';
 import { ThreadsProvider } from '../context/ThreadsProvider';
-import { InputController } from '../pages/chat/InputController';
 import { SyncProvider } from '../context/SyncProvider';
-import { AttachmentProvider } from '../context/AttachmentContext';
 
 export const AuthenticatedProviders = () => {
   return (
@@ -14,11 +12,7 @@ export const AuthenticatedProviders = () => {
         <MessagesProvider>
           <NewMessageProvider>
             <SyncProvider>
-              <InputController>
-                <AttachmentProvider>
-                  <Outlet />
-                </AttachmentProvider>
-              </InputController>
+              <Outlet />
             </SyncProvider>
           </NewMessageProvider>
         </MessagesProvider>

@@ -1,10 +1,10 @@
 import { useNewMessage } from '../../context/NewMessageContext';
-import { ChatMessage } from './ChatMessage';
+import { AssistantMessage } from './AssistantMessage';
 
 export const StreamingMessage = () => {
   const { message } = useNewMessage();
 
-  if (!message) return null;
+  if (!message?.content.text) return null;
 
-  return <ChatMessage message={message} />;
+  return <AssistantMessage text={message.content.text} />;
 };

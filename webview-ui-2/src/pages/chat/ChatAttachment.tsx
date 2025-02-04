@@ -1,24 +1,19 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAttachment } from '../../context/AttachmentContext';
+import { useEditMode } from '../../context/EditModeContext';
 import { ImagePreview } from './ImagePreview';
 
 export const ChatAttachment = () => {
   const { imageAttachment, figmaAttachment, isFigmaLoading, removeAttachment } = useAttachment();
 
+  const { isEditMode } = useEditMode();
+
   const handleRemoveAttachment = useCallback(() => removeAttachment(), [removeAttachment]);
+
+  const src = useMemo(() => figmaAttachment?.imageUrl || imageAttachment || '', [figmaAttachment, imageAttachment]);
 
   if (!imageAttachment && !figmaAttachment && !isFigmaLoading) {
     return null;
-  }
-
-  let src = '';
-
-  if (imageAttachment) {
-    src = URL.createObjectURL(imageAttachment);
-  }
-
-  if (figmaAttachment) {
-    src = figmaAttachment.imageUrl;
   }
 
   return (
@@ -29,7 +24,7 @@ export const ChatAttachment = () => {
         alt="preview image"
         src={src}
         isLoading={isFigmaLoading}
-        onRemove={handleRemoveAttachment}
+        {...(isEditMode && { onRemove: handleRemoveAttachment })}
       />
     </div>
   );

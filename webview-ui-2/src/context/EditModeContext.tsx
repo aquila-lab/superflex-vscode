@@ -1,4 +1,4 @@
-import { createContext, useMemo, ReactNode, useState } from 'react';
+import { createContext, useMemo, ReactNode, useState, useContext } from 'react';
 
 interface EditModeContextValue {
   isEditMode: boolean;
@@ -15,8 +15,23 @@ export const EditModeProvider = ({ children }: { children: ReactNode }) => {
 
   const value: EditModeContextValue = useMemo(
     () => ({ isEditMode, isDraft, setIsEditMode, setIsDraft }),
-    [isEditMode, setIsEditMode]
+    [isEditMode, isDraft, setIsEditMode, setIsDraft]
   );
 
   return <EditModeContext.Provider value={value}>{children}</EditModeContext.Provider>;
 };
+
+export function useEditMode() {
+  const context = useContext(EditModeContext);
+
+  if (!context) {
+    return {
+      isEditMode: true,
+      isDraft: false,
+      setIsEditMode: () => {},
+      setIsDraft: () => {}
+    };
+  }
+
+  return context;
+}

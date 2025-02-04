@@ -14,11 +14,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/Pop
 import { FileIcon } from '../../components/ui/FileIcon';
 import { useFiles } from '../../context/FilesProvider';
 import { useConsumeMessage } from '../../hooks/useConsumeMessage';
+import { useEditMode } from '../../context/EditModeContext';
 
 const FileSelectorPopover = () => {
   const { selectedFiles, fetchFiles, selectFile } = useFiles();
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<FilePayload[]>([]);
+  const { isEditMode } = useEditMode();
 
   const handleFetchFiles = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILES]) => {
     setFiles(payload);
@@ -51,6 +53,10 @@ const FileSelectorPopover = () => {
 
     return matches ? 1 : 0;
   }, []);
+
+  if (!isEditMode) {
+    return null;
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

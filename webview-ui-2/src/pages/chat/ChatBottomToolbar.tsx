@@ -4,18 +4,25 @@ import { FigmaButton } from './FigmaButton';
 import { FilePicker } from './FilePicker';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { TrashIcon } from '@radix-ui/react-icons';
-import { InputContextValue } from '../../common/utils';
 import { useNewMessage } from '../../context/NewMessageContext';
 import { useAttachment } from '../../context/AttachmentContext';
+import { useInput } from '../../context/InputContext';
+import { useFiles } from '../../context/FilesProvider';
+import { useEditMode } from '../../context/EditModeContext';
 
-export const ChatBottomToolbar = ({ context, messageId }: { context: InputContextValue; messageId?: string }) => {
-  const { isDisabled, input, stopMessage, setInput } = context;
+export const ChatBottomToolbar = () => {
+  const { input, setInput } = useInput();
+  const { selectedFiles } = useFiles();
+  const messageId = '';
+  const isDisabled = false;
+  const { isEditMode } = useEditMode();
+
   const { sendMessageContent } = useNewMessage();
   const { figmaAttachment, removeAttachment } = useAttachment();
 
   const handleMessageStopped = useCallback(() => {
-    stopMessage();
-  }, [stopMessage]);
+    // stopMessage();
+  }, []);
 
   const handleButtonClicked = useCallback(() => {
     console.log(input);
@@ -27,11 +34,16 @@ export const ChatBottomToolbar = ({ context, messageId }: { context: InputContex
             figma: figmaAttachment
           }
         : undefined,
-      fromMessageID: messageId
+      fromMessageID: messageId,
+      files: selectedFiles
     });
     setInput('');
     removeAttachment();
-  }, [messageId, figmaAttachment, input, sendMessageContent, setInput, removeAttachment]);
+  }, [messageId, figmaAttachment, input, sendMessageContent, setInput, removeAttachment, selectedFiles]);
+
+  if (!isEditMode) {
+    return null;
+  }
 
   return (
     <div className="flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2">

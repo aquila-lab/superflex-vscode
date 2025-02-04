@@ -5,9 +5,11 @@ import { cn } from '../../common/utils';
 import { FileIcon } from '../../components/ui/FileIcon';
 import { Button } from '../../components/ui/Button';
 import { useFiles } from '../../context/FilesProvider';
+import { useEditMode } from '../../context/EditModeContext';
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
   const { previewedFile, deselectFile, setPreviewedFile } = useFiles();
+  const { isEditMode } = useEditMode();
 
   const handleTogglePreview = useCallback(() => {}, []);
 
@@ -44,16 +46,18 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             {file.isCurrentOpenFile ? 'Current file' : file.endLine ? 'Code' : 'File'}
           </p>
         </div>
-        <div className="ml-auto flex gap-2">
-          <Button
-            size="xs"
-            variant="text"
-            className="p-0"
-            onClick={handleDeselectFile}
-            aria-label={`remove-${file.name}`}>
-            <Cross2Icon className="size-3.5" />
-          </Button>
-        </div>
+        {isEditMode && (
+          <div className="ml-auto flex gap-2">
+            <Button
+              size="xs"
+              variant="text"
+              className="p-0"
+              onClick={handleDeselectFile}
+              aria-label={`remove-${file.name}`}>
+              <Cross2Icon className="size-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

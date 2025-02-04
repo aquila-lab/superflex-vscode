@@ -1,7 +1,7 @@
 import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
 import { MessageContent, Message, Role, MessageAttachment } from '../../../shared/model';
-import { ReactNode, RefObject, SetStateAction } from 'react';
+import { ReactNode } from 'react';
 import { FilePayload } from '../../../shared/protocol';
 
 export function cn(...inputs: ClassValue[]): string {
@@ -81,17 +81,6 @@ const areFilesEqual = (prevFiles?: FilePayload[], nextFiles?: FilePayload[]): bo
   });
 };
 
-export const areMessagePropsEqual = (prevProps: { message: Message }, nextProps: { message: Message }) => {
-  return (
-    prevProps.message.id === nextProps.message.id &&
-    prevProps.message.threadID === nextProps.message.threadID &&
-    prevProps.message.role === nextProps.message.role &&
-    prevProps.message.feedback === nextProps.message.feedback &&
-    prevProps.message.updatedAt === nextProps.message.updatedAt &&
-    areMessageContentsEqual(prevProps.message.content, nextProps.message.content)
-  );
-};
-
 export const roleClassName: Partial<Record<Role, string>> = {
   [Role.Assistant]: 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
 };
@@ -123,15 +112,6 @@ export interface MarkdownRenderProps {
   children: ReactNode;
 }
 
-export interface InputContextValue {
-  input: string;
-  isDisabled: boolean;
-  inputRef: RefObject<HTMLTextAreaElement>;
-  setInput: (value: SetStateAction<string>) => void;
-  replaceWithPaste: (pastedText: string) => void;
-  stopMessage: () => void;
-}
-
 export const DEFAULT_WELCOME_MESSAGE: Message = {
   id: 'welcome',
   threadID: 'welcome',
@@ -141,4 +121,21 @@ export const DEFAULT_WELCOME_MESSAGE: Message = {
   },
   createdAt: new Date(),
   updatedAt: new Date()
+};
+
+export const getAvatarConfig = (role: Role, picture?: string, username?: string) => {
+  switch (role) {
+    case Role.Assistant:
+      return {
+        src: window.superflexLogoUri,
+        alt: 'Superflex Logo',
+        fallback: 'S'
+      };
+    case Role.User:
+      return {
+        src: picture,
+        alt: 'User Avatar',
+        fallback: username ? username.charAt(0).toUpperCase() : 'U'
+      };
+  }
 };

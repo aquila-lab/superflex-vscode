@@ -4,47 +4,37 @@ import {
   useMemo,
   ReactNode,
   useState,
-  useCallback,
   useRef,
+  SetStateAction,
   RefObject,
-  SetStateAction
+  useCallback
 } from 'react';
-import { InputContextValue } from '../common/utils';
+
+export interface InputContextValue {
+  input: string;
+  inputRef: RefObject<HTMLTextAreaElement>;
+  setInput: (value: SetStateAction<string>) => void;
+  focusInput: () => void;
+}
 
 export const InputContext = createContext<InputContextValue | null>(null);
 
-export const InputProvider = ({
-  isDisabled,
-  stopMessage: _stopMessage,
-  replaceWithPaste: _replaceWithPaste,
-  children
-}: {
-  isDisabled: boolean;
-  stopMessage: (setInput: (value: SetStateAction<string>) => void, inputRef: RefObject<HTMLTextAreaElement>) => void;
-  replaceWithPaste: (setInput: (value: SetStateAction<string>) => void, pastedText: string) => void;
-  children: ReactNode;
-}) => {
-  const [input, setInput] = useState('');
+export const InputProvider = ({ text, children }: { text?: string; children: ReactNode }) => {
+  const [input, setInput] = useState(text ?? '');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const stopMessage = useCallback(() => {
-    _stopMessage(setInput, inputRef);
-  }, []);
-
-  const replaceWithPaste = useCallback((pastedText: string) => {
-    _replaceWithPaste(setInput, pastedText);
-  }, []);
+  const focusInput = useCallback(() => {
+    inputRef.current?.focus();
+  }, [inputRef.current]);
 
   const value: InputContextValue = useMemo(
     () => ({
       input,
-      isDisabled,
       inputRef,
       setInput,
-      replaceWithPaste,
-      stopMessage
+      focusInput
     }),
-    [input, isDisabled, inputRef, setInput, replaceWithPaste, stopMessage]
+    [input, inputRef, setInput, focusInput]
   );
 
   return <InputContext.Provider value={value}>{children}</InputContext.Provider>;

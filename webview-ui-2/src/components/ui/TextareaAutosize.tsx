@@ -13,7 +13,6 @@ const TextareaAutosize = React.forwardRef<HTMLTextAreaElement, TextareaAutosizeP
           'shadow-sm transition-colors',
           'placeholder:text-muted-foreground',
           'focus:outline-none',
-          'disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
         ref={ref}

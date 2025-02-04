@@ -1,14 +1,13 @@
 import { ReactNode, useMemo, useContext, createContext, useState, useCallback } from 'react';
 import { EventRequestType, EventResponsePayload, EventResponseType } from '../../../shared/protocol';
 import { usePostMessage } from '../hooks/usePostMessage';
-import { FigmaAttachment } from '../../../shared/model';
+import { FigmaAttachment, MessageAttachment } from '../../../shared/model';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
-import { useInput } from './InputContext';
 
 interface AttachmentContextValue {
   isSelectionModalOpen: boolean;
   isFigmaLoading: boolean;
-  imageAttachment: File | null;
+  imageAttachment: string | null;
   figmaAttachment: FigmaAttachment | null;
   figmaLink: string;
   setFigmaLink: React.Dispatch<React.SetStateAction<string>>;
@@ -20,15 +19,14 @@ interface AttachmentContextValue {
 
 const AttachmentContext = createContext<AttachmentContextValue | null>(null);
 
-export const AttachmentProvider = ({ children }: { children: ReactNode }) => {
+export const AttachmentProvider = ({ attachment, children }: { attachment?: MessageAttachment, children: ReactNode }) => {
   const postMessage = usePostMessage();
 
   const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false);
   const [isFigmaLoading, setIsFigmaLoading] = useState(false);
   const [figmaLink, setFigmaLink] = useState('');
-  const [imageAttachment, setImageAttachment] = useState<File | null>(null);
-  const [figmaAttachment, setFigmaAttachment] = useState<FigmaAttachment | null>(null);
-  const { inputRef } = useInput();
+  const [imageAttachment, setImageAttachment] = useState<string | null>(attachment?.image ?? null);
+  const [figmaAttachment, setFigmaAttachment] = useState<FigmaAttachment | null>(attachment?.figma ?? null);
 
   const openSelectionModal = useCallback(() => {
     setIsSelectionModalOpen(true);
@@ -55,10 +53,9 @@ export const AttachmentProvider = ({ children }: { children: ReactNode }) => {
       console.log(payload);
       setFigmaAttachment(payload);
       setIsFigmaLoading(false);
-      inputRef.current?.focus();
       setFigmaLink('');
     },
-    [inputRef.current]
+    []
   );
 
   useConsumeMessage(EventResponseType.CREATE_FIGMA_ATTACHMENT, handleCreateFigmaAttachment);
