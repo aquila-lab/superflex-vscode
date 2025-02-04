@@ -1,14 +1,15 @@
 import { ReactNode, useCallback, RefObject, SetStateAction } from 'react';
-import { MessageType } from '../../../../shared/model';
 import { useNewMessage } from '../../context/NewMessageContext';
 import { useSync } from '../../context/SyncProvider';
 import { InputProvider } from '../../context/InputContext';
 import { EditInputProvider } from '../../context/EditInputContext';
+import { useGlobal } from '../../context/GlobalContext';
 
 export const InputController = ({ children }: { children: ReactNode }) => {
   const { isSyncing } = useSync();
-  const { sendMessageContent, isMessageProcessing, stopStreaming, lastUserMessage } = useNewMessage();
-  const isDisabled = isMessageProcessing || isSyncing; // TODO || !initState.isInitialized || isFigmaFileLoading
+  const { isMessageProcessing, stopStreaming, lastUserMessage } = useNewMessage();
+  const { isInitialized } = useGlobal();
+  const isDisabled = isMessageProcessing || isSyncing || !isInitialized;
 
   const stopMessage = useCallback(
     (setInput: (value: SetStateAction<string>) => void, inputRef: RefObject<HTMLTextAreaElement>) => {
@@ -21,32 +22,14 @@ export const InputController = ({ children }: { children: ReactNode }) => {
     [lastUserMessage]
   );
 
-  const sendUserMessage = useCallback(
-    async (input: string, setInput: (value: SetStateAction<string>) => void, messageId?: string) => {
-      if (!input.trim()) return;
-
-      sendMessageContent([{ type: MessageType.Text, text: input.trim() }], [], messageId);
-      setInput('');
-    },
-    [sendMessageContent]
-  );
-
   const replaceWithPaste = useCallback((setInput: (value: SetStateAction<string>) => void, pastedText: string) => {
     // TODO
     setInput(pastedText);
   }, []);
 
   return (
-    <InputProvider
-      isDisabled={isDisabled}
-      stopMessage={stopMessage}
-      sendUserMessage={sendUserMessage}
-      replaceWithPaste={replaceWithPaste}>
-      <EditInputProvider
-        isDisabled={isDisabled}
-        stopMessage={stopMessage}
-        sendUserMessage={sendUserMessage}
-        replaceWithPaste={replaceWithPaste}>
+    <InputProvider isDisabled={isDisabled} stopMessage={stopMessage} replaceWithPaste={replaceWithPaste}>
+      <EditInputProvider isDisabled={isDisabled} stopMessage={stopMessage} replaceWithPaste={replaceWithPaste}>
         {children}
       </EditInputProvider>
     </InputProvider>

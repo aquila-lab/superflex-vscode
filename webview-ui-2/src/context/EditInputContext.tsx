@@ -16,13 +16,11 @@ export const EditInputContext = createContext<InputContextValue | null>(null);
 export const EditInputProvider = ({
   isDisabled: _isDisabled,
   stopMessage: _stopMessage,
-  sendUserMessage: _sendUserMessage,
   replaceWithPaste: _replaceWithPaste,
   children
 }: {
   isDisabled: boolean;
   stopMessage: (setInput: (value: SetStateAction<string>) => void, inputRef: RefObject<HTMLTextAreaElement>) => void;
-  sendUserMessage: (input: string, setInput: (value: SetStateAction<string>) => void, messageId?: string) => Promise<void>;
   replaceWithPaste: (setInput: (value: SetStateAction<string>) => void, pastedText: string) => void;
   children: ReactNode;
 }) => {
@@ -34,9 +32,6 @@ export const EditInputProvider = ({
     _stopMessage(setInput, inputRef);
   }, []);
 
-  const sendUserMessage = useCallback(async (messageId?: string) => {
-    _sendUserMessage(input, setInput, messageId);
-  }, [input]);
 
   const replaceWithPaste = useCallback((pastedText: string) => {
     _replaceWithPaste(setInput, pastedText);
@@ -48,11 +43,10 @@ export const EditInputProvider = ({
       isDisabled,
       inputRef,
       setInput,
-      sendUserMessage,
       replaceWithPaste,
       stopMessage
     }),
-    [input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste, stopMessage]
+    [input, isDisabled, inputRef, setInput, replaceWithPaste, stopMessage]
   );
 
   return <EditInputContext.Provider value={value}>{children}</EditInputContext.Provider>;

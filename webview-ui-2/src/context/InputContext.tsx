@@ -16,13 +16,11 @@ export const InputContext = createContext<InputContextValue | null>(null);
 export const InputProvider = ({
   isDisabled,
   stopMessage: _stopMessage,
-  sendUserMessage: _sendUserMessage,
   replaceWithPaste: _replaceWithPaste,
   children
 }: {
   isDisabled: boolean;
   stopMessage: (setInput: (value: SetStateAction<string>) => void, inputRef: RefObject<HTMLTextAreaElement>) => void;
-  sendUserMessage: (input: string, setInput: (value: SetStateAction<string>) => void) => Promise<void>;
   replaceWithPaste: (setInput: (value: SetStateAction<string>) => void, pastedText: string) => void;
   children: ReactNode;
 }) => {
@@ -32,10 +30,6 @@ export const InputProvider = ({
   const stopMessage = useCallback(() => {
     _stopMessage(setInput, inputRef);
   }, []);
-
-  const sendUserMessage = useCallback(async () => {
-    _sendUserMessage(input, setInput);
-  }, [input]);
 
   const replaceWithPaste = useCallback((pastedText: string) => {
     _replaceWithPaste(setInput, pastedText);
@@ -47,11 +41,10 @@ export const InputProvider = ({
       isDisabled,
       inputRef,
       setInput,
-      sendUserMessage,
       replaceWithPaste,
       stopMessage
     }),
-    [input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste, stopMessage]
+    [input, isDisabled, inputRef, setInput, replaceWithPaste, stopMessage]
   );
 
   return <InputContext.Provider value={value}>{children}</InputContext.Provider>;

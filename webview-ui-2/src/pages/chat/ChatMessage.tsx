@@ -1,7 +1,7 @@
-import { Message, MessageType, Role } from '../../../../shared/model';
+import { Message, Role } from '../../../../shared/model';
 import { areMessagePropsEqual } from '../../common/utils';
 import { useUser } from '../../context/UserContext';
-import { memo, useCallback, useContext, useMemo } from 'react';
+import { memo, useCallback, useContext } from 'react';
 import { ChatMessageHeader } from './ChatMessageHeader';
 import { ChatMessageContainer } from './ChatMessageContainer';
 import { MarkdownRender } from './MarkdownRender';
@@ -13,23 +13,15 @@ const ChatMessageComponent = ({ message }: { message: Message }) => {
   const { user } = useUser();
   const editModeContext = useContext(EditModeContext);
   const context = useEditInput();
-  
-  if (!user) return null;
 
-  const textContent = useMemo(() => {
-    if (message.content.type === MessageType.Text) {
-      return message.content.text;
-    } else if (message.content.type === MessageType.TextDelta) {
-      return message.content.value;
-    } else {
-      return '';
-    }
-  }, [message, message.content]);
+  if (!user) return null;
 
   const handleMessageClicked = useCallback(() => {
     if (editModeContext) {
       editModeContext.setIsEditMode(true);
-      context.setInput(textContent);
+      if (message.content.text) {
+        context.setInput(message.content.text);
+      }
     }
   }, [editModeContext, editModeContext?.setIsEditMode, context]);
 
@@ -42,8 +34,13 @@ const ChatMessageComponent = ({ message }: { message: Message }) => {
           ) : (
             <ChatMessageContainer role={message.role}>
               {/* <ImagePreview alt="preview image" className="mt-2" src={message.content.image} />; */}
-              <ChatMessageHeader role={message.role} picture={user.picture} username={user.username} isDraft={Boolean(editModeContext?.isDraft)} />
-              <MarkdownRender role={message.role}>{textContent}</MarkdownRender>
+              <ChatMessageHeader
+                role={message.role}
+                picture={user.picture}
+                username={user.username}
+                isDraft={Boolean(editModeContext?.isDraft)}
+              />
+              <MarkdownRender role={message.role}>{message.content.text}</MarkdownRender>
             </ChatMessageContainer>
           )}
         </div>
@@ -52,7 +49,7 @@ const ChatMessageComponent = ({ message }: { message: Message }) => {
       return (
         <ChatMessageContainer role={message.role}>
           <ChatMessageHeader role={message.role} picture={user.picture} username={user.username} />
-          <MarkdownRender role={message.role}>{textContent}</MarkdownRender>
+          <MarkdownRender role={message.role}>{message.content.text}</MarkdownRender>
         </ChatMessageContainer>
       );
   }

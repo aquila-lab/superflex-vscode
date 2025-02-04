@@ -5,6 +5,7 @@ import { NewMessageProvider } from '../context/NewMessageContext';
 import { ThreadsProvider } from '../context/ThreadsProvider';
 import { InputController } from '../pages/chat/InputController';
 import { SyncProvider } from '../context/SyncProvider';
+import { AttachmentProvider } from '../context/AttachmentContext';
 
 export const AuthenticatedProviders = () => {
   return (
@@ -14,7 +15,9 @@ export const AuthenticatedProviders = () => {
           <NewMessageProvider>
             <SyncProvider>
               <InputController>
-                <Outlet />
+                <AttachmentProvider>
+                  <Outlet />
+                </AttachmentProvider>
               </InputController>
             </SyncProvider>
           </NewMessageProvider>

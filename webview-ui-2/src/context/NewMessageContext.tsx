@@ -1,12 +1,10 @@
 import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
-import { Message, MessageContent, MessageType, Role, TextDelta } from '../../../shared/model';
+import { Message, MessageContent, Role } from '../../../shared/model';
 import {
   EventRequestType,
   EventResponseMessage,
   EventResponsePayload,
-  EventResponseType,
-  FilePayload,
-  SendMessagesRequestPayload
+  EventResponseType
 } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
@@ -19,7 +17,7 @@ interface NewMessageContextValue {
   isMessageStreaming: boolean;
   hasMessageStopped: boolean;
   lastUserMessage: string | null;
-  sendMessageContent: (content: MessageContent[], files: FilePayload[], fromMessageID?: string) => void;
+  sendMessageContent: (content: MessageContent) => void;
   stopStreaming: () => void;
 }
 
@@ -28,6 +26,7 @@ const NewMessageContext = createContext<NewMessageContextValue | null>(null);
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
   const { messages, addMessages, popMessage, removeMessagesFrom } = useMessages();
+
   const [message, setMessage] = useState<Message | null>(null);
   const [streamTextDelta, setStreamTextDelta] = useState('');
   const [isMessageProcessing, setIsMessageProcessing] = useState(false);
@@ -49,10 +48,10 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   }, [postMessage, resetNewMessage]);
 
   const handleMessageDelta = useCallback(
-    (payload: TextDelta) => {
+    (payload: string) => {
       if (hasMessageStopped) return;
       if (!isMessageStreaming) setIsMessageStreaming(true);
-      setStreamTextDelta((prev) => prev + payload.value);
+      setStreamTextDelta((prev) => prev + payload);
 
       setMessage((prev) => {
         if (!prev) {
@@ -61,8 +60,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
             threadID: messages[0]?.threadID || uuidv4(),
             role: Role.Assistant,
             content: {
-              type: MessageType.TextDelta,
-              value: payload.value
+              text: payload
             },
             createdAt: new Date(),
             updatedAt: new Date()
@@ -72,8 +70,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         return {
           ...prev,
           content: {
-            type: MessageType.TextDelta,
-            value: streamTextDelta + payload.value
+            text: streamTextDelta + payload
           },
           updatedAt: new Date()
         };
@@ -83,7 +80,9 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const handleSendMessageResponse = useCallback(
-    (payload: Message | null) => {
+    (payload: Message) => {
+      console.log(payload);
+
       setIsMessageProcessing(false);
       setIsMessageStreaming(false);
 
@@ -108,7 +107,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
           handleMessageDelta(payload as EventResponsePayload[typeof event.command]);
           break;
         }
-        case EventResponseType.SEND_MESSAGE: {
+        case EventResponseType.MESSAGE_COMPLETE: {
           handleSendMessageResponse(payload as EventResponsePayload[typeof event.command]);
         }
       }
@@ -116,41 +115,36 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     [handleMessageDelta, handleSendMessageResponse]
   );
 
-  useConsumeMessage([EventResponseType.MESSAGE_TEXT_DELTA, EventResponseType.SEND_MESSAGE], handleMessage);
+  useConsumeMessage([EventResponseType.MESSAGE_TEXT_DELTA, EventResponseType.MESSAGE_COMPLETE], handleMessage);
 
   const sendMessageContent = useCallback(
-    (content: MessageContent[], files: FilePayload[], fromMessageID?: string): void => {
-      if (content.length === 0) return;
+    (content: MessageContent): void => {
+      console.log(content);
+      if (!content.text && !content.attachment) return;
 
       const userMessage: Message = {
         id: uuidv4(),
         threadID: messages[0]?.threadID || uuidv4(),
         role: Role.User,
-        content: content[0],
+        content,
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
-      if (fromMessageID) {
+      if (content.fromMessageID) {
         stopStreaming();
-        removeMessagesFrom(fromMessageID);
+        removeMessagesFrom(content.fromMessageID);
       }
 
       setHasMessageStopped(false);
       setIsMessageProcessing(true);
-
       addMessages([userMessage]);
 
-      if (userMessage.content.type === MessageType.Text) {
+      if (userMessage.content.text) {
         setLastUserMessage(userMessage.content.text);
       }
 
-      const payload: SendMessagesRequestPayload = {
-        messages: content,
-        files
-      };
-
-      postMessage(EventRequestType.SEND_MESSAGE, payload);
+      postMessage(EventRequestType.SEND_MESSAGE, content);
     },
     [postMessage, messages, addMessages]
   );

@@ -14,6 +14,7 @@ const SyncContext = createContext<SyncContextValue | null>(null);
 
 export const SyncProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
+  
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);

@@ -17,6 +17,7 @@ const FilesContext = createContext<FilesContextValue | null>(null);
 
 export const FilesProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
+  
   const [manuallySelectedFiles, setManuallySelectedFiles] = useState<FilePayload[]>([]);
   const [previewedFile, setPreviewedFile] = useState<FilePayload | null>(null);
   const [currentFile, setCurrentFile] = useState<FilePayload | null>(null);

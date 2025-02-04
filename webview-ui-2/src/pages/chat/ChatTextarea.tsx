@@ -3,9 +3,13 @@ import { TextareaAutosize } from '../../components/ui/TextareaAutosize';
 import { EventResponseType } from '../../../../shared/protocol';
 import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 import { InputContextValue } from '../../common/utils';
+import { useNewMessage } from '../../context/NewMessageContext';
+import { useAttachment } from '../../context/AttachmentContext';
 
 export const ChatTextarea = ({ context, messageId }: { context: InputContextValue; messageId?: string }) => {
-  const { input, isDisabled, inputRef, setInput, sendUserMessage, replaceWithPaste } = context;
+  const { input, isDisabled, inputRef, setInput, replaceWithPaste } = context;
+  const { sendMessageContent } = useNewMessage();
+  const { figmaAttachment, removeAttachment } = useAttachment();
 
   const handleFocusChat = useCallback(() => {
     inputRef.current?.focus();
@@ -15,12 +19,22 @@ export const ChatTextarea = ({ context, messageId }: { context: InputContextValu
 
   const handleOnKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (!isDisabled && e.key === 'Enter' && !e.shiftKey) {
+      if (!isDisabled && (input.length || figmaAttachment) && e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendUserMessage(messageId);
+        sendMessageContent({
+          text: input,
+          attachment: figmaAttachment
+            ? {
+                figma: figmaAttachment
+              }
+            : undefined,
+          fromMessageID: messageId
+        });
+        setInput('');
+        removeAttachment();
       }
     },
-    [isDisabled, sendUserMessage, messageId]
+    [isDisabled, messageId, input, figmaAttachment, sendMessageContent, setInput]
   );
 
   const handleOnPaste = useCallback(

@@ -14,6 +14,7 @@ const ThreadsContext = createContext<ThreadsContextValue | null>(null);
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
+  
   const [threads, setThreads] = useState<Thread[]>([]);
   const [currentThread, setCurrentThread] = useState<Thread | null>(null);
 

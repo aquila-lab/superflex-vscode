@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useMemo, ReactNode, useEffect } from 'react';
-import { Message, MessageType, Role } from '../../../shared/model';
+import { Message, Role } from '../../../shared/model';
 import { useThreads } from './ThreadsProvider';
+import { DEFAULT_WELCOME_MESSAGE } from '../common/utils';
 
 interface MessagesContextValue {
   messages: Message[];
@@ -13,24 +14,13 @@ interface MessagesContextValue {
 
 const MessagesContext = createContext<MessagesContextValue | null>(null);
 
-const DEFAULT_WELCOME_MESSAGE: Message = {
-  id: 'welcome',
-  threadID: 'welcome',
-  role: Role.Assistant,
-  content: {
-    type: MessageType.Text,
-    text: "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let's work together and get things done—tell me what you'd like to build today!"
-  },
-  createdAt: new Date(),
-  updatedAt: new Date()
-};
-
 interface MessagesProviderProps {
   children: ReactNode;
 }
 
 export const MessagesProvider = ({ children }: MessagesProviderProps) => {
   const { currentThread } = useThreads();
+  
   const [messages, setMessages] = useState<Message[]>([DEFAULT_WELCOME_MESSAGE]);
 
   useEffect(() => {
@@ -76,7 +66,6 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
           return {
             ...message,
             content: {
-              type: MessageType.Text,
               text
             },
             updatedAt: new Date()

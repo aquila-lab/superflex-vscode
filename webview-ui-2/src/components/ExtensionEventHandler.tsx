@@ -32,6 +32,15 @@ export const ExtensionEventHandler = () => {
     [navigate, setIsFigmaAuthenticated, setIsInitialized]
   );
 
+  const handleConnectFigma = useCallback(
+    (payload: EventResponsePayload[EventResponseType.FIGMA_OAUTH_CONNECT]) => {
+      if (payload) {
+        setIsFigmaAuthenticated(true);
+      }
+    },
+    [navigate, setIsFigmaAuthenticated, setIsInitialized]
+  );
+
   const handleShowLoginView = useCallback(() => {
     setIsLoggedIn(false);
   }, [setIsLoggedIn]);
@@ -53,6 +62,10 @@ export const ExtensionEventHandler = () => {
         }
         case EventResponseType.SHOW_LOGIN_VIEW: {
           handleShowLoginView();
+          break;
+        }
+        case EventResponseType.FIGMA_OAUTH_CONNECT: {
+          handleConnectFigma(payload as EventResponsePayload[typeof event.command]);
           break;
         }
         case EventResponseType.SHOW_CHAT_VIEW: {

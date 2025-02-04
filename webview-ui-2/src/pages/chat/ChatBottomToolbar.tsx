@@ -5,17 +5,33 @@ import { FilePicker } from './FilePicker';
 import { IoIosReturnLeft } from 'react-icons/io';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { InputContextValue } from '../../common/utils';
+import { useNewMessage } from '../../context/NewMessageContext';
+import { useAttachment } from '../../context/AttachmentContext';
 
 export const ChatBottomToolbar = ({ context, messageId }: { context: InputContextValue; messageId?: string }) => {
-  const { isDisabled, input, sendUserMessage, stopMessage } = context;
+  const { isDisabled, input, stopMessage, setInput } = context;
+  const { sendMessageContent } = useNewMessage();
+  const { figmaAttachment, removeAttachment } = useAttachment();
 
   const handleMessageStopped = useCallback(() => {
     stopMessage();
   }, [stopMessage]);
 
   const handleButtonClicked = useCallback(() => {
-    sendUserMessage(messageId);
-  }, [sendUserMessage, messageId]);
+    console.log(input);
+    console.log(figmaAttachment);
+    sendMessageContent({
+      text: input,
+      attachment: figmaAttachment
+        ? {
+            figma: figmaAttachment
+          }
+        : undefined,
+      fromMessageID: messageId
+    });
+    setInput('');
+    removeAttachment();
+  }, [messageId, figmaAttachment, input, sendMessageContent, setInput, removeAttachment]);
 
   return (
     <div className="flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2">
@@ -29,8 +45,8 @@ export const ChatBottomToolbar = ({ context, messageId }: { context: InputContex
           <Button
             size="xs"
             variant="text"
-            active={!isDisabled && input.length > 0 ? 'active' : 'none'}
-            disabled={isDisabled || !input.length}
+            active={!isDisabled && (input.length > 0 || figmaAttachment) ? 'active' : 'none'}
+            disabled={isDisabled || (!input.length && !figmaAttachment)}
             className={isDisabled ? 'opacity-60' : ''}
             onClick={handleButtonClicked}>
             <span className="sr-only">Enter</span>

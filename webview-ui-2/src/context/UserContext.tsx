@@ -26,6 +26,7 @@ const UserContext = createContext<UserContextValue | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
+  
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);

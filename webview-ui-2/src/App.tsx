@@ -1,3 +1,4 @@
+import './App.css';
 import { GlobalProvider } from './context/GlobalContext';
 import { SyncProvider } from './context/SyncProvider';
 import { VSCodeProvider } from './context/VSCodeContext';

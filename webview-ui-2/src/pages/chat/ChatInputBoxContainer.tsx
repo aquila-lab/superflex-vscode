@@ -2,7 +2,6 @@ import { ReactNode, useContext, useEffect, useRef } from 'react';
 import { cn, chatInputDisabledClasses, chatInputEnabledClasses, InputContextValue } from '../../common/utils';
 import { EditModeContext } from '../../context/EditModeContext';
 import { useMessages } from '../../context/MessagesContext';
-import { MessageType } from '../../../../shared/model';
 
 export const ChatInputBoxContainer = ({
   children,
@@ -25,7 +24,7 @@ export const ChatInputBoxContainer = ({
 
         if (messageId) {
           const message = getMessage(messageId);
-          if (message?.content.type === MessageType.Text && message.content.text !== input) {
+          if (message?.content.text !== input) {
             editModeContext.setIsDraft(true);
             updateUserMessage(messageId, input);
           }

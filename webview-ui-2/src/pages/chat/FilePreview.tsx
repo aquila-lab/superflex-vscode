@@ -9,7 +9,9 @@ export const FilePreview = () => {
   const [content, setContent] = useState(file?.content ?? '');
 
   const handleFetchFileContent = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILE_CONTENT]) => {
-    setContent(payload);
+    if (payload) {
+      setContent(payload);
+    }
   }, []);
 
   useConsumeMessage(EventResponseType.FETCH_FILE_CONTENT, handleFetchFileContent);
