@@ -1,10 +1,5 @@
-import { createContext, useState, useContext, useMemo, ReactNode, useCallback, useEffect } from 'react';
-import {
-  EventRequestType,
-  EventResponsePayload,
-  EventResponseType,
-  TypedEventResponseMessage
-} from '../../../shared/protocol';
+import { createContext, useState, useContext, useMemo, ReactNode, useCallback } from 'react';
+import { EventResponsePayload, EventResponseType, TypedEventResponseMessage } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 
 export interface GlobalState {
@@ -28,10 +23,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [config, setConfig] = useState<Record<string, unknown> | null>(null);
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState(false);
-
-  useEffect(() => {
-    postMessage(EventRequestType.READY);
-  }, [postMessage]);
 
   const handleConfig = useCallback(
     (payload: EventResponsePayload[EventResponseType.CONFIG]) => {
@@ -61,14 +52,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     setIsFigmaAuthenticated(false);
   }, [setIsFigmaAuthenticated]);
 
-  const handleShowLoginView = useCallback(() => {
-    setIsLoggedIn(false);
-  }, [setIsLoggedIn]);
-
-  const handleShowChatView = useCallback(() => {
-    setIsLoggedIn(true);
-  }, [setIsLoggedIn]);
-
   const handleMessage = useCallback(
     ({ command, payload }: TypedEventResponseMessage) => {
       switch (command) {
@@ -80,10 +63,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
           handleInitialized(payload);
           break;
         }
-        case EventResponseType.SHOW_LOGIN_VIEW: {
-          handleShowLoginView();
-          break;
-        }
         case EventResponseType.FIGMA_OAUTH_CONNECT: {
           handleConnectFigma(payload);
           break;
@@ -92,13 +71,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
           handleDisconnectFigma();
           break;
         }
-        case EventResponseType.SHOW_CHAT_VIEW: {
-          handleShowChatView();
-          break;
-        }
       }
     },
-    [handleConfig, handleInitialized, handleShowLoginView, handleConnectFigma, handleShowChatView]
+    [handleConfig, handleInitialized, handleConnectFigma]
   );
 
   useConsumeMessage(
