@@ -25,9 +25,9 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
 
   useEffect(() => {
     if (currentThread) {
-      setMessages(currentThread.messages);
+      setMessages([DEFAULT_WELCOME_MESSAGE, ...currentThread.messages]);
     } else {
-      setMessages([DEFAULT_WELCOME_MESSAGE]);
+      setMessages([DEFAULT_WELCOME_MESSAGE])
     }
   }, [currentThread]);
 

@@ -8,6 +8,7 @@ interface ThreadsContextValue {
   threads: Thread[];
   currentThread: Thread | null;
   selectThread: (threadId: string) => void;
+  threadKey: number;
 }
 
 const ThreadsContext = createContext<ThreadsContextValue | null>(null);
@@ -17,6 +18,11 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
 
   const [threads, setThreads] = useState<Thread[]>([]);
   const [currentThread, setCurrentThread] = useState<Thread | null>(null);
+  const [threadKey, setThreadKey] = useState(0);
+
+  useEffect(() => {
+    setThreadKey((prev) => prev + 1);
+  }, [currentThread]);
 
   const selectThread = useCallback((threadId: string) => {
     postMessage(EventRequestType.FETCH_THREAD, {
@@ -32,10 +38,11 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
       case EventResponseType.FETCH_THREAD:
         setCurrentThread(payload);
         break;
+      case EventResponseType.NEW_THREAD:
+        setCurrentThread(payload);
+        break;
     }
   }, []);
-
-  useConsumeMessage([EventResponseType.FETCH_THREADS, EventResponseType.FETCH_THREAD], handleThreads);
 
   const fetchThreads = useCallback(() => {
     postMessage(EventRequestType.FETCH_THREADS);
@@ -45,9 +52,14 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     fetchThreads();
   }, [fetchThreads]);
 
+  useConsumeMessage(
+    [EventResponseType.FETCH_THREADS, EventResponseType.FETCH_THREAD, EventResponseType.NEW_THREAD],
+    handleThreads
+  );
+
   const value: ThreadsContextValue = useMemo(
-    () => ({ threads, currentThread, selectThread }),
-    [threads, currentThread, selectThread]
+    () => ({ threads, currentThread, threadKey, selectThread }),
+    [threads, currentThread, threadKey, selectThread]
   );
 
   return <ThreadsContext.Provider value={value}>{children}</ThreadsContext.Provider>;

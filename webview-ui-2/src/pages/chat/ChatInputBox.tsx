@@ -13,10 +13,19 @@ import { FigmaSelectionModal } from './FigmaSelectionModal';
 import { FilePreview } from './FilePreview';
 import { useUser } from '../../context/UserContext';
 import { ChatMessageContainer } from './ChatMessageContainer';
+import { usePostMessage } from '../../hooks/usePostMessage';
+import { useEffect } from 'react';
+import { EventRequestType } from '../../../../shared/protocol';
 
 export const ChatInputBox = ({ message }: { message?: Message }) => {
+  const postMessage = usePostMessage();
   const { isEditMode, isDraft } = useEditMode();
   const { user } = useUser();
+
+
+  useEffect(() => {
+    postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE);
+  }, [postMessage]);
 
   return (
     <AttachmentProvider attachment={message?.content.attachment}>
