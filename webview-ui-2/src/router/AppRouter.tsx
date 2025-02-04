@@ -6,12 +6,15 @@ import { LoginView } from '../pages/login/LoginView';
 import ProfileView from '../pages/profile/ProfileView';
 import { ChatView } from '../pages/chat/ChatView';
 import { AuthenticatedProviders } from '../components/AuthenticatedProviders';
+import { NavigationHandler } from './NavigationHandler';
 
 const OpenProject = () => <div>Open Project</div>;
 
 export const AppRouter = () => {
   return (
     <MemoryRouter>
+      <NavigationHandler />
+
       <Routes>
         <Route element={<AlreadyLoggedInGuard />}>
           <Route element={<Layout />}>

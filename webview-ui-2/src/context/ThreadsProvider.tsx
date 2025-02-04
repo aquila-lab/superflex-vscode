@@ -3,6 +3,7 @@ import { Thread } from '../../../shared/model';
 import { EventRequestType, EventResponseType, TypedEventResponseMessage } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
+import { useNavigate } from 'react-router-dom';
 
 interface ThreadsContextValue {
   threads: Thread[];
@@ -15,6 +16,7 @@ const ThreadsContext = createContext<ThreadsContextValue | null>(null);
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
+  const navigate = useNavigate();
 
   const [threads, setThreads] = useState<Thread[]>([]);
   const [currentThread, setCurrentThread] = useState<Thread | null>(null);
@@ -40,6 +42,7 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
         break;
       case EventResponseType.NEW_THREAD:
         setCurrentThread(payload);
+        navigate('/chat', { replace: true });
         break;
     }
   }, []);
