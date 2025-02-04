@@ -2,6 +2,7 @@ import { createContext, Dispatch, ReactNode, useCallback, useContext, useMemo, u
 import { EventRequestType, EventResponseMessage, EventResponseType, FilePayload } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
+import { useEditMode } from './EditModeContext';
 
 interface FilesContextValue {
   selectedFiles: FilePayload[];
@@ -17,6 +18,7 @@ const FilesContext = createContext<FilesContextValue | null>(null);
 
 export const FilesProvider = ({ files, children }: { files?: FilePayload[]; children: ReactNode }) => {
   const postMessage = usePostMessage();
+  const { isEditMode } = useEditMode();
 
   const [manuallySelectedFiles, setManuallySelectedFiles] = useState<FilePayload[]>(files ?? []);
   const [previewedFile, setPreviewedFile] = useState<FilePayload | null>(null);
@@ -46,7 +48,9 @@ export const FilesProvider = ({ files, children }: { files?: FilePayload[]; chil
 
   const handleNewOpenFile = useCallback(
     ({ payload }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
-      setCurrentFile(payload);
+      if (payload && isEditMode) {
+        setCurrentFile(payload);
+      }
     },
     []
   );
