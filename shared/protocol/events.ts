@@ -476,6 +476,6 @@ export function newEventRequest<T extends EventRequestType>(
 export function newEventResponse<T extends EventResponseType>(
   command: T,
   payload?: EventResponsePayload[T]
-): { id: string; command: T; payload?: EventResponsePayload[T]; error?: Error } {
-  return { id: uuidv4(), command, payload };
+): EventResponseMessage<T> {
+  return { id: uuidv4(), command, payload: payload as EventResponsePayload[T] };
 }
