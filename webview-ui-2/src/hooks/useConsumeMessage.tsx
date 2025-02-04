@@ -1,27 +1,25 @@
 import { useEffect, useCallback } from 'react';
-import { EventResponseType, EventResponsePayload, EventResponseMessage } from '../../../shared/protocol';
+import { EventResponseType, TypedEventResponseMessage } from '../../../shared/protocol';
 
-type MessageHandler<T extends EventResponseType> = (
-  payload: EventResponsePayload[T],
-  fullEvent: EventResponseMessage<EventResponseType>
+type TypedEventConsumeHandler<T extends EventResponseType> = (
+  event: Extract<TypedEventResponseMessage, { command: T }>
 ) => void;
 
 export function useConsumeMessage<T extends EventResponseType>(
-  eventTypes: T | T[],
-  onMessage: MessageHandler<T>,
+  eventTypes: T[],
+  handler: TypedEventConsumeHandler<T>,
   deps: React.DependencyList = []
 ): void {
   const handleMessage = useCallback(
-    (evt: MessageEvent<EventResponseMessage<EventResponseType>>) => {
-      const { command, payload, error } = evt.data || {};
-      const typesArray = Array.isArray(eventTypes) ? eventTypes : [eventTypes];
+    (evt: MessageEvent<TypedEventResponseMessage>) => {
+      const { command, error } = evt.data || {};
 
-      if (!typesArray.includes(command as T)) return;
+      if (!eventTypes.includes(command as T)) return;
       if (error) return;
 
-      onMessage(payload as EventResponsePayload[T], evt.data);
+      handler(evt.data as Extract<TypedEventResponseMessage, { command: T }>);
     },
-    [eventTypes, onMessage, ...deps]
+    [eventTypes, handler, ...deps]
   );
 
   useEffect(() => {

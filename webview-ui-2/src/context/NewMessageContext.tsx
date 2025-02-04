@@ -1,11 +1,6 @@
 import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 import { Message, MessageContent, Role } from '../../../shared/model';
-import {
-  EventRequestType,
-  EventResponseMessage,
-  EventResponsePayload,
-  EventResponseType
-} from '../../../shared/protocol';
+import { EventRequestType, EventResponseType, TypedEventResponseMessage } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
 import { useMessages } from './MessagesContext';
@@ -101,15 +96,14 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const handleMessage = useCallback(
-    (payload: EventResponsePayload[EventResponseType], event: EventResponseMessage<EventResponseType>) => {
-      switch (event.command) {
-        case EventResponseType.MESSAGE_TEXT_DELTA: {
-          handleMessageDelta(payload as EventResponsePayload[typeof event.command]);
+    ({ command, payload }: TypedEventResponseMessage) => {
+      switch (command) {
+        case EventResponseType.MESSAGE_TEXT_DELTA:
+          handleMessageDelta(payload);
           break;
-        }
-        case EventResponseType.MESSAGE_COMPLETE: {
-          handleSendMessageResponse(payload as EventResponsePayload[typeof event.command]);
-        }
+        case EventResponseType.MESSAGE_COMPLETE:
+          handleSendMessageResponse(payload);
+          break;
       }
     },
     [handleMessageDelta, handleSendMessageResponse]
