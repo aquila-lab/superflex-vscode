@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useContext, createContext, useState, useCallback } from 'react';
-import { EventRequestType, EventResponsePayload, EventResponseType } from '../../../shared/protocol';
+import { EventRequestType, EventResponseMessage, EventResponseType } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
 
@@ -14,13 +14,13 @@ const SyncContext = createContext<SyncContextValue | null>(null);
 
 export const SyncProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
-  
+
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
   const [isFirstTimeSync, setIsFirstTimeSync] = useState(false);
 
   const handleProjectProgress = useCallback(
-    (payload: EventResponsePayload[EventResponseType.SYNC_PROJECT_PROGRESS]) => {
+    ({ payload }: EventResponseMessage<EventResponseType.SYNC_PROJECT_PROGRESS>) => {
       const { isFirstTimeSync: firstTime, progress } = payload;
 
       if (progress === 0) {

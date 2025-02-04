@@ -1,5 +1,5 @@
 import { createContext, Dispatch, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-import { EventRequestType, EventResponsePayload, EventResponseType, FilePayload } from '../../../shared/protocol';
+import { EventRequestType, EventResponseMessage, EventResponseType, FilePayload } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
 
@@ -44,9 +44,12 @@ export const FilesProvider = ({ files, children }: { files?: FilePayload[]; chil
     });
   }, []);
 
-  const handleNewOpenFile = useCallback((payload: EventResponsePayload[EventResponseType.SET_CURRENT_OPEN_FILE]) => {
-    setCurrentFile(payload);
-  }, []);
+  const handleNewOpenFile = useCallback(
+    ({ payload }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
+      setCurrentFile(payload);
+    },
+    []
+  );
 
   const deselectFile = useCallback((file: FilePayload) => {
     setManuallySelectedFiles((prevSelectedFiles) => prevSelectedFiles.filter((selected) => selected.id !== file.id));

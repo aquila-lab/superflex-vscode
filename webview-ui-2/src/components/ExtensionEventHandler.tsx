@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EventResponseType, EventResponseMessage, EventResponsePayload } from '../../../shared/protocol';
+import { EventResponseType, EventResponsePayload, TypedEventResponseMessage } from '../../../shared/protocol';
 import { useGlobal } from '../context/GlobalContext';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 
@@ -50,14 +50,14 @@ export const ExtensionEventHandler = () => {
   }, [setIsLoggedIn]);
 
   const handleMessage = useCallback(
-    (payload: EventResponsePayload[EventResponseType], event: EventResponseMessage<EventResponseType>) => {
-      switch (event.command) {
+    ({ command, payload }: TypedEventResponseMessage) => {
+      switch (command) {
         case EventResponseType.CONFIG: {
-          handleConfig(payload as EventResponsePayload[typeof event.command]);
+          handleConfig(payload);
           break;
         }
         case EventResponseType.INITIALIZED: {
-          handleInitialized(payload as EventResponsePayload[typeof event.command]);
+          handleInitialized(payload);
           break;
         }
         case EventResponseType.SHOW_LOGIN_VIEW: {
@@ -65,7 +65,7 @@ export const ExtensionEventHandler = () => {
           break;
         }
         case EventResponseType.FIGMA_OAUTH_CONNECT: {
-          handleConnectFigma(payload as EventResponsePayload[typeof event.command]);
+          handleConnectFigma(payload);
           break;
         }
         case EventResponseType.SHOW_CHAT_VIEW: {

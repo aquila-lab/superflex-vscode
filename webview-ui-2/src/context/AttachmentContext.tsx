@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useContext, createContext, useState, useCallback } from 'react';
-import { EventRequestType, EventResponsePayload, EventResponseType } from '../../../shared/protocol';
+import { EventRequestType, EventResponseMessage, EventResponseType } from '../../../shared/protocol';
 import { usePostMessage } from '../hooks/usePostMessage';
 import { FigmaAttachment, MessageAttachment } from '../../../shared/model';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
@@ -19,7 +19,13 @@ interface AttachmentContextValue {
 
 const AttachmentContext = createContext<AttachmentContextValue | null>(null);
 
-export const AttachmentProvider = ({ attachment, children }: { attachment?: MessageAttachment, children: ReactNode }) => {
+export const AttachmentProvider = ({
+  attachment,
+  children
+}: {
+  attachment?: MessageAttachment;
+  children: ReactNode;
+}) => {
   const postMessage = usePostMessage();
 
   const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false);
@@ -49,7 +55,7 @@ export const AttachmentProvider = ({ attachment, children }: { attachment?: Mess
   }, []);
 
   const handleCreateFigmaAttachment = useCallback(
-    (payload: EventResponsePayload[EventResponseType.CREATE_FIGMA_ATTACHMENT]) => {
+    ({ payload }: EventResponseMessage<EventResponseType.CREATE_FIGMA_ATTACHMENT>) => {
       console.log(payload);
       setFigmaAttachment(payload);
       setIsFigmaLoading(false);

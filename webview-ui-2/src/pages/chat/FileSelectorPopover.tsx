@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
-import { EventResponsePayload, EventResponseType, FilePayload } from '../../../../shared/protocol';
+import { EventResponseType, EventResponseMessage, FilePayload } from '../../../../shared/protocol';
 import {
   Command,
   CommandEmpty,
@@ -22,7 +22,7 @@ const FileSelectorPopover = () => {
   const [files, setFiles] = useState<FilePayload[]>([]);
   const { isEditMode } = useEditMode();
 
-  const handleFetchFiles = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILES]) => {
+  const handleFetchFiles = useCallback(({ payload }: EventResponseMessage<EventResponseType.FETCH_FILES>) => {
     setFiles(payload);
   }, []);
 

@@ -6,7 +6,7 @@ import {
   EventRequestType,
   EventResponseType,
   EventResponsePayload,
-  EventResponseMessage
+  TypedEventResponseMessage
 } from '../../../shared/protocol';
 
 interface UserContextValue {
@@ -26,7 +26,7 @@ const UserContext = createContext<UserContextValue | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
-  
+
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
@@ -46,14 +46,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const handleMessage = useCallback(
-    (payload: EventResponsePayload[EventResponseType], event: EventResponseMessage<EventResponseType>) => {
-      switch (event.command) {
+    ({ command, payload }: TypedEventResponseMessage) => {
+      switch (command) {
         case EventResponseType.GET_USER_INFO: {
-          handleUserInfo(payload as EventResponsePayload[typeof event.command]);
+          handleUserInfo(payload);
           break;
         }
         case EventResponseType.GET_USER_SUBSCRIPTION: {
-          handleUserSubscription(payload as EventResponsePayload[typeof event.command]);
+          handleUserSubscription(payload);
           break;
         }
       }

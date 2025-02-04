@@ -6,7 +6,7 @@ type TypedEventConsumeHandler<T extends EventResponseType> = (
 ) => void;
 
 export function useConsumeMessage<T extends EventResponseType>(
-  eventTypes: T[],
+  eventTypes: T | T[],
   handler: TypedEventConsumeHandler<T>,
   deps: React.DependencyList = []
 ): void {
@@ -14,7 +14,8 @@ export function useConsumeMessage<T extends EventResponseType>(
     (evt: MessageEvent<TypedEventResponseMessage>) => {
       const { command, error } = evt.data || {};
 
-      if (!eventTypes.includes(command as T)) return;
+      const matchesType = Array.isArray(eventTypes) ? eventTypes.includes(command as T) : eventTypes === command;
+      if (!matchesType) return;
       if (error) return;
 
       handler(evt.data as Extract<TypedEventResponseMessage, { command: T }>);

@@ -197,7 +197,7 @@
         "command": "superflex.settings",
         "category": "Superflex",
         "title": "Settings",
-        "icon": "$(settings)",
+        "icon": "$(settings-gear)",
         "enablement": "superflex.chat.authenticated"
       },
       {

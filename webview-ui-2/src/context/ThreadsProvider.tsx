@@ -1,6 +1,6 @@
 import { ReactNode, useMemo, useContext, createContext, useState, useCallback, useEffect } from 'react';
 import { Thread } from '../../../shared/model';
-import { EventRequestType, EventResponsePayload, EventResponseType } from '../../../shared/protocol';
+import { EventRequestType, EventResponseType, TypedEventResponseMessage } from '../../../shared/protocol';
 import { useConsumeMessage } from '../hooks/useConsumeMessage';
 import { usePostMessage } from '../hooks/usePostMessage';
 
@@ -14,7 +14,7 @@ const ThreadsContext = createContext<ThreadsContextValue | null>(null);
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage();
-  
+
   const [threads, setThreads] = useState<Thread[]>([]);
   const [currentThread, setCurrentThread] = useState<Thread | null>(null);
 
@@ -24,16 +24,18 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
-  const handleFetchThreads = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_THREADS]) => {
-    setThreads(payload);
+  const handleThreads = useCallback(({ command, payload }: TypedEventResponseMessage) => {
+    switch (command) {
+      case EventResponseType.FETCH_THREADS:
+        setThreads(payload);
+        break;
+      case EventResponseType.FETCH_THREAD:
+        setCurrentThread(payload);
+        break;
+    }
   }, []);
 
-  const handleFetchThread = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_THREAD]) => {
-    setCurrentThread(payload);
-  }, []);
-
-  useConsumeMessage(EventResponseType.FETCH_THREADS, handleFetchThreads);
-  useConsumeMessage(EventResponseType.FETCH_THREAD, handleFetchThread);
+  useConsumeMessage([EventResponseType.FETCH_THREADS, EventResponseType.FETCH_THREAD], handleThreads);
 
   const fetchThreads = useCallback(() => {
     postMessage(EventRequestType.FETCH_THREADS);

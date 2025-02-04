@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Editor } from './Editor';
 import { useFiles } from '../../context/FilesProvider';
-import { EventResponsePayload, EventResponseType } from '../../../../shared/protocol';
+import { EventResponseType, EventResponseMessage } from '../../../../shared/protocol';
 import { useConsumeMessage } from '../../hooks/useConsumeMessage';
 
 export const FilePreview = () => {
   const { previewedFile: file, fetchFileContent } = useFiles();
   const [content, setContent] = useState(file?.content ?? '');
 
-  const handleFetchFileContent = useCallback((payload: EventResponsePayload[EventResponseType.FETCH_FILE_CONTENT]) => {
-    if (payload) {
-      setContent(payload);
-    }
-  }, []);
+  const handleFetchFileContent = useCallback(
+    ({ payload }: EventResponseMessage<EventResponseType.FETCH_FILE_CONTENT>) => {
+      if (payload) {
+        setContent(payload);
+      }
+    },
+    []
+  );
 
   useConsumeMessage(EventResponseType.FETCH_FILE_CONTENT, handleFetchFileContent);
 

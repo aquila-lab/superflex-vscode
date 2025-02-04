@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { usePostMessage } from '../../hooks/usePostMessage';
 import { useConsumeMessage } from '../../hooks/useConsumeMessage';
-import { EventRequestType, EventResponseType, EventResponsePayload } from '../../../../shared/protocol';
+import { EventRequestType, EventResponseType, EventResponseMessage } from '../../../../shared/protocol';
 import { LoginAuthLinkView } from './LoginAuthLinkView';
 import { LoginDefaultView } from './LoginDefaultView';
 
@@ -9,7 +9,7 @@ export const LoginView = () => {
   const postMessage = usePostMessage();
   const [authUniqueLink, setAuthUniqueLink] = useState<string | undefined>();
 
-  const handleAuthLink = useCallback((payload: EventResponsePayload[EventResponseType.CREATE_AUTH_LINK]) => {
+  const handleAuthLink = useCallback(({ payload }: EventResponseMessage<EventResponseType.CREATE_AUTH_LINK>) => {
     setAuthUniqueLink(payload.uniqueLink);
   }, []);
 
