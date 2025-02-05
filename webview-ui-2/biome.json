@@ -1,0 +1,91 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"ignore": [
+			"**/node_modules/**",
+			"**/dist/**",
+			"**/build/**",
+			"**/.next/**",
+			"coverage/**"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 80,
+		"lineEnding": "lf",
+		"formatWithErrors": false
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"a11y": {
+				"noSvgWithoutTitle": "off",
+				"useKeyWithClickEvents": "off",
+				"useAltText": "off"
+			},
+			"complexity": {
+				"noForEach": "off",
+				"noStaticOnlyClass": "error",
+				"noUselessFragments": "error",
+				"noUselessConstructor": "error",
+				"useSimplifiedLogicExpression": "error",
+				"noVoid": "error"
+			},
+			"correctness": {
+				"noUnreachable": "error",
+				"noUnusedVariables": "error",
+				"useExhaustiveDependencies": "error",
+				"noConstantCondition": "error"
+			},
+			"performance": {
+				"noDelete": "error"
+			},
+			"style": {
+				"noNonNullAssertion": "error",
+				"useBlockStatements": "error",
+				"useShorthandArrayType": "error",
+				"useTemplate": "error",
+				"noUselessElse": "error"
+			},
+			"suspicious": {
+				"noConsoleLog": "warn",
+				"noDebugger": "error",
+				"noEmptyBlockStatements": "off",
+				"noRedundantUseStrict": "error"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"trailingCommas": "all",
+			"semicolons": "always"
+		},
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": false
+		}
+	},
+	"json": {
+		"parser": {
+			"allowComments": true
+		},
+		"formatter": {
+			"enabled": true
+		}
+	}
+}
