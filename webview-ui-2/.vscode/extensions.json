@@ -1,8 +1,8 @@
 {
-	"recommendations": [
-		"bradlc.vscode-tailwindcss",
-		"biomejs.biome",
-		"aquilalabs.superflex"
-	],
-	"unwantedRecommendations": []
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "biomejs.biome",
+    "aquilalabs.superflex"
+  ],
+  "unwantedRecommendations": []
 }

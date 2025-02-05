@@ -1,15 +1,15 @@
 .figma-copy-selection-example {
-	background-image: url(./assets/figma-copy-selection-example.png);
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
+  background-image: url(./assets/figma-copy-selection-example.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .scrollbar-hide {
-	scrollbar-width: none;
-	-ms-overflow-style: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-	display: none;
+  display: none;
 }
