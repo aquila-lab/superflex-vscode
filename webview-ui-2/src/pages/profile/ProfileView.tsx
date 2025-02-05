@@ -4,7 +4,6 @@ import { BillingCard } from './BillingCard'
 import { UserInfoCard } from './UserInfoCard'
 
 export const ProfileView = () => {
-  console.log('ProfileView')
   const {
     user,
     subscription,

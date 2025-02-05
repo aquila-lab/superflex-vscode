@@ -5,8 +5,6 @@ export const AuthGuard = () => {
   const { isLoggedIn } = useGlobal()
   const navigate = useNavigate()
 
-  console.log('AuthGuard, isLoggedIn:', isLoggedIn)
-
   if (isLoggedIn === null) {
     return null
   }

@@ -3,12 +3,11 @@ import { AuthenticatedProviders } from '../components/AuthenticatedProviders'
 import { Layout } from '../layouts/Layout'
 import { ChatView } from '../pages/chat/ChatView'
 import { LoginView } from '../pages/login/LoginView'
+import { OpenProjectView } from '../pages/open-project/OpenProjectView'
 import ProfileView from '../pages/profile/ProfileView'
 import { AlreadyLoggedInGuard } from './AlreadyLoggedInGuard'
 import { AuthGuard } from './AuthGuard'
 import { NavigationHandler } from './NavigationHandler'
-
-const OpenProject = () => <div>Open Project</div>
 
 export const AppRouter = () => {
   return (
@@ -29,7 +28,7 @@ export const AppRouter = () => {
           <Route element={<Layout />}>
             <Route
               path='/open-project'
-              element={<OpenProject />}
+              element={<OpenProjectView />}
             />
           </Route>
         </Route>

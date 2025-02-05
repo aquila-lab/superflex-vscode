@@ -14,10 +14,10 @@ import {
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 
 export interface GlobalState {
-  isInitialized: boolean
+  isInitialized: boolean | null
   isLoggedIn: boolean | null
   config: Record<string, unknown> | null
-  isFigmaAuthenticated: boolean
+  isFigmaAuthenticated: boolean | null
 }
 
 interface GlobalContextValue extends GlobalState {
@@ -30,14 +30,12 @@ interface GlobalContextValue extends GlobalState {
 const GlobalContext = createContext<GlobalContextValue | null>(null)
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const [isInitialized, setIsInitialized] = useState(false)
+  const [isInitialized, setIsInitialized] = useState<boolean | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
   const [config, setConfig] = useState<Record<string, unknown> | null>(null)
-  const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState(false)
-
-  console.log('isInitialized', isInitialized)
-  console.log('isLoggedIn', isLoggedIn)
-  console.log('isFigmaAuthenticated', isFigmaAuthenticated)
+  const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState<
+    boolean | null
+  >(null)
 
   const handleConfig = useCallback(
     (payload: EventResponsePayload[EventResponseType.CONFIG]) => {
