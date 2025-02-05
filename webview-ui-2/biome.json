@@ -21,7 +21,7 @@
 		"indentWidth": 2,
 		"lineWidth": 80,
 		"lineEnding": "lf",
-		"formatWithErrors": false
+		"formatWithErrors": true
 	},
 	"organizeImports": {
 		"enabled": true
