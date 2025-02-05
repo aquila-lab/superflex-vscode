@@ -3,15 +3,18 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState
 } from 'react'
 import {
+  EventRequestType,
   type EventResponsePayload,
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../shared/protocol'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
+import { usePostMessage } from '../hooks/usePostMessage'
 
 export interface GlobalState {
   isInitialized: boolean | null
@@ -30,12 +33,18 @@ interface GlobalContextValue extends GlobalState {
 const GlobalContext = createContext<GlobalContextValue | null>(null)
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
+  const postMessage = usePostMessage()
   const [isInitialized, setIsInitialized] = useState<boolean | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
   const [config, setConfig] = useState<Record<string, unknown> | null>(null)
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState<
     boolean | null
   >(null)
+
+  useEffect(() => {
+    postMessage(EventRequestType.READY)
+    console.log('READY')
+  }, [postMessage])
 
   const handleConfig = useCallback(
     (payload: EventResponsePayload[EventResponseType.CONFIG]) => {

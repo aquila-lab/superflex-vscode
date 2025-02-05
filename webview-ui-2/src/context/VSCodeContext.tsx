@@ -10,7 +10,7 @@ import {
 import {
   type EventRequestMessage,
   type EventRequestPayload,
-  EventRequestType,
+  type EventRequestType,
   newEventRequest
 } from '../../../shared/protocol'
 
@@ -56,12 +56,6 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
     },
     [vscodeApi]
   )
-
-  useEffect(() => {
-    if (vscodeApi) {
-      vscodeApi.postMessage(newEventRequest(EventRequestType.READY))
-    }
-  }, [vscodeApi])
 
   const value: VSCodeContextValue = useMemo(
     () => ({ postMessage }),
