@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react'
+import { Outlet } from 'react-router-dom'
 
-export const SharedLayout = ({ children }: { children: ReactNode }) => {
+export const BaseLayout = () => {
   return (
     <div className='App h-full'>
       <div
         id='AppContent'
         className='h-full'
       >
-        {children}
+        <Outlet />
       </div>
     </div>
   )

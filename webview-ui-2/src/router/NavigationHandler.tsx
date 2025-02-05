@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   EventResponseType,
@@ -7,7 +7,7 @@ import {
 import { useGlobal } from '../context/GlobalContext'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 
-export const NavigationHandler = () => {
+export const NavigationHandler = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate()
   const { setIsLoggedIn } = useGlobal()
 
@@ -16,17 +16,16 @@ export const NavigationHandler = () => {
       switch (command) {
         case EventResponseType.SHOW_LOGIN_VIEW: {
           setIsLoggedIn(false)
-          navigate('/login')
+          navigate('/login', { replace: true })
           break
         }
         case EventResponseType.SHOW_CHAT_VIEW: {
           setIsLoggedIn(true)
-          navigate('/chat')
+          navigate('/chat', { replace: true })
           break
         }
         case EventResponseType.SHOW_SETTINGS_VIEW: {
-          navigate('/profile')
-          break
+          navigate('/profile', { replace: true })
         }
       }
     },
@@ -42,5 +41,5 @@ export const NavigationHandler = () => {
     handleMessage
   )
 
-  return null
+  return children
 }

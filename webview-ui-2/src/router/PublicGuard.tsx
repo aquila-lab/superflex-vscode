@@ -1,7 +1,7 @@
-import { Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useGlobal } from '../context/GlobalContext'
 
-export const AlreadyLoggedInGuard = () => {
+export const PublicGuard = () => {
   const { isLoggedIn } = useGlobal()
   const navigate = useNavigate()
 
@@ -10,7 +10,7 @@ export const AlreadyLoggedInGuard = () => {
   }
 
   if (isLoggedIn) {
-    navigate('/chat')
+    navigate('/chat', { replace: true })
   }
 
   return <Outlet />

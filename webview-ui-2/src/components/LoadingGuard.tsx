@@ -13,7 +13,7 @@ export const LoadingGuard = ({ children }: { children: ReactNode }) => {
   }
 
   if (!isInitialized) {
-    navigate('/open-project')
+    navigate('/open-project', { replace: true })
   }
 
   return children
