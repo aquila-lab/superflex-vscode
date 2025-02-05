@@ -35,6 +35,10 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<Record<string, unknown> | null>(null)
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState(false)
 
+  console.log('isInitialized', isInitialized)
+  console.log('isLoggedIn', isLoggedIn)
+  console.log('isFigmaAuthenticated', isFigmaAuthenticated)
+
   const handleConfig = useCallback(
     (payload: EventResponsePayload[EventResponseType.CONFIG]) => {
       setConfig(payload)

@@ -1,20 +1,18 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useGlobal } from '../context/GlobalContext'
 
 export const AuthGuard = () => {
   const { isLoggedIn } = useGlobal()
+  const navigate = useNavigate()
+
+  console.log('AuthGuard, isLoggedIn:', isLoggedIn)
 
   if (isLoggedIn === null) {
     return null
   }
 
   if (!isLoggedIn) {
-    return (
-      <Navigate
-        to='/login'
-        replace
-      />
-    )
+    navigate('/login')
   }
 
   return <Outlet />

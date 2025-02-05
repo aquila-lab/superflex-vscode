@@ -5,6 +5,7 @@ import { ChatInputBox } from './ChatInputBox'
 import { ChatMessageList } from './ChatMessageList'
 
 export const ChatView = () => {
+  console.log('ChatView')
   const postMessage = usePostMessage()
 
   useEffect(() => {

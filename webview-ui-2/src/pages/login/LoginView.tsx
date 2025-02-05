@@ -10,6 +10,7 @@ import { LoginAuthLinkView } from './LoginAuthLinkView'
 import { LoginDefaultView } from './LoginDefaultView'
 
 export const LoginView = () => {
+  console.log('LoginView')
   const postMessage = usePostMessage()
   const [authUniqueLink, setAuthUniqueLink] = useState<string | null>(null)
 

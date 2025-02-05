@@ -42,6 +42,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isUserLoading, setIsUserLoading] = useState(true)
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true)
 
+  console.log('user', user)
+  console.log('user is loading:', isUserLoading)
+
+  console.log('subscription', subscription)
+  console.log('subscription is loading:', isSubscriptionLoading)
+
   const handleUserInfo = useCallback(
     (payload: EventResponsePayload[EventResponseType.GET_USER_INFO]) => {
       setUser(payload)
