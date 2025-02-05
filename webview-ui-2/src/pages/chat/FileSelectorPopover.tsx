@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
-import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from '@radix-ui/react-icons';
-import { EventResponseType, EventResponseMessage, FilePayload } from '../../../../shared/protocol';
+import { useCallback, useEffect, useState } from "react";
+import { PlusIcon, ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons";
+import { EventResponseType, EventResponseMessage, FilePayload } from "../../../../shared/protocol";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList
-} from '../../components/ui/Command';
-import { Button } from '../../components/ui/Button';
-import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/Popover';
-import { FileIcon } from '../../components/ui/FileIcon';
-import { useFiles } from '../../context/FilesProvider';
-import { useConsumeMessage } from '../../hooks/useConsumeMessage';
-import { useEditMode } from '../../context/EditModeContext';
+  CommandList,
+} from "../../components/ui/Command";
+import { Button } from "../../components/ui/Button";
+import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/Popover";
+import { FileIcon } from "../../components/ui/FileIcon";
+import { useFiles } from "../../context/FilesProvider";
+import { useConsumeMessage } from "../../hooks/useConsumeMessage";
+import { useEditMode } from "../../context/EditModeContext";
 
 const FileSelectorPopover = () => {
   const { selectedFiles, fetchFiles, selectFile } = useFiles();
@@ -23,6 +23,8 @@ const FileSelectorPopover = () => {
   const { isEditMode } = useEditMode();
 
   const handleFetchFiles = useCallback(({ payload }: EventResponseMessage<EventResponseType.FETCH_FILES>) => {
+    console.log(payload);
+    console.log("fetching files");
     setFiles(payload);
   }, []);
 
@@ -79,7 +81,8 @@ const FileSelectorPopover = () => {
                   added={!!selectedFiles.find((f) => f.id === file.id)}
                   onSelect={() => {
                     handleFileSelected(file);
-                  }}>
+                  }}
+                >
                   <div className="flex items-center gap-2 w-full">
                     <FileIcon filePath={file.relativePath} className="size-5" />
                     <span className="text-sm whitespace-nowrap">{file.name}</span>

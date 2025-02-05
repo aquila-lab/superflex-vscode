@@ -12,7 +12,7 @@ import {
 
 export interface InputContextValue {
   input: string;
-  inputRef: RefObject<HTMLTextAreaElement>;
+  inputRef: RefObject<HTMLTextAreaElement | null>
   setInput: (value: SetStateAction<string>) => void;
   focusInput: () => void;
 }

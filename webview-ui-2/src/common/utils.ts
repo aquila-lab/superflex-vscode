@@ -123,7 +123,7 @@ export const DEFAULT_WELCOME_MESSAGE: Message = {
   updatedAt: new Date()
 };
 
-export const getAvatarConfig = (role: Role, picture?: string, username?: string) => {
+export const getAvatarConfig = (role: Role, picture?: string | null | undefined, username?: string) => {
   switch (role) {
     case Role.Assistant:
       return {
@@ -133,7 +133,7 @@ export const getAvatarConfig = (role: Role, picture?: string, username?: string)
       };
     case Role.User:
       return {
-        src: picture,
+        src: picture ?? undefined,
         alt: 'User Avatar',
         fallback: username ? username.charAt(0).toUpperCase() : 'U'
       };

@@ -10,10 +10,6 @@ export const NavigationHandler = () => {
   const navigate = useNavigate();
   const { setIsLoggedIn } = useGlobal();
 
-  useEffect(() => {
-    postMessage(EventRequestType.READY);
-  }, [postMessage]);
-
   const handleMessage = ({ command }: TypedEventResponseMessage) => {
     switch (command) {
       case EventResponseType.SHOW_LOGIN_VIEW: {
@@ -37,6 +33,10 @@ export const NavigationHandler = () => {
     [EventResponseType.SHOW_LOGIN_VIEW, EventResponseType.SHOW_CHAT_VIEW, EventResponseType.SHOW_SETTINGS_VIEW],
     handleMessage
   );
+
+  useEffect(() => {
+    postMessage(EventRequestType.READY);
+  }, [postMessage]);
 
   return null;
 };

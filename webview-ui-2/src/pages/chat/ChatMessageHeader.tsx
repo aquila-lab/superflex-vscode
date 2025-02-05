@@ -10,7 +10,7 @@ export const ChatMessageHeader = ({
   isDraft = false
 }: {
   role: Role;
-  picture?: string;
+  picture?: string | null;
   username?: string;
   isDraft?: boolean;
 }) => {

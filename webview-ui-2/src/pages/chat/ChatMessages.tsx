@@ -15,7 +15,7 @@ export const ChatMessages = () => {
           case Role.User:
             return (
               <EditModeProvider key={message.id}>
-                <ChatInputBox message={message} />
+                <ChatInputBox content={message.content} />
               </EditModeProvider>
             );
           case Role.Assistant:

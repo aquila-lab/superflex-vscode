@@ -1,4 +1,4 @@
-import { Message, Role } from '../../../../shared/model';
+import { MessageContent, Role } from '../../../../shared/model';
 import { AttachmentProvider } from '../../context/AttachmentContext';
 import { useEditMode } from '../../context/EditModeContext';
 import { FilesProvider } from '../../context/FilesProvider';
@@ -14,27 +14,22 @@ import { FilePreview } from './FilePreview';
 import { useUser } from '../../context/UserContext';
 import { ChatMessageContainer } from './ChatMessageContainer';
 
-export const ChatInputBox = ({ message }: { message?: Message }) => {
+export const ChatInputBox = ({ content }: { content?: MessageContent }) => {
   const { isEditMode, isDraft } = useEditMode();
   const { user } = useUser();
 
   return (
-    <AttachmentProvider attachment={message?.content.attachment}>
+    <AttachmentProvider attachment={content?.attachment}>
       <ChatAttachment />
 
-      <InputProvider text={message?.content.text}>
+      <InputProvider text={content?.text}>
         <ChatInputBoxContainer>
-          <FilesProvider files={message?.content.files}>
+          <FilesProvider files={content?.files}>
             <FilePreview />
             <ChatTopToolbar />
             {!isEditMode && (
               <ChatMessageContainer role={Role.User}>
-                <ChatMessageHeader
-                  role={Role.User}
-                  picture={user?.picture ?? ''}
-                  username={user?.username}
-                  isDraft={isDraft}
-                />
+                <ChatMessageHeader role={Role.User} picture={user.picture} username={user.username} isDraft={isDraft} />
               </ChatMessageContainer>
             )}
             <ChatTextarea />

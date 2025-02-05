@@ -80,8 +80,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     [
       EventResponseType.CONFIG,
       EventResponseType.INITIALIZED,
-      EventResponseType.SHOW_LOGIN_VIEW,
-      EventResponseType.SHOW_CHAT_VIEW,
       EventResponseType.FIGMA_OAUTH_CONNECT,
       EventResponseType.FIGMA_OAUTH_DISCONNECT
     ],

@@ -7,7 +7,7 @@ import { LoginDefaultView } from './LoginDefaultView';
 
 export const LoginView = () => {
   const postMessage = usePostMessage();
-  const [authUniqueLink, setAuthUniqueLink] = useState<string | undefined>();
+  const [authUniqueLink, setAuthUniqueLink] = useState<string | null>(null);
 
   const handleAuthLink = useCallback(({ payload }: EventResponseMessage<EventResponseType.CREATE_AUTH_LINK>) => {
     setAuthUniqueLink(payload.uniqueLink);
@@ -23,7 +23,7 @@ export const LoginView = () => {
   }, [authUniqueLink, postMessage]);
 
   const handleReturnToLogin = useCallback(() => {
-    setAuthUniqueLink(undefined);
+    setAuthUniqueLink(null);
   }, []);
 
   if (authUniqueLink) {
