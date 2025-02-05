@@ -3,7 +3,7 @@ import path from "path";
 import * as vscode from "vscode";
 import { Mutex } from "async-mutex";
 
-import { extractFigmaSelectionUrl, FigmaAttachment, Message, MessageContent, Thread } from "../../shared/model";
+import { extractFigmaSelectionUrl, Message, MessageContent, Thread } from "../../shared/model";
 import {
   EventRequestPayload,
   EventRequestType,
@@ -23,6 +23,7 @@ import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
 import { Assistant } from "../assistant";
 import SuperflexAssistant from "../assistant/SuperflexAssistant";
 import { findWorkspaceFiles } from "../scanner";
+import { enrichFilePayloads } from "../common/files";
 import { VerticalDiffManager } from "../diff/vertical/manager";
 import { myersDiff, createDiffStream } from "../diff/myers";
 
@@ -196,7 +197,7 @@ export class ChatAPI {
        * @param sendEventMessageCb - Callback function to send event messages to the webview.
        */
       .registerEvent(EventRequestType.SEND_MESSAGE, async (payload: MessageContent, sendEventMessageCb) => {
-        if (!this._isInitialized || !this._assistant) {
+        if (!this._isInitialized || !this._assistant || !this._workspaceDirPath) {
           return null;
         }
 
@@ -217,22 +218,8 @@ export class ChatAPI {
               break;
             }
             case "complete": {
-              /**
-               * Check if the message has files and if the files can be read from the workspace directory.
-               * If so, read the file content and add it to the file payload with the absolute path.
-               */
-              if (delta.message?.content.files && delta.message.content.files.length > 0) {
-                delta.message.content.files = delta.message.content.files.map((file: FilePayload) => {
-                  if (this._workspaceDirPath && file.relativePath) {
-                    const absolutePath = path.resolve(this._workspaceDirPath, file.relativePath);
-                    let content = undefined;
-                    if (fs.existsSync(absolutePath)) {
-                      content = fs.readFileSync(absolutePath, "utf8");
-                    }
-                    return { ...file, path: absolutePath, content };
-                  }
-                  return file;
-                });
+              if (delta.message?.content.files) {
+                delta.message.content.files = enrichFilePayloads(delta.message.content.files, this._workspaceDirPath);
               }
 
               sendEventMessageCb(newEventResponse(EventResponseType.MESSAGE_COMPLETE, delta.message));
@@ -525,11 +512,16 @@ export class ChatAPI {
        * @throws An error if the thread cannot be fetched.
        */
       .registerEvent(EventRequestType.FETCH_THREAD, async (payload: { threadID: string }) => {
-        if (!this._isInitialized || !this._assistant) {
+        if (!this._isInitialized || !this._assistant || !this._workspaceDirPath) {
           return null;
         }
 
         this._thread = await this._assistant.getThread(payload.threadID);
+
+        for (const message of this._thread.messages) {
+          if (!message.content.files) continue;
+          message.content.files = enrichFilePayloads(message.content.files, this._workspaceDirPath);
+        }
 
         return this._thread;
       });
