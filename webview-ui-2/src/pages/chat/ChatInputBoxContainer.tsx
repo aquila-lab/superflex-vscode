@@ -14,19 +14,16 @@ export const ChatInputBoxContainer = ({
   const { input } = useInput()
   const isDisabled = false
   const messageId = ''
-  const { setIsEditMode, setIsDraft } = useEditMode()
-
+  const { isEditMode, setIsEditMode, setIsDraft } = useEditMode()
   const { getMessage, updateUserMessage } = useMessages()
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setIsEditMode(false)
+    const handlePointer = (event: PointerEvent) => {
+      const isClickInside = wrapperRef.current?.contains(event.target as Node)
 
+      if (!isClickInside) {
+        setIsEditMode(false)
         if (messageId) {
           const message = getMessage(messageId)
           if (message?.content.text !== input) {
@@ -34,12 +31,22 @@ export const ChatInputBoxContainer = ({
             updateUserMessage(messageId, input)
           }
         }
+      } else if (!isEditMode) {
+        setIsEditMode(true)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [input, setIsEditMode, setIsDraft, getMessage, updateUserMessage])
+    document.addEventListener('pointerdown', handlePointer, true)
+    return () =>
+      document.removeEventListener('pointerdown', handlePointer, true)
+  }, [
+    input,
+    isEditMode,
+    setIsEditMode,
+    setIsDraft,
+    getMessage,
+    updateUserMessage
+  ])
 
   return (
     <div

@@ -11,9 +11,14 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
   const { previewedFile, deselectFile, setPreviewedFile } = useFiles()
   const { isEditMode } = useEditMode()
 
-  const handlePreviewClicked = useCallback(() => {
+  const togglePreviewedFile = useCallback(() => {
+    if (previewedFile?.id === file.id) {
+      setPreviewedFile(null)
+      return
+    }
+
     setPreviewedFile(file)
-  }, [file, setPreviewedFile])
+  }, [file, previewedFile, setPreviewedFile])
 
   const handleDeselectFile = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -32,7 +37,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             ? 'border border-accent'
             : 'border border-border'
         )}
-        onClick={handlePreviewClicked}
+        onClick={togglePreviewedFile}
       >
         <div className='flex flex-row items-center gap-1'>
           <FileIcon filePath={file.relativePath} className='size-5' />

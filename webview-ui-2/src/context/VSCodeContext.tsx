@@ -37,10 +37,13 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (vscodeApi) {
-      pendingTasks.forEach(task => vscodeApi.postMessage(task))
+      pendingTasks.forEach(task => {
+        console.warn(`New task from event queue: ${task}`)
+        vscodeApi.postMessage(task)
+      })
       setPendingTasks([])
     }
-  }, [vscodeApi])
+  }, [vscodeApi, pendingTasks.forEach])
 
   const postMessage = useCallback(
     <T extends EventRequestType>(

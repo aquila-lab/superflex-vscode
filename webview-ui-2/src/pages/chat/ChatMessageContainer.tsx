@@ -4,15 +4,18 @@ import { cn } from '../../common/utils'
 
 export const ChatMessageContainer = ({
   role,
-  children
-}: { role: Role; children: ReactNode }) => {
+  children,
+  className
+}: {
+  role: Role
+  children: ReactNode
+  className?: string
+}) => {
+  const baseStyles = 'rounded-lg px-4'
+  const roleSpecificStyles = role === Role.User ? 'py-0' : 'py-4'
+
   return (
-    <div
-      className={cn(
-        'py-4 px-4 rounded-lg',
-        role === Role.User ? 'bg-muted pb-0' : undefined
-      )}
-    >
+    <div className={cn(baseStyles, roleSpecificStyles, className)}>
       {children}
     </div>
   )

@@ -5,6 +5,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState
@@ -29,6 +30,22 @@ export const InputProvider = ({
   const focusInput = useCallback(() => {
     inputRef.current?.focus()
   }, [])
+
+  useEffect(() => {
+    const setFocusCursorPos = function (this: HTMLTextAreaElement) {
+      this.setSelectionRange(input.length, input.length)
+    }
+
+    if (inputRef.current) {
+      inputRef.current.addEventListener('focus', setFocusCursorPos)
+    }
+
+    return () => {
+      if (inputRef.current) {
+        inputRef.current.removeEventListener('focus', setFocusCursorPos)
+      }
+    }
+  })
 
   const value: InputContextValue = useMemo(
     () => ({

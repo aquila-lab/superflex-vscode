@@ -5,25 +5,42 @@ import { useMessages } from '../../context/MessagesContext'
 import { AssistantMessage } from './AssistantMessage'
 import { ChatInputBox } from './ChatInputBox'
 
+const MessageWrapper = ({ children }: { children: React.ReactNode }) => (
+  <div className='mb-2'>{children}</div>
+)
+
 export const ChatMessages = () => {
   const { messages } = useMessages()
 
-  return useMemo(
+  const renderedMessages = useMemo(
     () =>
       messages.map(message => {
-        switch (message.role) {
+        const { id, role, content } = message
+
+        switch (role) {
           case Role.User:
             return (
-              <EditModeProvider key={message.id}>
-                <ChatInputBox content={message.content} />
-              </EditModeProvider>
+              <MessageWrapper key={id}>
+                <EditModeProvider>
+                  <ChatInputBox content={content} />
+                </EditModeProvider>
+              </MessageWrapper>
             )
+
           case Role.Assistant:
-            return <AssistantMessage text={message.content.text ?? ''} />
+            return (
+              <MessageWrapper key={id}>
+                <AssistantMessage text={content.text || ''} />
+              </MessageWrapper>
+            )
+
           default:
+            console.warn(`Unsupported message role: ${role}`)
             return null
         }
       }),
     [messages]
   )
+
+  return <div className='flex flex-col space-y-2'>{renderedMessages}</div>
 }

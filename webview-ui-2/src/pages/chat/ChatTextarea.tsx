@@ -2,7 +2,8 @@ import {
   type ChangeEvent,
   type ClipboardEvent,
   type KeyboardEvent,
-  useCallback
+  useCallback,
+  useEffect
 } from 'react'
 import { EventResponseType } from '../../../../shared/protocol'
 import { TextareaAutosize } from '../../components/ui/TextareaAutosize'
@@ -55,6 +56,8 @@ export const ChatTextarea = () => {
       setInput
     ]
   )
+
+  useEffect(() => focusInput())
 
   const handleFocusChat = useCallback(() => focusInput(), [focusInput])
 
