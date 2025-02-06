@@ -41,7 +41,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
       >
         <div className='flex flex-row items-center gap-1'>
           <FileIcon filePath={file.relativePath} className='size-5' />
-          <p className='text-xs text-foreground truncate max-w-36'>
+          <p className='text-xs text-foreground truncate max-w-16'>
             {file.name}
           </p>
           <p className='text-xs text-foreground'>
@@ -51,7 +51,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
           </p>
           <p className='text-xs text-muted-secondary-foreground'>
             {file.isCurrentOpenFile
-              ? 'Current file'
+              ? 'Current'
               : file.endLine
                 ? 'Code'
                 : 'File'}

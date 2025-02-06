@@ -16,7 +16,7 @@ import { useConsumeMessage } from '../../hooks/useConsumeMessage'
 
 export const ChatTextarea = () => {
   const { input, inputRef, setInput, focusInput } = useInput()
-  const { selectedFiles } = useFiles()
+  const { selectedFiles, clearManuallySelectedFiles } = useFiles()
   const { isEditMode } = useEditMode()
   const isDisabled = false
   const messageId = ''
@@ -45,6 +45,7 @@ export const ChatTextarea = () => {
         })
         setInput('')
         removeAttachment()
+        clearManuallySelectedFiles()
       }
     },
     [
@@ -53,7 +54,8 @@ export const ChatTextarea = () => {
       sendMessageContent,
       selectedFiles,
       removeAttachment,
-      setInput
+      setInput,
+      clearManuallySelectedFiles
     ]
   )
 

@@ -12,7 +12,7 @@ import { FilePicker } from './FilePicker'
 
 export const ChatBottomToolbar = () => {
   const { input, setInput } = useInput()
-  const { selectedFiles } = useFiles()
+  const { selectedFiles, clearManuallySelectedFiles } = useFiles()
   const messageId = ''
   const isDisabled = false
   const { isEditMode } = useEditMode()
@@ -37,13 +37,15 @@ export const ChatBottomToolbar = () => {
     })
     setInput('')
     removeAttachment()
+    clearManuallySelectedFiles()
   }, [
     figmaAttachment,
     input,
     sendMessageContent,
     setInput,
     removeAttachment,
-    selectedFiles
+    selectedFiles,
+    clearManuallySelectedFiles
   ])
 
   if (!isEditMode) {

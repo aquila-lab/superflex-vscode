@@ -25,6 +25,7 @@ interface FilesContextValue {
   setPreviewedFile: Dispatch<React.SetStateAction<FilePayload | null>>
   selectFile: (file: FilePayload) => void
   deselectFile: (file: FilePayload) => void
+  clearManuallySelectedFiles: () => void
 }
 
 const FilesContext = createContext<FilesContextValue | null>(null)
@@ -53,6 +54,11 @@ export const FilesProvider = ({
 
     return files
   }, [manuallySelectedFiles, currentFile])
+
+  const clearManuallySelectedFiles = useCallback(
+    () => setManuallySelectedFiles([]),
+    []
+  )
 
   const selectFile = useCallback((file: FilePayload) => {
     setManuallySelectedFiles(prevSelectedFiles => {
@@ -107,7 +113,8 @@ export const FilesProvider = ({
       fetchFileContent,
       selectFile,
       deselectFile,
-      setPreviewedFile
+      setPreviewedFile,
+      clearManuallySelectedFiles
     }),
     [
       selectedFiles,
@@ -115,7 +122,8 @@ export const FilesProvider = ({
       fetchFiles,
       fetchFileContent,
       selectFile,
-      deselectFile
+      deselectFile,
+      clearManuallySelectedFiles
     ]
   )
 
