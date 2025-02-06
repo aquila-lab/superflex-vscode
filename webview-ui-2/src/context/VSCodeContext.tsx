@@ -40,7 +40,7 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
       pendingTasks.forEach(task => vscodeApi.postMessage(task))
       setPendingTasks([])
     }
-  }, [vscodeApi, pendingTasks])
+  }, [vscodeApi])
 
   const postMessage = useCallback(
     <T extends EventRequestType>(
