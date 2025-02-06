@@ -32,19 +32,13 @@ export const LoginAuthLinkView = ({
             {authUniqueLink}
           </CardDescription>
 
-          <Button
-            className='mt-4'
-            onClick={onCopyLink}
-          >
+          <Button className='mt-4' onClick={onCopyLink}>
             Copy Link
           </Button>
         </CardContent>
 
         <CardFooter className='flex justify-center items-center'>
-          <Button
-            variant='link'
-            onClick={onReturnToLogin}
-          >
+          <Button variant='link' onClick={onReturnToLogin}>
             Return to Login
           </Button>
         </CardFooter>

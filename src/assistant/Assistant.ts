@@ -1,4 +1,9 @@
-import { Message, MessageContent, Thread, ThreadRun } from "../../shared/model";
+import type {
+  Message,
+  MessageContent,
+  Thread,
+  ThreadRun
+} from '../../shared/model'
 
 export interface Assistant {
   /**
@@ -7,14 +12,14 @@ export interface Assistant {
    * @param title - Optional parameter to specify the title of the thread.
    * @returns A promise that resolves with the created thread.
    */
-  createThread(title?: string): Promise<Thread>;
+  createThread(title?: string): Promise<Thread>
 
   /**
    * Get all threads.
    *
    * @returns A promise that resolves with an array of threads.
    */
-  getThreads(): Promise<Thread[]>;
+  getThreads(): Promise<Thread[]>
 
   /**
    * Get a specific thread by ID.
@@ -22,12 +27,12 @@ export interface Assistant {
    * @param threadID - The ID of the thread to fetch.
    * @returns A promise that resolves with the thread.
    */
-  getThread(threadID: string): Promise<Thread>;
+  getThread(threadID: string): Promise<Thread>
 
   /**
    * Stop the message generation. It will stop the message stream and remove the message from the thread.
    */
-  stopMessage(): void;
+  stopMessage(): void
 
   /**
    * Send a message in a chat thread. If there is no active thread, a new thread will be created.
@@ -36,7 +41,7 @@ export interface Assistant {
    * @param message - The message to send to the assistant.
    * @returns {ThreadRun} ThreadRun object that contains the stream and the response.
    */
-  sendMessage(threadID: string, message: MessageContent): Promise<ThreadRun>;
+  sendMessage(threadID: string, message: MessageContent): Promise<ThreadRun>
 
   /**
    * Update a message in a chat thread.
@@ -44,7 +49,7 @@ export interface Assistant {
    * @param message - The message to update.
    * @returns A promise that resolves when the message is updated.
    */
-  updateMessage(message: Message): Promise<void>;
+  updateMessage(message: Message): Promise<void>
 
   /**
    * Apply the code to the file in the workspace.
@@ -53,7 +58,7 @@ export interface Assistant {
    * @param edits - The code to apply to the file.
    * @returns A promise that resolves when the code is applied to the file.
    */
-  fastApply(code: string, edits: string): Promise<string>;
+  fastApply(code: string, edits: string): Promise<string>
 
   /**
    * Sync files parse and upload small bites of project files to the vector store.
@@ -64,5 +69,7 @@ export interface Assistant {
    * @param isFirstTimeSync - Optional parameter to specify if the sync is the first time sync.
    * @returns A promise that resolves with the uploaded files.
    */
-  syncFiles(progressCb?: (current: number, isFirstTimeSync?: boolean) => void): Promise<void>;
+  syncFiles(
+    progressCb?: (current: number, isFirstTimeSync?: boolean) => void
+  ): Promise<void>
 }

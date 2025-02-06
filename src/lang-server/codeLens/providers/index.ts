@@ -1,1 +1,1 @@
-export { VerticalDiffCodeLensProvider as VerticalPerLineCodeLensProvider } from "./VerticalPerLineCodeLensProvider";
+export { VerticalDiffCodeLensProvider as VerticalPerLineCodeLensProvider } from './VerticalPerLineCodeLensProvider'

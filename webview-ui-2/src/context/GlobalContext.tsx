@@ -43,7 +43,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     postMessage(EventRequestType.READY)
-    console.log('READY')
   }, [postMessage])
 
   const handleConfig = useCallback(

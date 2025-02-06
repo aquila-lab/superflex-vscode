@@ -33,10 +33,7 @@ export const FigmaSelectionModal = () => {
   )
 
   return (
-    <Dialog
-      open={isSelectionModalOpen}
-      onOpenChange={handleOpenChange}
-    >
+    <Dialog open={isSelectionModalOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Enter the link of Figma selection</DialogTitle>
@@ -49,10 +46,7 @@ export const FigmaSelectionModal = () => {
             onChange={handleInputChange}
           />
 
-          <Button
-            onClick={handleSubmit}
-            className='w-full'
-          >
+          <Button onClick={handleSubmit} className='w-full'>
             Submit
           </Button>
 

@@ -39,10 +39,7 @@ export const MarkdownCode = ({
   return (
     <div className='rounded-md border border-border bg-background mt-1'>
       <FileHeader>{draft}</FileHeader>
-      <Editor
-        extension={codeBlock.extension}
-        filePath={codeBlock.filePath}
-      >
+      <Editor extension={codeBlock.extension} filePath={codeBlock.filePath}>
         {draft}
       </Editor>
     </div>

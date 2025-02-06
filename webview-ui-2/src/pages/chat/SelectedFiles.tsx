@@ -6,13 +6,7 @@ export const SelectedFiles = () => {
   const { selectedFiles } = useFiles()
 
   const renderSelectedFiles = useMemo(
-    () =>
-      selectedFiles.map(file => (
-        <FileTab
-          key={file.id}
-          file={file}
-        />
-      )),
+    () => selectedFiles.map(file => <FileTab key={file.id} file={file} />),
     [selectedFiles]
   )
 

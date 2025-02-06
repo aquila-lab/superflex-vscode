@@ -26,10 +26,7 @@ export const FileHeader = ({ children }: { children: ReactNode }) => {
   return (
     <div className='flex items-center justify-between gap-4 px-1 rounded-t-md border-b border-border bg-sidebar h-6'>
       <div className='flex items-center gap-1 min-w-0'>
-        <FileIcon
-          filePath={filePath}
-          className='size-4'
-        />
+        <FileIcon filePath={filePath} className='size-4' />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -45,10 +42,7 @@ export const FileHeader = ({ children }: { children: ReactNode }) => {
       </div>
 
       <div className='flex flex-row items-center'>
-        <CopyToClipboard
-          text={String(children)}
-          onCopy={() => {}}
-        >
+        <CopyToClipboard text={String(children)} onCopy={() => {}}>
           {copyTip === 'Copied' ? (
             <div className='text-muted-foreground px-1 py-0.5 rounded-md hover:bg-muted'>
               <CheckIcon className='size-3.5' />
@@ -92,10 +86,7 @@ export const FileHeader = ({ children }: { children: ReactNode }) => {
             >
               ✅ Accept
             </Button>
-            <Separator
-              orientation='vertical'
-              className='h-4'
-            />
+            <Separator orientation='vertical' className='h-4' />
             <Button
               size='xs'
               variant='text'

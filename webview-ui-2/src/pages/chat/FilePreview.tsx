@@ -40,10 +40,7 @@ export const FilePreview = () => {
   return (
     <div className='rounded-md -mb-1 mt-1.5 mx-1.5 bg-background border border-accent'>
       <div className='max-h-60 overflow-hidden'>
-        <Editor
-          filePath={file.relativePath}
-          maxHeight={240}
-        >
+        <Editor filePath={file.relativePath} maxHeight={240}>
           {content}
         </Editor>
       </div>

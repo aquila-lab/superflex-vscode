@@ -1,11 +1,12 @@
-import * as vscode from "vscode";
-import { VerticalDiffCodeLens } from "../../diff/vertical/manager";
-import * as providers from "./providers";
+import * as vscode from 'vscode'
+import type { VerticalDiffCodeLens } from '../../diff/vertical/manager'
+import * as providers from './providers'
 
-const { registerCodeLensProvider } = vscode.languages;
+const { registerCodeLensProvider } = vscode.languages
 
-export let verticalPerLineCodeLensProvider: vscode.Disposable | undefined = undefined;
-let diffsCodeLensDisposable: vscode.Disposable | undefined = undefined;
+export let verticalPerLineCodeLensProvider: vscode.Disposable | undefined =
+  undefined
+const diffsCodeLensDisposable: vscode.Disposable | undefined = undefined
 
 /**
  * Registers all CodeLens providers for the Superflex extension.
@@ -15,18 +16,23 @@ export function registerAllCodeLensProviders(
   editorToVerticalDiffCodeLens: Map<string, VerticalDiffCodeLens[]>
 ) {
   if (verticalPerLineCodeLensProvider) {
-    verticalPerLineCodeLensProvider.dispose();
+    verticalPerLineCodeLensProvider.dispose()
   }
 
   if (diffsCodeLensDisposable) {
-    diffsCodeLensDisposable.dispose();
+    diffsCodeLensDisposable.dispose()
   }
 
-  const verticalDiffCodeLens = new providers.VerticalPerLineCodeLensProvider(editorToVerticalDiffCodeLens);
+  const verticalDiffCodeLens = new providers.VerticalPerLineCodeLensProvider(
+    editorToVerticalDiffCodeLens
+  )
 
-  verticalPerLineCodeLensProvider = registerCodeLensProvider("*", verticalDiffCodeLens);
+  verticalPerLineCodeLensProvider = registerCodeLensProvider(
+    '*',
+    verticalDiffCodeLens
+  )
 
-  context.subscriptions.push(verticalPerLineCodeLensProvider);
+  context.subscriptions.push(verticalPerLineCodeLensProvider)
 
-  return { verticalDiffCodeLens };
+  return { verticalDiffCodeLens }
 }

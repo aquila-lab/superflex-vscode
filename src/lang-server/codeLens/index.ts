@@ -1,1 +1,1 @@
-export { registerAllCodeLensProviders } from "./registerAllCodeLensProviders";
+export { registerAllCodeLensProviders } from './registerAllCodeLensProviders'

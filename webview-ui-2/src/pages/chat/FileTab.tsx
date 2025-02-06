@@ -35,10 +35,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
         onClick={handlePreviewClicked}
       >
         <div className='flex flex-row items-center gap-1'>
-          <FileIcon
-            filePath={file.relativePath}
-            className='size-5'
-          />
+          <FileIcon filePath={file.relativePath} className='size-5' />
           <p className='text-xs text-foreground truncate max-w-36'>
             {file.name}
           </p>

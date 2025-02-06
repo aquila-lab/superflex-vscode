@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
+import fs from 'node:fs'
+import path from 'node:path'
 
-import { FilePayload } from "../../shared/protocol";
+import type { FilePayload } from '../../shared/protocol'
 
 /**
  * Enriches file payloads with absolute paths and content from the workspace
@@ -9,18 +9,23 @@ import { FilePayload } from "../../shared/protocol";
  * @param workspaceDirPath Base workspace directory path
  * @returns Enriched file payloads
  */
-export function enrichFilePayloads(files: FilePayload[], workspaceDirPath: string): FilePayload[] {
-  if (!files || files.length === 0) return files;
+export function enrichFilePayloads(
+  files: FilePayload[],
+  workspaceDirPath: string
+): FilePayload[] {
+  if (!files || files.length === 0) {
+    return files
+  }
 
   return files.map((file: FilePayload) => {
     if (workspaceDirPath && file.relativePath) {
-      const absolutePath = path.resolve(workspaceDirPath, file.relativePath);
-      let content = undefined;
+      const absolutePath = path.resolve(workspaceDirPath, file.relativePath)
+      let content = undefined
       if (fs.existsSync(absolutePath)) {
-        content = fs.readFileSync(absolutePath, "utf8");
+        content = fs.readFileSync(absolutePath, 'utf8')
       }
-      return { ...file, path: absolutePath, content };
+      return { ...file, path: absolutePath, content }
     }
-    return file;
-  });
+    return file
+  })
 }

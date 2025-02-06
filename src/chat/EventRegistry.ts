@@ -1,26 +1,31 @@
-import {
-  EventRequestType,
-  EventResponseType,
+import type {
   EventRequestPayload,
-  EventResponsePayload,
+  EventRequestType,
   EventResponseMessage,
-} from "../../shared/protocol";
+  EventResponsePayload,
+  EventResponseType
+} from '../../shared/protocol'
 
 export type Handler<T extends EventRequestType, R extends EventResponseType> = (
   payload: EventRequestPayload[T],
   sendEventMessageCb: (msg: EventResponseMessage<R>) => void
-) => Promise<EventResponsePayload[R]> | EventResponsePayload[R];
+) => Promise<EventResponsePayload[R]> | EventResponsePayload[R]
 
 export class EventRegistry {
-  private events: { [key: string]: Handler<EventRequestType, EventResponseType> };
-
-  constructor() {
-    this.events = {};
+  private events: {
+    [key: string]: Handler<EventRequestType, EventResponseType>
   }
 
-  registerEvent<T extends EventRequestType, R extends EventResponseType>(event: T, handler: Handler<T, R>) {
-    this.events[event] = handler;
-    return this;
+  constructor() {
+    this.events = {}
+  }
+
+  registerEvent<T extends EventRequestType, R extends EventResponseType>(
+    event: T,
+    handler: Handler<T, R>
+  ) {
+    this.events[event] = handler
+    return this
   }
 
   async handleEvent<T extends EventRequestType, R extends EventResponseType>(
@@ -28,10 +33,10 @@ export class EventRegistry {
     requestPayload: EventRequestPayload[T],
     sendEventMessageCb: (msg: EventResponseMessage<R>) => void
   ): Promise<EventResponsePayload[R]> {
-    const handler = this.events[event] as Handler<T, R>;
+    const handler = this.events[event] as Handler<T, R>
     if (handler) {
-      return handler(requestPayload, sendEventMessageCb);
+      return handler(requestPayload, sendEventMessageCb)
     }
-    throw new Error(`Event: ${event} does not exist in the registry`);
+    throw new Error(`Event: ${event} does not exist in the registry`)
   }
 }

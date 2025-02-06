@@ -5,7 +5,10 @@
   "scripts": {
     "start": "vite build --watch",
     "build": "tsc -b && vite build",
-    "lint": "biome check --fix --unsafe",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
     "preview": "vite preview"
   },
   "dependencies": {

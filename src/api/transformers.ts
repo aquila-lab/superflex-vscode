@@ -1,9 +1,16 @@
-import fs from "fs";
-import path from "path";
+import fs from 'node:fs'
+import path from 'node:path'
 
-import { FilePayload } from "../../shared/protocol/types";
-import { User, Message, Thread, Plan, UserSubscription, MessageContent } from "../../shared/model";
-import { generateFileID } from "../common/utils";
+import type {
+  Message,
+  MessageContent,
+  Plan,
+  Thread,
+  User,
+  UserSubscription
+} from '../../shared/model'
+import type { FilePayload } from '../../shared/protocol/types'
+import { generateFileID } from '../common/utils'
 
 export function buildUserFromResponse(res: any): User {
   return {
@@ -11,16 +18,16 @@ export function buildUserFromResponse(res: any): User {
     email: res.email,
     username: res.username,
     picture: res.picture ?? null,
-    stripeCustomerID: res.stripe_customer_id ?? null,
-  };
+    stripeCustomerID: res.stripe_customer_id ?? null
+  }
 }
 
 export function buildPlanFromResponse(res: any): Plan {
   return {
     name: res.name,
     basicRequestLimit: res.basic_request_limit,
-    premiumRequestLimit: res.premium_request_limit,
-  };
+    premiumRequestLimit: res.premium_request_limit
+  }
 }
 
 export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
@@ -30,8 +37,8 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
     premiumRequestsUsed: res.premium_requests_used,
     lastResetDate: new Date(res.last_reset_date),
     createdAt: new Date(res.created_at),
-    endDate: res.end_date ? new Date(res.end_date) : null,
-  };
+    endDate: res.end_date ? new Date(res.end_date) : null
+  }
 }
 
 function buildMessageContentFromResponse(res: any): MessageContent {
@@ -44,28 +51,28 @@ function buildMessageContentFromResponse(res: any): MessageContent {
           name: path.basename(file.path),
           relativePath: file.path,
           startLine: file.start_line,
-          endLine: file.end_line,
-        } as FilePayload)
-    ),
-  };
+          endLine: file.end_line
+        }) as FilePayload
+    )
+  }
 
   if (res.attachment) {
     if (res.attachment.image) {
       content.attachment = {
-        image: res.attachment.image,
-      };
+        image: res.attachment.image
+      }
     } else if (res.attachment.figma) {
       content.attachment = {
         figma: {
           fileID: res.attachment.figma.file_id,
           nodeID: res.attachment.figma.node_id,
-          imageUrl: res.attachment.figma.image_url,
-        },
-      };
+          imageUrl: res.attachment.figma.image_url
+        }
+      }
     }
   }
 
-  return content;
+  return content
 }
 
 export function buildMessageFromResponse(res: any): Message {
@@ -76,8 +83,8 @@ export function buildMessageFromResponse(res: any): Message {
     content: buildMessageContentFromResponse(res.content),
     feedback: res.feedback ?? undefined,
     updatedAt: new Date(res.updated_at),
-    createdAt: new Date(res.created_at),
-  };
+    createdAt: new Date(res.created_at)
+  }
 }
 
 export function buildThreadFromResponse(res: any): Thread {
@@ -86,27 +93,32 @@ export function buildThreadFromResponse(res: any): Thread {
     title: res.title,
     updatedAt: new Date(res.updated_at),
     createdAt: new Date(res.created_at),
-    messages: (res.messages ?? []).map((msg: any) => buildMessageFromResponse(msg)),
-  };
+
+    messages: (res.messages ?? []).map((msg: any) =>
+      buildMessageFromResponse(msg)
+    )
+  }
 }
 
-export function buildThreadRunRequest(message: MessageContent): Record<string, any> {
+export function buildThreadRunRequest(
+  message: MessageContent
+): Record<string, any> {
   const reqBody: Record<string, any> = {
     text: message.text,
-    files: [],
-  };
+    files: []
+  }
 
   for (const file of message.files ?? []) {
     if (!file.path) {
-      continue;
+      continue
     }
 
     if (!fs.existsSync(file.path)) {
-      continue;
+      continue
     }
 
-    if (!file.startLine && !file.endLine) {
-      file.content = fs.readFileSync(file.path, "utf8");
+    if (file.startLine === undefined && file.endLine === undefined) {
+      file.content = fs.readFileSync(file.path, 'utf8')
     }
 
     reqBody.files.push({
@@ -114,28 +126,28 @@ export function buildThreadRunRequest(message: MessageContent): Record<string, a
       content: file.content,
       start_line: file.startLine,
       end_line: file.endLine,
-      is_current_open_file: file.isCurrentOpenFile,
-    });
+      is_current_open_file: file.isCurrentOpenFile
+    })
   }
 
   if (message.attachment) {
     if (message.attachment.image) {
       reqBody.attachment = {
-        image: message.attachment.image,
-      };
+        image: message.attachment.image
+      }
     } else if (message.attachment.figma) {
       reqBody.attachment = {
         figma: {
           file_id: message.attachment.figma.fileID,
-          node_id: message.attachment.figma.nodeID,
-        },
-      };
+          node_id: message.attachment.figma.nodeID
+        }
+      }
     }
   }
 
   if (message.fromMessageID) {
-    reqBody.from_message_id = message.fromMessageID;
+    reqBody.from_message_id = message.fromMessageID
   }
 
-  return reqBody;
+  return reqBody
 }

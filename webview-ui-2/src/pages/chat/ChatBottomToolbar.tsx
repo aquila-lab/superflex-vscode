@@ -72,10 +72,7 @@ export const ChatBottomToolbar = () => {
             onClick={handleButtonClicked}
           >
             <span className='sr-only'>Enter</span>
-            <IoIosReturnLeft
-              className='size-4'
-              aria-hidden='true'
-            />
+            <IoIosReturnLeft className='size-4' aria-hidden='true' />
             <span>send</span>
           </Button>
         )}

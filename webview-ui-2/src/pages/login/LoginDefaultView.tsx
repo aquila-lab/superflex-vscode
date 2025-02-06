@@ -47,17 +47,11 @@ export const LoginDefaultView = () => {
         </CardHeader>
 
         <CardContent className='flex flex-col items-center justify-center'>
-          <Button
-            className='w-full'
-            onClick={handleCreateAccount}
-          >
+          <Button className='w-full' onClick={handleCreateAccount}>
             Start for Free
           </Button>
           <p className='text-muted-foreground mt-4'>Already have an account?</p>
-          <Button
-            variant='link'
-            onClick={handleSignIn}
-          >
+          <Button variant='link' onClick={handleSignIn}>
             Sign In
           </Button>
         </CardContent>

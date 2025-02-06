@@ -27,10 +27,7 @@ export const ChatMessageHeader = ({
     <div className='flex flex-row justify-between items-start'>
       <div className='flex items-center mb-2'>
         <Avatar className='mr-2 size-5'>
-          <AvatarImage
-            src={avatarConfig.src}
-            alt={avatarConfig.alt}
-          />
+          <AvatarImage src={avatarConfig.src} alt={avatarConfig.alt} />
           <AvatarFallback>{avatarConfig.fallback}</AvatarFallback>
         </Avatar>
         <p className='text-sm font-medium text-primary'>{displayName}</p>

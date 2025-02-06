@@ -108,9 +108,7 @@
     "node": ">=20.11.0"
   },
   "engine-strict": true,
-  "activationEvents": [
-    "onStartupFinished"
-  ],
+  "activationEvents": ["onStartupFinished"],
   "main": "./dist/extension.js",
   "scripts": {
     "compile": "npm run check-types && node esbuild.js",
@@ -307,6 +305,7 @@
     ]
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/async": "^3.2.24",
     "@types/diff": "^6.0.0",
     "@types/express": "^4.17.21",

@@ -1,11 +1,11 @@
-import { EventEmitter, Uri, UriHandler } from "vscode";
+import { EventEmitter, type Uri, type UriHandler } from 'vscode'
 
 export class UriEventHandler extends EventEmitter<Uri> implements UriHandler {
   public handleUri(uri: Uri) {
-    this.fire(uri);
+    this.fire(uri)
   }
 }
 
-const uriEventHandler = new UriEventHandler();
+const uriEventHandler = new UriEventHandler()
 
-export default uriEventHandler;
+export default uriEventHandler

@@ -1,4 +1,4 @@
 export interface Analytics {
-  clientKey: string;
-  url: string;
+  clientKey: string
+  url: string
 }

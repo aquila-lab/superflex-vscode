@@ -70,29 +70,16 @@ export const FileSelectorPopover = () => {
   }
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant='outline'
-          size='icon'
-          aria-expanded={open}
-        >
+        <Button variant='outline' size='icon' aria-expanded={open}>
           <span className='sr-only'>Select Files</span>
-          <PlusIcon
-            className='text-muted-foreground'
-            aria-hidden='true'
-          />
+          <PlusIcon className='text-muted-foreground' aria-hidden='true' />
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-60 h-[300px] p-0'>
         <Command filter={customFilter}>
-          <CommandInput
-            placeholder='Search files...'
-            className='h-6'
-          />
+          <CommandInput placeholder='Search files...' className='h-6' />
           <CommandList>
             <CommandEmpty>No files found.</CommandEmpty>
             <CommandGroup>
@@ -106,10 +93,7 @@ export const FileSelectorPopover = () => {
                   }}
                 >
                   <div className='flex items-center gap-2 w-full'>
-                    <FileIcon
-                      filePath={file.relativePath}
-                      className='size-5'
-                    />
+                    <FileIcon filePath={file.relativePath} className='size-5' />
                     <span className='text-sm whitespace-nowrap'>
                       {file.name}
                     </span>
