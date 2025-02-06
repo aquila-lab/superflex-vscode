@@ -11,7 +11,7 @@ import { useMessages } from '../../context/MessagesContext'
 export const ChatInputBoxContainer = ({
   children
 }: { children: ReactNode }) => {
-  const { input } = useInput()
+  const { input, focusInput } = useInput()
   const isDisabled = false
   const messageId = ''
   const { isEditMode, setIsEditMode, setIsDraft } = useEditMode()
@@ -33,6 +33,7 @@ export const ChatInputBoxContainer = ({
         }
       } else if (!isEditMode) {
         setIsEditMode(true)
+        focusInput()
       }
     }
 
@@ -45,7 +46,8 @@ export const ChatInputBoxContainer = ({
     setIsEditMode,
     setIsDraft,
     getMessage,
-    updateUserMessage
+    updateUserMessage,
+    focusInput
   ])
 
   return (

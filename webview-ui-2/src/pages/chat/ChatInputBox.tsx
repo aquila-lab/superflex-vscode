@@ -22,9 +22,9 @@ export const ChatInputBox = ({
     <AttachmentProvider attachment={content?.attachment}>
       {isMainChat ? (
         <>
-          <ChatAttachment />
+          <ChatAttachment isMainChat />
           <InputProvider text={content?.text}>
-            <InputSection content={content} />
+            <InputSection content={content} isMainChat />
           </InputProvider>
         </>
       ) : (
@@ -35,7 +35,6 @@ export const ChatInputBox = ({
             isDraft={isDraft}
           />
           <InputSection content={content} />
-          <ChatAttachment />
         </InputProvider>
       )}
       <FigmaSelectionModal />

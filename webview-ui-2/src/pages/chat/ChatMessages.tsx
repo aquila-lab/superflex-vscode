@@ -42,5 +42,5 @@ export const ChatMessages = () => {
     [messages]
   )
 
-  return <div className='flex flex-col space-y-2'>{renderedMessages}</div>
+  return <div className='flex flex-col'>{renderedMessages}</div>
 }
