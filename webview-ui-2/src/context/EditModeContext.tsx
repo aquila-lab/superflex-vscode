@@ -1,25 +1,25 @@
 import {
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
   createContext,
   useContext,
   useMemo,
   useState
 } from 'react'
 
-interface EditModeContextValue {
+export const EditModeContext = createContext<{
   isEditMode: boolean
   isDraft: boolean
-  setIsEditMode: React.Dispatch<React.SetStateAction<boolean>>
-  setIsDraft: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-export const EditModeContext = createContext<EditModeContextValue | null>(null)
+  setIsEditMode: Dispatch<SetStateAction<boolean>>
+  setIsDraft: Dispatch<SetStateAction<boolean>>
+} | null>(null)
 
 export const EditModeProvider = ({ children }: { children: ReactNode }) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isDraft, setIsDraft] = useState(false)
 
-  const value: EditModeContextValue = useMemo(
+  const value = useMemo(
     () => ({ isEditMode, isDraft, setIsEditMode, setIsDraft }),
     [isEditMode, isDraft]
   )

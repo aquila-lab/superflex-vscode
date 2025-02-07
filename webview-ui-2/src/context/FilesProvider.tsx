@@ -1,6 +1,7 @@
 import {
   type Dispatch,
   type ReactNode,
+  type SetStateAction,
   createContext,
   useCallback,
   useContext,
@@ -17,18 +18,16 @@ import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 import { useEditMode } from './EditModeContext'
 
-interface FilesContextValue {
+const FilesContext = createContext<{
   selectedFiles: FilePayload[]
   previewedFile: FilePayload | null
   fetchFiles: () => void
   fetchFileContent: (file: FilePayload) => void
-  setPreviewedFile: Dispatch<React.SetStateAction<FilePayload | null>>
+  setPreviewedFile: Dispatch<SetStateAction<FilePayload | null>>
   selectFile: (file: FilePayload) => void
   deselectFile: (file: FilePayload) => void
   clearManuallySelectedFiles: () => void
-}
-
-const FilesContext = createContext<FilesContextValue | null>(null)
+} | null>(null)
 
 export const FilesProvider = ({
   files,
@@ -105,7 +104,7 @@ export const FilesProvider = ({
 
   useConsumeMessage(EventResponseType.SET_CURRENT_OPEN_FILE, handleNewOpenFile)
 
-  const value: FilesContextValue = useMemo(
+  const value = useMemo(
     () => ({
       selectedFiles,
       previewedFile,

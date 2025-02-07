@@ -5,6 +5,7 @@ import { ThreadsProvider } from '../context/ThreadsProvider'
 import { UserProvider } from '../context/UserContext'
 import { LoadingGuard } from './LoadingGuard'
 import { ThreadResetWrapper } from './ThreadResetWrapper'
+import { OverlayProvider } from '../context/OverlayContext'
 
 export const AuthenticatedProviders = () => {
   return (
@@ -12,11 +13,13 @@ export const AuthenticatedProviders = () => {
       <LoadingGuard>
         <ThreadsProvider>
           <ThreadResetWrapper>
-            <MessagesProvider>
-              <NewMessageProvider>
-                <Outlet />
-              </NewMessageProvider>
-            </MessagesProvider>
+            <OverlayProvider>
+              <MessagesProvider>
+                <NewMessageProvider>
+                  <Outlet />
+                </NewMessageProvider>
+              </MessagesProvider>
+            </OverlayProvider>
           </ThreadResetWrapper>
         </ThreadsProvider>
       </LoadingGuard>

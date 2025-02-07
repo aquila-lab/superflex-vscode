@@ -1,91 +1,18 @@
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
-import type React from 'react'
-import { useEffect, useMemo, useState } from 'react'
-
-const defineVSCodeTheme = (monaco: Monaco) => {
-  monaco.editor.defineTheme('vscode-theme', {
-    base: 'vs-dark',
-    inherit: true,
-    rules: [],
-    colors: {
-      'editor.background': getComputedStyle(document.body).getPropertyValue(
-        '--vscode-editor-background'
-      ),
-      'editor.foreground': getComputedStyle(document.body).getPropertyValue(
-        '--vscode-editor-foreground'
-      ),
-      'editor.lineHighlightBackground': getComputedStyle(
-        document.body
-      ).getPropertyValue('--vscode-editor-lineHighlightBackground'),
-      'editorLineNumber.foreground': getComputedStyle(
-        document.body
-      ).getPropertyValue('--vscode-editorLineNumber-foreground'),
-      'editor.selectionBackground': getComputedStyle(
-        document.body
-      ).getPropertyValue('--vscode-editor-selectionBackground')
-    }
-  })
-}
-
-const getLanguageFromPath = (filePath: string): string => {
-  const extension = filePath.split('.').pop()?.toLowerCase() ?? ''
-
-  const languageMap: Record<string, string> = {
-    // JavaScript/TypeScript
-    js: 'javascript',
-    jsx: 'javascript',
-    ts: 'typescript',
-    tsx: 'typescript',
-
-    // Styling
-    css: 'css',
-    scss: 'scss',
-    sass: 'scss',
-    less: 'less',
-    stylus: 'stylus',
-
-    // Markup/Template
-    html: 'html',
-    htm: 'html',
-    vue: 'vue',
-    svelte: 'svelte',
-
-    // Config files
-    json: 'json',
-    yaml: 'yaml',
-    yml: 'yaml',
-    toml: 'toml',
-    env: 'plaintext',
-
-    // Package managers
-    lock: 'yaml',
-    packagejson: 'json',
-
-    // Shell scripts
-    sh: 'shell',
-    bash: 'shell',
-
-    // Other web technologies
-    md: 'markdown',
-    graphql: 'graphql',
-    gql: 'graphql'
-  }
-
-  return languageMap[extension] || 'plaintext'
-}
-
-interface EditorProps extends React.PropsWithChildren {
-  extension?: string
-  filePath?: string
-  maxHeight?: number
-}
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
+import { getLanguageFromPath, defineVSCodeTheme } from '../../common/utils'
 
 export const Editor = ({
   extension,
   filePath,
   maxHeight,
   children
-}: EditorProps) => {
+}: {
+  extension?: string
+  filePath?: string
+  maxHeight?: number
+  children: ReactNode
+}) => {
   const [themeVersion, setThemeVersion] = useState(0)
 
   const lineCount = useMemo(

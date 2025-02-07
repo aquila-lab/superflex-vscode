@@ -16,21 +16,16 @@ import {
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 
-export interface GlobalState {
+const GlobalContext = createContext<{
   isInitialized: boolean | null
   isLoggedIn: boolean | null
   config: Record<string, unknown> | null
   isFigmaAuthenticated: boolean | null
-}
-
-interface GlobalContextValue extends GlobalState {
   setIsInitialized: (val: boolean) => void
   setIsLoggedIn: (val: boolean) => void
   setConfig: (cfg: Record<string, unknown> | null) => void
   setIsFigmaAuthenticated: (val: boolean) => void
-}
-
-const GlobalContext = createContext<GlobalContextValue | null>(null)
+} | null>(null)
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
@@ -107,7 +102,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     handleMessage
   )
 
-  const value: GlobalContextValue = useMemo(
+  const value = useMemo(
     () => ({
       isInitialized,
       isLoggedIn,

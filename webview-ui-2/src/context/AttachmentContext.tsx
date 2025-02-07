@@ -1,5 +1,7 @@
 import {
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
   createContext,
   useCallback,
   useContext,
@@ -15,20 +17,18 @@ import {
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 
-interface AttachmentContextValue {
+const AttachmentContext = createContext<{
   isSelectionModalOpen: boolean
   isFigmaLoading: boolean
   imageAttachment: string | null
   figmaAttachment: FigmaAttachment | null
   figmaLink: string
-  setFigmaLink: React.Dispatch<React.SetStateAction<string>>
+  setFigmaLink: Dispatch<SetStateAction<string>>
   removeAttachment: () => void
   openSelectionModal: () => void
   closeSelectionModal: () => void
   submitSelection: () => void
-}
-
-const AttachmentContext = createContext<AttachmentContextValue | null>(null)
+} | null>(null)
 
 export const AttachmentProvider = ({
   attachment,
@@ -84,7 +84,7 @@ export const AttachmentProvider = ({
     handleCreateFigmaAttachment
   )
 
-  const value: AttachmentContextValue = useMemo(
+  const value = useMemo(
     () => ({
       isSelectionModalOpen,
       isFigmaLoading,

@@ -17,7 +17,7 @@ import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 import { useMessages } from './MessagesContext'
 
-interface NewMessageContextValue {
+const NewMessageContext = createContext<{
   message: Message | null
   isMessageProcessing: boolean
   isMessageStreaming: boolean
@@ -25,9 +25,7 @@ interface NewMessageContextValue {
   lastUserMessage: string | null
   sendMessageContent: (content: MessageContent) => void
   stopStreaming: () => void
-}
-
-const NewMessageContext = createContext<NewMessageContextValue | null>(null)
+} | null>(null)
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()

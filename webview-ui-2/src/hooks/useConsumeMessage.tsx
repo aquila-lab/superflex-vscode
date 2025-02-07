@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { type DependencyList, useCallback, useEffect } from 'react'
 import type {
   EventResponseType,
   TypedEventResponseMessage
@@ -11,7 +11,7 @@ type TypedEventConsumeHandler<T extends EventResponseType> = (
 export function useConsumeMessage<T extends EventResponseType>(
   eventTypes: T | T[],
   handler: TypedEventConsumeHandler<T>,
-  deps: React.DependencyList = []
+  deps: DependencyList = []
 ): void {
   const handleMessage = useCallback(
     (evt: MessageEvent<TypedEventResponseMessage>) => {

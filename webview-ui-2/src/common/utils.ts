@@ -8,6 +8,7 @@ import {
   Role
 } from '../../../shared/model'
 import type { FilePayload } from '../../../shared/protocol'
+import type { Monaco } from '@monaco-editor/react'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -164,3 +165,68 @@ export const getAvatarConfig = (
 }
 
 export const commonApplyButtonStyles = 'text-[11px] px-1 py-0 hover:bg-muted'
+
+export const defineVSCodeTheme = (monaco: Monaco) => {
+  monaco.editor.defineTheme('vscode-theme', {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [],
+    colors: {
+      'editor.background': getComputedStyle(document.body).getPropertyValue(
+        '--vscode-editor-background'
+      ),
+      'editor.foreground': getComputedStyle(document.body).getPropertyValue(
+        '--vscode-editor-foreground'
+      ),
+      'editor.lineHighlightBackground': getComputedStyle(
+        document.body
+      ).getPropertyValue('--vscode-editor-lineHighlightBackground'),
+      'editorLineNumber.foreground': getComputedStyle(
+        document.body
+      ).getPropertyValue('--vscode-editorLineNumber-foreground'),
+      'editor.selectionBackground': getComputedStyle(
+        document.body
+      ).getPropertyValue('--vscode-editor-selectionBackground')
+    }
+  })
+}
+
+export const getLanguageFromPath = (filePath: string): string => {
+  const extension = filePath.split('.').pop()?.toLowerCase() ?? ''
+
+  const languageMap: Record<string, string> = {
+    js: 'javascript',
+    jsx: 'javascript',
+    ts: 'typescript',
+    tsx: 'typescript',
+
+    css: 'css',
+    scss: 'scss',
+    sass: 'scss',
+    less: 'less',
+    stylus: 'stylus',
+
+    html: 'html',
+    htm: 'html',
+    vue: 'vue',
+    svelte: 'svelte',
+
+    json: 'json',
+    yaml: 'yaml',
+    yml: 'yaml',
+    toml: 'toml',
+    env: 'plaintext',
+
+    lock: 'yaml',
+    packagejson: 'json',
+
+    sh: 'shell',
+    bash: 'shell',
+
+    md: 'markdown',
+    graphql: 'graphql',
+    gql: 'graphql'
+  }
+
+  return languageMap[extension] || 'plaintext'
+}

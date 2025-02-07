@@ -14,14 +14,12 @@ import {
   newEventRequest
 } from '../../../shared/protocol'
 
-interface VSCodeContextValue {
+const VSCodeContext = createContext<{
   postMessage: <T extends EventRequestType>(
     command: T,
     payload?: EventRequestPayload[T]
   ) => void
-}
-
-const VSCodeContext = createContext<VSCodeContextValue | null>(null)
+} | null>(null)
 
 export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
   const [vscodeApi, setVscodeApi] = useState<VsCodeApi | null>(null)
@@ -38,7 +36,8 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (vscodeApi) {
       pendingTasks.forEach(task => {
-        console.warn(`New task from event queue: ${task}`)
+        console.warn('New task from event queue')
+        console.dir(task)
         vscodeApi.postMessage(task)
       })
       setPendingTasks([])
@@ -60,10 +59,7 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
     [vscodeApi]
   )
 
-  const value: VSCodeContextValue = useMemo(
-    () => ({ postMessage }),
-    [postMessage]
-  )
+  const value = useMemo(() => ({ postMessage }), [postMessage])
 
   return (
     <VSCodeContext.Provider value={value}>{children}</VSCodeContext.Provider>

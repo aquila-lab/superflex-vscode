@@ -11,16 +11,14 @@ import { type Message, Role } from '../../../shared/model'
 import { DEFAULT_WELCOME_MESSAGE } from '../common/utils'
 import { useThreads } from './ThreadsProvider'
 
-interface MessagesContextValue {
+const MessagesContext = createContext<{
   messages: Message[]
   addMessages: (messages: Message[]) => void
   updateUserMessage: (messageId: string, text: string) => void
   popMessage: () => void
   getMessage: (messageId: string) => Message | undefined
   removeMessagesFrom: (messageId: string) => void
-}
-
-const MessagesContext = createContext<MessagesContextValue | null>(null)
+} | null>(null)
 
 interface MessagesProviderProps {
   children: ReactNode

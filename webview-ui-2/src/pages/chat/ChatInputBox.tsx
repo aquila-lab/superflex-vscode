@@ -10,10 +10,12 @@ import { UserMessageHeader } from './UserMessageHeader'
 
 export const ChatInputBox = ({
   content,
-  isMainChat = false
+  isMainChat = false,
+  messageId
 }: {
   content?: MessageContent
   isMainChat?: boolean
+  messageId?: string
 }) => {
   const { isDraft } = useEditMode()
   const { user } = useUser()
@@ -28,7 +30,7 @@ export const ChatInputBox = ({
           </InputProvider>
         </>
       ) : (
-        <InputProvider text={content?.text}>
+        <InputProvider text={content?.text} id={messageId}>
           <UserMessageHeader
             picture={user.picture}
             username={user.username}

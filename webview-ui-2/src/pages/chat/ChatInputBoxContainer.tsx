@@ -7,16 +7,17 @@ import {
 import { useEditMode } from '../../context/EditModeContext'
 import { useInput } from '../../context/InputContext'
 import { useMessages } from '../../context/MessagesContext'
+import { useOverlay } from '../../context/OverlayContext'
 
 export const ChatInputBoxContainer = ({
   children
 }: { children: ReactNode }) => {
-  const { input, focusInput } = useInput()
+  const { input, focusInput, messageId } = useInput()
   const isDisabled = false
-  const messageId = ''
   const { isEditMode, setIsEditMode, setIsDraft } = useEditMode()
   const { getMessage, updateUserMessage } = useMessages()
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const { setActiveMessageId } = useOverlay()
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => {
@@ -24,14 +25,25 @@ export const ChatInputBoxContainer = ({
 
       if (!isClickInside) {
         setIsEditMode(false)
+        setActiveMessageId(null)
+
         if (messageId) {
           const message = getMessage(messageId)
+
           if (message?.content.text !== input) {
             setIsDraft(true)
             updateUserMessage(messageId, input)
           }
         }
-      } else if (!isEditMode) {
+
+        return
+      }
+
+      if (!isEditMode) {
+        if (messageId) {
+          setActiveMessageId(messageId)
+        }
+
         setIsEditMode(true)
         focusInput()
       }
@@ -43,7 +55,9 @@ export const ChatInputBoxContainer = ({
   }, [
     input,
     isEditMode,
+    messageId,
     setIsEditMode,
+    setActiveMessageId,
     setIsDraft,
     getMessage,
     updateUserMessage,

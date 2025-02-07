@@ -1,28 +1,34 @@
-import { useMemo } from 'react'
+import { type ReactNode, useMemo } from 'react'
 import { Role } from '../../../../shared/model'
 import { EditModeProvider } from '../../context/EditModeContext'
 import { useMessages } from '../../context/MessagesContext'
 import { AssistantMessage } from './AssistantMessage'
 import { ChatInputBox } from './ChatInputBox'
-
-const MessageWrapper = ({ children }: { children: React.ReactNode }) => (
-  <div className='mb-2'>{children}</div>
-)
+import { useOverlay } from '../../context/OverlayContext'
+import { MessageWrapper } from './ChatMessageWrapper'
+import { cn } from '../../common/utils'
 
 export const ChatMessages = () => {
   const { messages } = useMessages()
+  const { activeMessageId } = useOverlay()
 
   const renderedMessages = useMemo(
     () =>
       messages.map(message => {
         const { id, role, content } = message
+        const isActive = id === activeMessageId
+
+        const messageClasses = cn(
+          'relative transition-all duration-200',
+          isActive && 'z-50'
+        )
 
         switch (role) {
           case Role.User:
             return (
-              <MessageWrapper key={id}>
+              <MessageWrapper key={id} className={messageClasses}>
                 <EditModeProvider>
-                  <ChatInputBox content={content} />
+                  <ChatInputBox content={content} messageId={id} />
                 </EditModeProvider>
               </MessageWrapper>
             )
@@ -39,8 +45,8 @@ export const ChatMessages = () => {
             return null
         }
       }),
-    [messages]
+    [messages, activeMessageId]
   )
 
-  return <div className='flex flex-col'>{renderedMessages}</div>
+  return <div className='flex flex-col relative'>{renderedMessages}</div>
 }

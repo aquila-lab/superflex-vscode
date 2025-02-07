@@ -1,4 +1,5 @@
 import {
+  type Dispatch,
   type ReactNode,
   type RefObject,
   type SetStateAction,
@@ -11,20 +12,22 @@ import {
   useState
 } from 'react'
 
-export interface InputContextValue {
+export const InputContext = createContext<{
   input: string
+  messageId: string | null
   inputRef: RefObject<HTMLTextAreaElement | null>
-  setInput: (value: SetStateAction<string>) => void
+  setMessageId: Dispatch<SetStateAction<string | null>>
+  setInput: Dispatch<SetStateAction<string>>
   focusInput: () => void
-}
-
-export const InputContext = createContext<InputContextValue | null>(null)
+} | null>(null)
 
 export const InputProvider = ({
   text,
+  id,
   children
-}: { text?: string; children: ReactNode }) => {
+}: { text?: string; id?: string; children: ReactNode }) => {
   const [input, setInput] = useState(text ?? '')
+  const [messageId, setMessageId] = useState(id ?? null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const focusInput = useCallback(() => {
@@ -47,14 +50,16 @@ export const InputProvider = ({
     }
   })
 
-  const value: InputContextValue = useMemo(
+  const value = useMemo(
     () => ({
       input,
       inputRef,
+      messageId,
+      setMessageId,
       setInput,
       focusInput
     }),
-    [input, focusInput]
+    [input, messageId, focusInput]
   )
 
   return <InputContext.Provider value={value}>{children}</InputContext.Provider>

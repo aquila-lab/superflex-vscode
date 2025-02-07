@@ -17,20 +17,16 @@ import {
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 
-interface UserContextValue {
+const UserContext = createContext<{
   user: User | null
   subscription: UserSubscription | null
   isUserLoading: boolean
   isSubscriptionLoading: boolean
-
   fetchUserInfo: () => void
   fetchSubscription: () => void
-
   handleSubscribe: () => void
   handleManageBilling: () => void
-}
-
-const UserContext = createContext<UserContextValue | null>(null)
+} | null>(null)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
@@ -110,7 +106,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     handleMessage
   )
 
-  const value: UserContextValue = useMemo(
+  const value = useMemo(
     () => ({
       user,
       subscription,

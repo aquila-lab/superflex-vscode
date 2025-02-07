@@ -17,14 +17,12 @@ import {
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 
-interface ThreadsContextValue {
+const ThreadsContext = createContext<{
   threads: Thread[]
   currentThread: Thread | null
   selectThread: (threadId: string) => void
   threadKey: number
-}
-
-const ThreadsContext = createContext<ThreadsContextValue | null>(null)
+} | null>(null)
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
@@ -84,7 +82,7 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     handleThreads
   )
 
-  const value: ThreadsContextValue = useMemo(
+  const value = useMemo(
     () => ({ threads, currentThread, threadKey, selectThread }),
     [threads, currentThread, threadKey, selectThread]
   )
