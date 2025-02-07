@@ -11,7 +11,7 @@ export const ChatMessageListContainer = ({
   return (
     <div className='flex-1 flex flex-col gap-y-2 mb-4 overflow-hidden'>
       <ScrollToBottom
-        className='flex flex-col gap-y-2 overflow-y-auto'
+        className='flex flex-col gap-y-2 overflow-y-auto scroll-to-bottom'
         initialScrollBehavior='smooth'
         followButtonClassName='!bg-muted/50 hover:!bg-muted/80'
       >
