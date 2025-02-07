@@ -162,3 +162,5 @@ export const getAvatarConfig = (
       }
   }
 }
+
+export const commonApplyButtonStyles = 'text-[11px] px-1 py-0 hover:bg-muted'
