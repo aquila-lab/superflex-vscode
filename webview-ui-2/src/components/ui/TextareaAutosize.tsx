@@ -12,7 +12,7 @@ const TextareaAutosize = React.forwardRef<
   return (
     <TextareaAutosizeBase
       className={cn(
-        'flex w-full max-h-[15rem] rounded-md resize-none border border-border bg-input px-3 py-2 text-sm',
+        'flex w-full max-h-[15rem] rounded-md resize-none border border-border bg-input p-3 text-sm',
         'shadow-sm transition-colors',
         'placeholder:text-muted-foreground',
         'focus:outline-none',

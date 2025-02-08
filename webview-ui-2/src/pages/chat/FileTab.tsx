@@ -49,13 +49,9 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
               file.endLine &&
               ` (${file?.startLine}-${file?.endLine})`}
           </p>
-          <p className='text-xs text-muted-secondary-foreground'>
-            {file.isCurrentOpenFile
-              ? 'Current'
-              : file.endLine
-                ? 'Code'
-                : 'File'}
-          </p>
+          {file.isCurrentOpenFile && (
+            <p className='text-xs text-muted-secondary-foreground'>Current</p>
+          )}
         </div>
         {isEditMode && (
           <div className='ml-auto flex gap-2'>
