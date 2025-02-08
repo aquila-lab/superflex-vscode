@@ -59,8 +59,6 @@ export const ChatTextarea = () => {
     ]
   )
 
-  useEffect(() => focusInput())
-
   const handleFocusChat = useCallback(() => focusInput(), [focusInput])
 
   const handleOnPaste = useCallback(

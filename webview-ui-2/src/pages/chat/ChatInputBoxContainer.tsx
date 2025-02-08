@@ -21,6 +21,8 @@ export const ChatInputBoxContainer = ({
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => {
+      console.log('event')
+
       const isClickInside = wrapperRef.current?.contains(event.target as Node)
 
       if (!isClickInside) {
