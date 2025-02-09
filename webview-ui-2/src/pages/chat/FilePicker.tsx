@@ -1,6 +1,6 @@
 import { type ChangeEvent, useCallback, useRef } from 'react'
 import { IoImage } from 'react-icons/io5'
-import { cn } from '../../common/utils'
+import { cn, readImageFileAsBase64 } from '../../common/utils'
 import { useNewMessage } from '../../context/NewMessageContext'
 import { useAttachment } from '../../context/AttachmentContext'
 
@@ -13,7 +13,10 @@ export const FilePicker = () => {
   const handleImageSelected = useCallback(
     (file: File) => {
       removeAttachment()
-      setImageAttachment(URL.createObjectURL(file))
+
+      readImageFileAsBase64(file).then(imageBase64 => {
+        setImageAttachment(imageBase64)
+      })
     },
     [removeAttachment, setImageAttachment]
   )
