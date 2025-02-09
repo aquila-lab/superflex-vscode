@@ -11,6 +11,8 @@ import { ChatMessageList } from './ChatMessageList'
 import { SoftLimitModal } from './SoftLimitModal'
 import { useUser } from '../../context/UserContext'
 import { OutOfRequests } from './OutOfRequests'
+import { FigmaPremiumModalProvider } from '../../context/FigmaPremiumModalContext'
+import { FigmaPremiumModal } from './FigmaPremiumModal'
 
 export const ChatView = () => {
   const postMessage = usePostMessage()
@@ -33,19 +35,22 @@ export const ChatView = () => {
     <>
       {isOutOfRequests && <OutOfRequests />}
       {!isOutOfRequests && (
-        <div
-          className={cn(
-            'flex flex-col h-full p-2 pt-6 overflow-auto relative',
-            !hasMessages && 'justify-center'
-          )}
-        >
-          {hasMessages && <ChatMessageList />}
-          {!hasMessages && <WelcomeMessage />}
-          <ChatInputBox />
-          {!hasMessages && <ChatHistory />}
-          <UpgradeButton />
-          <SoftLimitModal />
-        </div>
+        <FigmaPremiumModalProvider>
+          <div
+            className={cn(
+              'flex flex-col h-full p-2 pt-6 overflow-auto relative',
+              !hasMessages && 'justify-center'
+            )}
+          >
+            {hasMessages && <ChatMessageList />}
+            {!hasMessages && <WelcomeMessage />}
+            <ChatInputBox />
+            {!hasMessages && <ChatHistory />}
+            <UpgradeButton />
+            <SoftLimitModal />
+          </div>
+          <FigmaPremiumModal />
+        </FigmaPremiumModalProvider>
       )}
     </>
   )

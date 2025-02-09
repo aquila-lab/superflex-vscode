@@ -24,7 +24,7 @@ const UserContext = createContext<{
   isSubscriptionLoading: boolean
   fetchUserInfo: () => void
   fetchSubscription: () => void
-  subscribe: () => void
+  subscribe: (url?: string) => void
   manageBilling: () => void
 } | null>(null)
 
@@ -80,11 +80,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     postMessage(EventRequestType.GET_USER_SUBSCRIPTION)
   }, [postMessage])
 
-  const subscribe = useCallback(() => {
-    postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
-      url: 'https://app.superflex.ai/pricing'
-    })
-  }, [postMessage])
+  const subscribe = useCallback(
+    (url?: string) => {
+      postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
+        url: url ?? 'https://app.superflex.ai/pricing'
+      })
+    },
+    [postMessage]
+  )
 
   const manageBilling = useCallback(() => {
     if (!user) {
