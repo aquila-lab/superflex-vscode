@@ -15,14 +15,14 @@ import { useNewMessage } from '../../context/NewMessageContext'
 import { useConsumeMessage } from '../../hooks/useConsumeMessage'
 
 export const ChatTextarea = () => {
-  const { input, inputRef, setInput, focusInput } = useInput()
+  const { input, inputRef, setInput, focusInput, messageId } = useInput()
   const { selectedFiles, clearManuallySelectedFiles } = useFiles()
   const { isEditMode } = useEditMode()
-  const isDisabled = false
-  const messageId = ''
-
-  const { sendMessageContent } = useNewMessage()
-  const { figmaAttachment, removeAttachment } = useAttachment()
+  const { sendMessageContent, isMessageProcessing, isMessageStreaming } =
+    useNewMessage()
+  const { figmaAttachment, imageAttachment, removeAttachment, isFigmaLoading } =
+    useAttachment()
+  const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
 
   const handleOnKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -35,12 +35,14 @@ export const ChatTextarea = () => {
         e.preventDefault()
         sendMessageContent({
           text: input,
-          attachment: figmaAttachment
-            ? {
-                figma: figmaAttachment
-              }
-            : undefined,
-          fromMessageID: messageId,
+          attachment:
+            figmaAttachment || imageAttachment
+              ? {
+                  figma: figmaAttachment ?? undefined,
+                  image: imageAttachment ?? undefined
+                }
+              : undefined,
+          fromMessageID: messageId ?? undefined,
           files: selectedFiles
         })
         setInput('')
@@ -49,8 +51,11 @@ export const ChatTextarea = () => {
       }
     },
     [
+      isDisabled,
+      messageId,
       input,
       figmaAttachment,
+      imageAttachment,
       sendMessageContent,
       selectedFiles,
       removeAttachment,

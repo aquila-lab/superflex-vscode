@@ -28,6 +28,7 @@ const AttachmentContext = createContext<{
   openSelectionModal: () => void
   closeSelectionModal: () => void
   submitSelection: () => void
+  setImageAttachment: Dispatch<SetStateAction<string | null>>
 } | null>(null)
 
 export const AttachmentProvider = ({
@@ -56,17 +57,17 @@ export const AttachmentProvider = ({
     setIsSelectionModalOpen(false)
   }, [])
 
-  const submitSelection = useCallback(() => {
-    postMessage(EventRequestType.CREATE_FIGMA_ATTACHMENT, figmaLink)
-    setImageAttachment(null)
-    setIsFigmaLoading(true)
-    closeSelectionModal()
-  }, [postMessage, figmaLink, closeSelectionModal])
-
   const removeAttachment = useCallback(() => {
     setImageAttachment(null)
     setFigmaAttachment(null)
   }, [])
+
+  const submitSelection = useCallback(() => {
+    postMessage(EventRequestType.CREATE_FIGMA_ATTACHMENT, figmaLink)
+    removeAttachment()
+    setIsFigmaLoading(true)
+    closeSelectionModal()
+  }, [postMessage, figmaLink, closeSelectionModal, removeAttachment])
 
   const handleCreateFigmaAttachment = useCallback(
     ({
@@ -95,7 +96,8 @@ export const AttachmentProvider = ({
       removeAttachment,
       openSelectionModal,
       closeSelectionModal,
-      submitSelection
+      submitSelection,
+      setImageAttachment
     }),
     [
       isSelectionModalOpen,

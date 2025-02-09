@@ -1,20 +1,29 @@
 import { type ChangeEvent, useCallback, useRef } from 'react'
 import { IoImage } from 'react-icons/io5'
 import { cn } from '../../common/utils'
+import { useNewMessage } from '../../context/NewMessageContext'
+import { useAttachment } from '../../context/AttachmentContext'
 
 export const FilePicker = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const disabled = true
+  const { isMessageStreaming, isMessageProcessing } = useNewMessage()
+  const { removeAttachment, setImageAttachment } = useAttachment()
+  const isDisabled = isMessageStreaming || isMessageProcessing
 
-  const handleImageSelected = useCallback((_file: File) => {
-    // TODO
-  }, [])
+  const handleImageSelected = useCallback(
+    (file: File) => {
+      removeAttachment()
+      setImageAttachment(URL.createObjectURL(file))
+    },
+    [removeAttachment, setImageAttachment]
+  )
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
-      // biome-ignore lint/style/useBlockStatements: <explanation>
-      if (!file) return
+      if (!file) {
+        return
+      }
 
       handleImageSelected(file)
 
@@ -32,7 +41,7 @@ export const FilePicker = () => {
           htmlFor='chat-file-picker'
           className={cn(
             'flex items-center gap-1 p-1.5 text-muted-foreground',
-            disabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
+            isDisabled ? 'opacity-60' : 'cursor-pointer hover:text-foreground'
           )}
         >
           <IoImage className='size-3.5' />
@@ -43,7 +52,7 @@ export const FilePicker = () => {
           type='file'
           name='chat-file-picker'
           id='chat-file-picker'
-          disabled={disabled}
+          disabled={isDisabled}
           onChange={handleChange}
           accept={'image/jpeg, image/png'}
           ref={fileInputRef}

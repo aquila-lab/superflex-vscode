@@ -6,13 +6,15 @@ import { Button } from '../../components/ui/Button'
 import { useAttachment } from '../../context/AttachmentContext'
 import { useGlobal } from '../../context/GlobalContext'
 import { usePostMessage } from '../../hooks/usePostMessage'
+import { useNewMessage } from '../../context/NewMessageContext'
 
 export const FigmaButton = () => {
   const postMessage = usePostMessage()
   const { isFigmaAuthenticated } = useGlobal()
   const { isFigmaLoading, openSelectionModal } = useAttachment()
+  const { isMessageProcessing, isMessageStreaming } = useNewMessage()
 
-  const disabled = isFigmaLoading
+  const isDisabled = isFigmaLoading || isMessageProcessing || isMessageStreaming
   const label = isFigmaAuthenticated ? 'Figma' : 'Connect Figma'
 
   const handleButtonClicked = useCallback(() => {
@@ -28,8 +30,8 @@ export const FigmaButton = () => {
     <Button
       size='xs'
       variant='text'
-      disabled={disabled}
-      className={cn('gap-0.5', disabled && 'opacity-60')}
+      disabled={isDisabled}
+      className={cn('gap-0.5', isDisabled && 'opacity-60')}
       onClick={handleButtonClicked}
     >
       <span className='sr-only'>{label}</span>

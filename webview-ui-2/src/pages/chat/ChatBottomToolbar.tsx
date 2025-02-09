@@ -11,14 +11,14 @@ import { FigmaButton } from './FigmaButton'
 import { FilePicker } from './FilePicker'
 
 export const ChatBottomToolbar = () => {
-  const { input, setInput } = useInput()
+  const { input, setInput, messageId } = useInput()
   const { selectedFiles, clearManuallySelectedFiles } = useFiles()
-  const messageId = ''
-  const isDisabled = false
   const { isEditMode } = useEditMode()
-
-  const { sendMessageContent } = useNewMessage()
-  const { figmaAttachment, removeAttachment } = useAttachment()
+  const { sendMessageContent, isMessageProcessing, isMessageStreaming } =
+    useNewMessage()
+  const { figmaAttachment, removeAttachment, imageAttachment, isFigmaLoading } =
+    useAttachment()
+  const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
 
   const handleMessageStopped = useCallback(() => {
     // stopMessage();
@@ -27,19 +27,23 @@ export const ChatBottomToolbar = () => {
   const handleButtonClicked = useCallback(() => {
     sendMessageContent({
       text: input,
-      attachment: figmaAttachment
-        ? {
-            figma: figmaAttachment
-          }
-        : undefined,
-      fromMessageID: messageId,
+      attachment:
+        figmaAttachment || imageAttachment
+          ? {
+              figma: figmaAttachment ?? undefined,
+              image: imageAttachment ?? undefined
+            }
+          : undefined,
+      fromMessageID: messageId ?? undefined,
       files: selectedFiles
     })
     setInput('')
     removeAttachment()
     clearManuallySelectedFiles()
   }, [
+    messageId,
     figmaAttachment,
+    imageAttachment,
     input,
     sendMessageContent,
     setInput,

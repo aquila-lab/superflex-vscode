@@ -8,21 +8,21 @@ import { useEditMode } from '../../context/EditModeContext'
 import { useInput } from '../../context/InputContext'
 import { useMessages } from '../../context/MessagesContext'
 import { useOverlay } from '../../context/OverlayContext'
+import { useNewMessage } from '../../context/NewMessageContext'
 
 export const ChatInputBoxContainer = ({
   children
 }: { children: ReactNode }) => {
   const { input, focusInput, messageId } = useInput()
-  const isDisabled = false
+  const { isMessageProcessing, isMessageStreaming } = useNewMessage()
   const { isEditMode, setIsEditMode, setIsDraft } = useEditMode()
   const { getMessage, updateUserMessage } = useMessages()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const { setActiveMessageId } = useOverlay()
+  const isDisabled = isMessageProcessing || isMessageStreaming
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => {
-      console.log('event')
-
       const isClickInside = wrapperRef.current?.contains(event.target as Node)
 
       if (!isClickInside) {
