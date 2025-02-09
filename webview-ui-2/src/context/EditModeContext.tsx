@@ -13,6 +13,7 @@ export const EditModeContext = createContext<{
   isDraft: boolean
   setIsEditMode: Dispatch<SetStateAction<boolean>>
   setIsDraft: Dispatch<SetStateAction<boolean>>
+  isMainTextbox: boolean
 } | null>(null)
 
 export const EditModeProvider = ({ children }: { children: ReactNode }) => {
@@ -20,7 +21,13 @@ export const EditModeProvider = ({ children }: { children: ReactNode }) => {
   const [isDraft, setIsDraft] = useState(false)
 
   const value = useMemo(
-    () => ({ isEditMode, isDraft, setIsEditMode, setIsDraft }),
+    () => ({
+      isEditMode,
+      isDraft,
+      setIsEditMode,
+      setIsDraft,
+      isMainTextbox: false
+    }),
     [isEditMode, isDraft]
   )
 
@@ -39,7 +46,8 @@ export function useEditMode() {
       isEditMode: true,
       isDraft: false,
       setIsEditMode: () => {},
-      setIsDraft: () => {}
+      setIsDraft: () => {},
+      isMainTextbox: true
     }
   }
 

@@ -3,13 +3,10 @@ import { useAttachment } from '../../context/AttachmentContext'
 import { useEditMode } from '../../context/EditModeContext'
 import { ImagePreview } from './ImagePreview'
 
-export const ChatAttachment = ({
-  isMainChat = false
-}: { isMainChat?: boolean }) => {
+export const ChatAttachment = () => {
   const { imageAttachment, figmaAttachment, isFigmaLoading, removeAttachment } =
     useAttachment()
-
-  const { isEditMode } = useEditMode()
+  const { isEditMode, isMainTextbox } = useEditMode()
 
   const handleRemoveAttachment = useCallback(
     () => removeAttachment(),
@@ -25,7 +22,7 @@ export const ChatAttachment = ({
     return null
   }
 
-  if (isMainChat) {
+  if (isMainTextbox) {
     return (
       <div className='flex items-center bg-transparent p-2'>
         <ImagePreview

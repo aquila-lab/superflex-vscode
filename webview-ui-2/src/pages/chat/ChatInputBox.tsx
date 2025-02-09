@@ -10,23 +10,21 @@ import { UserMessageHeader } from './UserMessageHeader'
 
 export const ChatInputBox = ({
   content,
-  isMainChat = false,
   messageId
 }: {
   content?: MessageContent
-  isMainChat?: boolean
   messageId?: string
 }) => {
-  const { isDraft } = useEditMode()
+  const { isDraft, isMainTextbox } = useEditMode()
   const { user } = useUser()
 
   return (
     <AttachmentProvider attachment={content?.attachment}>
-      {isMainChat ? (
+      {isMainTextbox ? (
         <>
-          <ChatAttachment isMainChat />
+          <ChatAttachment />
           <InputProvider text={content?.text}>
-            <InputSection content={content} isMainChat />
+            <InputSection content={content} />
           </InputProvider>
         </>
       ) : (
