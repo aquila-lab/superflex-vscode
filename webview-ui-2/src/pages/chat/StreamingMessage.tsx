@@ -8,5 +8,5 @@ export const StreamingMessage = () => {
     return null
   }
 
-  return <AssistantMessage text={message.content.text} />
+  return <AssistantMessage message={message} />
 }

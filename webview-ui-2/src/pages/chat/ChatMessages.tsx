@@ -36,7 +36,7 @@ export const ChatMessages = () => {
           case Role.Assistant:
             return (
               <MessageWrapper key={id}>
-                <AssistantMessage text={content.text || ''} />
+                <AssistantMessage message={message} hasFeedback />
               </MessageWrapper>
             )
 
