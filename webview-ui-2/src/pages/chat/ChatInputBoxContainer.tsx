@@ -15,11 +15,12 @@ export const ChatInputBoxContainer = ({
 }: { children: ReactNode }) => {
   const { input, focusInput, messageId } = useInput()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { isEditMode, setIsEditMode, setIsDraft } = useEditMode()
+  const { isEditMode, setIsEditMode, setIsDraft, isMainTextbox } = useEditMode()
   const { getMessage, updateUserMessage } = useMessages()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const { setActiveMessageId } = useOverlay()
-  const isDisabled = isMessageProcessing || isMessageStreaming
+  const isDisabled =
+    (isMessageProcessing || isMessageStreaming) && isMainTextbox
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => {
