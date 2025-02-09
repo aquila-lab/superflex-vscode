@@ -7,11 +7,7 @@ export const ChatTopToolbar = () => {
 
   return (
     <div className='flex flex-wrap gap-0.5 p-2 pb-0'>
-      {isEditMode && (
-        <div className='mr-1'>
-          <FileSelectorPopover />
-        </div>
-      )}
+      {isEditMode && <FileSelectorPopover />}
       <SelectedFiles />
     </div>
   )

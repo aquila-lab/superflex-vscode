@@ -32,14 +32,14 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
     <div className='flex flex-col'>
       <div
         className={cn(
-          'flex items-center gap-1 bg-background rounded-md pl-0.5 pr-1.5 cursor-pointer',
+          'flex items-center gap-0.5 bg-background rounded-md pl-0.5 pr-1.5 cursor-pointer',
           previewedFile?.id === file.id
             ? 'border border-accent'
             : 'border border-border'
         )}
         onClick={togglePreviewedFile}
       >
-        <div className='flex flex-row items-center gap-1'>
+        <div className='flex flex-row items-center gap-0.5'>
           <FileIcon filePath={file.relativePath} className='size-5' />
           <p className='text-xs text-foreground truncate max-w-16'>
             {file.name}
@@ -54,7 +54,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
           )}
         </div>
         {isEditMode && (
-          <div className='ml-auto flex gap-2'>
+          <div className='ml-auto flex gap-2 mt-0.5'>
             <Button
               size='xs'
               variant='text'
