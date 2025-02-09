@@ -8,8 +8,6 @@ export const ChatHistory = () => {
     return null
   }
 
-  console.log(threads)
-
   return (
     <div className='flex flex-col px-1 mt-6'>
       <h2 className='text-base font-medium mb-2'>Past workflows</h2>

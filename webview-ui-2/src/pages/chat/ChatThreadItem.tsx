@@ -8,7 +8,7 @@ export const ChatThreadItem = ({ thread }: { thread: Thread }) => {
   }, [thread.updatedAt])
 
   return (
-    <div className='group flex justify-between items-center gap-10 p-2 rounded-md cursor-pointer hover:bg-muted'>
+    <div className='group flex justify-between items-center gap-6 p-2 rounded-md cursor-pointer hover:bg-muted'>
       <div className='min-w-0 flex-1'>
         <p className='text-sm font-medium text-foreground truncate pr-2'>
           {thread.title}
