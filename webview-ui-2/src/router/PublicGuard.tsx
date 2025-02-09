@@ -11,6 +11,7 @@ export const PublicGuard = () => {
 
   if (isLoggedIn) {
     navigate('/chat', { replace: true })
+    return null
   }
 
   return <Outlet />

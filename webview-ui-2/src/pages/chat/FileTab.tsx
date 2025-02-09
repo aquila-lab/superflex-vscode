@@ -50,7 +50,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
               ` (${file?.startLine}-${file?.endLine})`}
           </p>
           {file.isCurrentOpenFile && (
-            <p className='text-xs text-muted-secondary-foreground'>Current</p>
+            <p className='text-xs text-muted-secondary-foreground'>(current)</p>
           )}
         </div>
         {isEditMode && (

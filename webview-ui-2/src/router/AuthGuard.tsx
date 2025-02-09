@@ -11,6 +11,7 @@ export const AuthGuard = () => {
 
   if (!isLoggedIn) {
     navigate('/login', { replace: true })
+    return null
   }
 
   return <Outlet />

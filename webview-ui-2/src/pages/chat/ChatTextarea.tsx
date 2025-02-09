@@ -2,8 +2,7 @@ import {
   type ChangeEvent,
   type ClipboardEvent,
   type KeyboardEvent,
-  useCallback,
-  useEffect
+  useCallback
 } from 'react'
 import { EventResponseType } from '../../../../shared/protocol'
 import { TextareaAutosize } from '../../components/ui/TextareaAutosize'
@@ -79,6 +78,10 @@ export const ChatTextarea = () => {
   )
 
   useConsumeMessage(EventResponseType.FOCUS_CHAT_INPUT, handleFocusChat)
+
+  if (!isEditMode && !input.length) {
+    return null
+  }
 
   return (
     <div className='flex-1'>
