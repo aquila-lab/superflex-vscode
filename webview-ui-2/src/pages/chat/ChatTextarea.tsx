@@ -2,9 +2,14 @@ import {
   type ChangeEvent,
   type ClipboardEvent,
   type KeyboardEvent,
-  useCallback
+  useCallback,
+  useRef
 } from 'react'
-import { EventResponseType } from '../../../../shared/protocol'
+import {
+  EventRequestType,
+  type EventResponseMessage,
+  EventResponseType
+} from '../../../../shared/protocol'
 import { TextareaAutosize } from '../../components/ui/TextareaAutosize'
 import { useAttachment } from '../../context/AttachmentContext'
 import { useEditMode } from '../../context/EditModeContext'
@@ -12,18 +17,26 @@ import { useFiles } from '../../context/FilesProvider'
 import { useInput } from '../../context/InputContext'
 import { useNewMessage } from '../../context/NewMessageContext'
 import { useConsumeMessage } from '../../hooks/useConsumeMessage'
+import { usePostMessage } from '../../hooks/usePostMessage'
 
 export const ChatTextarea = () => {
+  const postMessage = usePostMessage()
   const { input, inputRef, setInput, focusInput, messageId } = useInput()
-  const { selectedFiles, clearManuallySelectedFiles } = useFiles()
+  const {
+    selectedFiles,
+    clearManuallySelectedFiles,
+    selectFile,
+    setPreviewedFile
+  } = useFiles()
   const { isEditMode } = useEditMode()
   const { sendMessageContent, isMessageProcessing, isMessageStreaming } =
     useNewMessage()
   const { figmaAttachment, imageAttachment, removeAttachment, isFigmaLoading } =
     useAttachment()
   const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
+  const isAwaiting = useRef(false)
 
-  const handleOnKeyDown = useCallback(
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (
         !isDisabled &&
@@ -65,11 +78,33 @@ export const ChatTextarea = () => {
 
   const handleFocusChat = useCallback(() => focusInput(), [focusInput])
 
-  const handleOnPaste = useCallback(
-    (_e: ClipboardEvent<HTMLTextAreaElement>) => {
-      // TODO
+  const handlePaste = useCallback(
+    (e: ClipboardEvent<HTMLTextAreaElement>) => {
+      const text = e.clipboardData.getData('text')
+      postMessage(EventRequestType.PASTE_COPIED_CODE, { text })
+      isAwaiting.current = true
     },
-    []
+    [postMessage]
+  )
+
+  const handlePasteResponse = useCallback(
+    ({
+      payload
+    }: EventResponseMessage<EventResponseType.PASTE_COPIED_CODE>) => {
+      if (payload && isAwaiting.current) {
+        isAwaiting.current = false
+        selectFile(payload)
+        setPreviewedFile(payload)
+
+        setInput(prev => {
+          if (payload.content) {
+            return prev.replace(payload.content, '')
+          }
+          return prev
+        })
+      }
+    },
+    [selectFile, setInput, setPreviewedFile]
   )
 
   const handleInputChange = useCallback(
@@ -78,6 +113,7 @@ export const ChatTextarea = () => {
   )
 
   useConsumeMessage(EventResponseType.FOCUS_CHAT_INPUT, handleFocusChat)
+  useConsumeMessage(EventResponseType.PASTE_COPIED_CODE, handlePasteResponse)
 
   if (!isEditMode && !input.length) {
     return null
@@ -92,8 +128,8 @@ export const ChatTextarea = () => {
         placeholder='Describe your UI component... (⌘+; to focus)'
         className='border-0 shadow-none'
         onChange={handleInputChange}
-        onKeyDown={handleOnKeyDown}
-        onPaste={handleOnPaste}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         disabled={!isEditMode}
       />
     </div>
