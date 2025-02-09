@@ -1,6 +1,7 @@
 import type { MessageContent } from '../../../../shared/model'
 import { useEditMode } from '../../context/EditModeContext'
 import { FilesProvider } from '../../context/FilesProvider'
+import { AddSelectedCode } from './AddSelectedCode'
 import { ChatAttachment } from './ChatAttachment'
 import { ChatBottomToolbar } from './ChatBottomToolbar'
 import { ChatInputBoxContainer } from './ChatInputBoxContainer'
@@ -18,6 +19,7 @@ export const InputSection = ({
   return (
     <ChatInputBoxContainer>
       <FilesProvider files={content?.files}>
+        <AddSelectedCode />
         <FilePreview />
         <ChatTopToolbar />
         <ChatTextarea />

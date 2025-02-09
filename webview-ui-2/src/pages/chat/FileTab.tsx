@@ -44,14 +44,12 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
           <p className='text-xs text-foreground truncate max-w-16'>
             {file.name}
           </p>
-          <p className='text-xs text-foreground'>
+          <p className='text-xs text-muted-secondary-foreground'>
             {file.startLine &&
               file.endLine &&
               ` (${file?.startLine}-${file?.endLine})`}
+            {file.isCurrentOpenFile && '(current)'}
           </p>
-          {file.isCurrentOpenFile && (
-            <p className='text-xs text-muted-secondary-foreground'>(current)</p>
-          )}
         </div>
         {isEditMode && (
           <div className='ml-auto flex gap-2 mt-0.5'>
