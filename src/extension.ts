@@ -133,9 +133,13 @@ async function registerAuthenticationProviders(
     )
   )
 
-  state.chatApi.registerEvent(EventRequestType.LOGIN, async () => {
+  state.chatApi.registerEvent(EventRequestType.SIGN_IN, async () => {
     await state.authService.signIn(state.authProvider)
   })
+  state.chatApi.registerEvent(EventRequestType.SIGN_OUT, async () => {
+    await state.authService.signOut(state.authProvider)
+  })
+
   state.chatApi.registerEvent(EventRequestType.CREATE_ACCOUNT, async () => {
     await state.authService.signIn(state.authProvider, true)
   })

@@ -108,7 +108,9 @@
     "node": ">=20.11.0"
   },
   "engine-strict": true,
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "scripts": {
     "compile": "npm run check-types && node esbuild.js",
@@ -137,7 +139,7 @@
         {
           "command": "superflex.settings",
           "group": "navigation",
-          "when": "superflex.chat.authenticated"
+          "when": "view == superflex.chat && superflex.chat.authenticated"
         }
       ]
     },

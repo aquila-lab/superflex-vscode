@@ -132,17 +132,6 @@ export interface MarkdownRenderProps {
   children: ReactNode
 }
 
-export const DEFAULT_WELCOME_MESSAGE: Message = {
-  id: 'welcome',
-  threadID: 'welcome',
-  role: Role.Assistant,
-  content: {
-    text: "Welcome to Superflex! I'm here to help turn your ideas into reality in seconds. Let's work together and get things done—tell me what you'd like to build today!"
-  },
-  createdAt: new Date(),
-  updatedAt: new Date()
-}
-
 export const getAvatarConfig = (
   role: Role,
   picture?: string | null | undefined,

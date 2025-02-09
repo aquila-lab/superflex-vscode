@@ -8,7 +8,6 @@ import {
   useState
 } from 'react'
 import { type Message, Role } from '../../../shared/model'
-import { DEFAULT_WELCOME_MESSAGE } from '../common/utils'
 import { useThreads } from './ThreadsProvider'
 
 const MessagesContext = createContext<{
@@ -27,13 +26,13 @@ interface MessagesProviderProps {
 export const MessagesProvider = ({ children }: MessagesProviderProps) => {
   const { currentThread } = useThreads()
 
-  const [messages, setMessages] = useState<Message[]>([DEFAULT_WELCOME_MESSAGE])
+  const [messages, setMessages] = useState<Message[]>([])
 
   useEffect(() => {
     if (currentThread) {
-      setMessages([DEFAULT_WELCOME_MESSAGE, ...currentThread.messages])
+      setMessages([...currentThread.messages])
     } else {
-      setMessages([DEFAULT_WELCOME_MESSAGE])
+      setMessages([])
     }
   }, [currentThread])
 

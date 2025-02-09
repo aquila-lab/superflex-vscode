@@ -96,7 +96,7 @@ const LoginView: React.FunctionComponent<LoginViewProps> = ({ vscodeAPI }: Login
           <Button
             variant={'link'}
             onClick={() => {
-              vscodeAPI.postMessage(newEventRequest(EventRequestType.LOGIN));
+              vscodeAPI.postMessage(newEventRequest(EventRequestType.SIGN_IN));
               vscodeAPI.postMessage(newEventRequest(EventRequestType.CREATE_AUTH_LINK, { action: 'login' }));
             }}>
             Sign In

@@ -39,9 +39,14 @@ export enum EventRequestType {
   // ---------------- LOGIN EVENTS ----------------
 
   /**
-   * LOGIN will trigger the login flow on the extension.
+   * SIGN_IN will trigger the sign in flow on the extension.
    */
-  LOGIN = 'login',
+  SIGN_IN = 'sign_in',
+
+  /**
+   * SIGN_OUT will trigger the sign out flow on the extension.
+   */
+  SIGN_OUT = 'sign_out',
 
   /**
    * CREATE_ACCOUNT will trigger the create account flow on the extension.
@@ -391,7 +396,8 @@ export const EventRequestToResponseTypeMap: {
 export interface EventRequestPayload {
   [EventRequestType.READY]: void
   [EventRequestType.INITIALIZED]: void
-  [EventRequestType.LOGIN]: void
+  [EventRequestType.SIGN_IN]: void
+  [EventRequestType.SIGN_OUT]: void
   [EventRequestType.CREATE_ACCOUNT]: void
   [EventRequestType.CREATE_AUTH_LINK]: CreateAuthLinkPayload
   [EventRequestType.SYNC_PROJECT]: void
