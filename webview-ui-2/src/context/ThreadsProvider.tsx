@@ -17,6 +17,7 @@ import {
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
 import { NULL_UUID } from '../common/utils'
+import { PageLoaderView } from '../pages/PageLoaderView'
 
 const ThreadsContext = createContext<{
   threads: Thread[]
@@ -29,6 +30,7 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
   const navigate = useNavigate()
 
+  const [isInitialFetchDone, setIsInitialFetchDone] = useState(false)
   const [threads, setThreads] = useState<Thread[]>([])
   const [currentThread, setCurrentThread] = useState<Thread | null>(null)
   const [threadKey, setThreadKey] = useState(NULL_UUID)
@@ -53,6 +55,7 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
       switch (command) {
         case EventResponseType.FETCH_THREADS:
           setThreads(payload)
+          setIsInitialFetchDone(true)
           break
         case EventResponseType.FETCH_THREAD:
           setCurrentThread(payload)
@@ -89,7 +92,9 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   )
 
   return (
-    <ThreadsContext.Provider value={value}>{children}</ThreadsContext.Provider>
+    <ThreadsContext.Provider value={value}>
+      {isInitialFetchDone ? children : <PageLoaderView />}
+    </ThreadsContext.Provider>
   )
 }
 

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGlobal } from '../context/GlobalContext'
 import { useUser } from '../context/UserContext'
+import { PageLoaderView } from '../pages/PageLoaderView'
 
 export const LoadingGuard = ({ children }: { children: ReactNode }) => {
   const { isInitialized } = useGlobal()
@@ -9,7 +10,7 @@ export const LoadingGuard = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate()
 
   if (isUserLoading || isSubscriptionLoading || isInitialized === null) {
-    return null
+    return <PageLoaderView />
   }
 
   if (!isInitialized) {
