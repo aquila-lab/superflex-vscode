@@ -3,11 +3,11 @@ import { AuthenticatedProviders } from '../components/AuthenticatedProviders'
 import { ChatView } from '../pages/chat/ChatView'
 import { LoginView } from '../pages/login/LoginView'
 import { OpenProjectView } from '../pages/open-project/OpenProjectView'
-import ProfileView from '../pages/profile/ProfileView'
 import { AuthGuard } from './AuthGuard'
 import { BaseLayout } from './BaseLayout'
 import { NavigationHandler } from './NavigationHandler'
 import { PublicGuard } from './PublicGuard'
+import { SettingsView } from '../pages/profile/SettingsView'
 
 export const AppRouter = () => {
   return (
@@ -31,7 +31,7 @@ export const AppRouter = () => {
               <Route element={<BaseLayout />}>
                 <Route index element={<ChatView />} />
                 <Route path='chat' element={<ChatView />} />
-                <Route path='profile' element={<ProfileView />} />
+                <Route path='profile' element={<SettingsView />} />
               </Route>
             </Route>
           </Route>
