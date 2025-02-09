@@ -1,10 +1,8 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { EventRequestType } from '../../../../shared/protocol'
 import { usePostMessage } from '../../hooks/usePostMessage'
 import { ChatInputBox } from './ChatInputBox'
 import { ChatMessageList } from './ChatMessageList'
-import { useUser } from '../../context/UserContext'
-import { Button } from '../../components/ui/Button'
 import { UpgradeButton } from './UpgradeButton'
 
 export const ChatView = () => {
@@ -15,7 +13,7 @@ export const ChatView = () => {
   }, [postMessage])
 
   return (
-    <div className='flex flex-col h-full p-2 pt-0 overflow-auto relative z-10'>
+    <div className='flex flex-col h-full p-2 pt-0 overflow-auto relative'>
       <ChatMessageList />
       <ChatInputBox />
       <UpgradeButton />
