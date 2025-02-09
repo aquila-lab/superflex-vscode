@@ -8,6 +8,7 @@ import { ChatInputBox } from './ChatInputBox'
 import { UpgradeButton } from './UpgradeButton'
 import { WelcomeMessage } from './WelcomeMessage'
 import { ChatMessageList } from './ChatMessageList'
+import { SoftLimitModal } from './SoftLimitModal'
 
 export const ChatView = () => {
   const postMessage = usePostMessage()
@@ -30,6 +31,7 @@ export const ChatView = () => {
       <ChatInputBox />
       {!hasMessages && <ChatHistory />}
       <UpgradeButton />
+      <SoftLimitModal />
     </div>
   )
 }
