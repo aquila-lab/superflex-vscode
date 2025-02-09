@@ -30,7 +30,7 @@ export const ChatHistory = () => {
   }
 
   return (
-    <div className='flex flex-col px-1'>
+    <div className='flex flex-col px-1 mt-6'>
       <h2 className='text-base font-medium mb-2'>Past workflows</h2>
 
       <div className='flex flex-col gap-y-1'>

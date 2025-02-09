@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { EventRequestType } from '../../../../shared/protocol'
 import { usePostMessage } from '../../hooks/usePostMessage'
 import { useMessages } from '../../context/MessagesContext'
+import { cn } from '../../common/utils'
 import { ChatHistory } from './ChatHistory'
 import { ChatInputBox } from './ChatInputBox'
 import { UpgradeButton } from './UpgradeButton'
@@ -17,21 +18,17 @@ export const ChatView = () => {
     postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE)
   }, [postMessage])
 
-  if (!hasMessages) {
-    return (
-      <div className='flex flex-col h-full p-2 gap-y-6 overflow-none relative justify-center'>
-        <WelcomeMessage />
-        <ChatInputBox />
-        <ChatHistory />
-        <UpgradeButton />
-      </div>
-    )
-  }
-
   return (
-    <div className='flex flex-col h-full p-2 pt-6 overflow-auto relative'>
-      <ChatMessageList />
+    <div
+      className={cn(
+        'flex flex-col h-full p-2 pt-6 overflow-auto relative',
+        !hasMessages && 'justify-center'
+      )}
+    >
+      {hasMessages && <ChatMessageList />}
+      {!hasMessages && <WelcomeMessage />}
       <ChatInputBox />
+      {!hasMessages && <ChatHistory />}
       <UpgradeButton />
     </div>
   )
