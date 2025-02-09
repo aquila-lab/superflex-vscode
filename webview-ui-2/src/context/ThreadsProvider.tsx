@@ -16,12 +16,13 @@ import {
 } from '../../../shared/protocol'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { usePostMessage } from '../hooks/usePostMessage'
+import { NULL_UUID } from '../common/utils'
 
 const ThreadsContext = createContext<{
   threads: Thread[]
   currentThread: Thread | null
   selectThread: (threadId: string) => void
-  threadKey: number
+  threadKey: string
 } | null>(null)
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
@@ -30,13 +31,13 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
 
   const [threads, setThreads] = useState<Thread[]>([])
   const [currentThread, setCurrentThread] = useState<Thread | null>(null)
-  const [threadKey, setThreadKey] = useState(0)
+  const [threadKey, setThreadKey] = useState(NULL_UUID)
 
   useEffect(() => {
-    if (currentThread) {
-      setThreadKey(+currentThread.id)
+    if (currentThread && currentThread.id !== threadKey) {
+      setThreadKey(currentThread.id)
     }
-  }, [currentThread])
+  }, [currentThread, threadKey])
 
   const selectThread = useCallback(
     (threadId: string) => {

@@ -230,3 +230,5 @@ export const getLanguageFromPath = (filePath: string): string => {
 
   return languageMap[extension] || 'plaintext'
 }
+
+export const NULL_UUID = '00000000-0000-0000-0000-000000000000'
