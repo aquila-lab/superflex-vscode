@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { EventRequestType } from '../../../../shared/protocol'
 import { usePostMessage } from '../../hooks/usePostMessage'
 import { useMessages } from '../../context/MessagesContext'
@@ -9,29 +9,44 @@ import { UpgradeButton } from './UpgradeButton'
 import { WelcomeMessage } from './WelcomeMessage'
 import { ChatMessageList } from './ChatMessageList'
 import { SoftLimitModal } from './SoftLimitModal'
+import { useUser } from '../../context/UserContext'
+import { OutOfRequests } from './OutOfRequests'
 
 export const ChatView = () => {
   const postMessage = usePostMessage()
   const { messages } = useMessages()
+  const { subscription } = useUser()
   const hasMessages = messages.length > 0
+
+  const isOutOfRequests = useMemo(
+    () =>
+      subscription?.plan &&
+      subscription.basicRequestsUsed >= subscription.plan.basicRequestLimit,
+    [subscription]
+  )
 
   useEffect(() => {
     postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE)
   }, [postMessage])
 
   return (
-    <div
-      className={cn(
-        'flex flex-col h-full p-2 pt-6 overflow-auto relative',
-        !hasMessages && 'justify-center'
+    <>
+      {isOutOfRequests && <OutOfRequests />}
+      {!isOutOfRequests && (
+        <div
+          className={cn(
+            'flex flex-col h-full p-2 pt-6 overflow-auto relative',
+            !hasMessages && 'justify-center'
+          )}
+        >
+          {hasMessages && <ChatMessageList />}
+          {!hasMessages && <WelcomeMessage />}
+          <ChatInputBox />
+          {!hasMessages && <ChatHistory />}
+          <UpgradeButton />
+          <SoftLimitModal />
+        </div>
       )}
-    >
-      {hasMessages && <ChatMessageList />}
-      {!hasMessages && <WelcomeMessage />}
-      <ChatInputBox />
-      {!hasMessages && <ChatHistory />}
-      <UpgradeButton />
-      <SoftLimitModal />
-    </div>
+    </>
   )
 }
