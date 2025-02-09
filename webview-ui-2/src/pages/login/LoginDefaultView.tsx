@@ -21,7 +21,7 @@ export const LoginDefaultView = () => {
   }, [postMessage])
 
   const handleSignIn = useCallback(() => {
-    postMessage(EventRequestType.LOGIN)
+    postMessage(EventRequestType.SIGN_IN)
     postMessage(EventRequestType.CREATE_AUTH_LINK, { action: 'login' })
   }, [postMessage])
 

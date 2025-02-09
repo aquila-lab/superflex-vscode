@@ -8,13 +8,7 @@ import { UserInfoCard } from './UserInfoCard'
 
 export const SettingsView = () => {
   const navigate = useNavigate()
-  const {
-    user,
-    subscription,
-    handleSubscribe,
-    handleManageBilling,
-    fetchSubscription
-  } = useUser()
+  const { fetchSubscription } = useUser()
 
   useEffect(() => {
     fetchSubscription()
@@ -40,13 +34,8 @@ export const SettingsView = () => {
           </span>
         </Button>
       </div>
-      <UserInfoCard user={user} />
-      <BillingCard
-        user={user}
-        subscription={subscription}
-        onManageBilling={handleManageBilling}
-        onSubscribe={handleSubscribe}
-      />
+      <UserInfoCard />
+      <BillingCard />
     </div>
   )
 }

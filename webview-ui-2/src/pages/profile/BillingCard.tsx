@@ -1,4 +1,4 @@
-import type { User, UserSubscription } from '../../../../shared/model'
+import { useCallback } from 'react'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import {
@@ -8,19 +8,12 @@ import {
   CardHeader,
   CardTitle
 } from '../../components/ui/Card'
+import { useUser } from '../../context/UserContext'
 import { UsageDisplay } from './UsageDisplay'
 
-export const BillingCard = ({
-  user,
-  subscription,
-  onManageBilling,
-  onSubscribe
-}: {
-  user: User
-  subscription: UserSubscription
-  onManageBilling: () => void
-  onSubscribe: () => void
-}) => {
+export const BillingCard = () => {
+  const { user, subscription, manageBilling, subscribe } = useUser()
+
   if (!subscription.plan) {
     return null
   }
@@ -28,6 +21,14 @@ export const BillingCard = ({
   const isFreePlan = subscription.plan.name.toLowerCase().includes('free')
   const hasStripeAccount = Boolean(user.stripeCustomerID)
   const showManageBilling = hasStripeAccount && !isFreePlan
+
+  const handleManageBilling = useCallback(() => {
+    manageBilling()
+  }, [manageBilling])
+
+  const handleSubscribe = useCallback(() => {
+    subscribe()
+  }, [subscribe])
 
   return (
     <Card>
@@ -53,9 +54,9 @@ export const BillingCard = ({
           </div>
 
           {showManageBilling ? (
-            <Button onClick={onManageBilling}>Manage Billing</Button>
+            <Button onClick={handleManageBilling}>Manage Billing</Button>
           ) : (
-            <Button onClick={onSubscribe}>Subscribe</Button>
+            <Button onClick={handleSubscribe}>Subscribe</Button>
           )}
         </div>
 

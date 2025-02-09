@@ -23,8 +23,9 @@ const GlobalContext = createContext<{
   isFigmaAuthenticated: boolean | null
   setIsInitialized: (val: boolean) => void
   setIsLoggedIn: (val: boolean) => void
-  setConfig: (cfg: Record<string, unknown> | null) => void
-  setIsFigmaAuthenticated: (val: boolean) => void
+  connectFigma: () => void
+  disconnectFigma: () => void
+  signOut: () => void
 } | null>(null)
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
@@ -63,6 +64,18 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     },
     []
   )
+
+  const connectFigma = useCallback(() => {
+    postMessage(EventRequestType.FIGMA_OAUTH_CONNECT)
+  }, [postMessage])
+
+  const disconnectFigma = useCallback(() => {
+    postMessage(EventRequestType.FIGMA_OAUTH_DISCONNECT)
+  }, [postMessage])
+
+  const signOut = useCallback(() => {
+    postMessage(EventRequestType.SIGN_OUT)
+  }, [postMessage])
 
   const handleDisconnectFigma = useCallback(() => {
     setIsFigmaAuthenticated(false)
@@ -110,10 +123,19 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       isFigmaAuthenticated,
       setIsInitialized,
       setIsLoggedIn,
-      setConfig,
-      setIsFigmaAuthenticated
+      connectFigma,
+      disconnectFigma,
+      signOut
     }),
-    [isInitialized, isLoggedIn, config, isFigmaAuthenticated]
+    [
+      isInitialized,
+      isLoggedIn,
+      config,
+      isFigmaAuthenticated,
+      connectFigma,
+      disconnectFigma,
+      signOut
+    ]
   )
 
   return (

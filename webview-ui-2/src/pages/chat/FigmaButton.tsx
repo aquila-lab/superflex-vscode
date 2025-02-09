@@ -1,16 +1,13 @@
 import { useCallback } from 'react'
 import { FaFigma } from 'react-icons/fa'
-import { EventRequestType } from '../../../../shared/protocol'
 import { cn } from '../../common/utils'
 import { Button } from '../../components/ui/Button'
 import { useAttachment } from '../../context/AttachmentContext'
 import { useGlobal } from '../../context/GlobalContext'
-import { usePostMessage } from '../../hooks/usePostMessage'
 import { useNewMessage } from '../../context/NewMessageContext'
 
 export const FigmaButton = () => {
-  const postMessage = usePostMessage()
-  const { isFigmaAuthenticated } = useGlobal()
+  const { isFigmaAuthenticated, connectFigma } = useGlobal()
   const { isFigmaLoading, openSelectionModal } = useAttachment()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
 
@@ -23,8 +20,8 @@ export const FigmaButton = () => {
       return
     }
 
-    postMessage(EventRequestType.FIGMA_OAUTH_CONNECT)
-  }, [isFigmaAuthenticated, openSelectionModal, postMessage])
+    connectFigma()
+  }, [isFigmaAuthenticated, openSelectionModal, connectFigma])
 
   return (
     <Button
