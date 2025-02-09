@@ -163,19 +163,79 @@ export class ChatAPI {
        * @returns A promise that resolves when the new chat thread is created.
        * @throws An error if the new chat thread cannot be created.
        */
-      .registerEvent(EventRequestType.NEW_THREAD, async () => {
+      .registerEvent(
+        EventRequestType.NEW_THREAD,
+        async (_, sendEventMessageCb) => {
+          if (!this._isInitialized || !this._assistant) {
+            return false
+          }
+
+          this._thread = await this._assistant.createThread()
+
+          Telemetry.capture('new_thread', {
+            threadID: this._thread?.id ?? ''
+          })
+
+          this._assistant.getThreads().then(threads => {
+            sendEventMessageCb(
+              newEventResponse(EventResponseType.FETCH_THREADS, threads)
+            )
+          })
+
+          return this._thread
+        }
+      )
+
+      /**
+       * Event (fetch_threads): This event is fired when the webview needs to fetch all threads.
+       * It is used to fetch all threads from the assistant.
+       *
+       * @returns A promise that resolves with all threads.
+       * @throws An error if the threads cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_THREADS, async () => {
         if (!this._isInitialized || !this._assistant) {
-          return false
+          return []
         }
 
-        this._thread = await this._assistant.createThread()
-
-        Telemetry.capture('new_thread', {
-          threadID: this._thread?.id ?? ''
-        })
-
-        return this._thread
+        return this._assistant.getThreads()
       })
+
+      /**
+       * Event (fetch_thread): This event is fired when the webview needs to fetch a specific thread.
+       * It is used to fetch a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID.
+       * @returns A promise that resolves with the thread.
+       * @throws An error if the thread cannot be fetched.
+       */
+      .registerEvent(
+        EventRequestType.FETCH_THREAD,
+        async (payload: { threadID: string }) => {
+          if (
+            !this._isInitialized ||
+            !this._assistant ||
+            !this._workspaceDirPath
+          ) {
+            return null
+          }
+
+          this._thread = await this._assistant.getThread(payload.threadID)
+
+          for (const message of this._thread.messages) {
+            if (!message.content.files) {
+              continue
+            }
+
+            message.content.files = enrichFilePayloads(
+              message.content.files,
+              this._workspaceDirPath
+            )
+          }
+
+          return this._thread
+        }
+      )
 
       /**
        * Event (create_figma_attachment): This event is fired when the user selects a Figma file in the webview.
@@ -609,57 +669,6 @@ export class ChatAPI {
       .registerEvent(EventRequestType.GET_USER_SUBSCRIPTION, async () => {
         return api.getUserSubscription()
       })
-
-      /**
-       * Event (fetch_threads): This event is fired when the webview needs to fetch all threads.
-       * It is used to fetch all threads from the assistant.
-       *
-       * @returns A promise that resolves with all threads.
-       * @throws An error if the threads cannot be fetched.
-       */
-      .registerEvent(EventRequestType.FETCH_THREADS, async () => {
-        if (!this._isInitialized || !this._assistant) {
-          return []
-        }
-
-        return this._assistant.getThreads()
-      })
-
-      /**
-       * Event (fetch_thread): This event is fired when the webview needs to fetch a specific thread.
-       * It is used to fetch a thread by its ID from the assistant.
-       *
-       * @param payload - Payload containing the thread ID.
-       * @returns A promise that resolves with the thread.
-       * @throws An error if the thread cannot be fetched.
-       */
-      .registerEvent(
-        EventRequestType.FETCH_THREAD,
-        async (payload: { threadID: string }) => {
-          if (
-            !this._isInitialized ||
-            !this._assistant ||
-            !this._workspaceDirPath
-          ) {
-            return null
-          }
-
-          this._thread = await this._assistant.getThread(payload.threadID)
-
-          for (const message of this._thread.messages) {
-            if (!message.content.files) {
-              continue
-            }
-
-            message.content.files = enrichFilePayloads(
-              message.content.files,
-              this._workspaceDirPath
-            )
-          }
-
-          return this._thread
-        }
-      )
   }
 
   /**
