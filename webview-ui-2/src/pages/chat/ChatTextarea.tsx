@@ -18,21 +18,16 @@ import { useInput } from '../../context/InputContext'
 import { useNewMessage } from '../../context/NewMessageContext'
 import { useConsumeMessage } from '../../hooks/useConsumeMessage'
 import { usePostMessage } from '../../hooks/usePostMessage'
+import { useSendMessage } from '../../context/SendMessageContext'
 
 export const ChatTextarea = () => {
   const postMessage = usePostMessage()
-  const { input, inputRef, setInput, focusInput, messageId } = useInput()
-  const {
-    selectedFiles,
-    clearManuallySelectedFiles,
-    selectFile,
-    setPreviewedFile
-  } = useFiles()
+  const { input, inputRef, setInput, focusInput } = useInput()
+  const { selectFile, setPreviewedFile } = useFiles()
   const { isEditMode } = useEditMode()
-  const { sendMessageContent, isMessageProcessing, isMessageStreaming } =
-    useNewMessage()
-  const { figmaAttachment, imageAttachment, removeAttachment, isFigmaLoading } =
-    useAttachment()
+  const { isMessageProcessing, isMessageStreaming } = useNewMessage()
+  const { figmaAttachment, isFigmaLoading } = useAttachment()
+  const { sendMessage } = useSendMessage()
   const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
   const isAwaiting = useRef(false)
 
@@ -45,35 +40,10 @@ export const ChatTextarea = () => {
         !e.shiftKey
       ) {
         e.preventDefault()
-        sendMessageContent({
-          text: input,
-          attachment:
-            figmaAttachment || imageAttachment
-              ? {
-                  figma: figmaAttachment ?? undefined,
-                  image: imageAttachment ?? undefined
-                }
-              : undefined,
-          fromMessageID: messageId ?? undefined,
-          files: selectedFiles
-        })
-        setInput('')
-        removeAttachment()
-        clearManuallySelectedFiles()
+        sendMessage()
       }
     },
-    [
-      isDisabled,
-      messageId,
-      input,
-      figmaAttachment,
-      imageAttachment,
-      sendMessageContent,
-      selectedFiles,
-      removeAttachment,
-      setInput,
-      clearManuallySelectedFiles
-    ]
+    [isDisabled, sendMessage, figmaAttachment, input.length]
   )
 
   const handleFocusChat = useCallback(() => {

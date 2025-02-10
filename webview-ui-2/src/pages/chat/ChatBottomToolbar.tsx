@@ -4,57 +4,28 @@ import { IoIosReturnLeft } from 'react-icons/io'
 import { Button } from '../../components/ui/Button'
 import { useAttachment } from '../../context/AttachmentContext'
 import { useEditMode } from '../../context/EditModeContext'
-import { useFiles } from '../../context/FilesProvider'
 import { useInput } from '../../context/InputContext'
 import { useNewMessage } from '../../context/NewMessageContext'
 import { FigmaButton } from './FigmaButton'
 import { FilePicker } from './FilePicker'
+import { useSendMessage } from '../../context/SendMessageContext'
 
 export const ChatBottomToolbar = () => {
-  const { input, setInput, messageId } = useInput()
-  const { selectedFiles, clearManuallySelectedFiles } = useFiles()
+  const { input } = useInput()
   const { isEditMode } = useEditMode()
-  const {
-    sendMessageContent,
-    isMessageProcessing,
-    isMessageStreaming,
-    stopStreaming
-  } = useNewMessage()
-  const { figmaAttachment, removeAttachment, imageAttachment, isFigmaLoading } =
-    useAttachment()
+  const { isMessageProcessing, isMessageStreaming, stopStreaming } =
+    useNewMessage()
+  const { figmaAttachment, isFigmaLoading } = useAttachment()
+  const { sendMessage } = useSendMessage()
   const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
 
-  const handleMessageStopped = useCallback(() => {
+  const handleStop = useCallback(() => {
     stopStreaming()
   }, [stopStreaming])
 
-  const handleButtonClicked = useCallback(() => {
-    sendMessageContent({
-      text: input,
-      attachment:
-        figmaAttachment || imageAttachment
-          ? {
-              figma: figmaAttachment ?? undefined,
-              image: imageAttachment ?? undefined
-            }
-          : undefined,
-      fromMessageID: messageId ?? undefined,
-      files: selectedFiles
-    })
-    setInput('')
-    removeAttachment()
-    clearManuallySelectedFiles()
-  }, [
-    messageId,
-    figmaAttachment,
-    imageAttachment,
-    input,
-    sendMessageContent,
-    setInput,
-    removeAttachment,
-    selectedFiles,
-    clearManuallySelectedFiles
-  ])
+  const handleSend = useCallback(() => {
+    sendMessage()
+  }, [sendMessage])
 
   if (!isEditMode) {
     return null
@@ -79,7 +50,7 @@ export const ChatBottomToolbar = () => {
             }
             disabled={isDisabled || !(input.length || figmaAttachment)}
             className={isDisabled ? 'opacity-60' : ''}
-            onClick={handleButtonClicked}
+            onClick={handleSend}
           >
             <span className='sr-only'>Enter</span>
             <IoIosReturnLeft className='size-4' aria-hidden='true' />
@@ -91,7 +62,7 @@ export const ChatBottomToolbar = () => {
             size='xs'
             variant='text'
             className='text-[11px] px-1 py-0 hover:bg-muted'
-            onClick={handleMessageStopped}
+            onClick={handleStop}
           >
             <TrashIcon className='size-3.5' />
             Stop

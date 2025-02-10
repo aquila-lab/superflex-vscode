@@ -9,6 +9,7 @@ import { FilePreview } from './FilePreview'
 import { ChatTextarea } from './ChatTextarea'
 import { ChatTopToolbar } from './ChatTopToolbar'
 import { FigmaSelectionModal } from './FigmaSelectionModal'
+import { SendMessageProvider } from '../../context/SendMessageContext'
 
 export const InputSection = ({
   content
@@ -24,8 +25,10 @@ export const InputSection = ({
           <AddSelectedCode />
           <FilePreview />
           <ChatTopToolbar />
-          <ChatTextarea />
-          <ChatBottomToolbar />
+          <SendMessageProvider>
+            <ChatTextarea />
+            <ChatBottomToolbar />
+          </SendMessageProvider>
           {!isMainTextbox && <ChatAttachment />}
         </FilesProvider>
       </ChatInputBoxContainer>
