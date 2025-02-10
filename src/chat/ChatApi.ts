@@ -360,6 +360,8 @@ export class ChatAPI {
             )
           }
           this._isPremiumGeneration = isPremium
+
+          return true
         }
       )
 

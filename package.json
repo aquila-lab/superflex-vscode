@@ -216,7 +216,7 @@
         "command": "superflex.chat.focus-input",
         "category": "Superflex",
         "title": "Focus chat input",
-        "enablement": "view == superflex.chat && superflex.chat.authenticated"
+        "enablement": "superflex.chat.authenticated"
       },
       {
         "command": "superflex.chat.new-thread",
@@ -267,8 +267,7 @@
         "key": "cmd+;",
         "mac": "cmd+;",
         "win": "ctrl+;",
-        "linux": "ctrl+;",
-        "when": "editorTextFocus"
+        "linux": "ctrl+;"
       },
       {
         "command": "superflex.add-selection-to-chat",

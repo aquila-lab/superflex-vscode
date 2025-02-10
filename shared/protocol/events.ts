@@ -127,6 +127,7 @@ export enum EventRequestType {
 
   /**
    * SEND_MESSAGE will send a message to the extension for processing.
+   * @returns {boolean} indicating if the message job was done successfully.
    */
   SEND_MESSAGE = 'send_message',
 
@@ -285,6 +286,12 @@ export enum EventResponseType {
 
   /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
+   * SEND_MESSAGE will send the boolean indicating if the message job was done successfully to the webview.
+   */
+  SEND_MESSAGE = 'send_message',
+
+  /**
+   * @triggered by {EventRequestType.SEND_MESSAGE}
    * MESSAGE_TEXT_DELTA is used to stream the response message text delta to the webview.
    */
   MESSAGE_TEXT_DELTA = 'message_text_delta',
@@ -381,6 +388,7 @@ export const EventRequestToResponseTypeMap: {
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
   [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
   [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
+  [EventRequestType.SEND_MESSAGE]: EventResponseType.SEND_MESSAGE,
   [EventRequestType.FAST_APPLY]: EventResponseType.FAST_APPLY,
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
   [EventRequestType.FETCH_FILES]: EventResponseType.FETCH_FILES,
@@ -435,6 +443,7 @@ export interface EventResponsePayload {
   [EventResponseType.NEW_THREAD]: Thread
   [EventResponseType.FETCH_THREADS]: Thread[]
   [EventResponseType.FETCH_THREAD]: Thread
+  [EventResponseType.SEND_MESSAGE]: boolean
   [EventResponseType.MESSAGE_TEXT_DELTA]: string
   [EventResponseType.MESSAGE_COMPLETE]: Message
   [EventResponseType.FAST_APPLY]: boolean
