@@ -7,7 +7,7 @@ export const MarkdownCode = ({
   inline,
   className,
   children,
-  isStreamingMessage
+  isStreamingMessage = false
 }: MarkdownCodeProps) => {
   const match = useMemo(
     () => /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className ?? ''),
