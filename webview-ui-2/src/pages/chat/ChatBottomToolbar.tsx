@@ -14,15 +14,19 @@ export const ChatBottomToolbar = () => {
   const { input, setInput, messageId } = useInput()
   const { selectedFiles, clearManuallySelectedFiles } = useFiles()
   const { isEditMode } = useEditMode()
-  const { sendMessageContent, isMessageProcessing, isMessageStreaming } =
-    useNewMessage()
+  const {
+    sendMessageContent,
+    isMessageProcessing,
+    isMessageStreaming,
+    stopStreaming
+  } = useNewMessage()
   const { figmaAttachment, removeAttachment, imageAttachment, isFigmaLoading } =
     useAttachment()
   const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
 
   const handleMessageStopped = useCallback(() => {
-    // stopMessage();
-  }, [])
+    stopStreaming()
+  }, [stopStreaming])
 
   const handleButtonClicked = useCallback(() => {
     sendMessageContent({

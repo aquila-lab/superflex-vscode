@@ -54,7 +54,14 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
   )
 
   const popMessage = useCallback(() => {
-    setMessages(prev => prev.slice(0, -1))
+    setMessages(prev => {
+      for (let i = prev.length - 1; i >= 0; i--) {
+        if (prev[i].role === Role.User) {
+          return prev.slice(0, i)
+        }
+      }
+      return prev
+    })
   }, [])
 
   const addMessages = useCallback((newMessages: Message[]) => {

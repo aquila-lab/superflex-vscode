@@ -47,9 +47,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
 
   const stopStreaming = useCallback(() => {
     postMessage(EventRequestType.STOP_MESSAGE)
-    resetNewMessage()
-    popMessage()
-  }, [postMessage, resetNewMessage, popMessage])
+  }, [postMessage])
 
   const handleMessageDelta = useCallback(
     (payload: string) => {
@@ -112,6 +110,16 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
+  const handleStopMessageResponse = useCallback(
+    (payload: boolean) => {
+      if (payload) {
+        resetNewMessage()
+        popMessage()
+      }
+    },
+    [resetNewMessage, popMessage]
+  )
+
   const handleMessage = useCallback(
     ({ command, payload, error }: TypedEventResponseMessage) => {
       if (error) {
@@ -128,12 +136,16 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         case EventResponseType.SEND_MESSAGE:
           handleSendMessageContentResponse(payload)
           break
+        case EventResponseType.STOP_MESSAGE:
+          handleStopMessageResponse(payload)
+          break
       }
     },
     [
       handleMessageDelta,
       handleMessageComplete,
       handleSendMessageContentResponse,
+      handleStopMessageResponse,
       resetNewMessage
     ]
   )
@@ -142,7 +154,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     [
       EventResponseType.MESSAGE_TEXT_DELTA,
       EventResponseType.MESSAGE_COMPLETE,
-      EventResponseType.SEND_MESSAGE
+      EventResponseType.SEND_MESSAGE,
+      EventResponseType.STOP_MESSAGE
     ],
     handleMessage
   )
