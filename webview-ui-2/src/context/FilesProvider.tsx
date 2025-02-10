@@ -76,7 +76,7 @@ export const FilesProvider = ({
     ({
       payload
     }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
-      if (payload && isEditMode) {
+      if (isEditMode) {
         setCurrentFile(payload)
       }
     },
