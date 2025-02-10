@@ -62,11 +62,12 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
           break
         case EventResponseType.NEW_THREAD:
           setCurrentThread(payload)
+          postMessage(EventRequestType.STOP_MESSAGE)
           navigate('/chat', { replace: true })
           break
       }
     },
-    [navigate]
+    [navigate, postMessage]
   )
 
   const fetchThreads = useCallback(() => {

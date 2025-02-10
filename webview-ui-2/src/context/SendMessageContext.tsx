@@ -9,6 +9,7 @@ import { useAttachment } from './AttachmentContext'
 import { useFiles } from './FilesProvider'
 import { useInput } from './InputContext'
 import { useNewMessage } from './NewMessageContext'
+import { useEditMode } from './EditModeContext'
 
 export const SendMessageContext = createContext<{
   sendMessage: () => void
@@ -19,25 +20,34 @@ export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
   const { selectedFiles, clearManuallySelectedFiles } = useFiles()
   const { sendMessageContent } = useNewMessage()
   const { figmaAttachment, imageAttachment, removeAttachment } = useAttachment()
+  const { isMainTextbox } = useEditMode()
 
   const sendMessage = useCallback(() => {
-    sendMessageContent({
-      text: input,
-      attachment:
-        figmaAttachment || imageAttachment
-          ? {
-              figma: figmaAttachment ?? undefined,
-              image: imageAttachment ?? undefined
-            }
-          : undefined,
-      fromMessageID: messageId ?? undefined,
-      files: selectedFiles
-    })
-    setInput('')
-    removeAttachment()
-    clearManuallySelectedFiles()
+    const sm = () => {
+      sendMessageContent({
+        text: input,
+        attachment:
+          figmaAttachment || imageAttachment
+            ? {
+                figma: figmaAttachment ?? undefined,
+                image: imageAttachment ?? undefined
+              }
+            : undefined,
+        fromMessageID: messageId ?? undefined,
+        files: selectedFiles
+      })
+      setInput('')
+      removeAttachment()
+      clearManuallySelectedFiles()
+    }
+
+    if (isMainTextbox) {
+      sm()
+      return
+    }
   }, [
     messageId,
+    isMainTextbox,
     figmaAttachment,
     imageAttachment,
     input,
