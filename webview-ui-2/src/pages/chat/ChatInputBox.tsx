@@ -1,11 +1,13 @@
+import { useEffect } from 'react'
 import type { MessageContent } from '../../../../shared/model'
 import { AttachmentProvider } from '../../context/AttachmentContext'
 import { useEditMode } from '../../context/EditModeContext'
-import { InputProvider } from '../../context/InputContext'
+import { InputProvider, useInput } from '../../context/InputContext'
 import { useUser } from '../../context/UserContext'
 import { ChatAttachment } from './ChatAttachment'
 import { InputSection } from './InputSection'
 import { UserMessageHeader } from './UserMessageHeader'
+import { useOverlay } from '../../context/OverlayContext'
 
 export const ChatInputBox = ({
   content,
@@ -14,8 +16,17 @@ export const ChatInputBox = ({
   content?: MessageContent
   messageId?: string
 }) => {
-  const { isDraft, isMainTextbox } = useEditMode()
+  const { isDraft, isMainTextbox, isEditMode } = useEditMode()
   const { user } = useUser()
+  const { setActiveMessageId } = useOverlay()
+
+  useEffect(() => {
+    if (isEditMode) {
+      setActiveMessageId(messageId ?? null)
+    } else {
+      setActiveMessageId(null)
+    }
+  }, [isEditMode, messageId, setActiveMessageId])
 
   return (
     <AttachmentProvider attachment={content?.attachment}>

@@ -18,7 +18,6 @@ export const ChatInputBoxContainer = ({
   const { isEditMode, setIsEditMode, setIsDraft, isMainTextbox } = useEditMode()
   const { getMessage, updateUserMessage } = useMessages()
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const { setActiveMessageId } = useOverlay()
   const isDisabled =
     (isMessageProcessing || isMessageStreaming) && isMainTextbox
 
@@ -28,7 +27,6 @@ export const ChatInputBoxContainer = ({
 
       if (!isClickInside) {
         setIsEditMode(false)
-        setActiveMessageId(null)
 
         if (messageId) {
           const message = getMessage(messageId)
@@ -43,10 +41,6 @@ export const ChatInputBoxContainer = ({
       }
 
       if (!isEditMode) {
-        if (messageId) {
-          setActiveMessageId(messageId)
-        }
-
         setIsEditMode(true)
         focusInput()
       }
@@ -60,7 +54,6 @@ export const ChatInputBoxContainer = ({
     isEditMode,
     messageId,
     setIsEditMode,
-    setActiveMessageId,
     setIsDraft,
     getMessage,
     updateUserMessage,
