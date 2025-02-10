@@ -15,9 +15,10 @@ const buttonVariants = cva(
         secondary:
           'bg-button-secondary-background text-button-secondary-foreground hover:bg-button-secondary-background-hover disabled:opacity-75',
         text: 'text-muted-foreground hover:text-button-secondary-foreground',
-        link: 'text-link underline-offset-4 hover:underline hover:text-link-hover'
+        link: 'text-link underline-offset-4 hover:underline hover:text-link-hover',
+        destructive:
+          'bg-destructive-background text-button-foreground hover:opacity-90'
       },
-
       size: {
         default: 'px-4 py-2',
         xxs: 'rounded-md px-1 py-0.5 text-xs gap-1',
@@ -27,7 +28,6 @@ const buttonVariants = cva(
         icon: 'rounded-lg size-[1.375rem] gap-1', // Match VS Code’s 22px icon buttons
         none: 'p-0'
       },
-
       active: {
         none: '',
         active:
