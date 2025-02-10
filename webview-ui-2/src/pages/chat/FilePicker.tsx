@@ -1,24 +1,27 @@
 import { type ChangeEvent, useCallback, useRef } from 'react'
 import { IoImage } from 'react-icons/io5'
 import { cn, readImageFileAsBase64 } from '../../common/utils'
+import { useInput } from '../../context/InputContext'
 import { useNewMessage } from '../../context/NewMessageContext'
 import { useAttachment } from '../../context/AttachmentContext'
 
 export const FilePicker = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { isMessageStreaming, isMessageProcessing } = useNewMessage()
+  const { focusInput } = useInput()
   const { removeAttachment, setImageAttachment } = useAttachment()
+  const { isMessageStreaming, isMessageProcessing } = useNewMessage()
+
   const isDisabled = isMessageStreaming || isMessageProcessing
 
   const handleImageSelected = useCallback(
     (file: File) => {
       removeAttachment()
-
+      focusInput()
       readImageFileAsBase64(file).then(imageBase64 => {
         setImageAttachment(imageBase64)
       })
     },
-    [removeAttachment, setImageAttachment]
+    [removeAttachment, focusInput, setImageAttachment]
   )
 
   const handleChange = useCallback(

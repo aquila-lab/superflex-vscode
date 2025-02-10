@@ -5,9 +5,10 @@ import { AddSelectedCode } from './AddSelectedCode'
 import { ChatAttachment } from './ChatAttachment'
 import { ChatBottomToolbar } from './ChatBottomToolbar'
 import { ChatInputBoxContainer } from './ChatInputBoxContainer'
+import { FilePreview } from './FilePreview'
 import { ChatTextarea } from './ChatTextarea'
 import { ChatTopToolbar } from './ChatTopToolbar'
-import { FilePreview } from './FilePreview'
+import { FigmaSelectionModal } from './FigmaSelectionModal'
 
 export const InputSection = ({
   content
@@ -17,15 +18,19 @@ export const InputSection = ({
   const { isMainTextbox } = useEditMode()
 
   return (
-    <ChatInputBoxContainer>
-      <FilesProvider files={content?.files}>
-        <AddSelectedCode />
-        <FilePreview />
-        <ChatTopToolbar />
-        <ChatTextarea />
-        <ChatBottomToolbar />
-        {!isMainTextbox && <ChatAttachment />}
-      </FilesProvider>
-    </ChatInputBoxContainer>
+    <>
+      <ChatInputBoxContainer>
+        <FilesProvider files={content?.files}>
+          <AddSelectedCode />
+          <FilePreview />
+          <ChatTopToolbar />
+          <ChatTextarea />
+          <ChatBottomToolbar />
+          {!isMainTextbox && <ChatAttachment />}
+        </FilesProvider>
+      </ChatInputBoxContainer>
+
+      <FigmaSelectionModal />
+    </>
   )
 }

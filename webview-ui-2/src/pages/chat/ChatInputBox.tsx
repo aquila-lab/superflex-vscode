@@ -4,7 +4,6 @@ import { useEditMode } from '../../context/EditModeContext'
 import { InputProvider } from '../../context/InputContext'
 import { useUser } from '../../context/UserContext'
 import { ChatAttachment } from './ChatAttachment'
-import { FigmaSelectionModal } from './FigmaSelectionModal'
 import { InputSection } from './InputSection'
 import { UserMessageHeader } from './UserMessageHeader'
 
@@ -37,7 +36,6 @@ export const ChatInputBox = ({
           <InputSection content={content} />
         </InputProvider>
       )}
-      <FigmaSelectionModal />
     </AttachmentProvider>
   )
 }

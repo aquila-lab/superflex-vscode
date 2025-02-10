@@ -7,9 +7,11 @@ import {
   DialogTitle
 } from '../../components/ui/Dialog'
 import { Input } from '../../components/ui/Input'
+import { useInput } from '../../context/InputContext'
 import { useAttachment } from '../../context/AttachmentContext'
 
 export const FigmaSelectionModal = () => {
+  const { focusInput } = useInput()
   const {
     isSelectionModalOpen,
     figmaLink,
@@ -23,7 +25,10 @@ export const FigmaSelectionModal = () => {
     [closeSelectionModal]
   )
 
-  const handleSubmit = useCallback(() => submitSelection(), [submitSelection])
+  const handleSubmit = useCallback(() => {
+    submitSelection()
+    queueMicrotask(focusInput)
+  }, [submitSelection, focusInput])
 
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
