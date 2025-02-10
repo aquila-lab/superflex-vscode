@@ -34,7 +34,7 @@ export const FilesProvider = ({
   children
 }: { files?: FilePayload[]; children: ReactNode }) => {
   const postMessage = usePostMessage()
-  const { isEditMode } = useEditMode()
+  const { isEditMode, isMainTextbox } = useEditMode()
 
   const [manuallySelectedFiles, setManuallySelectedFiles] = useState<
     FilePayload[]
@@ -76,11 +76,11 @@ export const FilesProvider = ({
     ({
       payload
     }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
-      if (isEditMode) {
+      if (isEditMode && payload && isMainTextbox) {
         setCurrentFile(payload)
       }
     },
-    [isEditMode]
+    [isEditMode, isMainTextbox]
   )
 
   const deselectFile = useCallback((file: FilePayload) => {

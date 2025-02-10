@@ -9,7 +9,7 @@ import { useFiles } from '../../context/FilesProvider'
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
   const { previewedFile, deselectFile, setPreviewedFile } = useFiles()
-  const { isEditMode } = useEditMode()
+  const { isEditMode, isMainTextbox } = useEditMode()
 
   const togglePreviewedFile = useCallback(() => {
     if (previewedFile?.id === file.id) {
@@ -48,7 +48,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             {file.startLine &&
               file.endLine &&
               ` (${file?.startLine}-${file?.endLine})`}
-            {file.isCurrentOpenFile && '(current)'}
+            {file.isCurrentOpenFile && isMainTextbox && '(current)'}
           </p>
         </div>
         {isEditMode && (

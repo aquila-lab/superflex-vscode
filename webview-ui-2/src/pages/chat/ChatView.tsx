@@ -29,7 +29,7 @@ export const ChatView = () => {
 
   useEffect(() => {
     postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE)
-  }, [postMessage])
+  })
 
   return (
     <>
