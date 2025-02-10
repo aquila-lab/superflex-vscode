@@ -161,6 +161,12 @@ async function registerAuthenticationProviders(
       return !!token && !!token.accessToken
     }
   )
+  state.chatApi.registerEvent(
+    EventRequestType.FIGMA_OAUTH_DISCONNECT,
+    async () => {
+      await state.figmaAuthService.disconnect(state.figmaAuthProvider)
+    }
+  )
 
   state.authService.authenticate(state.authProvider)
   state.figmaAuthService.authenticate(state.figmaAuthProvider)
