@@ -51,7 +51,11 @@ export const FigmaSelectionModal = () => {
             onChange={handleInputChange}
           />
 
-          <Button onClick={handleSubmit} className='w-full'>
+          <Button
+            onClick={handleSubmit}
+            className='w-full'
+            disabled={!figmaLink.length}
+          >
             Submit
           </Button>
 

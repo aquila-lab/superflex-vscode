@@ -15,13 +15,13 @@ export function useConsumeMessage<T extends EventResponseType>(
 ): void {
   const handleMessage = useCallback(
     (evt: MessageEvent<TypedEventResponseMessage>) => {
-      const { command, error } = evt.data || {}
+      const { command } = evt.data || {}
 
       const matchesType = Array.isArray(eventTypes)
         ? eventTypes.includes(command as T)
         : eventTypes === command
 
-      if (!matchesType || error) {
+      if (!matchesType) {
         return
       }
 

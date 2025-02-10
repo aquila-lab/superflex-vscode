@@ -22,7 +22,6 @@ const NewMessageContext = createContext<{
   isMessageProcessing: boolean
   isMessageStreaming: boolean
   hasMessageStopped: boolean
-  lastUserMessage: string | null
   sendMessageContent: (content: MessageContent) => void
   stopStreaming: () => void
 } | null>(null)
@@ -37,9 +36,9 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const [isMessageProcessing, setIsMessageProcessing] = useState(false)
   const [isMessageStreaming, setIsMessageStreaming] = useState(false)
   const [hasMessageStopped, setHasMessageStopped] = useState(false)
-  const [lastUserMessage, setLastUserMessage] = useState<string | null>(null)
 
   const resetNewMessage = useCallback(() => {
+    setHasMessageStopped(false)
     setIsMessageStreaming(false)
     setIsMessageProcessing(false)
     setMessage(null)
@@ -57,9 +56,11 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       if (hasMessageStopped) {
         return
       }
+
       if (!isMessageStreaming) {
         setIsMessageStreaming(true)
       }
+
       setStreamTextDelta(prev => prev + payload)
 
       setMessage(prev => {
@@ -112,7 +113,11 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const handleMessage = useCallback(
-    ({ command, payload }: TypedEventResponseMessage) => {
+    ({ command, payload, error }: TypedEventResponseMessage) => {
+      if (error) {
+        resetNewMessage()
+      }
+
       switch (command) {
         case EventResponseType.MESSAGE_TEXT_DELTA:
           handleMessageDelta(payload)
@@ -128,7 +133,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     [
       handleMessageDelta,
       handleMessageComplete,
-      handleSendMessageContentResponse
+      handleSendMessageContentResponse,
+      resetNewMessage
     ]
   )
 
@@ -164,10 +170,6 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       setIsMessageProcessing(true)
       addMessages([userMessage])
 
-      if (userMessage.content.text) {
-        setLastUserMessage(userMessage.content.text)
-      }
-
       postMessage(EventRequestType.SEND_MESSAGE, content)
     },
     [postMessage, messages, addMessages, removeMessagesFrom, stopStreaming]
@@ -179,7 +181,6 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       isMessageProcessing,
       isMessageStreaming,
       hasMessageStopped,
-      lastUserMessage,
       sendMessageContent,
       stopStreaming
     }),
@@ -188,7 +189,6 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       isMessageProcessing,
       isMessageStreaming,
       hasMessageStopped,
-      lastUserMessage,
       sendMessageContent,
       stopStreaming
     ]

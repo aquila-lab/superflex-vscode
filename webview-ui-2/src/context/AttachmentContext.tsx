@@ -71,11 +71,14 @@ export const AttachmentProvider = ({
 
   const handleCreateFigmaAttachment = useCallback(
     ({
-      payload
+      payload,
+      error
     }: EventResponseMessage<EventResponseType.CREATE_FIGMA_ATTACHMENT>) => {
-      setFigmaAttachment(payload)
-      setIsFigmaLoading(false)
+      if (!error && payload) {
+        setFigmaAttachment(payload)
+      }
       setFigmaLink('')
+      setIsFigmaLoading(false)
     },
     []
   )
