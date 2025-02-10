@@ -280,6 +280,7 @@ export class ChatAPI {
         }
 
         this._assistant.stopMessage()
+        return true
       })
 
       /**

@@ -122,6 +122,7 @@ export enum EventRequestType {
 
   /**
    * STOP_MESSAGE will stop the message stream.
+   * @returns {boolean} indicating if the message stream was stopped successfully.
    */
   STOP_MESSAGE = 'stop_message',
 
@@ -285,6 +286,12 @@ export enum EventResponseType {
   FETCH_THREAD = 'fetch_thread',
 
   /**
+   * @triggered by {EventRequestType.STOP_MESSAGE}
+   * STOP_MESSAGE will send the boolean indicating if the message stream was stopped successfully to the webview.
+   */
+  STOP_MESSAGE = 'stop_message',
+
+  /**
    * @triggered by {EventRequestType.SEND_MESSAGE}
    * SEND_MESSAGE will send the boolean indicating if the message job was done successfully to the webview.
    */
@@ -388,6 +395,7 @@ export const EventRequestToResponseTypeMap: {
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
   [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
   [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
+  [EventRequestType.STOP_MESSAGE]: EventResponseType.STOP_MESSAGE,
   [EventRequestType.SEND_MESSAGE]: EventResponseType.SEND_MESSAGE,
   [EventRequestType.FAST_APPLY]: EventResponseType.FAST_APPLY,
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
@@ -443,6 +451,7 @@ export interface EventResponsePayload {
   [EventResponseType.NEW_THREAD]: Thread
   [EventResponseType.FETCH_THREADS]: Thread[]
   [EventResponseType.FETCH_THREAD]: Thread
+  [EventResponseType.STOP_MESSAGE]: boolean
   [EventResponseType.SEND_MESSAGE]: boolean
   [EventResponseType.MESSAGE_TEXT_DELTA]: string
   [EventResponseType.MESSAGE_COMPLETE]: Message
