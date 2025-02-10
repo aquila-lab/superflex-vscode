@@ -133,7 +133,11 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   )
 
   useConsumeMessage(
-    [EventResponseType.MESSAGE_TEXT_DELTA, EventResponseType.MESSAGE_COMPLETE],
+    [
+      EventResponseType.MESSAGE_TEXT_DELTA,
+      EventResponseType.MESSAGE_COMPLETE,
+      EventResponseType.SEND_MESSAGE
+    ],
     handleMessage
   )
   const sendMessageContent = useCallback(
