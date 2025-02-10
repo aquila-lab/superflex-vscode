@@ -18,7 +18,7 @@ export const SendMessageContext = createContext<{
 export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
   const { input, setInput, messageId } = useInput()
   const { selectedFiles, clearManuallySelectedFiles } = useFiles()
-  const { sendMessageContent } = useNewMessage()
+  const { sendMessageContent, stopStreaming } = useNewMessage()
   const { figmaAttachment, imageAttachment, removeAttachment } = useAttachment()
   const { isMainTextbox } = useEditMode()
 
@@ -45,6 +45,9 @@ export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
       sm()
       return
     }
+
+    stopStreaming(messageId)
+    sm()
   }, [
     messageId,
     isMainTextbox,
@@ -55,7 +58,8 @@ export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
     setInput,
     removeAttachment,
     selectedFiles,
-    clearManuallySelectedFiles
+    clearManuallySelectedFiles,
+    stopStreaming
   ])
 
   const value = useMemo(() => ({ sendMessage }), [sendMessage])

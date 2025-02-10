@@ -23,7 +23,7 @@ const NewMessageContext = createContext<{
   isMessageStreaming: boolean
   hasMessageStopped: boolean
   sendMessageContent: (content: MessageContent) => void
-  stopStreaming: () => void
+  stopStreaming: (messageId?: string | null) => void
 } | null>(null)
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
@@ -45,9 +45,14 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     setStreamTextDelta('')
   }, [])
 
-  const stopStreaming = useCallback(() => {
-    postMessage(EventRequestType.STOP_MESSAGE)
-  }, [postMessage])
+  const stopStreaming = useCallback(
+    (messageId?: string | null) => {
+      postMessage(EventRequestType.STOP_MESSAGE)
+      popMessage(messageId)
+      resetNewMessage()
+    },
+    [postMessage, popMessage, resetNewMessage]
+  )
 
   const handleMessageDelta = useCallback(
     (payload: string) => {
@@ -110,16 +115,6 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const handleStopMessageResponse = useCallback(
-    (payload: boolean) => {
-      if (payload) {
-        resetNewMessage()
-        popMessage()
-      }
-    },
-    [resetNewMessage, popMessage]
-  )
-
   const handleMessage = useCallback(
     ({ command, payload, error }: TypedEventResponseMessage) => {
       if (error) {
@@ -136,16 +131,12 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         case EventResponseType.SEND_MESSAGE:
           handleSendMessageContentResponse(payload)
           break
-        case EventResponseType.STOP_MESSAGE:
-          handleStopMessageResponse(payload)
-          break
       }
     },
     [
       handleMessageDelta,
       handleMessageComplete,
       handleSendMessageContentResponse,
-      handleStopMessageResponse,
       resetNewMessage
     ]
   )
