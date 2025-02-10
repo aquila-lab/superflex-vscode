@@ -6,9 +6,11 @@ import { FileInfo } from './FileInfo'
 
 export const FileHeader = ({
   filePath,
+  isStreamingMessage = false,
   children
 }: {
   filePath: string
+  isStreamingMessage?: boolean
   children: ReactNode
 }) => {
   const { isMessageStreaming } = useNewMessage()
@@ -19,7 +21,7 @@ export const FileHeader = ({
       <FileInfo filePath={filePath} />
       <div className='flex flex-row items-center'>
         <CopyButton content={content} />
-        {!isMessageStreaming && (
+        {(!isStreamingMessage || !isMessageStreaming) && (
           <ApplyControls filePath={filePath} content={content} />
         )}
       </div>

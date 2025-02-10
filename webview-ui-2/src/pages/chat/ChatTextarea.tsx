@@ -76,7 +76,9 @@ export const ChatTextarea = () => {
     ]
   )
 
-  const handleFocusChat = useCallback(() => focusInput(), [focusInput])
+  const handleFocusChat = useCallback(() => {
+    focusInput()
+  }, [focusInput])
 
   const handlePaste = useCallback(
     (e: ClipboardEvent<HTMLTextAreaElement>) => {

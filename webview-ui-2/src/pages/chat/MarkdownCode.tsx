@@ -6,7 +6,8 @@ import { FileHeader } from './FileHeader'
 export const MarkdownCode = ({
   inline,
   className,
-  children
+  children,
+  isStreamingMessage
 }: MarkdownCodeProps) => {
   const match = useMemo(
     () => /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className ?? ''),
@@ -39,7 +40,12 @@ export const MarkdownCode = ({
   return (
     <div className='rounded-md border border-border bg-background mt-1'>
       {codeBlock.filePath && (
-        <FileHeader filePath={codeBlock.filePath}>{draft}</FileHeader>
+        <FileHeader
+          filePath={codeBlock.filePath}
+          isStreamingMessage={isStreamingMessage}
+        >
+          {draft}
+        </FileHeader>
       )}
       <Editor extension={codeBlock.extension} filePath={codeBlock.filePath}>
         {draft}

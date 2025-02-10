@@ -88,11 +88,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     [messages, streamTextDelta, isMessageStreaming, hasMessageStopped]
   )
 
-  const handleSendMessageResponse = useCallback(
+  const handleMessageComplete = useCallback(
     (payload: Message) => {
-      setIsMessageProcessing(false)
-      setIsMessageStreaming(false)
-
       if (!payload) {
         setMessage(null)
         setStreamTextDelta('')
@@ -107,6 +104,13 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     [addMessages]
   )
 
+  const handleSendMessageContentResponse = useCallback((payload: boolean) => {
+    if (payload) {
+      setIsMessageProcessing(false)
+      setIsMessageStreaming(false)
+    }
+  }, [])
+
   const handleMessage = useCallback(
     ({ command, payload }: TypedEventResponseMessage) => {
       switch (command) {
@@ -114,18 +118,24 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
           handleMessageDelta(payload)
           break
         case EventResponseType.MESSAGE_COMPLETE:
-          handleSendMessageResponse(payload)
+          handleMessageComplete(payload)
+          break
+        case EventResponseType.SEND_MESSAGE:
+          handleSendMessageContentResponse(payload)
           break
       }
     },
-    [handleMessageDelta, handleSendMessageResponse]
+    [
+      handleMessageDelta,
+      handleMessageComplete,
+      handleSendMessageContentResponse
+    ]
   )
 
   useConsumeMessage(
     [EventResponseType.MESSAGE_TEXT_DELTA, EventResponseType.MESSAGE_COMPLETE],
     handleMessage
   )
-
   const sendMessageContent = useCallback(
     (content: MessageContent): void => {
       if (!(content.text || content.attachment)) {

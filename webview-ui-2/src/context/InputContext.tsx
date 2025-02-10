@@ -34,22 +34,6 @@ export const InputProvider = ({
     inputRef.current?.focus()
   }, [])
 
-  useEffect(() => {
-    const setFocusCursorPos = function (this: HTMLTextAreaElement) {
-      this.setSelectionRange(input.length, input.length)
-    }
-
-    if (inputRef.current) {
-      inputRef.current.addEventListener('focus', setFocusCursorPos)
-    }
-
-    return () => {
-      if (inputRef.current) {
-        inputRef.current.removeEventListener('focus', setFocusCursorPos)
-      }
-    }
-  })
-
   const value = useMemo(
     () => ({
       input,

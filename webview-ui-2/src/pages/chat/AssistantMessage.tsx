@@ -6,12 +6,20 @@ import { MarkdownRender } from './MarkdownRender'
 
 export const AssistantMessage = ({
   message,
-  hasFeedback = false
-}: { message: Message; hasFeedback?: boolean }) => {
+  hasFeedback = false,
+  isStreamingMessage = false
+}: {
+  message: Message
+  hasFeedback?: boolean
+  isStreamingMessage?: boolean
+}) => {
   return (
     <ChatMessageContainer role={Role.Assistant}>
       <ChatMessageHeader role={Role.Assistant} />
-      <MarkdownRender role={Role.Assistant}>
+      <MarkdownRender
+        role={Role.Assistant}
+        isStreamingMessage={isStreamingMessage}
+      >
         {message.content.text}
       </MarkdownRender>
       {hasFeedback && !message.feedback && (

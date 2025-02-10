@@ -11,13 +11,16 @@ import { MarkdownCode } from './MarkdownCode'
 
 export const MarkdownRender = ({
   role,
+  isStreamingMessage = false,
   children
-}: { role: Role; children: ReactNode }) => {
+}: { role: Role; isStreamingMessage?: boolean; children: ReactNode }) => {
   const codeComponents = useMemo(
     () => ({
-      code: (props: MarkdownCodeProps) => <MarkdownCode {...props} />
+      code: (props: MarkdownCodeProps) => (
+        <MarkdownCode {...props} isStreamingMessage={isStreamingMessage} />
+      )
     }),
-    []
+    [isStreamingMessage]
   )
 
   return (

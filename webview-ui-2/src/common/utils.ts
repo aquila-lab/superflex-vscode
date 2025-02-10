@@ -121,7 +121,7 @@ export interface CodeBlockInfo {
 
 export interface MarkdownCodeProps {
   inline?: boolean
-  isStreaming?: boolean
+  isStreamingMessage?: boolean
   className?: string
   children?: ReactNode
 }
