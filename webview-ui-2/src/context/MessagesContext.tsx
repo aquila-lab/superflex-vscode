@@ -14,7 +14,6 @@ const MessagesContext = createContext<{
   messages: Message[]
   addMessages: (messages: Message[]) => void
   updateUserMessage: (messageId: string, text: string) => void
-  popMessage: (messageId?: string | null) => void
   getMessage: (messageId: string) => Message | undefined
   removeMessagesFrom: (messageId: string) => void
 } | null>(null)
@@ -53,26 +52,6 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     [messages]
   )
 
-  const popMessage = useCallback((messageId?: string | null) => {
-    setMessages(prev => {
-      if (messageId) {
-        for (let i = prev.length - 1; i >= 0; i--) {
-          if (prev[i].id === messageId) {
-            return prev.slice(0, i)
-          }
-        }
-      }
-
-      for (let i = prev.length - 1; i >= 0; i--) {
-        if (prev[i].role === Role.User) {
-          return prev.slice(0, i)
-        }
-      }
-
-      return prev
-    })
-  }, [])
-
   const addMessages = useCallback((newMessages: Message[]) => {
     setMessages(prev => {
       if (prev.length === 0) {
@@ -104,18 +83,10 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       messages,
       addMessages,
       updateUserMessage,
-      popMessage,
       getMessage,
       removeMessagesFrom
     }),
-    [
-      messages,
-      addMessages,
-      updateUserMessage,
-      popMessage,
-      getMessage,
-      removeMessagesFrom
-    ]
+    [messages, addMessages, updateUserMessage, getMessage, removeMessagesFrom]
   )
 
   return (

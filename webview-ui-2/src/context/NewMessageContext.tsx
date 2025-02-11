@@ -28,8 +28,7 @@ const NewMessageContext = createContext<{
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
-  const { messages, addMessages, popMessage, removeMessagesFrom } =
-    useMessages()
+  const { messages, addMessages, removeMessagesFrom } = useMessages()
 
   const [message, setMessage] = useState<Message | null>(null)
   const [streamTextDelta, setStreamTextDelta] = useState('')
@@ -45,14 +44,10 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     setStreamTextDelta('')
   }, [])
 
-  const stopStreaming = useCallback(
-    (messageId?: string | null) => {
-      postMessage(EventRequestType.STOP_MESSAGE)
-      popMessage(messageId)
-      resetNewMessage()
-    },
-    [postMessage, popMessage, resetNewMessage]
-  )
+  const stopStreaming = useCallback(() => {
+    postMessage(EventRequestType.STOP_MESSAGE)
+    resetNewMessage()
+  }, [postMessage, resetNewMessage])
 
   const handleMessageDelta = useCallback(
     (payload: string) => {
