@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 import {
   EventRequestType,
   EventResponseType,
+  newEventRequest,
   newEventResponse
 } from '../shared/protocol'
 import FigmaAuthenticationProvider from './authentication/FigmaAuthenticationProvider'
@@ -35,6 +36,7 @@ type AppState = {
   figmaAuthService: FigmaAuthenticationService
   figmaAuthProvider: FigmaAuthenticationProvider
   chatViewProvider: ChatViewProvider
+  projectSyncInterval?: NodeJS.Timeout
 }
 
 export async function activate(
@@ -95,6 +97,15 @@ async function backgroundInit(
     payload => {
       vscode.env.openExternal(vscode.Uri.parse(payload.url))
     }
+  )
+
+  // Store the interval ID in appState
+  appState.projectSyncInterval = setInterval(
+    () =>
+      appState.chatViewProvider.handleEventMessage(
+        newEventRequest(EventRequestType.SYNC_PROJECT)
+      ),
+    5000
   )
 }
 
@@ -201,4 +212,8 @@ async function initializeAnalytics(
 }
 
 // This method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate(appState?: AppState) {
+  if (appState?.projectSyncInterval) {
+    clearInterval(appState.projectSyncInterval)
+  }
+}
