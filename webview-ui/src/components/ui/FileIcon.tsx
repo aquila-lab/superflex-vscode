@@ -1,11 +1,10 @@
-import React from 'react';
-import DOMPurify from 'dompurify';
-import { themeIcons } from 'seti-file-icons';
-import { cn, getFileName } from '../../common/utils';
+import DOMPurify from 'dompurify'
+import { themeIcons } from 'seti-file-icons'
+import { cn, getFileName } from '../../common/utils'
 
 interface FileIconProps {
-  filePath: string;
-  className?: string;
+  filePath: string
+  className?: string
 }
 
 const iconColors = {
@@ -20,13 +19,13 @@ const iconColors = {
   white: '#fdf6e3',
   yellow: '#b58900',
   ignore: '#586e75'
-};
+}
 
 export const FileIcon: React.FC<FileIconProps> = ({ filePath, className }) => {
-  const filename = getFileName(filePath);
-  const getIcon = themeIcons(iconColors);
-  const { svg, color } = getIcon(filename);
-  const sanitizedSVG = DOMPurify.sanitize(svg);
+  const filename = getFileName(filePath)
+  const getIcon = themeIcons(iconColors)
+  const { svg, color } = getIcon(filename)
+  const sanitizedSVG = DOMPurify.sanitize(svg)
 
   return (
     <div
@@ -34,5 +33,5 @@ export const FileIcon: React.FC<FileIconProps> = ({ filePath, className }) => {
       dangerouslySetInnerHTML={{ __html: sanitizedSVG }}
       style={{ fill: color }}
     />
-  );
-};
+  )
+}

@@ -16,6 +16,6 @@
     "moduleResolution": "Node",
     "jsx": "react-jsx"
   },
-  "include": ["src", "../shared/**/*"],
+  "include": ["src", "src/global.d.ts", "../shared/**/*"],
   "exclude": ["node_modules"]
 }

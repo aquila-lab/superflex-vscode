@@ -1,23 +1,10 @@
-import React, { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
+import './index.css'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { App } from './App'
 
-import './index.css';
-import App from './App';
-import store from './core/store';
-import { getVSCodeAPI } from './api/vscodeApi';
-import CustomPostHogProvider from './hooks/CustomPostHogProvider';
-
-const Root = (): JSX.Element => (
+createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
-    <Provider store={store}>
-      <CustomPostHogProvider>
-        <App vscodeAPI={getVSCodeAPI()} />
-      </CustomPostHogProvider>
-    </Provider>
+    <App />
   </StrictMode>
-);
-
-const container = document.getElementById('root') as HTMLElement;
-const root = createRoot(container);
-root.render(<Root />);
+)

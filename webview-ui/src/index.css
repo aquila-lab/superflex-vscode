@@ -10,7 +10,6 @@
   font-family: var(--vscode-font-family);
   color: var(--vscode-sideBar-foreground);
   background-color: var(--vscode-sideBar-background);
-  /* Override VS Code Webview Toolkit elements */
   --border-width: none;
 }
 
@@ -38,11 +37,12 @@ a:hover {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 .logo {
-  background-image: url('./assets/logo.png');
+  background-image: url("./assets/logo.png");
 }
 
 .npm__react-simple-code-editor__textarea:focus {

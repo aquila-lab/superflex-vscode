@@ -1,2 +1,2 @@
-export * from "./Assistant";
-export * from "./SuperflexAssistant";
+export * from './Assistant'
+export * from './SuperflexAssistant'

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-const plugin = require('tailwindcss/plugin');
+const plugin = require('tailwindcss/plugin')
 
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -135,8 +135,14 @@ export default {
     require('daisyui'),
     plugin(({ addVariant }) => {
       // Allows use to customize styling for VS Code light and dark themes
-      addVariant('high-contrast-dark', 'body[data-vscode-theme-kind="vscode-high-contrast"] &');
-      addVariant('high-contrast-light', 'body[data-vscode-theme-kind="vscode-high-contrast-light"] &');
+      addVariant(
+        'high-contrast-dark',
+        'body[data-vscode-theme-kind="vscode-high-contrast"] &'
+      )
+      addVariant(
+        'high-contrast-light',
+        'body[data-vscode-theme-kind="vscode-high-contrast-light"] &'
+      )
     })
   ]
-};
+}

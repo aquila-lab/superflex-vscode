@@ -1,17 +1,17 @@
-import { Message } from "./Message.model";
+import type { Message, MessageStream } from './Message.model'
 
 export type Thread = {
   /** @type {Generics.UUID} */
-  id: string;
+  id: string
 
-  title: string;
-  messages: Message[];
+  title: string | null
+  messages: Message[]
 
-  updatedAt: Date;
-  createdAt: Date;
-};
+  updatedAt: Date
+  createdAt: Date
+}
 
 export type ThreadRun = {
-  message: Message;
-  isPremium: boolean;
-};
+  stream: AsyncIterable<MessageStream>
+  response(): Promise<{ messages: Message[]; isPremium: boolean }>
+}

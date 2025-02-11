@@ -1,7 +1,7 @@
-import React from 'react';
-import { Command as CommandPrimitive } from 'cmdk';
+import { Command as CommandPrimitive } from 'cmdk'
+import React from 'react'
 
-import { cn } from '../../common/utils';
+import { cn } from '../../common/utils'
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -15,28 +15,31 @@ const Command = React.forwardRef<
     )}
     {...props}
   />
-));
-Command.displayName = CommandPrimitive.displayName;
+))
+Command.displayName = CommandPrimitive.displayName
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   // eslint-disable-next-line react/no-unknown-property
-  <div className="flex items-center border-b border-b-border" cmdk-input-wrapper="">
+  <div
+    className='flex items-center border-b border-b-border'
+    cmdk-input-wrapper=''
+  >
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
         'flex w-full border-solid border border-border bg-transparent rounded-md m-1 py-1 px-1.5 text-sm leading-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
         className
       )}
-      inputMode="search"
+      inputMode='search'
       {...props}
     />
   </div>
-));
+))
 
-CommandInput.displayName = CommandPrimitive.Input.displayName;
+CommandInput.displayName = CommandPrimitive.Input.displayName
 
 const CommandList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
@@ -47,9 +50,9 @@ const CommandList = React.forwardRef<
     className={cn('max-h-[500px] overflow-y-auto overflow-x-hidden', className)}
     {...props}
   />
-));
+))
 
-CommandList.displayName = CommandPrimitive.List.displayName;
+CommandList.displayName = CommandPrimitive.List.displayName
 
 const CommandEmpty = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
@@ -57,12 +60,15 @@ const CommandEmpty = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className={cn('py-2 px-1.5 text-muted-foreground font-medium text-xs', className)}
+    className={cn(
+      'py-2 px-1.5 text-muted-foreground font-medium text-xs',
+      className
+    )}
     {...props}
   />
-));
+))
 
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
+CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
 const CommandLoading = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Loading>,
@@ -70,12 +76,15 @@ const CommandLoading = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Loading
     ref={ref}
-    className={cn('py-1 px-1.5 text-muted-foreground font-medium text-xs', className)}
+    className={cn(
+      'py-1 px-1.5 text-muted-foreground font-medium text-xs',
+      className
+    )}
     {...props}
   />
-));
+))
 
-CommandLoading.displayName = CommandPrimitive.Loading.displayName;
+CommandLoading.displayName = CommandPrimitive.Loading.displayName
 
 const CommandGroup = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Group>,
@@ -89,21 +98,28 @@ const CommandGroup = React.forwardRef<
     )}
     {...props}
   />
-));
+))
 
-CommandGroup.displayName = CommandPrimitive.Group.displayName;
+CommandGroup.displayName = CommandPrimitive.Group.displayName
 
 const CommandSeparator = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Separator ref={ref} className={cn('-mx-2 my-2 h-px bg-border', className)} {...props} />
-));
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
+  <CommandPrimitive.Separator
+    ref={ref}
+    className={cn('-mx-2 my-2 h-px bg-border', className)}
+    {...props}
+  />
+))
+CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
 const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { added?: boolean; tooltip?: string }
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & {
+    added?: boolean
+    tooltip?: string
+  }
 >(({ className, added, tooltip, ...props }, ref) => {
   const item = (
     <CommandPrimitive.Item
@@ -116,12 +132,12 @@ const CommandItem = React.forwardRef<
       title={tooltip}
       {...props}
     />
-  );
+  )
 
-  return item;
-});
+  return item
+})
 
-CommandItem.displayName = CommandPrimitive.Item.displayName;
+CommandItem.displayName = CommandPrimitive.Item.displayName
 
 const CommandRow: React.FunctionComponent<
   React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
@@ -133,33 +149,44 @@ const CommandRow: React.FunctionComponent<
     )}
     {...props}
   />
-);
+)
 
-const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  return <span className={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)} {...props} />;
-};
-CommandShortcut.displayName = 'CommandShortcut';
+const CommandShortcut = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement>) => {
+  return (
+    <span
+      className={cn(
+        'ml-auto text-xs tracking-widest text-muted-foreground',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+CommandShortcut.displayName = 'CommandShortcut'
 
 export const CommandLink: React.FunctionComponent<
   React.AnchorHTMLAttributes<HTMLAnchorElement> & { onSelect?: () => void }
 > = ({ href, className, children, onSelect, ...props }) => {
-  const linkRef = React.useRef<HTMLAnchorElement>(null);
+  const linkRef = React.useRef<HTMLAnchorElement>(null)
 
   // We use a workaround to make links work in VS Code via keyboard and click (see the
   // `dispatchEvent` call and related comment below). However, to avoid a click opening the link
   // twice, we need to check if we're already opening a link due to a click and prevent the
   // `dispatchEvent` code path from being called. When cmdk supports links
   // (https://github.com/pacocoursey/cmdk/issues/258), this workaround will no longer be needed.
-  const isHandlingClick = React.useRef(false);
+  const isHandlingClick = React.useRef(false)
 
   return (
     <CommandItem
       onSelect={() => {
-        onSelect?.();
+        onSelect?.()
 
         if (isHandlingClick.current) {
-          linkRef.current?.blur(); // close after click
-          return;
+          linkRef.current?.blur() // close after click
+          return
         }
 
         // TODO: When cmdk supports links, use that instead. This workaround is only needed
@@ -169,22 +196,23 @@ export const CommandLink: React.FunctionComponent<
         // This workaround successfully opens an external link in VS Code webviews (which
         // block `window.open` and plain click MouseEvents) and in browsers.
         try {
-          linkRef.current?.focus();
+          linkRef.current?.focus()
           linkRef.current?.dispatchEvent(
             new MouseEvent('click', {
               button: 0,
               ctrlKey: true,
               metaKey: true
             })
-          );
-          linkRef.current?.blur();
+          )
+          linkRef.current?.blur()
         } catch (error) {
-          console.error(error);
+          console.error(error)
         } finally {
-          isHandlingClick.current = false;
+          isHandlingClick.current = false
         }
       }}
-      asChild>
+      asChild
+    >
       <a
         {...props}
         href={href}
@@ -192,18 +220,19 @@ export const CommandLink: React.FunctionComponent<
           '!text-foreground aria-selected:!text-accent-foreground hover:!text-accent-foreground',
           className
         )}
-        onClick={(e) => {
-          isHandlingClick.current = true;
+        onClick={() => {
+          isHandlingClick.current = true
           setTimeout(() => {
-            isHandlingClick.current = false;
-          });
+            isHandlingClick.current = false
+          })
         }}
-        ref={linkRef}>
+        ref={linkRef}
+      >
         {children}
       </a>
     </CommandItem>
-  );
-};
+  )
+}
 
 export {
   Command,
@@ -216,4 +245,4 @@ export {
   CommandRow,
   CommandShortcut,
   CommandSeparator
-};
+}

@@ -1,0 +1,104 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "ignore": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/out/**",
+      "**/.next/**",
+      "**/coverage/**",
+      "**/assets/**",
+      "**/binaries/**",
+      "**/.vscode/**",
+      "**/.github/**",
+      "**/.vscode-test/**",
+      "**/*.d.ts",
+      "**/package-lock.json",
+      "**/yarn.lock",
+      "**/.eslintrc.js",
+      "**/tailwind.config.js",
+      "**/postcss.config.js",
+      "**/vite.config.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "lineEnding": "lf",
+    "formatWithErrors": true
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "useKeyWithClickEvents": "off",
+        "useAltText": "off"
+      },
+      "complexity": {
+        "noForEach": "off",
+        "noStaticOnlyClass": "off",
+        "noUselessFragments": "error",
+        "noUselessConstructor": "error",
+        "useSimplifiedLogicExpression": "off",
+        "noVoid": "error"
+      },
+      "correctness": {
+        "noUnreachable": "error",
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "error",
+        "noConstantCondition": "error"
+      },
+      "performance": {
+        "noDelete": "error"
+      },
+      "style": {
+        "noParameterAssign": "off",
+        "noNonNullAssertion": "error",
+        "useBlockStatements": "error",
+        "useShorthandArrayType": "error",
+        "useTemplate": "error",
+        "noUselessElse": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noConsoleLog": "warn",
+        "noDebugger": "error",
+        "noConfusingVoidType": "off",
+        "noEmptyBlockStatements": "off",
+        "noRedundantUseStrict": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "none",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "asNeeded",
+      "indentStyle": "space",
+      "jsxQuoteStyle": "single"
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": false
+    },
+    "formatter": {
+      "enabled": true
+    }
+  }
+}

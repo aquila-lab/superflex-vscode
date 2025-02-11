@@ -1,43 +1,46 @@
-import { Analytics } from "./types";
-import { AnalyticsProvider } from "./AnalyticsProvider";
-import { PostHog } from "posthog-node";
+import { PostHog } from 'posthog-node'
+import type { AnalyticsProvider } from './AnalyticsProvider'
+import type { Analytics } from './types'
 
 export default class PostHogAnalyticsProvider implements AnalyticsProvider {
-  client?: PostHog;
-  uniqueID?: string;
+  client?: PostHog
+  uniqueID?: string
 
   async identify(properties: { [key: string]: any }): Promise<void> {
     this.client?.identify({
-      distinctId: this.uniqueID ?? "NOT_UNIQUE",
-      properties,
-    });
+      distinctId: this.uniqueID ?? 'NOT_UNIQUE',
+      properties
+    })
   }
 
-  async capture(event: string, properties: { [key: string]: any }): Promise<void> {
+  async capture(
+    event: string,
+    properties: { [key: string]: any }
+  ): Promise<void> {
     this.client?.capture({
-      distinctId: this.uniqueID ?? "NOT_UNIQUE",
+      distinctId: this.uniqueID ?? 'NOT_UNIQUE',
       event,
-      properties,
-    });
+      properties
+    })
   }
 
-  async setup(config: Analytics, uniqueID: string, workspaceID?: string): Promise<void> {
+  async setup(config: Analytics, uniqueID: string): Promise<void> {
     if (!config || !config.clientKey || !config.url) {
-      this.client = undefined;
+      this.client = undefined
     } else {
       try {
-        this.uniqueID = uniqueID;
+        this.uniqueID = uniqueID
 
         this.client = new PostHog(config.clientKey, {
-          host: config.url,
-        });
+          host: config.url
+        })
       } catch (e) {
-        console.error(`Failed to setup telemetry: ${e}`);
+        console.error(`Failed to setup telemetry: ${e}`)
       }
     }
   }
 
   async shutdown(): Promise<void> {
-    this.client?.shutdown();
+    this.client?.shutdown()
   }
 }

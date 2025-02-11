@@ -1,50 +1,59 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode'
 
-import { VerticalDiffCodeLens } from "../../../diff/vertical/manager";
+import type { VerticalDiffCodeLens } from '../../../diff/vertical/manager'
 
 export class VerticalDiffCodeLensProvider implements vscode.CodeLensProvider {
-  private _eventEmitter: vscode.EventEmitter<void> = new vscode.EventEmitter<void>();
+  private _eventEmitter: vscode.EventEmitter<void> =
+    new vscode.EventEmitter<void>()
 
-  onDidChangeCodeLenses: vscode.Event<void> = this._eventEmitter.event;
+  onDidChangeCodeLenses: vscode.Event<void> = this._eventEmitter.event
 
   public refresh(): void {
-    this._eventEmitter.fire();
+    this._eventEmitter.fire()
   }
 
-  constructor(private readonly editorToVerticalDiffCodeLens: Map<string, VerticalDiffCodeLens[]>) {}
+  constructor(
+    private readonly editorToVerticalDiffCodeLens: Map<
+      string,
+      VerticalDiffCodeLens[]
+    >
+  ) {}
 
   public provideCodeLenses(
     document: vscode.TextDocument,
     _: vscode.CancellationToken
   ): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
-    const uri = document.uri.toString();
-    const blocks = this.editorToVerticalDiffCodeLens.get(uri);
+    const uri = document.uri.toString()
+    const blocks = this.editorToVerticalDiffCodeLens.get(uri)
 
     if (!blocks) {
-      return [];
+      return []
     }
 
-    const codeLenses: vscode.CodeLens[] = [];
+    const codeLenses: vscode.CodeLens[] = []
 
     for (let i = 0; i < blocks.length; i++) {
-      const block = blocks[i];
-      const start = new vscode.Position(block.start, 0);
-      const range = new vscode.Range(start, start.translate(block.numGreen + block.numRed));
+      const block = blocks[i]
+      const start = new vscode.Position(block.start, 0)
+      const range = new vscode.Range(
+        start,
+        start.translate(block.numGreen + block.numRed)
+      )
 
       codeLenses.push(
         new vscode.CodeLens(range, {
-          title: `✅ Accept`,
-          command: "superflex.acceptVerticalDiffBlock",
-          arguments: [uri, i],
+          title: '✅ Accept',
+          command: 'superflex.acceptVerticalDiffBlock',
+          arguments: [uri, i]
         }),
         new vscode.CodeLens(range, {
-          title: `❌ Reject`,
-          command: "superflex.rejectVerticalDiffBlock",
-          arguments: [uri, i],
+          title: '❌ Reject',
+          command: 'superflex.rejectVerticalDiffBlock',
+          arguments: [uri, i]
         })
-      );
+      )
     }
 
-    return codeLenses;
+    return codeLenses
   }
 }

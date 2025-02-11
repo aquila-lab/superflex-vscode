@@ -1,50 +1,75 @@
+import type { FilePayload } from '../protocol/types'
+
 export enum Role {
-  User = "user",
-  Assistant = "assistant",
+  User = 'user',
+  Assistant = 'assistant'
 }
 
-export enum MessageType {
-  Text = "text",
-  TextDelta = "text_delta",
-  Image = "image",
-  Figma = "figma",
+export interface FigmaAttachment {
+  fileID: string
+  nodeID: string
+  imageUrl: string
 }
 
-export type TextDelta = {
-  type: MessageType.TextDelta;
-  value: string;
-};
-
-export interface TextContent {
-  type: MessageType.Text;
-  text: string;
+export interface MessageAttachment {
+  image?: string
+  figma?: FigmaAttachment
 }
 
-export interface ImageContent {
-  type: MessageType.Image;
-  image: string;
+export type MessageContent = {
+  /**
+   * Optional ID reference to a previous message. Used when regenerating/editing
+   * responses to maintain conversation context.
+   */
+  fromMessageID?: string
+
+  /**
+   * Optional if there are attachments.
+   * This contains the actual message text that will be displayed to the user.
+   */
+  text?: string
+
+  /**
+   * Optional attachment for the message. Can include either an Image or Figma.
+   * See MessageAttachment interface for details.
+   */
+  attachment?: MessageAttachment
+
+  /**
+   * Optional array of files that user has attached to this message. These files are used
+   * to give the AI additional context about the codebase when processing the message.
+   */
+  files?: FilePayload[]
+} & ({ text: string } | { attachment: MessageAttachment })
+
+export interface MessageStream {
+  /**
+   * The type of the message stream can be either "delta" or "complete".
+   */
+  type: 'delta' | 'complete'
+
+  /**
+   * If the type is "delta", this field contains the text delta of the message stream.
+   */
+  textDelta?: string
+
+  /**
+   * If the type is "complete", this field contains the complete message of the message stream.
+   */
+  message?: Message
 }
 
-export interface FigmaContent {
-  type: MessageType.Figma;
-  fileID: string;
-  nodeID: string;
-  image: string;
-}
-
-export type MessageContent = TextContent | TextDelta | ImageContent | FigmaContent;
-
-export type Message = {
+export interface Message {
   /** @type {Generics.UUID} */
-  id: string;
+  id: string
   /** @type {Generics.UUID} */
-  threadID: string;
+  threadID: string
 
-  role: Role;
-  content: MessageContent;
+  role: Role
+  content: MessageContent
 
-  feedback?: string;
+  feedback?: string
 
-  updatedAt: Date;
-  createdAt: Date;
-};
+  updatedAt: Date
+  createdAt: Date
+}

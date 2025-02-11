@@ -1,59 +1,69 @@
-import fs from "fs";
-import path from "path";
-import * as vscode from "vscode";
-import { Mutex } from "async-mutex";
+import fs from 'node:fs'
+import path from 'node:path'
+import { Mutex } from 'async-mutex'
+import * as vscode from 'vscode'
 
-import { Message, Thread } from "../../shared/model";
 import {
-  EventMessage,
-  EventPayloads,
-  EventType,
-  FastApplyPayload,
-  FigmaFile,
-  FilePayload,
-  newEventResponse,
-  SendMessagesRequestPayload,
-} from "../../shared/protocol";
-import * as api from "../api";
-import { FIGMA_AUTH_PROVIDER_ID } from "../common/constants";
-import { decodeUriAndRemoveFilePrefix, generateFileID, getOpenWorkspace, toKebabCase } from "../common/utils";
-import { Telemetry } from "../common/analytics/Telemetry";
-import { EventRegistry, Handler } from "./EventRegistry";
-import { getFigmaSelectionImageUrl, HttpStatusCode } from "../api";
-import { extractFigmaSelectionUrl } from "../../shared/model/Figma.model";
-import { Assistant } from "../assistant";
-import SuperflexAssistant from "../assistant/SuperflexAssistant";
-import { findWorkspaceFiles } from "../scanner";
-import { VerticalDiffManager } from "../diff/vertical/manager";
-import { myersDiff, createDiffStream } from "../diff/myers";
+  type Message,
+  type MessageContent,
+  type Thread,
+  extractFigmaSelectionUrl
+} from '../../shared/model'
+import {
+  type EventRequestPayload,
+  EventRequestType,
+  type EventResponseMessage,
+  type EventResponsePayload,
+  EventResponseType,
+  type FastApplyPayload,
+  type FilePayload,
+  newEventResponse
+} from '../../shared/protocol'
+import * as api from '../api'
+import { HttpStatusCode, getFigmaSelectionImageUrl } from '../api'
+import type { Assistant } from '../assistant'
+import SuperflexAssistant from '../assistant/SuperflexAssistant'
+import { Telemetry } from '../common/analytics/Telemetry'
+import { FIGMA_AUTH_PROVIDER_ID } from '../common/constants'
+import { enrichFilePayloads } from '../common/files'
+import {
+  decodeUriAndRemoveFilePrefix,
+  generateFileID,
+  getOpenWorkspace,
+  toKebabCase
+} from '../common/utils'
+import { createDiffStream, myersDiff } from '../diff/myers'
+import type { VerticalDiffManager } from '../diff/vertical/manager'
+import { findWorkspaceFiles } from '../scanner'
+import { EventRegistry, type Handler } from './EventRegistry'
 
 /**
  * ChatAPI class for interacting with the chat service.
  */
 export class ChatAPI {
-  private _assistant?: Assistant;
-  private _isReady = false;
-  private _ready = new vscode.EventEmitter<void>();
-  private _isInitialized = false;
-  private _initializedMutex = new Mutex();
-  private _chatEventRegistry = new EventRegistry();
-  private _isSyncProjectRunning = false;
-  private _thread?: Thread;
-  private _workspaceDirPath?: string;
-  private _isPremiumGeneration = true;
-  public verticalDiffManager: VerticalDiffManager;
+  private _assistant?: Assistant
+  private _isReady = false
+  private _ready = new vscode.EventEmitter<void>()
+  private _isInitialized = false
+  private _initializedMutex = new Mutex()
+  private _chatEventRegistry = new EventRegistry()
+  private _isSyncProjectRunning = false
+  private _thread?: Thread
+  private _workspaceDirPath?: string
+  private _isPremiumGeneration = true
+  public verticalDiffManager: VerticalDiffManager
 
   constructor(verticalDiffManager: VerticalDiffManager) {
-    this.verticalDiffManager = verticalDiffManager;
+    this.verticalDiffManager = verticalDiffManager
 
     this._chatEventRegistry
       /**
        * Event (ready): This event is fired when the webview is ready to receive events.
        */
-      .registerEvent(EventType.READY, () => {
-        this._ready.fire();
-        this._isReady = true;
-        Telemetry.capture("ready", {});
+      .registerEvent(EventRequestType.READY, () => {
+        this._ready.fire()
+        this._isReady = true
+        Telemetry.capture('ready', {})
       })
 
       /**
@@ -64,44 +74,61 @@ export class ChatAPI {
        * @returns A promise that resolves with the initialized state.
        * @throws An error if the project files cannot be synced.
        */
-      .registerEvent(EventType.INITIALIZED, async (_, sendEventMessageCb) => {
-        const release = await this._initializedMutex.acquire();
+      .registerEvent(
+        EventRequestType.INITIALIZED,
+        async (_, sendEventMessageCb) => {
+          const release = await this._initializedMutex.acquire()
 
-        try {
-          let isFigmaAuthenticated = false;
+          try {
+            let isFigmaAuthenticated = false
 
-          const openWorkspace = getOpenWorkspace();
-          if (!openWorkspace) {
-            Telemetry.capture("workspace_not_found", {});
-            return { isInitialized: false, isFigmaAuthenticated };
+            const openWorkspace = getOpenWorkspace()
+            if (!openWorkspace) {
+              Telemetry.capture('workspace_not_found', {})
+              return { isInitialized: false, isFigmaAuthenticated }
+            }
+
+            this._workspaceDirPath = decodeUriAndRemoveFilePrefix(
+              openWorkspace.uri.path
+            )
+            this._assistant = new SuperflexAssistant(
+              this._workspaceDirPath,
+              'local',
+              toKebabCase(openWorkspace.name)
+            )
+            await this.syncProjectFiles(sendEventMessageCb)
+
+            this._isInitialized = true
+
+            const session = await vscode.authentication.getSession(
+              FIGMA_AUTH_PROVIDER_ID,
+              []
+            )
+            if (session?.accessToken) {
+              isFigmaAuthenticated = true
+            }
+
+            Telemetry.capture('initialized', {})
+
+            const user = await api.getUserInfo()
+            sendEventMessageCb(
+              newEventResponse(EventResponseType.GET_USER_INFO, user)
+            )
+
+            const subscription = await api.getUserSubscription()
+            sendEventMessageCb(
+              newEventResponse(
+                EventResponseType.GET_USER_SUBSCRIPTION,
+                subscription
+              )
+            )
+
+            return { isInitialized: true, isFigmaAuthenticated }
+          } finally {
+            release()
           }
-
-          this._workspaceDirPath = decodeUriAndRemoveFilePrefix(openWorkspace.uri.path);
-          this._assistant = new SuperflexAssistant(this._workspaceDirPath, "local", toKebabCase(openWorkspace.name));
-          await this.syncProjectFiles(sendEventMessageCb);
-
-          this._isInitialized = true;
-
-          const session = await vscode.authentication.getSession(FIGMA_AUTH_PROVIDER_ID, []);
-          if (session && session.accessToken) {
-            isFigmaAuthenticated = true;
-          }
-
-          Telemetry.capture("initialized", {});
-
-          const user = await api.getUserInfo();
-          sendEventMessageCb(newEventResponse(EventType.GET_USER_INFO, user));
-
-          const subscription = await api.getUserSubscription();
-          sendEventMessageCb(newEventResponse(EventType.GET_USER_SUBSCRIPTION, subscription));
-
-          return { isInitialized: true, isFigmaAuthenticated };
-        } catch (err) {
-          throw err;
-        } finally {
-          release();
         }
-      })
+      )
 
       /**
        * Event (sync_project): This event is fired when the user clicks the "Sync Project" button in the webview.
@@ -112,18 +139,21 @@ export class ChatAPI {
        * @returns A promise that resolves when the project files are synced.
        * @throws An error if the project files cannot be synced.
        */
-      .registerEvent(EventType.SYNC_PROJECT, async (_, sendEventMessageCb) => {
-        // Prevent multiple sync project requests from running concurrently
-        if (!this._isInitialized || this._isSyncProjectRunning) {
-          return;
+      .registerEvent(
+        EventRequestType.SYNC_PROJECT,
+        async (_, sendEventMessageCb) => {
+          // Prevent multiple sync project requests from running concurrently
+          if (!this._isInitialized || this._isSyncProjectRunning) {
+            return
+          }
+
+          this._isSyncProjectRunning = true
+
+          await this.syncProjectFiles(sendEventMessageCb)
+
+          this._isSyncProjectRunning = false
         }
-
-        this._isSyncProjectRunning = true;
-
-        await this.syncProjectFiles(sendEventMessageCb);
-
-        this._isSyncProjectRunning = false;
-      })
+      )
 
       /**
        * Event (new_thread): This event is fired when the user clicks the "New Chat" button in the webview.
@@ -133,92 +163,208 @@ export class ChatAPI {
        * @returns A promise that resolves when the new chat thread is created.
        * @throws An error if the new chat thread cannot be created.
        */
-      .registerEvent(EventType.NEW_THREAD, async () => {
+      .registerEvent(
+        EventRequestType.NEW_THREAD,
+        async (_, sendEventMessageCb) => {
+          if (!this._isInitialized || !this._assistant) {
+            return false
+          }
+
+          this._thread = await this._assistant.createThread()
+
+          Telemetry.capture('new_thread', {
+            threadID: this._thread?.id ?? ''
+          })
+
+          this._assistant.getThreads().then(threads => {
+            sendEventMessageCb(
+              newEventResponse(EventResponseType.FETCH_THREADS, threads)
+            )
+          })
+
+          return this._thread
+        }
+      )
+
+      /**
+       * Event (fetch_threads): This event is fired when the webview needs to fetch all threads.
+       * It is used to fetch all threads from the assistant.
+       *
+       * @returns A promise that resolves with all threads.
+       * @throws An error if the threads cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_THREADS, async () => {
         if (!this._isInitialized || !this._assistant) {
-          return false;
+          return []
         }
 
-        this._thread = await this._assistant.createThread();
-
-        Telemetry.capture("new_thread", {
-          threadID: this._thread?.id ?? "",
-        });
-
-        return true;
+        return this._assistant.getThreads()
       })
 
       /**
-       * Event (figma_file_selected): This event is fired when the user selects a Figma file in the webview.
+       * Event (fetch_thread): This event is fired when the webview needs to fetch a specific thread.
+       * It is used to fetch a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID.
+       * @returns A promise that resolves with the thread.
+       * @throws An error if the thread cannot be fetched.
+       */
+      .registerEvent(
+        EventRequestType.FETCH_THREAD,
+        async (payload: { threadID: string }) => {
+          if (
+            !this._isInitialized ||
+            !this._assistant ||
+            !this._workspaceDirPath
+          ) {
+            return null
+          }
+
+          this._thread = await this._assistant.getThread(payload.threadID)
+
+          for (const message of this._thread.messages) {
+            if (!message.content.files) {
+              continue
+            }
+
+            message.content.files = enrichFilePayloads(
+              message.content.files,
+              this._workspaceDirPath
+            )
+          }
+
+          return this._thread
+        }
+      )
+
+      /**
+       * Event (create_figma_attachment): This event is fired when the user selects a Figma file in the webview.
        * It is used to extract the Figma selection URL get image url and send it back to the webview.
        *
-       * @param payload - Payload containing the Figma file selection URL.
-       * @param sendEventMessageCb - Callback function to send event messages to the webview.
-       * @returns A promise that resolves with the Figma file image URL.
-       * @throws An error if the Figma file selection URL is invalid.
+       * @param payload - Payload containing the Figma selection link.
+       * @returns A promise that resolves with the FigmaAttachment.
        */
-      .registerEvent(EventType.FIGMA_FILE_SELECTED, async (payload: FigmaFile, _) => {
+      .registerEvent(
+        EventRequestType.CREATE_FIGMA_ATTACHMENT,
+        async (payload: string, _) => {
+          if (!this._isInitialized) {
+            return
+          }
+
+          if (!payload) {
+            throw new Error('Figma selection link is required')
+          }
+
+          const figmaSelectionUrl = extractFigmaSelectionUrl(payload)
+          if (!figmaSelectionUrl) {
+            throw new Error('Invalid Figma selection link')
+          }
+
+          const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
+
+          return {
+            fileID: figmaSelectionUrl.fileID,
+            nodeID: figmaSelectionUrl.nodeID,
+            imageUrl
+          }
+        }
+      )
+
+      /**
+       * Event (stop_message): This event is fired when the user clicks the "Stop" button in the webview Chat.
+       * It is used to stop the message stream.
+       */
+      .registerEvent(EventRequestType.STOP_MESSAGE, async () => {
         if (!this._isInitialized || !this._assistant) {
-          return;
+          return
         }
 
-        const figma = extractFigmaSelectionUrl(payload.selectionLink);
-        if (!figma) {
-          throw new Error("Invalid figma link: Please provide a valid Figma selection url.");
-        }
-
-        const imageUrl = await getFigmaSelectionImageUrl(figma);
-        return { ...payload, imageUrl, isLoading: false } as FigmaFile;
+        this._assistant.stopMessage()
+        return true
       })
 
       /**
-       * Event (new_message): This event is fired when the user sends a message in the webview Chat.
+       * Event (send_message): This event is fired when the user sends a message in the webview Chat.
        * It is used to send a message to the AI code assistant, and return the assistant's message response.
        *
        * @param payload - Payload containing the messages to send.
        * @param sendEventMessageCb - Callback function to send event messages to the webview.
-       * @returns A promise that resolves with the assistant's message response.
-       * @throws An error if the message cannot be sent or processed.
        */
-      .registerEvent(EventType.NEW_MESSAGE, async (payload: SendMessagesRequestPayload, sendEventMessageCb) => {
-        if (!this._isInitialized || !this._assistant) {
-          return null;
+      .registerEvent(
+        EventRequestType.SEND_MESSAGE,
+        async (payload: MessageContent, sendEventMessageCb) => {
+          if (
+            !this._isInitialized ||
+            !this._assistant ||
+            !this._workspaceDirPath
+          ) {
+            return null
+          }
+
+          const timeNow = Date.now()
+
+          let thread = this._thread
+          if (!thread) {
+            thread = await this._assistant.createThread()
+            this._thread = thread
+          }
+
+          const { stream, response } = await this._assistant.sendMessage(
+            thread.id,
+            payload
+          )
+
+          for await (const delta of stream) {
+            switch (delta.type) {
+              case 'delta': {
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.MESSAGE_TEXT_DELTA,
+                    delta.textDelta
+                  )
+                )
+                break
+              }
+              case 'complete': {
+                if (delta.message?.content.files) {
+                  delta.message.content.files = enrichFilePayloads(
+                    delta.message.content.files,
+                    this._workspaceDirPath
+                  )
+                }
+
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.MESSAGE_COMPLETE,
+                    delta.message
+                  )
+                )
+                break
+              }
+            }
+          }
+
+          const { isPremium } = await response()
+
+          Telemetry.capture('new_message', {
+            threadID: thread.id,
+            numberOfSelectedFiles: (payload.files ?? []).length,
+            isFigmaFileAttached: payload.attachment?.figma !== undefined,
+            isImageFileAttached: payload.attachment?.image !== undefined,
+            processingDeltaTimeMs: Date.now() - timeNow
+          })
+
+          // Send subscription prompt if user is out of premium requests
+          if (!isPremium && this._isPremiumGeneration) {
+            sendEventMessageCb(
+              newEventResponse(EventResponseType.SHOW_SOFT_PAYWALL_MODAL)
+            )
+          }
+          this._isPremiumGeneration = isPremium
+
+          return true
         }
-
-        const { files, messages } = payload;
-        const timeNow = Date.now();
-        // Do not send empty messages
-        if (messages.length === 0) {
-          return null;
-        }
-
-        let thread = this._thread;
-        if (!thread) {
-          thread = await this._assistant.createThread();
-          this._thread = thread;
-        }
-
-        const threadRun = await this._assistant.sendMessage(thread.id, files, messages, (delta) => {
-          sendEventMessageCb(newEventResponse(EventType.MESSAGE_TEXT_DELTA, delta));
-        });
-        if (!threadRun) {
-          return null;
-        }
-
-        Telemetry.capture("new_message", {
-          threadID: thread.id,
-          customSelectedFiles: files.length,
-          assistantMessageID: threadRun.message.id,
-          processingDeltaTimeMs: Date.now() - timeNow,
-        });
-
-        // Send subscription prompt if user is out of premium requests
-        if (!threadRun.isPremium && this._isPremiumGeneration) {
-          sendEventMessageCb(newEventResponse(EventType.SHOW_SOFT_PAYWALL_MODAL));
-        }
-        this._isPremiumGeneration = threadRun.isPremium;
-
-        return threadRun.message;
-      })
+      )
 
       /**
        * Event (fast_apply): This event is used to apply the code to the file in the workspace.
@@ -228,57 +374,73 @@ export class ChatAPI {
        * @returns A promise that resolves when the code is applied.
        * @throws An error if the code cannot be applied.
        */
-      .registerEvent(EventType.FAST_APPLY, async (payload: FastApplyPayload) => {
-        if (!this._workspaceDirPath || !this._assistant) {
-          return false;
-        }
-
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-
-        if (fs.existsSync(resolvedPath)) {
-          Telemetry.capture("fast_apply_called", { createdFile: false });
-
-          const document = await vscode.workspace.openTextDocument(resolvedPath);
-          const originalCode = fs.readFileSync(resolvedPath, "utf8");
-
-          let modifiedCode = payload.edits;
-          if (originalCode !== "") {
-            modifiedCode = await this._assistant.fastApply(originalCode, payload.edits);
+      .registerEvent(
+        EventRequestType.FAST_APPLY,
+        async (payload: FastApplyPayload) => {
+          if (!this._workspaceDirPath || !this._assistant) {
+            return false
           }
 
+          const resolvedPath = path.resolve(
+            this._workspaceDirPath,
+            decodeUriAndRemoveFilePrefix(payload.filePath)
+          )
+
+          if (fs.existsSync(resolvedPath)) {
+            Telemetry.capture('fast_apply_called', { createdFile: false })
+
+            const document =
+              await vscode.workspace.openTextDocument(resolvedPath)
+            const originalCode = fs.readFileSync(resolvedPath, 'utf8')
+
+            let modifiedCode = payload.edits
+            if (originalCode !== '') {
+              modifiedCode = await this._assistant.fastApply(
+                originalCode,
+                payload.edits
+              )
+            }
+
+            // Create diff lines using Myers diff algorithm
+            const diffLines = myersDiff(originalCode, modifiedCode)
+
+            // Show the document
+            await vscode.window.showTextDocument(document)
+
+            // Stream the diffs
+            await this.verticalDiffManager.streamDiffLines(
+              createDiffStream(diffLines),
+              false
+            )
+            return true
+          }
+
+          Telemetry.capture('fast_apply_called', { createdFile: true })
+
+          // Handle new file creation
+          const directory = path.dirname(resolvedPath)
+          if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, { recursive: true })
+          }
+
+          fs.writeFileSync(resolvedPath, '', 'utf8')
+          const document = await vscode.workspace.openTextDocument(resolvedPath)
+
           // Create diff lines using Myers diff algorithm
-          const diffLines = myersDiff(originalCode, modifiedCode);
+          const diffLines = myersDiff('', payload.edits)
 
           // Show the document
-          await vscode.window.showTextDocument(document);
+          await vscode.window.showTextDocument(document)
 
           // Stream the diffs
-          await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), false);
-          return true;
+          await this.verticalDiffManager.streamDiffLines(
+            createDiffStream(diffLines),
+            true
+          )
+
+          return true
         }
-
-        Telemetry.capture("fast_apply_called", { createdFile: true });
-
-        // Handle new file creation
-        const directory = path.dirname(resolvedPath);
-        if (!fs.existsSync(directory)) {
-          fs.mkdirSync(directory, { recursive: true });
-        }
-
-        fs.writeFileSync(resolvedPath, "", "utf8");
-        const document = await vscode.workspace.openTextDocument(resolvedPath);
-
-        // Create diff lines using Myers diff algorithm
-        const diffLines = myersDiff("", payload.edits);
-
-        // Show the document
-        await vscode.window.showTextDocument(document);
-
-        // Stream the diffs
-        await this.verticalDiffManager.streamDiffLines(createDiffStream(diffLines), true);
-
-        return true;
-      })
+      )
 
       /**
        * Event (fast_apply_accept): This event is used to accept all changes in the streaming fast apply.
@@ -287,24 +449,33 @@ export class ChatAPI {
        * @returns A promise that resolves when the changes are accepted.
        * @throws An error if the changes cannot be accepted.
        */
-      .registerEvent(EventType.FAST_APPLY_ACCEPT, async (payload: { filePath: string }) => {
-        if (!this._workspaceDirPath) {
-          return false;
+      .registerEvent(
+        EventRequestType.FAST_APPLY_ACCEPT,
+        async (payload: { filePath: string }) => {
+          if (!this._workspaceDirPath) {
+            return false
+          }
+
+          const resolvedPath = path.resolve(
+            this._workspaceDirPath,
+            decodeUriAndRemoveFilePrefix(payload.filePath)
+          )
+          if (!fs.existsSync(resolvedPath)) {
+            return false
+          }
+
+          // Show the document first
+          const document = await vscode.workspace.openTextDocument(resolvedPath)
+          await vscode.window.showTextDocument(document)
+
+          // Accept all changes in the current diff
+          await this.verticalDiffManager.acceptRejectAllChanges(
+            true,
+            document.uri.toString()
+          )
+          return true
         }
-
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-        if (!fs.existsSync(resolvedPath)) {
-          return false;
-        }
-
-        // Show the document first
-        const document = await vscode.workspace.openTextDocument(resolvedPath);
-        await vscode.window.showTextDocument(document);
-
-        // Accept all changes in the current diff
-        await this.verticalDiffManager.acceptRejectAllChanges(true, document.uri.toString());
-        return true;
-      })
+      )
 
       /**
        * Event (fast_apply_reject): This event is used to reject all changes in the streaming fast apply.
@@ -313,31 +484,42 @@ export class ChatAPI {
        * @returns A promise that resolves when the changes are rejected.
        * @throws An error if the changes cannot be rejected.
        */
-      .registerEvent(EventType.FAST_APPLY_REJECT, async (payload: { filePath: string }) => {
-        if (!this._workspaceDirPath) {
-          return false;
+      .registerEvent(
+        EventRequestType.FAST_APPLY_REJECT,
+        async (payload: { filePath: string }) => {
+          if (!this._workspaceDirPath) {
+            return false
+          }
+
+          const resolvedPath = path.resolve(
+            this._workspaceDirPath,
+            decodeUriAndRemoveFilePrefix(payload.filePath)
+          )
+          if (!fs.existsSync(resolvedPath)) {
+            return false
+          }
+
+          // Show the document first
+          const document = await vscode.workspace.openTextDocument(resolvedPath)
+          await vscode.window.showTextDocument(document)
+
+          // Reject all changes in the current diff
+          await this.verticalDiffManager.acceptRejectAllChanges(
+            false,
+            document.uri.toString()
+          )
+
+          const fileContent = fs.readFileSync(resolvedPath, 'utf8')
+          if (fileContent.trim() === '') {
+            await vscode.commands.executeCommand(
+              'workbench.action.closeActiveEditor'
+            )
+            fs.unlinkSync(resolvedPath)
+          }
+
+          return true
         }
-
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-        if (!fs.existsSync(resolvedPath)) {
-          return false;
-        }
-
-        // Show the document first
-        const document = await vscode.workspace.openTextDocument(resolvedPath);
-        await vscode.window.showTextDocument(document);
-
-        // Reject all changes in the current diff
-        await this.verticalDiffManager.acceptRejectAllChanges(false, document.uri.toString());
-
-        const fileContent = fs.readFileSync(resolvedPath, "utf8");
-        if (fileContent.trim() === "") {
-          await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-          fs.unlinkSync(resolvedPath);
-        }
-
-        return true;
-      })
+      )
 
       /**
        * Event (open_file): This event is fired when the user clicks on a file in the webview.
@@ -345,19 +527,25 @@ export class ChatAPI {
        *
        * @param payload - Payload containing the relative file path.
        */
-      .registerEvent(EventType.OPEN_FILE, async (payload: { filePath: string }) => {
-        if (!this._workspaceDirPath) {
-          return;
-        }
+      .registerEvent(
+        EventRequestType.OPEN_FILE,
+        async (payload: { filePath: string }) => {
+          if (!this._workspaceDirPath) {
+            return
+          }
 
-        const resolvedPath = path.resolve(this._workspaceDirPath, decodeUriAndRemoveFilePrefix(payload.filePath));
-        if (!fs.existsSync(resolvedPath)) {
-          return;
-        }
+          const resolvedPath = path.resolve(
+            this._workspaceDirPath,
+            decodeUriAndRemoveFilePrefix(payload.filePath)
+          )
+          if (!fs.existsSync(resolvedPath)) {
+            return
+          }
 
-        const document = await vscode.workspace.openTextDocument(resolvedPath);
-        await vscode.window.showTextDocument(document);
-      })
+          const document = await vscode.workspace.openTextDocument(resolvedPath)
+          await vscode.window.showTextDocument(document)
+        }
+      )
 
       /**
        * Event (fetch_files): This event is fired when the webview needs to fetch the project files.
@@ -366,28 +554,31 @@ export class ChatAPI {
        * @returns A promise that resolves with the project files.
        * @throws An error if the project files cannot be fetched.
        */
-      .registerEvent(EventType.FETCH_FILES, async () => {
+      .registerEvent(EventRequestType.FETCH_FILES, async () => {
         if (!this._workspaceDirPath) {
-          return [];
+          return []
         }
 
-        const workspaceDirPath = this._workspaceDirPath;
-        const documentPaths: string[] = await findWorkspaceFiles(workspaceDirPath, ["**/*"]);
+        const workspaceDirPath = this._workspaceDirPath
+        const documentPaths: string[] = await findWorkspaceFiles(
+          workspaceDirPath,
+          ['**/*']
+        )
         return documentPaths
           .sort((a, b) => {
-            const statA = fs.statSync(a);
-            const statB = fs.statSync(b);
-            return statB.mtime.getTime() - statA.mtime.getTime();
+            const statA = fs.statSync(a)
+            const statB = fs.statSync(b)
+            return statB.mtime.getTime() - statA.mtime.getTime()
           })
-          .map((docPath) => {
-            const relativePath = path.relative(workspaceDirPath, docPath);
+          .map(docPath => {
+            const relativePath = path.relative(workspaceDirPath, docPath)
             return {
               id: generateFileID(relativePath),
               name: path.basename(docPath),
               path: docPath,
-              relativePath,
-            } as FilePayload;
-          });
+              relativePath
+            } as FilePayload
+          })
       })
 
       /**
@@ -398,13 +589,56 @@ export class ChatAPI {
        * @returns A promise that resolves with the file content.
        * @throws An error if the file content cannot be fetched.
        */
-      .registerEvent(EventType.FETCH_FILE_CONTENT, (payload: FilePayload) => {
-        if (!this._isInitialized || !this._workspaceDirPath) {
-          return "";
-        }
+      .registerEvent(
+        EventRequestType.FETCH_FILE_CONTENT,
+        (payload: FilePayload) => {
+          if (
+            !this._isInitialized ||
+            !this._workspaceDirPath ||
+            !payload.path ||
+            !fs.existsSync(payload.path)
+          ) {
+            return null
+          }
 
-        return fs.readFileSync(payload.path, "utf8");
-      })
+          return fs.readFileSync(payload.path, 'utf8')
+        }
+      )
+
+      /**
+       * Event (fetch_current_open_file): This event is fired when the webview needs to fetch the current open file.
+       * It is used to fetch the current open file from the extension.
+       *
+       * @returns A promise that resolves with the current open file.
+       * @throws An error if the current open file cannot be fetched.
+       */
+      .registerEvent(
+        EventRequestType.FETCH_CURRENT_OPEN_FILE,
+        (_, sendEventMessageCb) => {
+          const editor = vscode.window.activeTextEditor
+          if (!editor) {
+            return null
+          }
+
+          const newCurrentOpenFile = decodeUriAndRemoveFilePrefix(
+            editor.document.uri.path
+          )
+          const relativePath = path.relative(
+            this._workspaceDirPath ?? '',
+            newCurrentOpenFile
+          )
+
+          sendEventMessageCb(
+            newEventResponse(EventResponseType.SET_CURRENT_OPEN_FILE, {
+              id: generateFileID(relativePath),
+              name: path.basename(newCurrentOpenFile),
+              path: newCurrentOpenFile,
+              relativePath,
+              isCurrentOpenFile: true
+            } as FilePayload)
+          )
+        }
+      )
 
       /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
@@ -414,35 +648,30 @@ export class ChatAPI {
        * @returns A promise that resolves when the message is updated.
        * @throws An error if the message cannot be updated.
        */
-      .registerEvent(EventType.UPDATE_MESSAGE, async (payload: Message) => {
-        if (!this._isInitialized || !this._assistant) {
-          return;
-        }
+      .registerEvent(
+        EventRequestType.UPDATE_MESSAGE,
+        async (payload: Message) => {
+          if (!this._isInitialized || !this._assistant) {
+            return
+          }
 
-        await this._assistant.updateMessage(payload);
-      })
+          await this._assistant.updateMessage(payload)
+        }
+      )
 
       /**
        * Event (get_user_info): This event is fired when webview requests user info.
        */
-      .registerEvent(EventType.GET_USER_INFO, async () => {
-        if (!this._isInitialized) {
-          return;
-        }
-
-        return await api.getUserInfo();
+      .registerEvent(EventRequestType.GET_USER_INFO, async () => {
+        return api.getUserInfo()
       })
 
       /**
        * Event (get_user_subscription): This event is fired when webview requests user subscription info.
        */
-      .registerEvent(EventType.GET_USER_SUBSCRIPTION, async () => {
-        if (!this._isInitialized) {
-          return;
-        }
-
-        return await api.getUserSubscription();
-      });
+      .registerEvent(EventRequestType.GET_USER_SUBSCRIPTION, async () => {
+        return api.getUserSubscription()
+      })
   }
 
   /**
@@ -450,12 +679,12 @@ export class ChatAPI {
    */
   onReady(): Promise<void> {
     if (this._isReady) {
-      return Promise.resolve();
+      return Promise.resolve()
     }
 
-    return new Promise((resolve) => {
-      this._ready.event(resolve);
-    });
+    return new Promise(resolve => {
+      this._ready.event(resolve)
+    })
   }
 
   /**
@@ -464,11 +693,11 @@ export class ChatAPI {
    * @param command - The command for which to register the event handler.
    * @param handler - The event handler to register.
    */
-  registerEvent<T extends EventType>(
+  registerEvent<T extends EventRequestType, R extends EventResponseType>(
     command: T,
-    handler: Handler<EventPayloads[T]["request"], EventPayloads[T]["response"]>
+    handler: Handler<T, R>
   ): void {
-    this._chatEventRegistry.registerEvent(command, handler);
+    this._chatEventRegistry.registerEvent(command, handler)
   }
 
   /**
@@ -479,12 +708,16 @@ export class ChatAPI {
    * @param sendEventMessageCb - A callback to send event messages to webview.
    * @return A promise that resolves to the result of the event handler.
    */
-  async handleEvent<T extends EventType>(
+  async handleEvent<T extends EventRequestType, R extends EventResponseType>(
     event: T,
-    requestPayload: EventPayloads[T]["request"],
-    sendEventMessageCb: (msg: EventMessage) => void
-  ): Promise<EventPayloads[T]["response"]> {
-    return this._chatEventRegistry.handleEvent(event, requestPayload, sendEventMessageCb);
+    requestPayload: EventRequestPayload[T],
+    sendEventMessageCb: (msg: EventResponseMessage<R>) => void
+  ): Promise<EventResponsePayload[R]> {
+    return this._chatEventRegistry.handleEvent(
+      event,
+      requestPayload,
+      sendEventMessageCb
+    )
   }
 
   /**
@@ -493,23 +726,36 @@ export class ChatAPI {
    * @param sendEventMessageCb - A callback to send event messages to webview.
    * @return A promise that resolves when the synchronization is complete.
    */
-  private async syncProjectFiles(sendEventMessageCb: (msg: EventMessage) => void): Promise<void> {
+  private async syncProjectFiles(
+    sendEventMessageCb: (msg: EventResponseMessage<EventResponseType>) => void
+  ): Promise<void> {
     if (!this._assistant) {
-      return;
+      return
     }
 
     try {
       await this._assistant.syncFiles((progress, isFirstTimeSync) => {
-        sendEventMessageCb(newEventResponse(EventType.SYNC_PROJECT_PROGRESS, { progress, isFirstTimeSync }));
-      });
+        sendEventMessageCb(
+          newEventResponse(EventResponseType.SYNC_PROJECT_PROGRESS, {
+            progress,
+            isFirstTimeSync
+          })
+        )
+      })
     } catch (err: any) {
       if (err?.statusCode === HttpStatusCode.UNAUTHORIZED) {
-        throw err;
+        throw err
       }
-      if (err?.message && err.message.startsWith("No supported files found in the workspace")) {
-        vscode.window.showWarningMessage(err.message);
+      if (
+        err?.message?.startsWith('No supported files found in the workspace')
+      ) {
+        vscode.window.showWarningMessage(err.message)
       }
-      console.error(err);
+      console.error(err)
     }
+  }
+
+  setInitialized(initialized: boolean): void {
+    this._isInitialized = initialized
   }
 }

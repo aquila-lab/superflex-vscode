@@ -1,21 +1,20 @@
-import React from 'react';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
+import * as PopoverPrimitive from '@radix-ui/react-popover'
+import React from 'react'
 
-import { cn } from '../../common/utils';
+import { cn } from '../../common/utils'
 
-const Popover = PopoverPrimitive.Root;
+const Popover = PopoverPrimitive.Root
 
-const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverTrigger = PopoverPrimitive.Trigger
 
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
 >(({ className, align = 'start', sideOffset = 5, ...props }, ref) => {
-  const portalRef = React.useRef<HTMLDivElement>(null);
+  const portalRef = React.useRef<HTMLDivElement>(null)
   return (
     <>
-      {/* Use a portal that's in the same DOM tree to make focus handling easier. */}
-      <div ref={portalRef} className="empty:hidden" />
+      <div ref={portalRef} className='empty:hidden' />
       {portalRef.current && (
         <PopoverPrimitive.Portal container={portalRef.current}>
           <PopoverPrimitive.Content
@@ -31,9 +30,9 @@ const PopoverContent = React.forwardRef<
         </PopoverPrimitive.Portal>
       )}
     </>
-  );
-});
+  )
+})
 
-PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+PopoverContent.displayName = PopoverPrimitive.Content.displayName
 
-export { Popover, PopoverTrigger, PopoverContent };
+export { Popover, PopoverTrigger, PopoverContent }
