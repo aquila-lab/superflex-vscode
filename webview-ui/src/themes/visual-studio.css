@@ -1,0 +1,185 @@
+html[data-ide="VisualStudio"] {
+  --vscode-badge-background: var(--visualstudio-smarttaghoverfill);
+  --vscode-badge-foreground: var(--visualstudio-smarttaghovertext);
+  --vscode-button-border: var(
+    --visualstudio-filetabbuttonhoverselectedactiveborder
+  );
+  --vscode-button-background: var(--visualstudio-filetabbackground);
+  --vscode-button-hoverBackground: var(--visualstudio-filetabselectedbackground);
+  --vscode-button-foreground: var(--visualstudio-filetabparenttext);
+  --vscode-button-secondaryHoverBackground: var(
+    --visualstudio-filetabprovisionalhover
+  );
+  --vscode-button-secondaryBackground: var(--visualstudio-filetabbackground);
+  --vscode-button-secondaryForeground: var(--visualstudio-filetabinactivetext);
+  --vscode-button-separator: var(--visualstudio-filetabprimaryseparator);
+  --vscode-charts-blue: var(--visualstudio-vizsurfacesoftbluedark);
+  --vscode-charts-green: var(--visualstudio-vizsurfacegreendark);
+  --vscode-charts-lines: var(--visualstudio-snaplines);
+  --vscode-charts-orange: var(--visualstudio-vizsurfacebrowndark);
+  --vscode-charts-purple: var(--visualstudio-vizsurfaceplumdark);
+  --vscode-charts-red: var(--visualstudio-vizsurfacereddark);
+  --vscode-charts-yellow: var(--visualstudio-vizsurfacegoldlight);
+  --vscode-chat-slashCommandBackground: var(--visualstudio-editorexpansionlink);
+  --vscode-chat-slashCommandForeground: var(--visualstudio-editorexpansiontext);
+  --vscode-commentsView-resolvedIcon: var(--visualstudio-commentresolvedicon);
+  --vscode-dropdown-background: var(--visualstudio-dropdownbackground);
+  --vscode-dropdown-border: var(--visualstudio-dropdownborder);
+  --vscode-dropdown-foreground: var(--visualstudio-dropdowntext);
+  --vscode-dropdown-listBackground: var(
+    --visualstudio-dropdownmouseoverbackgroundend
+  );
+  --vscode-editor-background: var(--visualstudio-editorexpansionfill);
+  --vscode-editor-foreground: var(--visualstudio-toolwindowtext);
+  --vscode-editorGutter-addedBackground: var(
+    --visualstudio-editorgutteraddedbackground
+  );
+  --vscode-editorPane-background: var(--visualstudio-editorexpansionfill);
+  --vscode-errorForeground: var(--visualstudio-toolwindowvalidationerrortext);
+  --vscode-focusBorder: var(--visualstudio-comboboxborder);
+  --vscode-foreground: var(--visualstudio-toolwindowtext);
+  --vscode-icon-foreground: var(--visualstudio-comboboxtext);
+  --vscode-input-background: var(--visualstudio-comboboxbackground);
+  --vscode-input-border: var(--visualstudio-comboboxborder);
+  --vscode-input-foreground: var(--visualstudio-comboboxtext);
+  --vscode-input-placeholderForeground: var(
+    --visualstudio-comboboxitemtextinactive
+  );
+  --vscode-inputOption-activeBackground: var(
+    --visualstudio-startpagebuttonunpinned
+  );
+  --vscode-inputOption-activeBorder: var(--visualstudio-startpagebuttonborder);
+  --vscode-inputOption-activeForeground: var(--visualstudio-startpagebuttontext);
+  --vscode-inputValidation-errorBackground: var(
+    --visualstudio-statusbardebugging
+  );
+  --vscode-inputValidation-errorBorder: var(--visualstudio-statusbardebugging);
+  --vscode-inputValidation-infoBackground: var(--visualstudio-statusbarbuilding);
+  --vscode-inputValidation-infoBorder: var(--visualstudio-statusbarbuilding);
+  --vscode-keybindingLabel-background: var(--visualstudio-helpsearchbackground);
+  --vscode-keybindingLabel-border: var(--visualstudio-helpsearchborder);
+  --vscode-keybindingLabel-bottomBorder: var(
+    --visualstudio-helpsearchfilterborder
+  );
+  --vscode-keybindingLabel-foreground: var(--visualstudio-helpsearchtext);
+  --vscode-list-invalidItemForeground: var(
+    --visualstudio-toolwindowvalidationerrortext
+  );
+  --vscode-list-inactiveSelectionBackground: var(--visualstudio-sortbackground);
+  --vscode-list-activeSelectionForeground: var(--visualstudio-filetabparenttext);
+  --vscode-list-activeSelectionBackground: var(--visualstudio-filetabbackground);
+  --vscode-quickInput-background: var(--visualstudio-filetabbackground);
+  --vscode-quickInput-foreground: var(--visualstudio-comboboxtext);
+  --vscode-quickInputTitle-background: var(
+    --visualstudio---visualstudio-filetabselectedbackground
+  );
+  --vscode-scm-historyItemStatisticsBorder: var(
+    --visualstudio-scrollbararrowglyph
+  );
+  --vscode-scrollbar-shadow: var(--visualstudio-scrollbarthumbglyph);
+  --vscode-scrollbarSlider-activeBackground: var(
+    --visualstudio-scrollbarthumbpressedbackground
+  );
+  --vscode-scrollbarSlider-background: var(--visualstudio-scrollbarbackground);
+  --vscode-scrollbarSlider-hoverBackground: var(
+    --visualstudio-scrollbarthumbmouseoverbackground
+  );
+  --vscode-selection-background: var(--visualstudio-ComboBoxSelection);
+  --vscode-settings-dropdownBackground: var(--visualstudio-dropdownbackground);
+  --vscode-settings-dropdownBorder: var(--visualstudio-dropdownborder);
+  --vscode-settings-dropdownForeground: var(--visualstudio-dropdowntext);
+  --vscode-settings-dropdownListBorder: var(
+    --visualstudio-dropdownmouseoverbackground
+  );
+  --vscode-sideBar-background: var(--visualstudio-toolwindowbackground);
+  --vscode-sideBar-foreground: var(--visualstudio-toolwindowtext);
+  --vscode-sideBar-border: var(--visualstudio-toolwindowborder);
+  --vscode-sideBarStickyScroll-background: var(
+    --visualstudio-dropdownbackground
+  );
+  --vscode-sideBarTitle-background: var(--visualstudio-dropdownbackground);
+  --vscode-sideBarTitle-foreground: var(
+    --visualstudio-toolwindowtabselectedactivetext
+  );
+  --vscode-tab-activeBackground: var(
+    --visualstudio-filetabactivegrouptitlebackground
+  );
+  --vscode-tab-activeForeground: var(--visualstudio-filetabhottext);
+  --vscode-tab-border: var(--visualstudio-filetabborder);
+  --vscode-tab-dragAndDropBorder: var(
+    --visualstudio-filetabbuttonprovisionalhoverinactiveborder
+  );
+  --vscode-tab-inactiveForeground: var(--visualstudio-filetabinactivetext);
+  --vscode-tab-inactiveModifiedBorder: var(
+    --visualstudio-filetabbuttonhoverinactiveborder
+  );
+  --vscode-tab-lastPinnedBorder: var(
+    --visualstudio-filetabbuttonhoverselectedactiveborder
+  );
+  --vscode-tab-unfocusedActiveBackground: var(
+    --visualstudio-filetabprovisionalhover
+  );
+  --vscode-tab-unfocusedActiveForeground: var(
+    --visualstudio-filetabprovisionalhoverforeground
+  );
+  --vscode-tab-unfocusedActiveModifiedBorder: var(
+    --visualstudio-FileTabProvisionalHoverBorder
+  );
+  --vscode-tab-unfocusedInactiveForeground: var(
+    --visualstudio-filetabprovisionalinactiveforeground
+  );
+  --vscode-tab-unfocusedInactiveModifiedBorder: var(
+    --visualstudio-filetabprovisionalselectedactiveborder
+  );
+  --vscode-textCodeBlock-background: var(--visualstudio-editorexpansionfill);
+  --vscode-textLink-activeForeground: var(--visualstudio-editorexpansionlink);
+  --vscode-textLink-foreground: var(--visualstudio-editorexpansionlink);
+  --vscode-titleBar-activeBackground: var(--visualstudio-paneltitlebar);
+  --vscode-titleBar-activeForeground: var(--visualstudio-paneltitlebartext);
+  --vscode-window-activeBorder: var(--visualstudio-titlebaractiveborder);
+  --vscode-window-inactiveBorder: var(--visualstudio-titlebarinactive);
+  --button-icon-background: var(--visualstudio-filetabbackground);
+  --foreground: var(--visualstudio-toolwindowtext);
+  --visualstudio-font-weight: normal;
+  --vscode-font-family: var(--visualstudio-ui-font-family);
+  --vscode-font-size: var(--visualstudio-ui-font-size);
+  --vscode-font-weight: var(--visualstudio-font-weight);
+  --vscode-editor-font-family: var(--visualstudio-editor-font-family);
+  --vscode-editor-font-size: var(--visualstudio-editor-font-size);
+  --vscode-editor-font-weight: var(--visualstudio-font-weight);
+  --vscode-widget-shadow: var(--visualstudio-buttonshadow);
+  scrollbar-color: var(--vscode-scrollbarSlider-background)
+    var(--vscode-editor-background);
+}
+
+html[data-ide="VisualStudio"] body {
+  overscroll-behavior-x: none;
+  background-color: var(--vscode-sideBar-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-weight: var(--vscode-font-weight);
+  font-size: var(--vscode-font-size);
+  margin: 0 auto;
+  padding: 0;
+}
+
+html[data-ide="VisualStudio"] :matches(img, video) {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+html[data-ide="VisualStudio"] code {
+  font-family: var(--vscode-editor-font-family);
+  font-size: var(--vscode-editor-font-size);
+  color: var(--vscode-textPreformat-foreground);
+  background-color: var(--vscode-textPreformat-background);
+}
+
+html[data-ide="VisualStudio"] pre code {
+  padding: 0;
+}
+
+html[data-ide="VisualStudio"] blockquote {
+  background: var(--vscode-textBlockQuote-background);
+  border-color: var(--vscode-textBlockQuote-border);
+}
