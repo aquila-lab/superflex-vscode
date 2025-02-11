@@ -283,6 +283,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     )
   }
 
+  signout(): void {
+    this.chatApi.setInitialized(false)
+  }
+
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     const localWebviewView = webviewView
     this._chatWebviewView = localWebviewView

@@ -20,7 +20,7 @@ export const FigmaButton = () => {
 
   const handleButtonClicked = useCallback(() => {
     if (subscription?.plan?.name.toLowerCase().includes('free')) {
-      setIsOpen(false)
+      setIsOpen(true)
       return
     }
 

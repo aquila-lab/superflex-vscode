@@ -754,4 +754,8 @@ export class ChatAPI {
       console.error(err)
     }
   }
+
+  setInitialized(initialized: boolean): void {
+    this._isInitialized = initialized
+  }
 }

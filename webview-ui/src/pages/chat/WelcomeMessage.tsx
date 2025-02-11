@@ -4,7 +4,7 @@ export const WelcomeMessage = () => {
       <img
         src={window.superflexLogoUri}
         alt='Superflex Logo'
-        className='size-12 rounded-full mb-4'
+        className='size-12 mb-4'
       />
       <h1 className='text-2xl font-semibold'>Code with Superflex</h1>
       <p className='text-muted-foreground'>

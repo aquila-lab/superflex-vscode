@@ -76,6 +76,8 @@ export default class SuperflexAuthenticationService {
     this._webviewProvider.sendEventMessage(
       newEventResponse(EventResponseType.SHOW_LOGIN_VIEW)
     )
+    this._webviewProvider.signout()
+
     vscode.commands.executeCommand(
       'setContext',
       'superflex.chat.authenticated',
