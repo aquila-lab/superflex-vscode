@@ -1,9 +1,9 @@
 import {
+  DialogTitle,
   Dialog,
   DialogContent,
-  DialogTitle,
   DialogDescription
-} from '@radix-ui/react-dialog'
+} from '../../components/ui/Dialog'
 import { Button } from '../../components/ui/Button'
 import { DialogHeader, DialogFooter } from '../../components/ui/Dialog'
 import { useCallback, useState } from 'react'
