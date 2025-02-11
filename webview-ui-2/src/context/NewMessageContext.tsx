@@ -28,7 +28,8 @@ const NewMessageContext = createContext<{
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
-  const { messages, addMessages, removeMessagesFrom } = useMessages()
+  const { messages, addMessages, removeMessagesFrom, setIdToLastUserMessage } =
+    useMessages()
 
   const [message, setMessage] = useState<Message | null>(null)
   const [streamTextDelta, setStreamTextDelta] = useState('')
@@ -95,12 +96,17 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         return
       }
 
+      if (payload.role === Role.User) {
+        setIdToLastUserMessage(payload.id)
+        return
+      }
+
       addMessages([payload])
 
       setMessage(null)
       setStreamTextDelta('')
     },
-    [addMessages]
+    [addMessages, setIdToLastUserMessage]
   )
 
   const handleSendMessageContentResponse = useCallback((payload: boolean) => {
@@ -145,6 +151,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     ],
     handleMessage
   )
+
   const sendMessageContent = useCallback(
     (content: MessageContent): void => {
       if (!(content.text || content.attachment)) {
@@ -169,9 +176,23 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       setIsMessageProcessing(true)
       addMessages([userMessage])
 
+      if (content.fromMessageID) {
+        const fromMessageID = content.fromMessageID
+        queueMicrotask(() => {
+          setIdToLastUserMessage(fromMessageID)
+        })
+      }
+
       postMessage(EventRequestType.SEND_MESSAGE, content)
     },
-    [postMessage, messages, addMessages, removeMessagesFrom, stopStreaming]
+    [
+      postMessage,
+      messages,
+      addMessages,
+      removeMessagesFrom,
+      stopStreaming,
+      setIdToLastUserMessage
+    ]
   )
 
   const value = useMemo(

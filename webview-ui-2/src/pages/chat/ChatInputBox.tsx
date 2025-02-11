@@ -2,12 +2,13 @@ import { useEffect } from 'react'
 import type { MessageContent } from '../../../../shared/model'
 import { AttachmentProvider } from '../../context/AttachmentContext'
 import { useEditMode } from '../../context/EditModeContext'
-import { InputProvider, useInput } from '../../context/InputContext'
+import { InputProvider } from '../../context/InputContext'
 import { useUser } from '../../context/UserContext'
 import { ChatAttachment } from './ChatAttachment'
 import { InputSection } from './InputSection'
 import { UserMessageHeader } from './UserMessageHeader'
 import { useOverlay } from '../../context/OverlayContext'
+import { FigmaSelectionModal } from './FigmaSelectionModal'
 
 export const ChatInputBox = ({
   content,
@@ -35,6 +36,7 @@ export const ChatInputBox = ({
           <ChatAttachment />
           <InputProvider text={content?.text}>
             <InputSection content={content} />
+            <FigmaSelectionModal />
           </InputProvider>
         </>
       ) : (
@@ -45,6 +47,7 @@ export const ChatInputBox = ({
             isDraft={isDraft}
           />
           <InputSection content={content} />
+          <FigmaSelectionModal />
         </InputProvider>
       )}
     </AttachmentProvider>

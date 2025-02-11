@@ -16,6 +16,7 @@ const MessagesContext = createContext<{
   updateUserMessage: (messageId: string, text: string) => void
   getMessage: (messageId: string) => Message | undefined
   removeMessagesFrom: (messageId: string) => void
+  setIdToLastUserMessage: (messageId: string) => void
 } | null>(null)
 
 interface MessagesProviderProps {
@@ -78,15 +79,35 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     )
   }, [])
 
+  const setIdToLastUserMessage = useCallback((messageId: string) => {
+    setMessages(prev => {
+      const lastUserMessage = prev.findLast(
+        message => message.role === Role.User
+      )
+      if (lastUserMessage) {
+        lastUserMessage.id = messageId
+      }
+      return prev
+    })
+  }, [])
+
   const value = useMemo(
     () => ({
       messages,
       addMessages,
       updateUserMessage,
       getMessage,
-      removeMessagesFrom
+      removeMessagesFrom,
+      setIdToLastUserMessage
     }),
-    [messages, addMessages, updateUserMessage, getMessage, removeMessagesFrom]
+    [
+      messages,
+      addMessages,
+      updateUserMessage,
+      getMessage,
+      removeMessagesFrom,
+      setIdToLastUserMessage
+    ]
   )
 
   return (

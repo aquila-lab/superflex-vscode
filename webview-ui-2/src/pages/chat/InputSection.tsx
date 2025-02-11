@@ -8,7 +8,6 @@ import { ChatInputBoxContainer } from './ChatInputBoxContainer'
 import { FilePreview } from './FilePreview'
 import { ChatTextarea } from './ChatTextarea'
 import { ChatTopToolbar } from './ChatTopToolbar'
-import { FigmaSelectionModal } from './FigmaSelectionModal'
 import { SendMessageProvider } from '../../context/SendMessageContext'
 
 export const InputSection = ({
@@ -19,21 +18,17 @@ export const InputSection = ({
   const { isMainTextbox } = useEditMode()
 
   return (
-    <>
-      <ChatInputBoxContainer>
-        <FilesProvider files={content?.files}>
-          <AddSelectedCode />
-          <FilePreview />
-          <ChatTopToolbar />
-          <SendMessageProvider>
-            <ChatTextarea />
-            <ChatBottomToolbar />
-          </SendMessageProvider>
-          {!isMainTextbox && <ChatAttachment />}
-        </FilesProvider>
-      </ChatInputBoxContainer>
-
-      <FigmaSelectionModal />
-    </>
+    <ChatInputBoxContainer>
+      <FilesProvider files={content?.files}>
+        <AddSelectedCode />
+        <FilePreview />
+        <ChatTopToolbar />
+        <SendMessageProvider>
+          <ChatTextarea />
+          <ChatBottomToolbar />
+        </SendMessageProvider>
+        {!isMainTextbox && <ChatAttachment />}
+      </FilesProvider>
+    </ChatInputBoxContainer>
   )
 }

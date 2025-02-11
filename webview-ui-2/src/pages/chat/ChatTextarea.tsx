@@ -24,28 +24,41 @@ export const ChatTextarea = () => {
   const postMessage = usePostMessage()
   const { input, inputRef, setInput, focusInput } = useInput()
   const { selectFile, setPreviewedFile } = useFiles()
-  const { isEditMode } = useEditMode()
+  const { isEditMode, isMainTextbox } = useEditMode()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { figmaAttachment, isFigmaLoading } = useAttachment()
+  const { figmaAttachment, imageAttachment, isFigmaLoading } = useAttachment()
   const { sendMessage } = useSendMessage()
   const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
   const isAwaiting = useRef(false)
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
-      if (
-        !isDisabled &&
-        (input.length || figmaAttachment) &&
-        e.key === 'Enter' &&
-        !e.shiftKey
-      ) {
+      const hasContent = input.length || figmaAttachment || imageAttachment
+      const isEnterPressed = e.key === 'Enter' && !e.shiftKey
+
+      if (!isEnterPressed) {
+        return
+      }
+
+      const canSubmit = isMainTextbox
+        ? !isDisabled && hasContent
+        : !isFigmaLoading && hasContent
+
+      if (canSubmit) {
         e.preventDefault()
         sendMessage()
       }
     },
-    [isDisabled, sendMessage, figmaAttachment, input.length]
+    [
+      isMainTextbox,
+      isDisabled,
+      sendMessage,
+      figmaAttachment,
+      imageAttachment,
+      input.length,
+      isFigmaLoading
+    ]
   )
-
   const handleFocusChat = useCallback(() => {
     focusInput()
   }, [focusInput])

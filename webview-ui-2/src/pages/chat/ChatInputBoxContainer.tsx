@@ -7,7 +7,6 @@ import {
 import { useEditMode } from '../../context/EditModeContext'
 import { useInput } from '../../context/InputContext'
 import { useMessages } from '../../context/MessagesContext'
-import { useOverlay } from '../../context/OverlayContext'
 import { useNewMessage } from '../../context/NewMessageContext'
 
 export const ChatInputBoxContainer = ({

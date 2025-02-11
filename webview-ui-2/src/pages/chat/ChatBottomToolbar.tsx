@@ -12,10 +12,10 @@ import { useSendMessage } from '../../context/SendMessageContext'
 
 export const ChatBottomToolbar = () => {
   const { input } = useInput()
-  const { isEditMode } = useEditMode()
+  const { isEditMode, isMainTextbox } = useEditMode()
   const { isMessageProcessing, isMessageStreaming, stopStreaming } =
     useNewMessage()
-  const { figmaAttachment, isFigmaLoading } = useAttachment()
+  const { figmaAttachment, imageAttachment, isFigmaLoading } = useAttachment()
   const { sendMessage } = useSendMessage()
   const isDisabled = isMessageProcessing || isMessageStreaming || isFigmaLoading
 
@@ -31,6 +31,40 @@ export const ChatBottomToolbar = () => {
     return null
   }
 
+  if (!isMainTextbox) {
+    return (
+      <div className='flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2'>
+        <div className='flex flex-row items-center gap-1'>
+          <FigmaButton />
+          <FilePicker />
+        </div>
+
+        <div className='flex flex-row items-center gap-1'>
+          <Button
+            size='xs'
+            variant='text'
+            active={
+              !isFigmaLoading &&
+              (input.length > 0 || figmaAttachment || imageAttachment)
+                ? 'active'
+                : 'none'
+            }
+            disabled={
+              isFigmaLoading ||
+              !(input.length || figmaAttachment || imageAttachment)
+            }
+            className={isFigmaLoading ? 'opacity-60' : ''}
+            onClick={handleSend}
+          >
+            <span className='sr-only'>Enter</span>
+            <IoIosReturnLeft className='size-4' aria-hidden='true' />
+            <span>resend</span>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className='flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2'>
       <div className='flex flex-row items-center gap-1'>
@@ -44,11 +78,15 @@ export const ChatBottomToolbar = () => {
             size='xs'
             variant='text'
             active={
-              !isDisabled && (input.length > 0 || figmaAttachment)
+              !isDisabled &&
+              (input.length > 0 || figmaAttachment || imageAttachment)
                 ? 'active'
                 : 'none'
             }
-            disabled={isDisabled || !(input.length || figmaAttachment)}
+            disabled={
+              isDisabled ||
+              !(input.length || figmaAttachment || imageAttachment)
+            }
             className={isDisabled ? 'opacity-60' : ''}
             onClick={handleSend}
           >
@@ -65,7 +103,7 @@ export const ChatBottomToolbar = () => {
             onClick={handleStop}
           >
             <TrashIcon className='size-3.5' />
-            Stop
+            stop
           </Button>
         )}
       </div>
