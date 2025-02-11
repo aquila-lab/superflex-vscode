@@ -294,7 +294,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
       // Restrict the webview to only load resources from the `dist` and `webview-ui/dist` directories
       localResourceRoots: [
         vscode.Uri.joinPath(this._extensionUri, 'dist'),
-        vscode.Uri.joinPath(this._extensionUri, 'webview-ui-2', 'dist')
+        vscode.Uri.joinPath(this._extensionUri, 'webview-ui', 'dist')
       ],
       enableCommandUris: true
     }
@@ -333,7 +333,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const stylesUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._extensionUri,
-        'webview-ui-2',
+        'webview-ui',
         'dist',
         'assets',
         'index.css'
@@ -342,7 +342,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const scriptUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._extensionUri,
-        'webview-ui-2',
+        'webview-ui',
         'dist',
         'assets',
         'index.js'
@@ -351,7 +351,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const superflexLogoUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._extensionUri,
-        'webview-ui-2',
+        'webview-ui',
         'dist',
         'assets',
         'logo.png'
@@ -360,7 +360,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     const figmaCopySelectionExampleImage = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._extensionUri,
-        'webview-ui-2',
+        'webview-ui',
         'dist',
         'assets',
         'figma-copy-selection-example.png'
