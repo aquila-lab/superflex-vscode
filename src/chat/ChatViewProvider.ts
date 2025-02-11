@@ -244,6 +244,10 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
       this.sendEventMessage(eventResponse)
     } catch (err) {
+      if (err instanceof Error && err.message === 'canceled') {
+        return
+      }
+
       console.error(
         `Failed to handle event. message: ${JSON.stringify(message)}, error: ${(err as Error).message}`
       )

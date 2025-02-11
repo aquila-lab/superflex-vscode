@@ -227,6 +227,9 @@ async function sendThreadMessage({
       }
     }
   } catch (err) {
+    if (err instanceof Error && err.message === 'canceled') {
+      return Promise.reject(err)
+    }
     return Promise.reject(parseError(err))
   }
 }
