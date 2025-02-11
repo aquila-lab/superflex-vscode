@@ -1,16 +1,24 @@
 import { IS_PROD } from '../common/constants'
 
-export type ApiError = {
+export class ApiError extends Error {
   statusCode: number
   slug: string
-  message: string
-} | null
 
-const internalServerError: ApiError = {
-  slug: 'internal_server',
-  message: 'Internal server error',
-  statusCode: 500
+  constructor(statusCode: number, slug: string, message: string) {
+    super(message)
+    this.statusCode = statusCode
+    this.slug = slug
+
+    // This is needed in TypeScript when extending built-in classes
+    Object.setPrototypeOf(this, ApiError.prototype)
+  }
 }
+
+const internalServerError: ApiError = new ApiError(
+  500,
+  'internal_server',
+  'Internal server error'
+)
 
 export function parseError(err: any): ApiError {
   if (!IS_PROD) {
@@ -20,11 +28,11 @@ export function parseError(err: any): ApiError {
   if (!err?.response?.data?.error) {
     return internalServerError
   }
-  return {
-    statusCode: err.response.status,
-    slug: err.response.data.error.slug,
-    message: err.response.data.error.message
-  }
+  return new ApiError(
+    err.response.status,
+    err.response.data.error.slug,
+    err.response.data.error.message
+  )
 }
 
 export function getCustomUserError(

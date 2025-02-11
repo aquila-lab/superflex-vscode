@@ -5,8 +5,8 @@ import type {
   ThreadRun
 } from '../../shared/model'
 import { Api } from './api'
-import { parseError } from './error'
 import type { RepoArgs } from './repo'
+import { ApiError, parseError } from './error'
 import {
   buildMessageFromResponse,
   buildThreadFromResponse,
@@ -168,6 +168,14 @@ async function sendThreadMessage({
             try {
               const data = JSON.parse(jsonStr)
 
+              if (data.error) {
+                throw new ApiError(
+                  data.error.statusCode,
+                  data.error.slug,
+                  data.error.message
+                )
+              }
+
               // Handle complete message with nested structure
               if (data.is_complete && data.message) {
                 const message = buildMessageFromResponse(data.message)
@@ -181,14 +189,17 @@ async function sendThreadMessage({
 
               // Remove processed JSON from buffer
               buffer = buffer.slice(closeBraceIndex + 1)
-            } catch (_) {
+            } catch (err) {
+              if (err instanceof ApiError) {
+                throw err
+              }
               // If parsing fails, it might be incomplete. Keep in buffer.
               break
             }
           }
         } catch (err) {
           streamError = err as Error
-          throw streamError
+          throw err
         }
       }
 
@@ -227,6 +238,9 @@ async function sendThreadMessage({
       }
     }
   } catch (err) {
+    if (err instanceof ApiError) {
+      return Promise.reject(err)
+    }
     if (err instanceof Error && err.message === 'canceled') {
       return Promise.reject(err)
     }
