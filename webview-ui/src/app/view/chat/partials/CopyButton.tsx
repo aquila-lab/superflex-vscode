@@ -1,5 +1,4 @@
-import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
-import { CheckIcon } from '@radix-ui/react-icons'
+import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
 import { useState, useCallback } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Button } from '../../../../common/ui/Button'
@@ -40,7 +39,7 @@ export const CopyButton = ({ content }: { content: string }) => {
           className='px-1 py-0.5 hover:bg-muted'
           onClick={handleCopy}
         >
-          <DocumentDuplicateIcon className='size-3.5' />
+          <CopyIcon className='size-3.5' />
         </Button>
       )}
     </CopyToClipboard>
