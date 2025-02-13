@@ -59,7 +59,6 @@ export const ChatTextarea = () => {
       isFigmaLoading
     ]
   )
-
   const handleFocusChat = useCallback(() => {
     focusInput()
   }, [focusInput])
@@ -111,7 +110,7 @@ export const ChatTextarea = () => {
         ref={inputRef}
         autoFocus
         value={input}
-        placeholder='Describe your UI component... (hold ⇧ to drop into editor)'
+        placeholder='Describe your UI component... (⌘+; to focus)'
         className='border-0 shadow-none'
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}

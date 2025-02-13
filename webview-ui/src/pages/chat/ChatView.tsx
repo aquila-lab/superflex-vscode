@@ -13,6 +13,7 @@ import { useUser } from '../../context/UserContext'
 import { OutOfRequests } from './OutOfRequests'
 import { FigmaPremiumModalProvider } from '../../context/FigmaPremiumModalContext'
 import { FigmaPremiumModal } from './FigmaPremiumModal'
+import { Hints } from './Hints'
 
 export const ChatView = () => {
   const postMessage = usePostMessage()
@@ -43,7 +44,12 @@ export const ChatView = () => {
             )}
           >
             {hasMessages && <ChatMessageList />}
-            {!hasMessages && <WelcomeMessage />}
+            {!hasMessages && (
+              <div className='flex flex-col gap-y-2 mb-4'>
+                <WelcomeMessage />
+                <Hints />
+              </div>
+            )}
             <ChatInputBoxWrapper />
             {!hasMessages && <ChatHistory />}
             <UpgradeButton />

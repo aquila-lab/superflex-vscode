@@ -1,6 +1,6 @@
 export const WelcomeMessage = () => {
   return (
-    <div className='flex flex-col gap-y-2 items-center text-center px-6 mb-6'>
+    <div className='flex flex-col gap-y-2 items-center text-center px-6'>
       <img
         src={window.superflexLogoUri}
         alt='Superflex Logo'
