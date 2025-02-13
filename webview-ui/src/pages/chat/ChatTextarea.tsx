@@ -111,7 +111,7 @@ export const ChatTextarea = () => {
         ref={inputRef}
         autoFocus
         value={input}
-        placeholder='Describe your UI component... (⌘+; to focus)'
+        placeholder='Describe your UI component... (hold ⇧ to drop into editor)'
         className='border-0 shadow-none'
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
