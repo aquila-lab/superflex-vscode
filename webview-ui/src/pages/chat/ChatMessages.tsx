@@ -3,7 +3,7 @@ import { Role } from '../../../../shared/model'
 import { EditModeProvider } from '../../context/EditModeContext'
 import { useMessages } from '../../context/MessagesContext'
 import { AssistantMessage } from './AssistantMessage'
-import { ChatInputBox } from './ChatInputBox'
+import { ChatInputBoxWrapper } from './ChatInputBoxWrapper'
 import { useOverlay } from '../../context/OverlayContext'
 import { MessageWrapper } from './ChatMessageWrapper'
 import { cn } from '../../common/utils'
@@ -28,7 +28,7 @@ export const ChatMessages = () => {
             return (
               <MessageWrapper key={id} className={messageClasses}>
                 <EditModeProvider>
-                  <ChatInputBox content={content} messageId={id} />
+                  <ChatInputBoxWrapper content={content} messageId={id} />
                 </EditModeProvider>
               </MessageWrapper>
             )

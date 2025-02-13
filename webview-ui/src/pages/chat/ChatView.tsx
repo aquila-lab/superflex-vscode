@@ -4,7 +4,7 @@ import { usePostMessage } from '../../hooks/usePostMessage'
 import { useMessages } from '../../context/MessagesContext'
 import { cn } from '../../common/utils'
 import { ChatHistory } from './ChatHistory'
-import { ChatInputBox } from './ChatInputBox'
+import { ChatInputBoxWrapper } from './ChatInputBoxWrapper'
 import { UpgradeButton } from './UpgradeButton'
 import { WelcomeMessage } from './WelcomeMessage'
 import { ChatMessageList } from './ChatMessageList'
@@ -44,7 +44,7 @@ export const ChatView = () => {
           >
             {hasMessages && <ChatMessageList />}
             {!hasMessages && <WelcomeMessage />}
-            <ChatInputBox />
+            <ChatInputBoxWrapper />
             {!hasMessages && <ChatHistory />}
             <UpgradeButton />
             <SoftLimitModal />
