@@ -9,7 +9,7 @@ import { useInput } from '../../context/InputContext'
 import { useMessages } from '../../context/MessagesContext'
 import { useNewMessage } from '../../context/NewMessageContext'
 
-export const ChatInputBoxContainer = ({
+export const ChatInputBoxWrapperContainer = ({
   children
 }: { children: ReactNode }) => {
   const { input, focusInput, messageId } = useInput()

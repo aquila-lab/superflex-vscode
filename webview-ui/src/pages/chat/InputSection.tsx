@@ -4,7 +4,7 @@ import { FilesProvider } from '../../context/FilesProvider'
 import { AddSelectedCode } from './AddSelectedCode'
 import { ChatAttachment } from './ChatAttachment'
 import { ChatBottomToolbar } from './ChatBottomToolbar'
-import { ChatInputBoxContainer } from './ChatInputBoxContainer'
+import { ChatInputBoxWrapperContainer } from './ChatInputBoxContainer'
 import { FilePreview } from './FilePreview'
 import { ChatTextarea } from './ChatTextarea'
 import { ChatTopToolbar } from './ChatTopToolbar'
@@ -18,7 +18,7 @@ export const InputSection = ({
   const { isMainTextbox } = useEditMode()
 
   return (
-    <ChatInputBoxContainer>
+    <ChatInputBoxWrapperContainer>
       <FilesProvider files={content?.files}>
         <AddSelectedCode />
         <FilePreview />
@@ -29,6 +29,6 @@ export const InputSection = ({
         </SendMessageProvider>
         {!isMainTextbox && <ChatAttachment />}
       </FilesProvider>
-    </ChatInputBoxContainer>
+    </ChatInputBoxWrapperContainer>
   )
 }

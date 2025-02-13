@@ -59,6 +59,7 @@ export const ChatTextarea = () => {
       isFigmaLoading
     ]
   )
+
   const handleFocusChat = useCallback(() => {
     focusInput()
   }, [focusInput])
