@@ -22,7 +22,6 @@ export const ChatInputBoxDnd = ({
   const handleDrag = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log('Drag over')
   }, [])
 
   const handleDragIn = useCallback((e: DragEvent<HTMLDivElement>) => {
@@ -30,11 +29,6 @@ export const ChatInputBoxDnd = ({
     e.stopPropagation()
     dragCounterRef.current += 1
     const dragEvent = e as DragEvent
-
-    console.log('Drag in', {
-      counter: dragCounterRef.current,
-      hasItems: dragEvent.dataTransfer?.items.length
-    })
 
     if (
       dragEvent.dataTransfer?.items &&
@@ -49,10 +43,6 @@ export const ChatInputBoxDnd = ({
     e.stopPropagation()
     dragCounterRef.current -= 1
 
-    console.log('Drag out', {
-      counter: dragCounterRef.current
-    })
-
     if (dragCounterRef.current === 0) {
       setIsDragging(false)
     }
@@ -65,15 +55,12 @@ export const ChatInputBoxDnd = ({
       setIsDragging(false)
       dragCounterRef.current = 0
 
-      console.log('Drop event occurred')
-
       const dragEvent = e as DragEvent
       if (
         dragEvent.dataTransfer?.files &&
         dragEvent.dataTransfer.files.length > 0
       ) {
         const file = dragEvent.dataTransfer.files[0]
-        console.log('File dropped:', file.name, file.type)
 
         const validTypes = ['image/jpeg', 'image/png']
         if (!validTypes.includes(file.type)) {
@@ -90,7 +77,6 @@ export const ChatInputBoxDnd = ({
         removeAttachment()
         readImageFileAsBase64(file)
           .then(imageBase64 => {
-            console.log('Image successfully processed')
             setImageAttachment(imageBase64)
           })
           .catch(error => {
@@ -109,20 +95,22 @@ export const ChatInputBoxDnd = ({
         onDragOver={handleDrag}
         onDrop={handleDrop}
         className={cn(
-          'relative bg-red-500 w-full h-[200px]',
+          'relative',
           isDragging &&
             'after:absolute after:inset-0 after:border-2 after:border-dashed after:border-primary after:bg-primary/5 after:rounded-md'
         )}
       >
+        {children}
         {isDragging && (
-          <div className='absolute inset-0 pointer-events-none'>
+          <div className='absolute inset-0 pointer-events-none z-30 bg-black/20'>
             <div className='h-full w-full flex items-center justify-center'>
-              <span className='text-primary text-sm'>Drop image here</span>
+              <span className='text-xs text-primary bg-sidebar px-4 py-2 rounded-md shadow-sm'>
+                Drop image here
+              </span>
             </div>
           </div>
         )}
       </div>
-      {children}
     </>
   )
 }
