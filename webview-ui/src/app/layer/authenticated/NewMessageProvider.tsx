@@ -17,9 +17,9 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../shared/protocol'
-import { useMessages } from './MessagesProvider'
 import { useConsumeMessage } from '../global/hooks/useConsumeMessage'
 import { usePostMessage } from '../global/hooks/usePostMessage'
+import { useMessages } from './MessagesProvider'
 
 const NewMessageContext = createContext<{
   message: Message | null

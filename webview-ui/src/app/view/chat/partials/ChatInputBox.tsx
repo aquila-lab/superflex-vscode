@@ -1,11 +1,11 @@
-import { ChatAttachment } from './ChatAttachment'
-import { InputSection } from './InputSection'
-import { UserMessageHeader } from './UserMessageHeader'
-import { FigmaSelectionModal } from './FigmaSelectionModal'
 import type { MessageContent } from '../../../../../../shared/model'
 import { useUser } from '../../../layer/authenticated/UserProvider'
+import { ChatAttachment } from './ChatAttachment'
 import { useEditMode } from './EditModeProvider'
+import { FigmaSelectionModal } from './FigmaSelectionModal'
 import { InputProvider } from './InputProvider'
+import { InputSection } from './InputSection'
+import { UserMessageHeader } from './UserMessageHeader'
 
 export const ChatInputBox = ({
   content,
@@ -30,7 +30,10 @@ export const ChatInputBox = ({
   }
 
   return (
-    <InputProvider text={content?.text} id={messageId}>
+    <InputProvider
+      text={content?.text}
+      id={messageId}
+    >
       <UserMessageHeader
         picture={user.picture}
         username={user.username}

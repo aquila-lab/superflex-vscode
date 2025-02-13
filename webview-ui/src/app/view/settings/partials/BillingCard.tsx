@@ -1,15 +1,15 @@
 import { useCallback } from 'react'
-import { UsageDisplay } from './UsageDisplay'
 import { Badge } from '../../../../common/ui/Badge'
 import { Button } from '../../../../common/ui/Button'
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
-  CardDescription
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '../../../../common/ui/Card'
 import { useUser } from '../../../layer/authenticated/UserProvider'
+import { UsageDisplay } from './UsageDisplay'
 
 export const BillingCard = () => {
   const { user, subscription, manageBilling, subscribe } = useUser()

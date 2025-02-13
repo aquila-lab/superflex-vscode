@@ -2,9 +2,9 @@ import { useCallback } from 'react'
 import { Button } from '../../../../common/ui/Button'
 import {
   Card,
+  CardContent,
   CardHeader,
-  CardTitle,
-  CardContent
+  CardTitle
 } from '../../../../common/ui/Card'
 import { useUser } from '../../../layer/authenticated/UserProvider'
 import { useGlobal } from '../../../layer/global/GlobalProvider'
@@ -46,13 +46,19 @@ export const UserInfoCard = () => {
         </div>
         <div className='flex flex-col gap-6 sm:flex-row sm:justify-between sm:items-center'>
           {isFigmaAuthenticated ? (
-            <Button variant='destructive' onClick={handleDisconnectFigma}>
+            <Button
+              variant='destructive'
+              onClick={handleDisconnectFigma}
+            >
               Disconnect Figma
             </Button>
           ) : (
             <Button onClick={handleConnectFigma}>Connect Figma</Button>
           )}
-          <Button variant='destructive' onClick={handleSignOut}>
+          <Button
+            variant='destructive'
+            onClick={handleSignOut}
+          >
             Sign Out
           </Button>
         </div>

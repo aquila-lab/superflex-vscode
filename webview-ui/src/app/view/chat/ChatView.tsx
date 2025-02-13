@@ -8,12 +8,12 @@ import { ChatHistory } from './partials/ChatHistory'
 import { ChatInputBoxWrapper } from './partials/ChatInputBoxWrapper'
 import { ChatMessageList } from './partials/ChatMessageList'
 import { FigmaPremiumModal } from './partials/FigmaPremiumModal'
+import { FigmaPremiumModalProvider } from './partials/FigmaPremiumModalProvider'
 import { Hints } from './partials/Hints'
 import { OutOfRequests } from './partials/OutOfRequests'
 import { SoftLimitModal } from './partials/SoftLimitModal'
 import { UpgradeButton } from './partials/UpgradeButton'
 import { WelcomeMessage } from './partials/WelcomeMessage'
-import { FigmaPremiumModalProvider } from './partials/FigmaPremiumModalProvider'
 
 export const ChatView = () => {
   const postMessage = usePostMessage()

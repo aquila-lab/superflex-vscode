@@ -1,8 +1,8 @@
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
 import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import {
-  getLanguageFromPath,
-  defineVSCodeTheme
+  defineVSCodeTheme,
+  getLanguageFromPath
 } from '../../../../common/utils'
 
 export const Editor = ({

@@ -1,5 +1,5 @@
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Button } from '../../../../common/ui/Button'
 import {
@@ -18,7 +18,10 @@ export const CopyButton = ({ content }: { content: string }) => {
   }, [])
 
   return (
-    <CopyToClipboard text={String(content)} onCopy={() => {}}>
+    <CopyToClipboard
+      text={String(content)}
+      onCopy={() => {}}
+    >
       {isCopied ? (
         <TooltipProvider>
           <Tooltip>

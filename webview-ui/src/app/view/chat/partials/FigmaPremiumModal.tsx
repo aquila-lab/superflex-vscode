@@ -1,15 +1,15 @@
 import { useCallback } from 'react'
-import { useFigmaPremiumModal } from './FigmaPremiumModalProvider'
 import { Button } from '../../../../common/ui/Button'
 import {
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   Dialog,
   DialogContent,
-  DialogDescription
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from '../../../../common/ui/Dialog'
 import { useUser } from '../../../layer/authenticated/UserProvider'
+import { useFigmaPremiumModal } from './FigmaPremiumModalProvider'
 
 export const FigmaPremiumModal = () => {
   const { isOpen, setIsOpen } = useFigmaPremiumModal()
@@ -28,7 +28,10 @@ export const FigmaPremiumModal = () => {
   const handleCloseModal = useCallback(() => setIsOpen(false), [setIsOpen])
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleCloseModal}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={handleCloseModal}
+    >
       <DialogContent className='w-full'>
         <DialogHeader>
           <DialogTitle className='text-left'>
@@ -47,7 +50,10 @@ export const FigmaPremiumModal = () => {
         </DialogDescription>
         <DialogFooter className='flex flex-col sm:flex-row sm:justify-start gap-2'>
           <Button onClick={handleSubscribe}>Upgrade to Premium</Button>
-          <Button variant='secondary' onClick={handleChatWithFounder}>
+          <Button
+            variant='secondary'
+            onClick={handleChatWithFounder}
+          >
             Chat for Free Trial
           </Button>
         </DialogFooter>

@@ -38,7 +38,10 @@ export const FigmaSelectionModal = () => {
   )
 
   return (
-    <Dialog open={isSelectionModalOpen} onOpenChange={handleOpenChange}>
+    <Dialog
+      open={isSelectionModalOpen}
+      onOpenChange={handleOpenChange}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Enter the link of Figma selection</DialogTitle>

@@ -1,14 +1,13 @@
+import type { Monaco } from '@monaco-editor/react'
 import { type ClassValue, clsx } from 'clsx'
 import type { ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 import {
-  type Message,
   type MessageAttachment,
   type MessageContent,
   Role
 } from '../../../shared/model'
 import type { FilePayload } from '../../../shared/protocol'
-import type { Monaco } from '@monaco-editor/react'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))

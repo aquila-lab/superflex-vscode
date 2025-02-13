@@ -1,11 +1,11 @@
 import { Button } from '../../../../common/ui/Button'
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
-  CardFooter
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from '../../../../common/ui/Card'
 
 export const LoginAuthLinkView = ({
@@ -32,13 +32,19 @@ export const LoginAuthLinkView = ({
             {authUniqueLink}
           </CardDescription>
 
-          <Button className='mt-4' onClick={onCopyLink}>
+          <Button
+            className='mt-4'
+            onClick={onCopyLink}
+          >
             Copy Link
           </Button>
         </CardContent>
 
         <CardFooter className='flex justify-center items-center'>
-          <Button variant='link' onClick={onReturnToLogin}>
+          <Button
+            variant='link'
+            onClick={onReturnToLogin}
+          >
             Return to Login
           </Button>
         </CardFooter>

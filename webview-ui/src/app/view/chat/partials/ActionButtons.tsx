@@ -18,7 +18,10 @@ export const ActionButtons = ({
     >
       ✅ Accept
     </Button>
-    <Separator orientation='vertical' className='h-4' />
+    <Separator
+      orientation='vertical'
+      className='h-4'
+    />
     <Button
       size='xs'
       variant='text'

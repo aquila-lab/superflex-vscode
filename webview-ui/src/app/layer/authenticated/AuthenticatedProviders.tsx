@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router-dom'
-import { ThreadsProvider } from './ThreadsProvider'
 import { LoadingGuard } from './LoadingGuard'
-import { ThreadReset } from './ThreadReset'
-import { OverlayProvider } from './OverlayProvider'
 import { MessagesProvider } from './MessagesProvider'
 import { NewMessageProvider } from './NewMessageProvider'
+import { OverlayProvider } from './OverlayProvider'
+import { ThreadReset } from './ThreadReset'
+import { ThreadsProvider } from './ThreadsProvider'
 import { UserProvider } from './UserProvider'
 
 export const AuthenticatedProviders = () => {

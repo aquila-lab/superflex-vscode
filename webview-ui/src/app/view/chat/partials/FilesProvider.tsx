@@ -9,10 +9,10 @@ import {
   useState
 } from 'react'
 import {
-  type FilePayload,
+  EventRequestType,
   type EventResponseMessage,
   EventResponseType,
-  EventRequestType
+  type FilePayload
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../layer/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../../layer/global/hooks/usePostMessage'

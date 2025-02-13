@@ -47,7 +47,12 @@ export const ApplyControls = ({
   const stateComponents = {
     idle: <ApplyButton onClick={handleApply} />,
     applying: <ApplySpinner />,
-    applied: <ActionButtons onAccept={handleAccept} onReject={handleReject} />
+    applied: (
+      <ActionButtons
+        onAccept={handleAccept}
+        onReject={handleReject}
+      />
+    )
   }
 
   return stateComponents[applyState]

@@ -8,5 +8,10 @@ export const StreamingMessage = () => {
     return null
   }
 
-  return <AssistantMessage message={message} isStreamingMessage />
+  return (
+    <AssistantMessage
+      message={message}
+      isStreamingMessage
+    />
+  )
 }

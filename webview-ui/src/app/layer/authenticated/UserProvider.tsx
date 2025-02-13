@@ -9,13 +9,13 @@ import {
 } from 'react'
 import type { User, UserSubscription } from '../../../../../shared/model'
 import {
+  EventRequestType,
   type EventResponsePayload,
   EventResponseType,
-  type TypedEventResponseMessage,
-  EventRequestType
+  type TypedEventResponseMessage
 } from '../../../../../shared/protocol'
-import { usePostMessage } from '../global/hooks/usePostMessage'
 import { useConsumeMessage } from '../global/hooks/useConsumeMessage'
+import { usePostMessage } from '../global/hooks/usePostMessage'
 
 const UserContext = createContext<{
   user: User | null

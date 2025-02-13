@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { Editor } from './Editor'
 import {
   type EventResponseMessage,
   EventResponseType
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../layer/global/hooks/useConsumeMessage'
+import { Editor } from './Editor'
 import { useFiles } from './FilesProvider'
 
 export const FilePreview = () => {
@@ -41,7 +41,10 @@ export const FilePreview = () => {
   return (
     <div className='rounded-md -mb-1 mt-1.5 mx-1.5 bg-background border border-accent'>
       <div className='max-h-60 overflow-hidden'>
-        <Editor filePath={file.relativePath} maxHeight={200}>
+        <Editor
+          filePath={file.relativePath}
+          maxHeight={200}
+        >
           {file.content ?? content}
         </Editor>
       </div>

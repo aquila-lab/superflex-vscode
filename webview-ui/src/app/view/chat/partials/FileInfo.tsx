@@ -1,7 +1,5 @@
 import { useCallback } from 'react'
 import { EventRequestType } from '../../../../../../shared/protocol'
-import { getFileName } from '../../../../common/utils'
-import { usePostMessage } from '../../../layer/global/hooks/usePostMessage'
 import { FileIcon } from '../../../../common/ui/FileIcon'
 import {
   Tooltip,
@@ -9,6 +7,8 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '../../../../common/ui/Tooltip'
+import { getFileName } from '../../../../common/utils'
+import { usePostMessage } from '../../../layer/global/hooks/usePostMessage'
 
 export const FileInfo = ({ filePath }: { filePath: string }) => {
   const postMessage = usePostMessage()
@@ -20,7 +20,10 @@ export const FileInfo = ({ filePath }: { filePath: string }) => {
 
   return (
     <div className='flex items-center gap-1 min-w-0'>
-      <FileIcon filePath={filePath} className='size-4' />
+      <FileIcon
+        filePath={filePath}
+        className='size-4'
+      />
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>

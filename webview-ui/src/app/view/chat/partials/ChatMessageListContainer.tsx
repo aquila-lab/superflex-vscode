@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import ScrollToBottom from 'react-scroll-to-bottom'
-import { LoadingDots } from './LoadingDots'
 import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'
+import { LoadingDots } from './LoadingDots'
 
 export const ChatMessageListContainer = ({
   children

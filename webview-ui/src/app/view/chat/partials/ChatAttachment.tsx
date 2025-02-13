@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
-import { ImagePreview } from './ImagePreview'
 import { useAttachment } from './AttachmentProvider'
 import { useEditMode } from './EditModeProvider'
+import { ImagePreview } from './ImagePreview'
 
 export const ChatAttachment = () => {
   const { imageAttachment, figmaAttachment, isFigmaLoading, removeAttachment } =

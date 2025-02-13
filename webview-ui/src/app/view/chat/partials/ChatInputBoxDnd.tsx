@@ -1,11 +1,11 @@
 import {
+  type DragEvent,
   type ReactNode,
   useCallback,
-  useState,
   useRef,
-  type DragEvent
+  useState
 } from 'react'
-import { readImageFileAsBase64, cn } from '../../../../common/utils'
+import { cn, readImageFileAsBase64 } from '../../../../common/utils'
 import { useAttachment } from './AttachmentProvider'
 
 export const ChatInputBoxDnd = ({

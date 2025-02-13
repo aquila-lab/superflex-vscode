@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
+import { type MarkdownCodeProps, cn } from '../../../../common/utils'
 import { Editor } from './Editor'
 import { FileHeader } from './FileHeader'
-import { cn, type MarkdownCodeProps } from '../../../../common/utils'
 
 export const MarkdownCode = ({
   inline,
@@ -47,7 +47,10 @@ export const MarkdownCode = ({
           {draft}
         </FileHeader>
       )}
-      <Editor extension={codeBlock.extension} filePath={codeBlock.filePath}>
+      <Editor
+        extension={codeBlock.extension}
+        filePath={codeBlock.filePath}
+      >
         {draft}
       </Editor>
     </div>

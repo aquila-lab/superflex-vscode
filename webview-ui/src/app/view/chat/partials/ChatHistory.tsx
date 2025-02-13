@@ -14,7 +14,10 @@ export const ChatHistory = () => {
 
       <div className='flex flex-col gap-y-1'>
         {threads.slice(0, 5).map(thread => (
-          <div key={thread.id} onClick={() => selectThread(thread.id)}>
+          <div
+            key={thread.id}
+            onClick={() => selectThread(thread.id)}
+          >
             <ChatThreadItem thread={thread} />
           </div>
         ))}

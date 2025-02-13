@@ -1,8 +1,8 @@
-import { type ReactNode, useRef, useEffect } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 import {
-  cn,
   chatInputDisabledClasses,
-  chatInputEnabledClasses
+  chatInputEnabledClasses,
+  cn
 } from '../../../../common/utils'
 import { useMessages } from '../../../layer/authenticated/MessagesProvider'
 import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'

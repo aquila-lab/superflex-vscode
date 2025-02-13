@@ -1,14 +1,14 @@
 import { useCallback, useState } from 'react'
 
-import { LoginAuthLinkView } from './partials/LoginAuthLinkView'
-import { LoginDefaultView } from './partials/LoginDefaultView'
 import {
+  EventRequestType,
   type EventResponseMessage,
-  EventResponseType,
-  EventRequestType
+  EventResponseType
 } from '../../../../../shared/protocol'
 import { useConsumeMessage } from '../../layer/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../layer/global/hooks/usePostMessage'
+import { LoginAuthLinkView } from './partials/LoginAuthLinkView'
+import { LoginDefaultView } from './partials/LoginDefaultView'
 
 export const LoginView = () => {
   const postMessage = usePostMessage()

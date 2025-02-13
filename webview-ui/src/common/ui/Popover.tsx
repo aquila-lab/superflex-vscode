@@ -14,7 +14,10 @@ const PopoverContent = React.forwardRef<
   const portalRef = React.useRef<HTMLDivElement>(null)
   return (
     <>
-      <div ref={portalRef} className='empty:hidden' />
+      <div
+        ref={portalRef}
+        className='empty:hidden'
+      />
       {portalRef.current && (
         <PopoverPrimitive.Portal container={portalRef.current}>
           <PopoverPrimitive.Content

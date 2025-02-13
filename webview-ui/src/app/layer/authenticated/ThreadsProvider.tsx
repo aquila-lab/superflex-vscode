@@ -11,13 +11,13 @@ import { useNavigate } from 'react-router-dom'
 import type { Thread } from '../../../../../shared/model'
 import {
   EventRequestType,
-  type TypedEventResponseMessage,
-  EventResponseType
+  EventResponseType,
+  type TypedEventResponseMessage
 } from '../../../../../shared/protocol'
 import { NULL_UUID } from '../../../common/utils'
-import { usePostMessage } from '../global/hooks/usePostMessage'
 import { LoadingView } from '../../view/loading/LoadingView'
 import { useConsumeMessage } from '../global/hooks/useConsumeMessage'
+import { usePostMessage } from '../global/hooks/usePostMessage'
 
 const ThreadsContext = createContext<{
   threads: Thread[]

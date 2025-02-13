@@ -1,14 +1,11 @@
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon } from '@radix-ui/react-icons'
 import { useCallback, useEffect, useState } from 'react'
 import {
-  type FilePayload,
   type EventResponseMessage,
-  EventResponseType
+  EventResponseType,
+  type FilePayload
 } from '../../../../../../shared/protocol'
 import { Button } from '../../../../common/ui/Button'
-import { useConsumeMessage } from '../../../layer/global/hooks/useConsumeMessage'
-import { useEditMode } from './EditModeProvider'
-import { useFiles } from './FilesProvider'
 import {
   Command,
   CommandEmpty,
@@ -23,6 +20,9 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '../../../../common/ui/Popover'
+import { useConsumeMessage } from '../../../layer/global/hooks/useConsumeMessage'
+import { useEditMode } from './EditModeProvider'
+import { useFiles } from './FilesProvider'
 
 export const FileSelectorPopover = () => {
   const { selectedFiles, fetchFiles, selectFile } = useFiles()
@@ -71,16 +71,29 @@ export const FileSelectorPopover = () => {
 
   return (
     <div className='mr-0.5'>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={open}
+        onOpenChange={setOpen}
+      >
         <PopoverTrigger asChild>
-          <Button variant='outline' size='icon' aria-expanded={open}>
+          <Button
+            variant='outline'
+            size='icon'
+            aria-expanded={open}
+          >
             <span className='sr-only'>Select Files</span>
-            <PlusIcon className='text-muted-foreground' aria-hidden='true' />
+            <PlusIcon
+              className='text-muted-foreground'
+              aria-hidden='true'
+            />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-60 h-[300px] p-0'>
           <Command filter={customFilter}>
-            <CommandInput placeholder='Search files...' className='h-6' />
+            <CommandInput
+              placeholder='Search files...'
+              className='h-6'
+            />
             <CommandList>
               <CommandEmpty>No files found.</CommandEmpty>
               <CommandGroup>

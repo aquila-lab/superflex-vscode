@@ -1,13 +1,13 @@
 import { type ReactNode, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { MarkdownCode } from './MarkdownCode'
 import type { Role } from '../../../../../../shared/model'
 import {
   type MarkdownCodeProps,
   cn,
-  roleClassName,
-  defaultClassName
+  defaultClassName,
+  roleClassName
 } from '../../../../common/utils'
+import { MarkdownCode } from './MarkdownCode'
 
 export const MarkdownRender = ({
   role,
@@ -17,7 +17,10 @@ export const MarkdownRender = ({
   const codeComponents = useMemo(
     () => ({
       code: (props: MarkdownCodeProps) => (
-        <MarkdownCode {...props} isStreamingMessage={isStreamingMessage} />
+        <MarkdownCode
+          {...props}
+          isStreamingMessage={isStreamingMessage}
+        />
       )
     }),
     [isStreamingMessage]

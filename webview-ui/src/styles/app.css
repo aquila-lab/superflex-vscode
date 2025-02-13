@@ -54,7 +54,7 @@ code {
 }
 
 .figma-copy-selection-example {
-  background-image: url('../assets/figma-copy-selection-example.png');
+  background-image: url("../assets/figma-copy-selection-example.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

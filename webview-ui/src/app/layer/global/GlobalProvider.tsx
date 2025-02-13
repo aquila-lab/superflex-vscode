@@ -13,8 +13,8 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../shared/protocol'
-import { usePostMessage } from './hooks/usePostMessage'
 import { useConsumeMessage } from './hooks/useConsumeMessage'
+import { usePostMessage } from './hooks/usePostMessage'
 
 const GlobalContext = createContext<{
   isInitialized: boolean | null

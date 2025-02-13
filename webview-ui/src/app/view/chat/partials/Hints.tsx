@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { HintMessage } from './HintMessage'
 import { HINTS } from '../../../../common/utils'
+import { HintMessage } from './HintMessage'
 
 export const Hints = () => {
   const [currentHintIndex, setCurrentHintIndex] = useState(0)
@@ -21,7 +21,10 @@ export const Hints = () => {
 
   return (
     <div className='relative my-6'>
-      <HintMessage hint={HINTS[currentHintIndex]} isVisible={isVisible} />
+      <HintMessage
+        hint={HINTS[currentHintIndex]}
+        isVisible={isVisible}
+      />
     </div>
   )
 }

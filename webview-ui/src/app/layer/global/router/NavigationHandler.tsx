@@ -1,11 +1,11 @@
 import { type ReactNode, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { useGlobal } from '../GlobalProvider'
 import {
-  type TypedEventResponseMessage,
-  EventResponseType
+  EventResponseType,
+  type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
+import { useGlobal } from '../GlobalProvider'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
 
 export const NavigationHandler = ({ children }: { children: ReactNode }) => {

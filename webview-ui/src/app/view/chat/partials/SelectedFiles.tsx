@@ -1,14 +1,20 @@
 import { useMemo } from 'react'
+import { useEditMode } from './EditModeProvider'
 import { FileTab } from './FileTab'
 import { useFiles } from './FilesProvider'
-import { useEditMode } from './EditModeProvider'
 
 export const SelectedFiles = () => {
   const { selectedFiles } = useFiles()
   const { isEditMode } = useEditMode()
 
   const renderSelectedFiles = useMemo(
-    () => selectedFiles.map(file => <FileTab key={file.id} file={file} />),
+    () =>
+      selectedFiles.map(file => (
+        <FileTab
+          key={file.id}
+          file={file}
+        />
+      )),
     [selectedFiles]
   )
 

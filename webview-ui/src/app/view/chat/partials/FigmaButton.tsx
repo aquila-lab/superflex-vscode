@@ -47,7 +47,10 @@ export const FigmaButton = () => {
       onClick={handleButtonClicked}
     >
       <span className='sr-only'>{label}</span>
-      <FaFigma className='size-3.5' aria-hidden='true' />
+      <FaFigma
+        className='size-3.5'
+        aria-hidden='true'
+      />
       <span className='hidden xs:block'>{label}</span>
     </Button>
   )

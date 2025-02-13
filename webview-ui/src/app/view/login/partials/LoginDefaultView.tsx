@@ -3,10 +3,10 @@ import { EventRequestType } from '../../../../../../shared/protocol'
 import { Button } from '../../../../common/ui/Button'
 import {
   Card,
-  CardHeader,
-  CardTitle,
+  CardContent,
   CardDescription,
-  CardContent
+  CardHeader,
+  CardTitle
 } from '../../../../common/ui/Card'
 import { usePostMessage } from '../../../layer/global/hooks/usePostMessage'
 
@@ -47,11 +47,17 @@ export const LoginDefaultView = () => {
         </CardHeader>
 
         <CardContent className='flex flex-col items-center justify-center'>
-          <Button className='w-full' onClick={handleCreateAccount}>
+          <Button
+            className='w-full'
+            onClick={handleCreateAccount}
+          >
             Start for Free
           </Button>
           <p className='text-muted-foreground mt-4'>Already have an account?</p>
-          <Button variant='link' onClick={handleSignIn}>
+          <Button
+            variant='link'
+            onClick={handleSignIn}
+          >
             Sign In
           </Button>
         </CardContent>

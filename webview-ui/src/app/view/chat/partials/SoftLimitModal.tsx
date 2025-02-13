@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react'
 import { EventResponseType } from '../../../../../../shared/protocol'
 import { Button } from '../../../../common/ui/Button'
 import {
-  DialogHeader,
-  DialogFooter,
-  DialogDescription,
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle
 } from '../../../../common/ui/Dialog'
 import { useUser } from '../../../layer/authenticated/UserProvider'
@@ -32,7 +32,10 @@ export function SoftLimitModal() {
   useConsumeMessage(EventResponseType.SHOW_SOFT_PAYWALL_MODAL, handleShowModal)
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleCloseModal}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={handleCloseModal}
+    >
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle className='text-left'>
@@ -45,7 +48,10 @@ export function SoftLimitModal() {
         </DialogDescription>
         <DialogFooter className='flex flex-col sm:flex-row sm:justify-start gap-2'>
           <Button onClick={handleSubscribe}>Upgrade to Premium</Button>
-          <Button variant='secondary' onClick={handleCloseModal}>
+          <Button
+            variant='secondary'
+            onClick={handleCloseModal}
+          >
             Switch to Basic
           </Button>
         </DialogFooter>

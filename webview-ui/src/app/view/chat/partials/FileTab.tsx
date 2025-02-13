@@ -1,11 +1,11 @@
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { type MouseEvent, useCallback } from 'react'
-import { useEditMode } from './EditModeProvider'
 import type { FilePayload } from '../../../../../../shared/protocol'
 import { Button } from '../../../../common/ui/Button'
-import { cn } from '../../../../common/utils'
-import { useFiles } from './FilesProvider'
 import { FileIcon } from '../../../../common/ui/FileIcon'
+import { cn } from '../../../../common/utils'
+import { useEditMode } from './EditModeProvider'
+import { useFiles } from './FilesProvider'
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
   const { previewedFile, deselectFile, setPreviewedFile } = useFiles()
@@ -40,7 +40,10 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
         onClick={togglePreviewedFile}
       >
         <div className='flex flex-row items-center gap-0.5'>
-          <FileIcon filePath={file.relativePath} className='size-5' />
+          <FileIcon
+            filePath={file.relativePath}
+            className='size-5'
+          />
           <p className='text-xs text-foreground truncate max-w-16'>
             {file.name}
           </p>

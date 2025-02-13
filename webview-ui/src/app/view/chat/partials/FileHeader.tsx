@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
+import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'
 import { ApplyControls } from './ApplyControls'
 import { CopyButton } from './CopyButton'
 import { FileInfo } from './FileInfo'
-import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'
 
 export const FileHeader = ({
   filePath,
@@ -22,7 +22,10 @@ export const FileHeader = ({
       <div className='flex flex-row items-center'>
         <CopyButton content={content} />
         {(!isStreamingMessage || !isMessageStreaming) && (
-          <ApplyControls filePath={filePath} content={content} />
+          <ApplyControls
+            filePath={filePath}
+            content={content}
+          />
         )}
       </div>
     </div>

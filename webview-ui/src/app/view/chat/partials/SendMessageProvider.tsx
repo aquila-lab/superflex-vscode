@@ -5,11 +5,11 @@ import {
   useContext,
   useMemo
 } from 'react'
+import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'
 import { useAttachment } from './AttachmentProvider'
+import { useEditMode } from './EditModeProvider'
 import { useFiles } from './FilesProvider'
 import { useInput } from './InputProvider'
-import { useEditMode } from './EditModeProvider'
-import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'
 
 export const SendMessageContext = createContext<{
   sendMessage: () => void

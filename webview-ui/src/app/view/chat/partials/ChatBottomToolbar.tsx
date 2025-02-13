@@ -1,12 +1,12 @@
 import { TrashIcon } from '@radix-ui/react-icons'
 import { useCallback } from 'react'
 import { IoIosReturnLeft } from 'react-icons/io'
-import { FigmaButton } from './FigmaButton'
-import { FilePicker } from './FilePicker'
 import { Button } from '../../../../common/ui/Button'
 import { useNewMessage } from '../../../layer/authenticated/NewMessageProvider'
 import { useAttachment } from './AttachmentProvider'
 import { useEditMode } from './EditModeProvider'
+import { FigmaButton } from './FigmaButton'
+import { FilePicker } from './FilePicker'
 import { useInput } from './InputProvider'
 import { useSendMessage } from './SendMessageProvider'
 
@@ -57,7 +57,10 @@ export const ChatBottomToolbar = () => {
             onClick={handleSend}
           >
             <span className='sr-only'>Enter</span>
-            <IoIosReturnLeft className='size-4' aria-hidden='true' />
+            <IoIosReturnLeft
+              className='size-4'
+              aria-hidden='true'
+            />
             <span>resend</span>
           </Button>
         </div>
@@ -91,7 +94,10 @@ export const ChatBottomToolbar = () => {
             onClick={handleSend}
           >
             <span className='sr-only'>Enter</span>
-            <IoIosReturnLeft className='size-4' aria-hidden='true' />
+            <IoIosReturnLeft
+              className='size-4'
+              aria-hidden='true'
+            />
             <span>send</span>
           </Button>
         )}
