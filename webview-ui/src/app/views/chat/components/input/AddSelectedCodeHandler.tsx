@@ -1,14 +1,16 @@
-import { useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 import {
   type EventResponseMessage,
   EventResponseType
-} from '../../../../../../../../shared/protocol'
+} from '../../../../../../../shared/protocol'
 
-import { useConsumeMessage } from '../../../../../layers/global/hooks/useConsumeMessage'
-import { useEditMode } from '../../../providers/EditModeProvider'
-import { useFiles } from '../../../providers/FilesProvider'
+import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
+import { useEditMode } from '../../providers/EditModeProvider'
+import { useFiles } from '../../providers/FilesProvider'
 
-export const AddSelectedCodeHandler = () => {
+export const AddSelectedCodeHandler = ({
+  children
+}: { children: ReactNode }) => {
   const { isMainTextarea } = useEditMode()
   const { selectFile, setPreviewedFile } = useFiles()
 
@@ -26,5 +28,5 @@ export const AddSelectedCodeHandler = () => {
 
   useConsumeMessage(EventResponseType.ADD_SELECTED_CODE, handleAddSelectedCode)
 
-  return null
+  return children
 }

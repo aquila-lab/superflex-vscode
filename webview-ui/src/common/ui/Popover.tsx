@@ -1,5 +1,5 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import { cn } from '../../common/utils'
 
@@ -13,7 +13,7 @@ const PopoverContent = React.forwardRef<
 >(({ className, align = 'start', sideOffset = 5, ...props }, ref) => {
   const portalRef = React.useRef<HTMLDivElement>(null)
   return (
-    <>
+    <Fragment>
       <div
         ref={portalRef}
         className='empty:hidden'
@@ -32,7 +32,7 @@ const PopoverContent = React.forwardRef<
           />
         </PopoverPrimitive.Portal>
       )}
-    </>
+    </Fragment>
   )
 })
 

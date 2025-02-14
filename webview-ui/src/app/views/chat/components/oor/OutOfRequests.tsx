@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { Button } from '../../../../common/ui/Button'
-import { useUser } from '../../../layers/authenticated/providers/UserProvider'
+import { Button } from '../../../../../common/ui/Button'
+import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 
 export const OutOfRequests = () => {
   const { subscribe } = useUser()
