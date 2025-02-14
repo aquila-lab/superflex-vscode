@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
-import { type MarkdownCodeProps, cn } from '../../../../../common/utils'
-import { FileHeader } from './FileHeader'
-import { Editor } from './Editor'
+import { type MarkdownCodeProps, cn } from '../../../../../../../common/utils'
+import { CodeBlock } from './code/CodeBlock'
 
 export const MarkdownCode = ({
   inline,
@@ -38,21 +37,11 @@ export const MarkdownCode = ({
   const draft = String(children).replace(/\n$/, '')
 
   return (
-    <div className='rounded-md border border-border bg-background mt-1'>
-      {codeBlock.filePath && (
-        <FileHeader
-          filePath={codeBlock.filePath}
-          isStreamingMessage={isStreamingMessage}
-        >
-          {draft}
-        </FileHeader>
-      )}
-      <Editor
-        extension={codeBlock.extension}
-        filePath={codeBlock.filePath}
-      >
-        {draft}
-      </Editor>
-    </div>
+    <CodeBlock
+      filePath={codeBlock.filePath}
+      isStreamingMessage={isStreamingMessage}
+      draft={draft}
+      extension={codeBlock.extension}
+    />
   )
 }

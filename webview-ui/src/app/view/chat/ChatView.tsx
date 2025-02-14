@@ -7,14 +7,14 @@ import { usePostMessage } from '../../layers/global/hooks/usePostMessage'
 
 import { FigmaPremiumModal } from './components/FigmaPremiumModal'
 import { FigmaPremiumModalProvider } from './providers/FigmaPremiumModalProvider'
-import { Hints } from './components/Hints'
+import { Hints } from './components/hints/Hints'
 import { OutOfRequests } from './components/OutOfRequests'
 import { SoftLimitModal } from './components/SoftLimitModal'
 import { UpgradeButton } from './components/UpgradeButton'
 import { WelcomeMessage } from './components/WelcomeMessage'
-import { ChatHistory } from './components/history/ChatHistory'
 import { ChatInputBoxWrapper } from './components/input/ChatInputBoxWrapper'
-import { ChatMessageList } from './components/message/ChatMessageList'
+import { ThreadHistory } from './components/history/ThreadHistory'
+import { MessageList } from './components/message/MessageList'
 
 export const ChatView = () => {
   const postMessage = usePostMessage()
@@ -44,7 +44,7 @@ export const ChatView = () => {
               !hasMessages && 'justify-center'
             )}
           >
-            {hasMessages && <ChatMessageList />}
+            {hasMessages && <MessageList />}
             {!hasMessages && (
               <div className='flex flex-col gap-y-2 mb-4'>
                 <WelcomeMessage />
@@ -52,7 +52,7 @@ export const ChatView = () => {
               </div>
             )}
             <ChatInputBoxWrapper />
-            {!hasMessages && <ChatHistory />}
+            {!hasMessages && <ThreadHistory />}
             <UpgradeButton />
             <SoftLimitModal />
           </div>

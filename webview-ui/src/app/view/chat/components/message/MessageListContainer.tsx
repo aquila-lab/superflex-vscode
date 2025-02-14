@@ -3,9 +3,7 @@ import ScrollToBottom from 'react-scroll-to-bottom'
 import { LoadingDots } from '../../../../../common/ui/LoadingDots'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 
-export const ChatMessageListContainer = ({
-  children
-}: { children: ReactNode }) => {
+export const MessageListContainer = ({ children }: { children: ReactNode }) => {
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
 
   return (

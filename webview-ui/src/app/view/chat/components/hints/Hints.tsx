@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { HINTS } from '../../../../common/utils'
+import { HINTS } from '../../../../../common/utils'
 import { HintMessage } from './HintMessage'
 
 export const Hints = () => {

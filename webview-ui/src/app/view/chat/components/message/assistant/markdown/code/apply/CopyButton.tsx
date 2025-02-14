@@ -1,13 +1,13 @@
 import { CheckIcon, CopyIcon } from '@radix-ui/react-icons'
 import { useCallback, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import { Button } from '../../../../../common/ui/Button'
+import { Button } from '../../../../../../../../../common/ui/Button'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '../../../../../common/ui/Tooltip'
+} from '../../../../../../../../../common/ui/Tooltip'
 
 export const CopyButton = ({ content }: { content: string }) => {
   const [isCopied, setIsCopied] = useState(false)

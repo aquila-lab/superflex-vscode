@@ -1,6 +1,6 @@
-import { cn } from '../../../../../common/utils'
+import { cn } from '../../../../../../common/utils'
 
-export const MessageWrapper = ({
+export const MessageBox = ({
   children,
   className
 }: {

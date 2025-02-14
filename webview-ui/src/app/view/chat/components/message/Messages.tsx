@@ -5,10 +5,10 @@ import { useMessages } from '../../../../layers/authenticated/providers/Messages
 import { useOverlay } from '../../../../layers/authenticated/providers/OverlayProvider'
 import { EditModeProvider } from '../../providers/EditModeProvider'
 import { ChatInputBoxWrapper } from '../input/ChatInputBoxWrapper'
-import { AssistantMessage } from './AssistantMessage'
-import { MessageWrapper } from './ChatMessageWrapper'
+import { AssistantMessage } from './assistant/AssistantMessage'
+import { MessageBox } from './shared/MessageBox'
 
-export const ChatMessages = () => {
+export const Messages = () => {
   const { messages } = useMessages()
   const { activeMessageId } = useOverlay()
 
@@ -26,7 +26,7 @@ export const ChatMessages = () => {
         switch (role) {
           case Role.User:
             return (
-              <MessageWrapper
+              <MessageBox
                 key={id}
                 className={messageClasses}
               >
@@ -36,17 +36,17 @@ export const ChatMessages = () => {
                     messageId={id}
                   />
                 </EditModeProvider>
-              </MessageWrapper>
+              </MessageBox>
             )
 
           case Role.Assistant:
             return (
-              <MessageWrapper key={id}>
+              <MessageBox key={id}>
                 <AssistantMessage
                   message={message}
                   hasFeedback
                 />
-              </MessageWrapper>
+              </MessageBox>
             )
 
           default:

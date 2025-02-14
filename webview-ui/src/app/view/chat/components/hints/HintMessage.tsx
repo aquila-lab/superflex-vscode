@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { cn } from '../../../../common/utils'
+import { cn } from '../../../../../common/utils'
 
 export const HintMessage = ({
   hint,

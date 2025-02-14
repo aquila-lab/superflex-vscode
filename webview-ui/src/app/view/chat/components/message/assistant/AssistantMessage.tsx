@@ -1,8 +1,8 @@
-import { type Message, Role } from '../../../../../../../shared/model'
-import { MarkdownRender } from '../markdown/MarkdownRender'
-import { ChatMessageContainer } from './ChatMessageContainer'
-import { ChatMessageHeader } from './ChatMessageHeader'
+import { type Message, Role } from '../../../../../../../../shared/model'
+import { MarkdownRender } from './markdown/MarkdownRender'
 import { FeedbackDialog } from './FeedbackDialog'
+import { MessageContainer } from '../shared/MessageContainer'
+import { MessageHeader } from '../shared/MessageHeader'
 
 export const AssistantMessage = ({
   message,
@@ -14,8 +14,8 @@ export const AssistantMessage = ({
   isStreamingMessage?: boolean
 }) => {
   return (
-    <ChatMessageContainer role={Role.Assistant}>
-      <ChatMessageHeader role={Role.Assistant} />
+    <MessageContainer role={Role.Assistant}>
+      <MessageHeader role={Role.Assistant} />
       <MarkdownRender
         role={Role.Assistant}
         isStreamingMessage={isStreamingMessage}
@@ -27,6 +27,6 @@ export const AssistantMessage = ({
           <FeedbackDialog message={message} />
         </div>
       )}
-    </ChatMessageContainer>
+    </MessageContainer>
   )
 }

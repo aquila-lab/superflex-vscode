@@ -1,7 +1,7 @@
 import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
-import { ChatThreadItem } from './ChatThreadItem'
+import { ThreadItem } from './ThreadItem'
 
-export const ChatHistory = () => {
+export const ThreadHistory = () => {
   const { threads, selectThread } = useThreads()
 
   if (threads.length === 0) {
@@ -15,7 +15,7 @@ export const ChatHistory = () => {
           key={thread.id}
           onClick={() => selectThread(thread.id)}
         >
-          <ChatThreadItem thread={thread} />
+          <ThreadItem thread={thread} />
         </div>
       ))}
     </div>

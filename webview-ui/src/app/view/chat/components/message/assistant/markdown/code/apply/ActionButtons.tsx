@@ -1,6 +1,6 @@
-import { Button } from '../../../../../common/ui/Button'
-import { Separator } from '../../../../../common/ui/Separator'
-import { commonApplyButtonStyles } from '../../../../../common/utils'
+import { Button } from '../../../../../../../../../common/ui/Button'
+import { Separator } from '../../../../../../../../../common/ui/Separator'
+import { commonApplyButtonStyles } from '../../../../../../../../../common/utils'
 
 export const ActionButtons = ({
   onAccept,

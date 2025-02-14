@@ -3,9 +3,9 @@ import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   defineVSCodeTheme,
   getLanguageFromPath
-} from '../../../../../common/utils'
+} from '../../../../../../../../common/utils'
 
-export const Editor = ({
+export const CodeEditor = ({
   extension,
   filePath,
   maxHeight,

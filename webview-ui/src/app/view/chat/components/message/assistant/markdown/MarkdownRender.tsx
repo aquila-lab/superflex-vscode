@@ -5,9 +5,9 @@ import {
   cn,
   defaultClassName,
   roleClassName
-} from '../../../../../common/utils'
+} from '../../../../../../../common/utils'
 import { MarkdownCode } from './MarkdownCode'
-import type { Role } from '../../../../../../../shared/model'
+import type { Role } from '../../../../../../../../../shared/model'
 
 export const MarkdownRender = ({
   role,

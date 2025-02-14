@@ -2,10 +2,10 @@ import { useCallback, useRef, useState } from 'react'
 import {
   EventRequestType,
   EventResponseType
-} from '../../../../../../../shared/protocol'
-import type { ApplyState } from '../../../../../common/utils'
-import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
-import { usePostMessage } from '../../../../layers/global/hooks/usePostMessage'
+} from '../../../../../../../../../../../shared/protocol'
+import type { ApplyState } from '../../../../../../../../../common/utils'
+import { useConsumeMessage } from '../../../../../../../../layers/global/hooks/useConsumeMessage'
+import { usePostMessage } from '../../../../../../../../layers/global/hooks/usePostMessage'
 import { ActionButtons } from './ActionButtons'
 import { ApplyButton } from './ApplyButton'
 import { ApplySpinner } from './ApplySpinner'

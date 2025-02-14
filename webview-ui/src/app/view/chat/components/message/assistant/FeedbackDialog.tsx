@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react'
-import type { Message } from '../../../../../../../shared/model'
-import { EventRequestType } from '../../../../../../../shared/protocol'
-import { Button } from '../../../../../common/ui/Button'
-import { usePostMessage } from '../../../../layers/global/hooks/usePostMessage'
+import type { Message } from '../../../../../../../../shared/model'
+import { EventRequestType } from '../../../../../../../../shared/protocol'
+import { Button } from '../../../../../../common/ui/Button'
+import { usePostMessage } from '../../../../../layers/global/hooks/usePostMessage'
 
 export const FeedbackDialog = ({ message }: { message: Message }) => {
   const postMessage = usePostMessage()

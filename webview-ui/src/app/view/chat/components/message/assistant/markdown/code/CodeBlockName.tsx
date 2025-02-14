@@ -4,13 +4,13 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '../../../../../common/ui/Tooltip'
-import { EventRequestType } from '../../../../../../../shared/protocol'
-import { getFileName } from '../../../../../common/utils'
-import { usePostMessage } from '../../../../layers/global/hooks/usePostMessage'
-import { FileIcon } from '../../../../../common/ui/FileIcon'
+} from '../../../../../../../../common/ui/Tooltip'
+import { EventRequestType } from '../../../../../../../../../../shared/protocol'
+import { getFileName } from '../../../../../../../../common/utils'
+import { usePostMessage } from '../../../../../../../layers/global/hooks/usePostMessage'
+import { FileIcon } from '../../../../../../../../common/ui/FileIcon'
 
-export const FileInfo = ({ filePath }: { filePath: string }) => {
+export const CodeBlockName = ({ filePath }: { filePath: string }) => {
   const postMessage = usePostMessage()
 
   const handleFileNameClick = useCallback(

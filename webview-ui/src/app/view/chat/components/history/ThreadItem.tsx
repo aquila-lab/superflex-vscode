@@ -2,7 +2,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useMemo } from 'react'
 import type { Thread } from '../../../../../../../shared/model'
 
-export const ChatThreadItem = ({ thread }: { thread: Thread }) => {
+export const ThreadItem = ({ thread }: { thread: Thread }) => {
   const duration = useMemo(() => {
     return formatDistanceToNow(new Date(thread.updatedAt), { addSuffix: false })
   }, [thread.updatedAt])

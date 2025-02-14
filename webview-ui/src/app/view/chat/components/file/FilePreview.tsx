@@ -5,7 +5,7 @@ import {
 } from '../../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
 import { useFiles } from '../../providers/FilesProvider'
-import { Editor } from '../markdown/Editor'
+import { CodeEditor } from '../message/assistant/markdown/code/CodeEditor'
 
 export const FilePreview = () => {
   const { previewedFile: file, fetchFileContent } = useFiles()
@@ -40,12 +40,12 @@ export const FilePreview = () => {
   return (
     <div className='rounded-md -mb-1 mt-1.5 mx-1.5 bg-background border border-accent'>
       <div className='max-h-60 overflow-hidden'>
-        <Editor
+        <CodeEditor
           filePath={file.relativePath}
           maxHeight={200}
         >
           {file.content ?? content}
-        </Editor>
+        </CodeEditor>
       </div>
     </div>
   )

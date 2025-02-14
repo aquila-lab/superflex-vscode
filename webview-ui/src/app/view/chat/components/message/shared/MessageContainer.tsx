@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
-import { Role } from '../../../../../../../shared/model'
-import { cn } from '../../../../../common/utils'
+import { Role } from '../../../../../../../../shared/model'
+import { cn } from '../../../../../../common/utils'
 
-export const ChatMessageContainer = ({
+export const MessageContainer = ({
   role,
   children,
   className

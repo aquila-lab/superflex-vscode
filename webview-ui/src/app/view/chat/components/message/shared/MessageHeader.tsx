@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
-import { Role } from '../../../../../../../shared/model'
+import { Role } from '../../../../../../../../shared/model'
 import {
   Avatar,
   AvatarFallback,
   AvatarImage
-} from '../../../../../common/ui/Avatar'
-import { getAvatarConfig } from '../../../../../common/utils'
+} from '../../../../../../common/ui/Avatar'
+import { getAvatarConfig } from '../../../../../../common/utils'
 
-export const ChatMessageHeader = ({
+export const MessageHeader = ({
   role,
   picture,
   username,
