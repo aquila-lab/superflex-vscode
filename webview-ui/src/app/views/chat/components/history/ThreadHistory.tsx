@@ -42,9 +42,20 @@ export const ThreadHistory = () => {
           <h2 className='text-sm font-medium text-muted-foreground'>
             Recent Conversations
           </h2>
-          <span className='text-xxs text-muted-secondary-foreground'>
-            {currentPosition} / {totalThreads}
-          </span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className='text-xxs text-muted-secondary-foreground'>
+                  {currentPosition} / {totalThreads}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className='text-xs m-0 text-muted-foreground'>
+                  Scroll to view more conversations
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className='flex items-center gap-0.5 text-muted-foreground text-sm'>
           <TooltipProvider>
