@@ -46,7 +46,7 @@ export const ThreadHistory = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className='text-xxs text-muted-secondary-foreground'>
-                  {currentPosition} / {totalThreads}
+                  {currentPosition + 5} / {totalThreads}
                 </span>
               </TooltipTrigger>
               <TooltipContent>
