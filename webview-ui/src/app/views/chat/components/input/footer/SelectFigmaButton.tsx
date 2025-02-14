@@ -8,7 +8,7 @@ import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvider'
 import { useGlobal } from '../../../../../layers/global/providers/GlobalProvider'
 
-export const FigmaButton = () => {
+export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
   const { isFigmaLoading, openSelectionModal } = useAttachment()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()

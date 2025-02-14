@@ -6,7 +6,7 @@ import { useEditMode } from '../../providers/EditModeProvider'
 import { FilesProvider } from '../../providers/FilesProvider'
 import { SendMessageProvider } from '../../providers/SendMessageProvider'
 import { AdvancedTextareaContainer } from './AdvancedTextareaContainer'
-import { AdvancedTextareaFooter } from './AdvancedTextareaFooter'
+import { AdvancedTextareaFooter } from './footer/AdvancedTextareaFooter'
 import { AdvancedTextareaHeader } from './AdvancedTextareaHeader'
 import { FilePreview } from './file/FilePreview'
 

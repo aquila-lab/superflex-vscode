@@ -5,7 +5,7 @@ import { useNewMessage } from '../../../../../layers/authenticated/providers/New
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
 
-export const FilePicker = () => {
+export const SelectImageButton = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { focusInput } = useInput()
   const { removeAttachment, setImageAttachment } = useAttachment()
