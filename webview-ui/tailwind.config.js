@@ -16,7 +16,8 @@ export default {
       },
       fontSize: {
         sm: ['13px', '19px'],
-        md: ['14px', '20px']
+        md: ['14px', '20px'],
+        xxs: ['10px', '14px']
       },
       border: {
         DEFAULT: '1px'

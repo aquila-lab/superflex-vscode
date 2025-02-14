@@ -5,10 +5,12 @@ import { ThreadItem } from './ThreadItem'
 
 export const VirtualizedThreadList = ({
   threads,
-  onSelect
+  onSelect,
+  onScroll
 }: {
   threads: Thread[]
   onSelect: (threadId: string) => void
+  onScroll: (position: number) => void
 }) => {
   const rowRenderer = useMemo(
     () =>
@@ -32,8 +34,12 @@ export const VirtualizedThreadList = ({
     [threads, onSelect]
   )
 
+  const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
+    onScroll(scrollTop)
+  }
+
   return (
-    <div className='h-[240px] scrollbar-hide'>
+    <div className='h-[240px]'>
       <AutoSizer>
         {({ height, width }) => (
           <List
@@ -42,7 +48,9 @@ export const VirtualizedThreadList = ({
             rowCount={threads.length}
             rowHeight={40}
             rowRenderer={rowRenderer}
-            overscanRowCount={5}
+            overscanRowCount={3}
+            onScroll={handleScroll}
+            scrollToAlignment='start'
             aria-label='Thread history'
             tabIndex={0}
             role='listbox'
