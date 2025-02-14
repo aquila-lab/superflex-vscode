@@ -238,3 +238,15 @@ export const HINTS = [
 
 export type MessageHandler = (message: TypedEventResponseMessage) => void
  
+export interface UseDragAndDrop<T> {
+  onDrop: (file: File) => Promise<T> | T
+  validate?: (file: File) => boolean
+  onInvalid?: (file: File) => void
+  onError?: (error: Error) => void
+}
+
+export interface UseImageDragAndDrop {
+  onImageDrop: (imageBase64: string) => void
+  onInvalidFile?: (fileType: string) => void
+  onError?: (error: Error) => void
+}
