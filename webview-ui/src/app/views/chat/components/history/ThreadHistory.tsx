@@ -4,6 +4,12 @@ import { ChevronUpIcon, ChevronDownIcon } from '@radix-ui/react-icons'
 import { useState, useCallback, useRef } from 'react'
 import { Button } from '../../../../../common/ui/Button'
 import type { List } from 'react-virtualized'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '../../../../../common/ui/Tooltip'
 
 export const ThreadHistory = () => {
   const { threads, selectThread } = useThreads()
@@ -41,24 +47,45 @@ export const ThreadHistory = () => {
           </span>
         </div>
         <div className='flex items-center gap-0.5 text-muted-foreground text-sm'>
-          <Button
-            variant='text'
-            size='icon'
-            onClick={handleScrollToTop}
-            className='hover:text-foreground w-auto h-auto'
-            aria-label='Scroll to top'
-          >
-            <ChevronUpIcon className='size-3' />
-          </Button>
-          <Button
-            variant='text'
-            size='icon'
-            onClick={handleScrollToBottom}
-            className='hover:text-foreground w-auto h-auto'
-            aria-label='Scroll to bottom'
-          >
-            <ChevronDownIcon className='size-3' />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='text'
+                  size='icon'
+                  onClick={handleScrollToTop}
+                  className='hover:text-foreground w-auto h-auto'
+                  aria-label='Scroll to top'
+                >
+                  <ChevronUpIcon className='size-3' />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className='text-xs m-0 text-muted-foreground'>
+                  Show most recent
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='text'
+                  size='icon'
+                  onClick={handleScrollToBottom}
+                  className='hover:text-foreground w-auto h-auto'
+                  aria-label='Scroll to bottom'
+                >
+                  <ChevronDownIcon className='size-3' />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className='text-xs m-0 text-muted-foreground'>Show oldest</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       <VirtualizedThreadList
