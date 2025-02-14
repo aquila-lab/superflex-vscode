@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import { LoadingView } from '../../../view/loading/LoadingView'
+import { LoadingView } from '../../../views/loading/LoadingView'
 import { useGlobal } from '../providers/GlobalProvider'
 
 export const PublicGuard = () => {

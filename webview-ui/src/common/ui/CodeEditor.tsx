@@ -1,9 +1,6 @@
 import MonacoEditor, { type Monaco } from '@monaco-editor/react'
 import { type ReactNode, useEffect, useMemo, useState } from 'react'
-import {
-  defineVSCodeTheme,
-  getLanguageFromPath
-} from '../../../../../../../../common/utils'
+import { defineVSCodeTheme, getLanguageFromPath } from '../utils'
 
 export const CodeEditor = ({
   extension,

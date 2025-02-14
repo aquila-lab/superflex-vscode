@@ -11,6 +11,7 @@ import { type Message, Role } from '../../../../../../shared/model'
 import { useThreads } from './ThreadsProvider'
 
 const MessagesContext = createContext<{
+  hasMessages: boolean
   messages: Message[]
   addMessages: (messages: Message[]) => void
   updateUserMessage: (messageId: string, text: string) => void
@@ -27,6 +28,8 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
   const { currentThread } = useThreads()
 
   const [messages, setMessages] = useState<Message[]>([])
+
+  const hasMessages = useMemo(() => messages.length > 0, [messages])
 
   useEffect(() => {
     if (currentThread) {
@@ -93,6 +96,7 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
 
   const value = useMemo(
     () => ({
+      hasMessages,
       messages,
       addMessages,
       updateUserMessage,
@@ -101,6 +105,7 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       setIdToLastUserMessage
     }),
     [
+      hasMessages,
       messages,
       addMessages,
       updateUserMessage,

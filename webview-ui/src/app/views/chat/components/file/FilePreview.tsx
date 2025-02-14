@@ -5,7 +5,7 @@ import {
 } from '../../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
 import { useFiles } from '../../providers/FilesProvider'
-import { CodeEditor } from '../message/assistant/markdown/code/CodeEditor'
+import { CodeEditor } from '../../../../../common/ui/CodeEditor'
 
 export const FilePreview = () => {
   const { previewedFile: file, fetchFileContent } = useFiles()

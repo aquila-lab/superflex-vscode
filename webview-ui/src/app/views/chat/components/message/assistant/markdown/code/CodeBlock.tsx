@@ -1,4 +1,4 @@
-import { CodeEditor } from './CodeEditor'
+import { CodeEditor } from '../../../../../../../../common/ui/CodeEditor'
 import { CodeBlockToolbar } from './CodeBlockToolbar'
 
 export const CodeBlock = ({

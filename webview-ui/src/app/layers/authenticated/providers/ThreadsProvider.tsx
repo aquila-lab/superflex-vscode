@@ -15,7 +15,7 @@ import {
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
 import { NULL_UUID } from '../../../../common/utils'
-import { LoadingView } from '../../../view/loading/LoadingView'
+import { LoadingView } from '../../../views/loading/LoadingView'
 import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../global/hooks/usePostMessage'
 

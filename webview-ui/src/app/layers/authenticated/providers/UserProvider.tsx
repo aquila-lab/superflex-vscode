@@ -22,6 +22,7 @@ const UserContext = createContext<{
   subscription: UserSubscription | null
   isUserLoading: boolean
   isSubscriptionLoading: boolean
+  isOutOfRequests: boolean
   fetchUserInfo: () => void
   fetchSubscription: () => void
   subscribe: (url?: string) => void
@@ -37,6 +38,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   )
   const [isUserLoading, setIsUserLoading] = useState(true)
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true)
+
+  const isOutOfRequests = useMemo(
+    () =>
+      Boolean(
+        subscription?.plan &&
+          subscription.basicRequestsUsed >= subscription.plan.basicRequestLimit
+      ),
+    [subscription]
+  )
 
   const handleUserInfo = useCallback(
     (payload: EventResponsePayload[EventResponseType.GET_USER_INFO]) => {
@@ -115,6 +125,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       subscription,
       isUserLoading,
       isSubscriptionLoading,
+      isOutOfRequests,
       fetchUserInfo,
       fetchSubscription,
       subscribe,
@@ -125,6 +136,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       subscription,
       isUserLoading,
       isSubscriptionLoading,
+      isOutOfRequests,
       fetchUserInfo,
       fetchSubscription,
       subscribe,
