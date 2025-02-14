@@ -9,6 +9,7 @@ import { AdvancedTextareaContainer } from './AdvancedTextareaContainer'
 import { AdvancedTextareaFooter } from './footer/AdvancedTextareaFooter'
 import { AdvancedTextareaHeader } from './AdvancedTextareaHeader'
 import { FilePreview } from './file/FilePreview'
+import { TextareaFooterProvider } from '../../providers/TextareaFooterProvider'
 
 export const AdvancedTextareaContent = ({
   content
@@ -25,7 +26,9 @@ export const AdvancedTextareaContent = ({
         <AdvancedTextareaHeader />
         <SendMessageProvider>
           <CoreTextarea />
-          <AdvancedTextareaFooter />
+          <TextareaFooterProvider>
+            <AdvancedTextareaFooter />
+          </TextareaFooterProvider>
         </SendMessageProvider>
         {!isMainTextarea && <Attachment />}
       </FilesProvider>
