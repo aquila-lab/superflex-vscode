@@ -5,10 +5,10 @@ import {
   type EventResponseMessage,
   EventResponseType
 } from '../../../../../shared/protocol'
-import { useConsumeMessage } from '../../layer/global/hooks/useConsumeMessage'
-import { usePostMessage } from '../../layer/global/hooks/usePostMessage'
-import { LoginAuthLinkView } from './partials/LoginAuthLinkView'
-import { LoginDefaultView } from './partials/LoginDefaultView'
+import { useConsumeMessage } from '../../layers/global/hooks/useConsumeMessage'
+import { usePostMessage } from '../../layers/global/hooks/usePostMessage'
+import { LoginAuthLinkView } from './components/LoginAuthLinkView'
+import { LoginDefaultView } from './components/LoginDefaultView'
 
 export const LoginView = () => {
   const postMessage = usePostMessage()

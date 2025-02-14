@@ -2,9 +2,9 @@ import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import { useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../common/ui/Button'
-import { useUser } from '../../layer/authenticated/UserProvider'
-import { BillingCard } from './partials/BillingCard'
-import { UserInfoCard } from './partials/UserInfoCard'
+import { useUser } from '../../layers/authenticated/providers/UserProvider'
+import { BillingCard } from './components/BillingCard'
+import { UserInfoCard } from './components/UserInfoCard'
 
 export const SettingsView = () => {
   const navigate = useNavigate()

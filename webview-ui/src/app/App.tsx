@@ -1,6 +1,6 @@
-import { GlobalProvider } from './layer/global/GlobalProvider'
-import { VSCodeProvider } from './layer/global/VSCodeProvider'
-import { Router } from './layer/global/router/Router'
+import { GlobalProvider } from './layers/global/providers/GlobalProvider'
+import { VSCodeProvider } from './layers/global/providers/VSCodeProvider'
+import { Router } from './layers/global/router/Router'
 
 export const App = () => {
   return (
