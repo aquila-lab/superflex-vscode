@@ -1,17 +1,16 @@
-import { useMemo } from 'react'
+import { useMemo, forwardRef } from 'react'
 import { List, AutoSizer } from 'react-virtualized'
 import type { Thread } from '../../../../../../../shared/model'
 import { ThreadItem } from './ThreadItem'
 
-export const VirtualizedThreadList = ({
-  threads,
-  onSelect,
-  onScroll
-}: {
-  threads: Thread[]
-  onSelect: (threadId: string) => void
-  onScroll: (position: number) => void
-}) => {
+export const VirtualizedThreadList = forwardRef<
+  List,
+  {
+    threads: Thread[]
+    onSelect: (threadId: string) => void
+    onScroll: (position: number) => void
+  }
+>(({ threads, onSelect, onScroll }, ref) => {
   const rowRenderer = useMemo(
     () =>
       ({
@@ -43,6 +42,7 @@ export const VirtualizedThreadList = ({
       <AutoSizer>
         {({ height, width }) => (
           <List
+            ref={ref}
             width={width}
             height={height}
             rowCount={threads.length}
@@ -60,4 +60,6 @@ export const VirtualizedThreadList = ({
       </AutoSizer>
     </div>
   )
-}
+})
+
+VirtualizedThreadList.displayName = 'VirtualizedThreadList'
