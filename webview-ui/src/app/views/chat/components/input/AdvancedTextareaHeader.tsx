@@ -1,8 +1,8 @@
 import { useEditMode } from '../../providers/EditModeProvider'
-import { FileSelectorPopover } from '../file/FileSelectorPopover'
-import { SelectedFiles } from '../file/SelectedFiles'
+import { FileSelectorPopover } from './file/FileSelectorPopover'
+import { SelectedFiles } from './file/SelectedFiles'
 
-export const ChatTopToolbar = () => {
+export const AdvancedTextareaHeader = () => {
   const { isEditMode } = useEditMode()
 
   return (

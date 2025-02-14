@@ -1,28 +1,29 @@
-import type { MessageContent } from '../../../../../../../shared/model'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useEditMode } from '../../providers/EditModeProvider'
 import { InputProvider } from '../../providers/InputProvider'
-import { InputSection } from './InputSection'
 import { UserMessageHeader } from '../message/user/UserMessageHeader'
-import { ChatAttachment } from './ChatAttachment'
-import { FigmaSelectionModal } from './FigmaSelectionModal'
+import { Attachment } from './attachment/Attachment'
+import { FigmaSelectionModal } from './attachment/FigmaSelectionModal'
+import type { ReactNode } from 'react'
 
-export const ChatInputBox = ({
-  content,
-  messageId
+export const AdvancedTextareaPresenter = ({
+  text,
+  messageId,
+  children
 }: {
-  content?: MessageContent
+  text?: string | undefined
   messageId?: string
+  children: ReactNode
 }) => {
-  const { isMainTextbox, isDraft } = useEditMode()
+  const { isMainTextarea, isDraft } = useEditMode()
   const { user } = useUser()
 
-  if (isMainTextbox) {
+  if (isMainTextarea) {
     return (
       <>
-        <ChatAttachment />
-        <InputProvider text={content?.text}>
-          <InputSection content={content} />
+        <Attachment />
+        <InputProvider text={text}>
+          {children}
           <FigmaSelectionModal />
         </InputProvider>
       </>
@@ -31,7 +32,7 @@ export const ChatInputBox = ({
 
   return (
     <InputProvider
-      text={content?.text}
+      text={text}
       id={messageId}
     >
       <UserMessageHeader
@@ -39,7 +40,7 @@ export const ChatInputBox = ({
         username={user.username}
         isDraft={isDraft}
       />
-      <InputSection content={content} />
+      {children}
       <FigmaSelectionModal />
     </InputProvider>
   )

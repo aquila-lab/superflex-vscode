@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
 import { FaFigma } from 'react-icons/fa'
-import { Button } from '../../../../../common/ui/Button'
-import { cn } from '../../../../../common/utils'
-import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
-import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
-import { useAttachment } from '../../providers/AttachmentProvider'
-import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
-import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
+import { Button } from '../../../../../../common/ui/Button'
+import { cn } from '../../../../../../common/utils'
+import { useNewMessage } from '../../../../../layers/authenticated/providers/NewMessageProvider'
+import { useUser } from '../../../../../layers/authenticated/providers/UserProvider'
+import { useAttachment } from '../../../providers/AttachmentProvider'
+import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvider'
+import { useGlobal } from '../../../../../layers/global/providers/GlobalProvider'
 
 export const FigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()

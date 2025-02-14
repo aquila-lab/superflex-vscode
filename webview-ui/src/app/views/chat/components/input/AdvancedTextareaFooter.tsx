@@ -7,12 +7,12 @@ import { useAttachment } from '../../providers/AttachmentProvider'
 import { useEditMode } from '../../providers/EditModeProvider'
 import { useInput } from '../../providers/InputProvider'
 import { useSendMessage } from '../../providers/SendMessageProvider'
-import { FigmaButton } from './FigmaButton'
-import { FilePicker } from '../file/FilePicker'
+import { FigmaButton } from './attachment/FigmaButton'
+import { FilePicker } from './file/FilePicker'
 
-export const ChatBottomToolbar = () => {
+export const AdvancedTextareaFooter = () => {
   const { input } = useInput()
-  const { isEditMode, isMainTextbox } = useEditMode()
+  const { isEditMode, isMainTextarea } = useEditMode()
   const { isMessageProcessing, isMessageStreaming, stopStreaming } =
     useNewMessage()
   const { figmaAttachment, imageAttachment, isFigmaLoading } = useAttachment()
@@ -31,7 +31,7 @@ export const ChatBottomToolbar = () => {
     return null
   }
 
-  if (!isMainTextbox) {
+  if (!isMainTextarea) {
     return (
       <div className='flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2'>
         <div className='flex flex-row items-center gap-1'>

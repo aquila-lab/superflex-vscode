@@ -20,11 +20,11 @@ import { useFiles } from '../../providers/FilesProvider'
 import { useInput } from '../../providers/InputProvider'
 import { useSendMessage } from '../../providers/SendMessageProvider'
 
-export const ChatTextarea = () => {
+export const CoreTextarea = () => {
   const postMessage = usePostMessage()
   const { input, inputRef, setInput, focusInput } = useInput()
   const { selectFile, setPreviewedFile } = useFiles()
-  const { isEditMode, isMainTextbox } = useEditMode()
+  const { isEditMode, isMainTextarea } = useEditMode()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
   const { figmaAttachment, imageAttachment, isFigmaLoading } = useAttachment()
   const { sendMessage } = useSendMessage()
@@ -40,7 +40,7 @@ export const ChatTextarea = () => {
         return
       }
 
-      const canSubmit = isMainTextbox
+      const canSubmit = isMainTextarea
         ? !isDisabled && hasContent
         : !isFigmaLoading && hasContent
 
@@ -50,7 +50,7 @@ export const ChatTextarea = () => {
       }
     },
     [
-      isMainTextbox,
+      isMainTextarea,
       isDisabled,
       sendMessage,
       figmaAttachment,

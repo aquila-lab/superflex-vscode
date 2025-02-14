@@ -13,7 +13,7 @@ export const EditModeContext = createContext<{
   isDraft: boolean
   setIsEditMode: Dispatch<SetStateAction<boolean>>
   setIsDraft: Dispatch<SetStateAction<boolean>>
-  isMainTextbox: boolean
+  isMainTextarea: boolean
 } | null>(null)
 
 export const EditModeProvider = ({ children }: { children: ReactNode }) => {
@@ -26,7 +26,7 @@ export const EditModeProvider = ({ children }: { children: ReactNode }) => {
       isDraft,
       setIsEditMode,
       setIsDraft,
-      isMainTextbox: false
+      isMainTextarea: false
     }),
     [isEditMode, isDraft]
   )
@@ -47,7 +47,7 @@ export function useEditMode() {
       isDraft: false,
       setIsEditMode: () => {},
       setIsDraft: () => {},
-      isMainTextbox: true
+      isMainTextarea: true
     }
   }
 

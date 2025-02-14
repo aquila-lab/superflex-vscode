@@ -1,20 +1,5 @@
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon } from '@radix-ui/react-icons'
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent
-} from '@radix-ui/react-popover'
 import { useCallback, useEffect, useState } from 'react'
-import {
-  type FilePayload,
-  type EventResponseMessage,
-  EventResponseType
-} from '../../../../../../../shared/protocol'
-import { Button } from '../../../../../common/ui/Button'
-import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
-import { useEditMode } from '../../providers/EditModeProvider'
-import { useFiles } from '../../providers/FilesProvider'
-import { FileIcon } from '../../../../../common/ui/FileIcon'
 import {
   Command,
   CommandEmpty,
@@ -22,7 +7,22 @@ import {
   CommandInput,
   CommandItem,
   CommandList
-} from '../../../../../common/ui/Command'
+} from '../../../../../../common/ui/Command'
+import {
+  type FilePayload,
+  type EventResponseMessage,
+  EventResponseType
+} from '../../../../../../../../shared/protocol'
+import { Button } from '../../../../../../common/ui/Button'
+import { useConsumeMessage } from '../../../../../layers/global/hooks/useConsumeMessage'
+import { useEditMode } from '../../../providers/EditModeProvider'
+import { useFiles } from '../../../providers/FilesProvider'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '../../../../../../common/ui/Popover'
+import { FileIcon } from '../../../../../../common/ui/FileIcon'
 
 export const FileSelectorPopover = () => {
   const { selectedFiles, fetchFiles, selectFile } = useFiles()

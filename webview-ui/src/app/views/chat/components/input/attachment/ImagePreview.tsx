@@ -1,7 +1,7 @@
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { type VariantProps, cva } from 'class-variance-authority'
-import { Spinner } from '../../../../../common/ui/Spinner'
-import { cn } from '../../../../../common/utils'
+import { Spinner } from '../../../../../../common/ui/Spinner'
+import { cn } from '../../../../../../common/utils'
 
 const imagePreviewVariants = cva('object-cover rounded-md', {
   variants: {

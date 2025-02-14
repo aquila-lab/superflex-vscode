@@ -20,7 +20,7 @@ export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
   const { selectedFiles, clearManuallySelectedFiles } = useFiles()
   const { sendMessageContent, stopStreaming } = useNewMessage()
   const { figmaAttachment, imageAttachment, removeAttachment } = useAttachment()
-  const { isMainTextbox } = useEditMode()
+  const { isMainTextarea } = useEditMode()
 
   const sendMessage = useCallback(() => {
     const sm = () => {
@@ -41,7 +41,7 @@ export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
       clearManuallySelectedFiles()
     }
 
-    if (isMainTextbox) {
+    if (isMainTextarea) {
       sm()
       return
     }
@@ -50,7 +50,7 @@ export const SendMessageProvider = ({ children }: { children: ReactNode }) => {
     sm()
   }, [
     messageId,
-    isMainTextbox,
+    isMainTextarea,
     figmaAttachment,
     imageAttachment,
     input,

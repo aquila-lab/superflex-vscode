@@ -1,14 +1,14 @@
 import { type ChangeEvent, useCallback } from 'react'
-import { Button } from '../../../../../common/ui/Button'
+import { Button } from '../../../../../../common/ui/Button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle
-} from '../../../../../common/ui/Dialog'
-import { Input } from '../../../../../common/ui/Input'
-import { useAttachment } from '../../providers/AttachmentProvider'
-import { useInput } from '../../providers/InputProvider'
+} from '../../../../../../common/ui/Dialog'
+import { Input } from '../../../../../../common/ui/Input'
+import { useAttachment } from '../../../providers/AttachmentProvider'
+import { useInput } from '../../../providers/InputProvider'
 
 export const FigmaSelectionModal = () => {
   const { focusInput } = useInput()

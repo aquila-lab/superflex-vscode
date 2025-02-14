@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { useEditMode } from '../../providers/EditModeProvider'
 import { FileTab } from './FileTab'
-import { useFiles } from '../../providers/FilesProvider'
+import { useFiles } from '../../../providers/FilesProvider'
+import { useEditMode } from '../../../providers/EditModeProvider'
 
 export const SelectedFiles = () => {
   const { selectedFiles } = useFiles()

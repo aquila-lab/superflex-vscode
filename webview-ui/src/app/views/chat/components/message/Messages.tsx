@@ -4,9 +4,9 @@ import { cn } from '../../../../../common/utils'
 import { useMessages } from '../../../../layers/authenticated/providers/MessagesProvider'
 import { useOverlay } from '../../../../layers/authenticated/providers/OverlayProvider'
 import { EditModeProvider } from '../../providers/EditModeProvider'
-import { ChatInputBoxWrapper } from '../input/ChatInputBoxWrapper'
 import { AssistantMessage } from './assistant/AssistantMessage'
 import { MessageBox } from './shared/MessageBox'
+import { AdvancedTextarea } from '../input/AdvancedTextarea'
 
 export const Messages = () => {
   const { messages } = useMessages()
@@ -31,7 +31,7 @@ export const Messages = () => {
                 className={messageClasses}
               >
                 <EditModeProvider>
-                  <ChatInputBoxWrapper
+                  <AdvancedTextarea
                     content={content}
                     messageId={id}
                   />

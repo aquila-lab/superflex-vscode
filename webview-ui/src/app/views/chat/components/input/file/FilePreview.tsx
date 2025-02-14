@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   type EventResponseMessage,
   EventResponseType
-} from '../../../../../../../shared/protocol'
-import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
-import { useFiles } from '../../providers/FilesProvider'
-import { CodeEditor } from '../../../../../common/ui/CodeEditor'
+} from '../../../../../../../../shared/protocol'
+import { CodeEditor } from '../../../../../../common/ui/CodeEditor'
+import { useConsumeMessage } from '../../../../../layers/global/hooks/useConsumeMessage'
+import { useFiles } from '../../../providers/FilesProvider'
 
 export const FilePreview = () => {
   const { previewedFile: file, fetchFileContent } = useFiles()

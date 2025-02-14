@@ -8,7 +8,7 @@ import {
 import { readImageFileAsBase64, cn } from '../../../../../common/utils'
 import { useAttachment } from '../../providers/AttachmentProvider'
 
-export const ChatInputBoxDnd = ({
+export const AdvancedTextareaDnd = ({
   children
 }: {
   children: ReactNode

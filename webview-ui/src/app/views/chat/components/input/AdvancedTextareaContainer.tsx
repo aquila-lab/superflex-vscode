@@ -9,16 +9,17 @@ import { useNewMessage } from '../../../../layers/authenticated/providers/NewMes
 import { useEditMode } from '../../providers/EditModeProvider'
 import { useInput } from '../../providers/InputProvider'
 
-export const ChatInputBoxWrapperContainer = ({
+export const AdvancedTextareaContainer = ({
   children
 }: { children: ReactNode }) => {
   const { input, focusInput, messageId } = useInput()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { isEditMode, setIsEditMode, setIsDraft, isMainTextbox } = useEditMode()
+  const { isEditMode, setIsEditMode, setIsDraft, isMainTextarea } =
+    useEditMode()
   const { getMessage, updateUserMessage } = useMessages()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const isDisabled =
-    (isMessageProcessing || isMessageStreaming) && isMainTextbox
+    (isMessageProcessing || isMessageStreaming) && isMainTextarea
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => {

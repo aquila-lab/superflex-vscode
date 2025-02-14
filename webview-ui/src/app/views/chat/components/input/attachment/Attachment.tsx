@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react'
-import { useAttachment } from '../../providers/AttachmentProvider'
-import { useEditMode } from '../../providers/EditModeProvider'
+import { useAttachment } from '../../../providers/AttachmentProvider'
+import { useEditMode } from '../../../providers/EditModeProvider'
 import { ImagePreview } from './ImagePreview'
 
-export const ChatAttachment = () => {
+export const Attachment = () => {
   const { imageAttachment, figmaAttachment, isFigmaLoading, removeAttachment } =
     useAttachment()
-  const { isEditMode, isMainTextbox } = useEditMode()
+  const { isEditMode, isMainTextarea } = useEditMode()
 
   const handleRemoveAttachment = useCallback(
     () => removeAttachment(),
@@ -22,7 +22,7 @@ export const ChatAttachment = () => {
     return null
   }
 
-  if (isMainTextbox) {
+  if (isMainTextarea) {
     return (
       <div className='flex items-center bg-transparent p-2'>
         <ImagePreview

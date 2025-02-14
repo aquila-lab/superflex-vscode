@@ -1,15 +1,15 @@
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { type MouseEvent, useCallback } from 'react'
-import type { FilePayload } from '../../../../../../../shared/protocol'
-import { Button } from '../../../../../common/ui/Button'
-import { cn } from '../../../../../common/utils'
-import { useEditMode } from '../../providers/EditModeProvider'
-import { useFiles } from '../../providers/FilesProvider'
-import { FileIcon } from '../../../../../common/ui/FileIcon'
+import type { FilePayload } from '../../../../../../../../shared/protocol'
+import { Button } from '../../../../../../common/ui/Button'
+import { cn } from '../../../../../../common/utils'
+import { useEditMode } from '../../../providers/EditModeProvider'
+import { useFiles } from '../../../providers/FilesProvider'
+import { FileIcon } from '../../../../../../common/ui/FileIcon'
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
   const { previewedFile, deselectFile, setPreviewedFile } = useFiles()
-  const { isEditMode, isMainTextbox } = useEditMode()
+  const { isEditMode, isMainTextarea } = useEditMode()
 
   const togglePreviewedFile = useCallback(() => {
     if (previewedFile?.id === file.id) {
@@ -51,7 +51,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             {file.startLine &&
               file.endLine &&
               ` (${file?.startLine}-${file?.endLine})`}
-            {file.isCurrentOpenFile && isMainTextbox && '(current)'}
+            {file.isCurrentOpenFile && isMainTextarea && '(current)'}
           </p>
         </div>
         {isEditMode && (
