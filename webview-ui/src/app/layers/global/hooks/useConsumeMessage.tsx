@@ -1,39 +1,17 @@
-import { type DependencyList, useCallback, useEffect } from 'react'
-import type {
-  EventResponseType,
-  TypedEventResponseMessage
-} from '../../../../../../shared/protocol'
+import { useEffect } from 'react'
+import type { EventResponseType } from '../../../../../../shared/protocol'
+import { useMessageBus } from '../providers/MessageBusProvider'
 
-type TypedEventConsumeHandler<T extends EventResponseType> = (
-  event: Extract<TypedEventResponseMessage, { command: T }>
-) => void
-
-export function useConsumeMessage<T extends EventResponseType>(
-  eventTypes: T | T[],
-  handler: TypedEventConsumeHandler<T>,
-  deps: DependencyList = []
-): void {
-  const handleMessage = useCallback(
-    (evt: MessageEvent<TypedEventResponseMessage>) => {
-      const { command } = evt.data || {}
-
-      const matchesType = Array.isArray(eventTypes)
-        ? eventTypes.includes(command as T)
-        : eventTypes === command
-
-      if (!matchesType) {
-        return
-      }
-
-      handler(evt.data as Extract<TypedEventResponseMessage, { command: T }>)
-    },
-    [eventTypes, handler, ...deps]
-  )
+export function useConsumeMessage(
+  events: EventResponseType | EventResponseType[],
+  handler: (payload: any) => void
+) {
+  const { subscribe } = useMessageBus()
 
   useEffect(() => {
-    window.addEventListener('message', handleMessage as EventListener)
-    return () => {
-      window.removeEventListener('message', handleMessage as EventListener)
-    }
-  }, [handleMessage])
+    const eventArray = Array.isArray(events) ? events : [events]
+    const cleanups = eventArray.map(event => subscribe(event, handler))
+
+    return () => cleanups.forEach(cleanup => cleanup())
+  }, [events, handler, subscribe])
 }

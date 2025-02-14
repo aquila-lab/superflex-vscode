@@ -7,7 +7,7 @@ import {
   type MessageContent,
   Role
 } from '../../../shared/model'
-import type { FilePayload } from '../../../shared/protocol'
+import type { FilePayload, TypedEventResponseMessage } from '../../../shared/protocol'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -235,3 +235,6 @@ export const HINTS = [
     shortcut: '⌘+M'
   }
 ]
+
+export type MessageHandler = (message: TypedEventResponseMessage) => void
+ 
