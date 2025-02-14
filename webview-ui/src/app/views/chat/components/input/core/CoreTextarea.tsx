@@ -10,5 +10,9 @@ export const CoreTextarea = () => {
     return null
   }
 
-  return <TextareaElement />
+  return (
+    <div className='flex-1'>
+      <TextareaElement />
+    </div>
+  )
 }
