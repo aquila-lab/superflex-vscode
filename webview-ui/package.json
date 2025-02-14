@@ -34,6 +34,7 @@
     "react-router-dom": "^7.1.5",
     "react-scroll-to-bottom": "^4.2.0",
     "react-textarea-autosize": "^8.5.7",
+    "react-virtualized": "^9.22.6",
     "seti-file-icons": "^0.0.8",
     "tailwind-merge": "^3.0.1"
   },
@@ -45,6 +46,7 @@
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-dom": "^19.0.3",
     "@types/react-scroll-to-bottom": "^4.2.5",
+    "@types/react-virtualized": "^9.22.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.1",

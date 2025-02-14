@@ -1,10 +1,9 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { Command, CommandInput } from '../../../../../../common/ui/Command'
 import { PopoverContent } from '../../../../../../common/ui/Popover'
-import { createFileSearchFilter } from '../../../../../../common/utils'
 import { KeyboardHints } from './KeyboardHints'
-import { FileCommandList } from './FileCommandList'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
+import { VirtualizedFileList } from './VirtualizedFileList'
 
 export const FilePopoverContent = ({
   files,
@@ -15,19 +14,22 @@ export const FilePopoverContent = ({
   selectedFiles: FilePayload[]
   onSelect: (file: FilePayload) => void
 }) => {
-  const customFilter = useMemo(() => createFileSearchFilter(), [])
+  const [searchValue, setSearchValue] = useState('')
 
   return (
     <PopoverContent className='w-60 h-[300px] p-0'>
-      <Command filter={customFilter}>
+      <Command>
         <CommandInput
           placeholder='Search files...'
           className='h-6'
+          value={searchValue}
+          onValueChange={setSearchValue}
         />
-        <FileCommandList
+        <VirtualizedFileList
           files={files}
           selectedFiles={selectedFiles}
           onSelect={onSelect}
+          searchValue={searchValue}
         />
         <KeyboardHints />
       </Command>
