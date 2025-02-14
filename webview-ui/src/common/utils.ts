@@ -7,7 +7,10 @@ import {
   type MessageContent,
   Role
 } from '../../../shared/model'
-import type { FilePayload, TypedEventResponseMessage } from '../../../shared/protocol'
+import type {
+  FilePayload,
+  TypedEventResponseMessage
+} from '../../../shared/protocol'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -237,7 +240,7 @@ export const HINTS = [
 ]
 
 export type MessageHandler = (message: TypedEventResponseMessage) => void
- 
+
 export interface UseDragAndDrop<T> {
   onDrop: (file: File) => Promise<T> | T
   validate?: (file: File) => boolean
@@ -250,3 +253,15 @@ export interface UseImageDragAndDrop {
   onInvalidFile?: (fileType: string) => void
   onError?: (error: Error) => void
 }
+
+export const createFileSearchFilter =
+  () =>
+  (value: string, search: string): number => {
+    const searchTerms = search
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(term => term.length > 0)
+    const valueLower = value.toLowerCase()
+
+    return searchTerms.every(term => valueLower.includes(term)) ? 1 : 0
+  }
