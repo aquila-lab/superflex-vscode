@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Button } from '../../../../common/ui/Button'
+import { Button } from '../../../../../common/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '../../../../common/ui/Dialog'
-import { useUser } from '../../../layers/authenticated/providers/UserProvider'
-import { useFigmaPremiumModal } from '../providers/FigmaPremiumModalProvider'
+} from '../../../../../common/ui/Dialog'
+import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
+import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
 
 export const FigmaPremiumModal = () => {
   const { isOpen, setIsOpen } = useFigmaPremiumModal()

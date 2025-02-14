@@ -1,10 +1,9 @@
 import { useMessages } from '../../../layers/authenticated/providers/MessagesProvider'
 import { ChatContentContainer } from './ChatContentContainer'
-import { EmptyStateContent } from './EmptyStateContent'
+import { EmptyStateContent } from './empty/EmptyStateContent'
 import { ThreadHistory } from './history/ThreadHistory'
 import { AdvancedTextarea } from './input/AdvancedTextarea'
 import { MessageList } from './message/MessageList'
-import { SoftLimitModal } from './SoftLimitModal'
 import { UpgradeButton } from './UpgradeButton'
 
 export const ChatContent = () => {
@@ -17,7 +16,6 @@ export const ChatContent = () => {
       <AdvancedTextarea />
       {!hasMessages && <ThreadHistory />}
       <UpgradeButton />
-      <SoftLimitModal />
     </ChatContentContainer>
   )
 }

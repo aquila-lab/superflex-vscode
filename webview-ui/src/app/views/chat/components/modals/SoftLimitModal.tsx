@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
-import { EventResponseType } from '../../../../../../shared/protocol'
-import { Button } from '../../../../common/ui/Button'
+import { EventResponseType } from '../../../../../../../shared/protocol'
+import { Button } from '../../../../../common/ui/Button'
 import {
   Dialog,
   DialogContent,
@@ -8,9 +8,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle
-} from '../../../../common/ui/Dialog'
-import { useUser } from '../../../layers/authenticated/providers/UserProvider'
-import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
+} from '../../../../../common/ui/Dialog'
+import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
+import { useConsumeMessage } from '../../../../layers/global/hooks/useConsumeMessage'
 
 export function SoftLimitModal() {
   const [isOpen, setIsOpen] = useState(false)
