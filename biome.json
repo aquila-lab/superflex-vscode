@@ -43,6 +43,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
       "a11y": {
         "noSvgWithoutTitle": "off",
         "useKeyWithClickEvents": "off",
@@ -60,7 +63,8 @@
         "noUnreachable": "error",
         "noUnusedVariables": "error",
         "useExhaustiveDependencies": "error",
-        "noConstantCondition": "error"
+        "noConstantCondition": "error",
+        "noUnusedImports": "error"
       },
       "performance": {
         "noDelete": "error"
@@ -71,7 +75,8 @@
         "useBlockStatements": "error",
         "useShorthandArrayType": "error",
         "useTemplate": "error",
-        "noUselessElse": "error"
+        "noUselessElse": "error",
+        "useImportType": "error"
       },
       "suspicious": {
         "noExplicitAny": "off",
@@ -90,8 +95,10 @@
       "semicolons": "asNeeded",
       "arrowParentheses": "asNeeded",
       "indentStyle": "space",
-      "jsxQuoteStyle": "single"
-    }
+      "jsxQuoteStyle": "single",
+      "attributePosition": "multiline"
+    },
+    "jsxRuntime": "transparent"
   },
   "json": {
     "parser": {

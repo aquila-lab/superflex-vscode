@@ -1,0 +1,70 @@
+@import url(./index.css);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  height: 100%;
+  margin: 0 auto;
+  font-family: var(--vscode-font-family);
+  color: var(--vscode-sideBar-foreground);
+  background-color: var(--vscode-sideBar-background);
+  --border-width: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: var(--vscode-sideBar-background);
+  overflow: hidden;
+}
+
+a {
+  font-weight: 500;
+  color: var(--vscode-textLink-foreground);
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--vscode-textLink-activeForeground);
+}
+
+.w-100 {
+  width: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.logo {
+  background-image: url("../assets/logo.png");
+}
+
+.npm__react-simple-code-editor__textarea:focus {
+  outline: none;
+}
+
+.prose pre {
+  padding: 0;
+}
+
+.figma-copy-selection-example {
+  background-image: url("../assets/figma-copy-selection-example.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
