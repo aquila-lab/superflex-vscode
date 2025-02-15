@@ -7,8 +7,8 @@ export const SettingsView = () => (
   <SettingsHandlersProvider>
     <div className='flex-1 w-full p-6 space-y-8'>
       <ReturnToChatButton />
-      <UserInfoCard />
       <BillingCard />
+      <UserInfoCard />
     </div>
   </SettingsHandlersProvider>
 )
