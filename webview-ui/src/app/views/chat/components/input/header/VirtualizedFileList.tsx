@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
-import type { FilePayload } from '../../../../../../../../shared/protocol'
-import { FileCommandList } from './FileCommandList'
 import { List, AutoSizer } from 'react-virtualized'
-import { CommandList } from '../../../../../../common/ui/Command'
+import { customFilesFilter } from '../../../../../../common/utils'
+import type { FilePayload } from '../../../../../../../../shared/protocol'
+import { CommandEmpty, CommandList } from '../../../../../../common/ui/Command'
+import { FileCommandList } from './FileCommandList'
 
 export const VirtualizedFileList = ({
   files,
@@ -21,7 +22,7 @@ export const VirtualizedFileList = ({
     }
 
     return files.filter(file =>
-      file.relativePath.toLowerCase().includes(searchValue.toLowerCase())
+      customFilesFilter(file.relativePath, searchValue)
     )
   }, [files, searchValue])
 
@@ -48,6 +49,8 @@ export const VirtualizedFileList = ({
 
   return (
     <CommandList className='overflow-y-hidden'>
+      <CommandEmpty>No files found.</CommandEmpty>
+
       <div className='h-[240px]'>
         <AutoSizer>
           {({ height, width }) => (
