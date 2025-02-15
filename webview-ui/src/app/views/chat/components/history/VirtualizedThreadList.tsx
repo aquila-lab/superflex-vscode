@@ -1,7 +1,8 @@
-import { useMemo, forwardRef } from 'react'
+import { useMemo, forwardRef, useState } from 'react'
 import { List, AutoSizer } from 'react-virtualized'
 import type { Thread } from '../../../../../../../shared/model'
 import { ThreadItem } from './ThreadItem'
+import { cn } from '../../../../../common/utils'
 
 export const VirtualizedThreadList = forwardRef<
   List,
@@ -11,6 +12,9 @@ export const VirtualizedThreadList = forwardRef<
     onScroll: (position: number) => void
   }
 >(({ threads, onSelect, onScroll }, ref) => {
+  const [showTopGradient, setShowTopGradient] = useState(false)
+  const [showBottomGradient, setShowBottomGradient] = useState(true)
+
   const rowRenderer = useMemo(
     () =>
       ({
@@ -35,10 +39,15 @@ export const VirtualizedThreadList = forwardRef<
 
   const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
     onScroll(scrollTop)
+
+    setShowTopGradient(scrollTop > 20)
+
+    const maxScroll = threads.length * 40 - 240
+    setShowBottomGradient(scrollTop < maxScroll - 20)
   }
 
   return (
-    <div className='h-[240px]'>
+    <div className='h-[240px] relative'>
       <AutoSizer>
         {({ height, width }) => (
           <List
@@ -58,6 +67,20 @@ export const VirtualizedThreadList = forwardRef<
           />
         )}
       </AutoSizer>
+
+      <div
+        className={cn(
+          'absolute top-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-b from-sidebar to-transparent transition-opacity duration-200',
+          showTopGradient ? 'opacity-80' : 'opacity-0'
+        )}
+      />
+
+      <div
+        className={cn(
+          'absolute bottom-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-t from-sidebar to-transparent transition-opacity duration-200',
+          showBottomGradient ? 'opacity-80' : 'opacity-0'
+        )}
+      />
     </div>
   )
 })
