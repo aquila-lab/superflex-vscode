@@ -30,7 +30,7 @@ export const HintMessage = ({
     <div
       className={cn(
         'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
-        'flex items-center text-sm text-muted-foreground transition-all duration-1000',
+        'flex items-center text-sm text-muted-foreground transition-opacity duration-1000',
         'bg-muted bg-opacity-30 border border-muted rounded-lg px-2 py-1.5',
         'whitespace-nowrap max-w-[90%]',
         isVisible ? 'opacity-100' : 'opacity-0'
