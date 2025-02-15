@@ -1,4 +1,4 @@
-import { Progress } from '../../../../common/ui/Progress'
+import { Progress } from '../../../../../common/ui/Progress'
 
 export const UsageDisplay = ({
   label,
