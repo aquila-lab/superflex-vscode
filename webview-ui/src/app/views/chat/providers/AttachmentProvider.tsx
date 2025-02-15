@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState
 } from 'react'
 import type {
@@ -51,6 +52,7 @@ export const AttachmentProvider = ({
   )
   const [figmaAttachment, setFigmaAttachment] =
     useState<FigmaAttachment | null>(attachment?.figma ?? null)
+  const isAwaitingFigmaAttachment = useRef(false)
 
   const openSelectionModal = useCallback(() => {
     setIsSelectionModalOpen(true)
@@ -67,6 +69,7 @@ export const AttachmentProvider = ({
 
   const submitSelection = useCallback(() => {
     postMessage(EventRequestType.CREATE_FIGMA_ATTACHMENT, figmaLink)
+    isAwaitingFigmaAttachment.current = true
     removeAttachment()
     setIsFigmaLoading(true)
     closeSelectionModal()
@@ -77,11 +80,14 @@ export const AttachmentProvider = ({
       payload,
       error
     }: EventResponseMessage<EventResponseType.CREATE_FIGMA_ATTACHMENT>) => {
-      if (!error && payload) {
-        setFigmaAttachment(payload)
+      if (isAwaitingFigmaAttachment.current) {
+        if (!error && payload) {
+          setFigmaAttachment(payload)
+        }
+        setFigmaLink('')
+        setIsFigmaLoading(false)
+        isAwaitingFigmaAttachment.current = false
       }
-      setFigmaLink('')
-      setIsFigmaLoading(false)
     },
     []
   )
