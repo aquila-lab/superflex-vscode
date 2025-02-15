@@ -15,9 +15,11 @@ export const useTextareaClickHandler = ({
 
   useEffect(() => {
     const handlePointer = (event: PointerEvent) => {
-      const isClickInside = wrapperRef.current?.contains(event.target as Node)
+      const target = event.target as HTMLElement
+      const isClickInside = wrapperRef.current?.contains(target)
+      const isClickInModal = target.closest('[role="dialog"]')
 
-      if (!isClickInside) {
+      if (!isClickInside && !isClickInModal) {
         setIsEditMode(false)
 
         if (messageId) {
@@ -30,7 +32,7 @@ export const useTextareaClickHandler = ({
         return
       }
 
-      if (!isEditMode) {
+      if (!isEditMode && !isClickInModal) {
         setIsEditMode(true)
         focusInput()
       }
