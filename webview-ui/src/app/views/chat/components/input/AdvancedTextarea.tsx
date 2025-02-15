@@ -1,4 +1,4 @@
-import { AdvancedTextareaDnd } from './AdvancedTextareaDnd'
+import { AdvancedTextareaDnd } from './dnd/AdvancedTextareaDnd'
 import type { MessageContent } from '../../../../../../../shared/model'
 import { AttachmentProvider } from '../../providers/AttachmentProvider'
 import { AdvancedTextareaPresenter } from './AdvancedTextareaPresenter'

@@ -76,7 +76,7 @@ export const FilesProvider = ({
     ({
       payload
     }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
-      if (isEditMode && payload && isMainTextarea) {
+      if (isEditMode && isMainTextarea) {
         setCurrentFile(payload)
       }
     },

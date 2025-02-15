@@ -2,6 +2,7 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { type VariantProps, cva } from 'class-variance-authority'
 import { Spinner } from '../../../../../../common/ui/Spinner'
 import { cn } from '../../../../../../common/utils'
+import { useEditMode } from '../../../providers/EditModeProvider'
 
 const imagePreviewVariants = cva('object-cover rounded-md', {
   variants: {
@@ -66,6 +67,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
   className,
   ...props
 }) => {
+  const { isMainTextarea } = useEditMode()
   const isValidSrc = src && (isBase64Image(src) || isValidImageUrl(src))
 
   return (
@@ -89,7 +91,10 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
       {onRemove && (
         <button
           aria-label='Remove image'
-          className='absolute -top-1.5 -right-1.5 flex items-center justify-center size-3.5 bg-background rounded-md border border-border hover:bg-muted'
+          className={cn(
+            'absolute flex items-center justify-center size-3.5 bg-background rounded-md border border-border hover:bg-muted',
+            isMainTextarea ? '-top-1.5 -right-1.5' : 'top-1.5 right-1.5'
+          )}
           onClick={onRemove}
           type='button'
         >

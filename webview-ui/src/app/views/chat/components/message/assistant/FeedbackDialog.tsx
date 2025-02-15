@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 import type { Message } from '../../../../../../../../shared/model'
 import { EventRequestType } from '../../../../../../../../shared/protocol'
 import { Button } from '../../../../../../common/ui/Button'
@@ -24,7 +24,7 @@ export const FeedbackDialog = ({ message }: { message: Message }) => {
   return (
     <div className='flex flex-row justify-center items-center gap-4'>
       {!confirmationVisible ? (
-        <>
+        <Fragment>
           <span className='text-xs'>Was this generation useful?</span>
           <div className='flex gap-2'>
             <Button
@@ -42,7 +42,7 @@ export const FeedbackDialog = ({ message }: { message: Message }) => {
               👎 No - Improve it
             </Button>
           </div>
-        </>
+        </Fragment>
       ) : (
         <p className='text-xs p-[5px]'>Thank you for your feedback!</p>
       )}

@@ -44,6 +44,7 @@ export const Attachment = () => {
           size='default'
           alt='preview image'
           src={src}
+          isLoading={isFigmaLoading}
           {...(isEditMode && { onRemove: handleRemoveAttachment })}
         />
       </div>

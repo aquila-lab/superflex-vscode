@@ -36,8 +36,7 @@ export const VSCodeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (vscodeApi) {
       pendingTasks.forEach(task => {
-        console.warn('New task from event queue')
-        console.dir(task)
+        console.warn(`New task from event queue: ${task.command}`)
         vscodeApi.postMessage(task)
       })
       setPendingTasks([])

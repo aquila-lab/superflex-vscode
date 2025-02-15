@@ -19,7 +19,7 @@ export const Messages = () => {
         const isActive = id === activeMessageId
 
         const messageClasses = cn(
-          'relative transition-all duration-200',
+          'relative',
           isActive && 'z-50'
         )
 

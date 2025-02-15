@@ -4,7 +4,7 @@ import { InputProvider } from '../../providers/InputProvider'
 import { UserMessageHeader } from '../message/user/UserMessageHeader'
 import { Attachment } from './attachment/Attachment'
 import { FigmaSelectionModal } from './attachment/FigmaSelectionModal'
-import type { ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 
 export const AdvancedTextareaPresenter = ({
   text,
@@ -20,13 +20,13 @@ export const AdvancedTextareaPresenter = ({
 
   if (isMainTextarea) {
     return (
-      <>
+      <Fragment>
         <Attachment />
         <InputProvider text={text}>
           {children}
           <FigmaSelectionModal />
         </InputProvider>
-      </>
+      </Fragment>
     )
   }
 
