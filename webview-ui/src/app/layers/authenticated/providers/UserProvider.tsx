@@ -95,6 +95,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
         url: url ?? 'https://app.superflex.ai/pricing'
       })
+      postMessage(EventRequestType.GET_USER_SUBSCRIPTION)
     },
     [postMessage]
   )
