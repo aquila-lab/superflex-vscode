@@ -4,6 +4,7 @@ import type {
   Thread,
   ThreadRun
 } from '../../shared/model'
+import type { FetchThreadsResponse } from '../../shared/protocol'
 import { Api } from './api'
 import type { RepoArgs } from './repo'
 import { ApiError, parseError } from './error'
@@ -12,7 +13,6 @@ import {
   buildThreadFromResponse,
   buildThreadRunRequest
 } from './transformers'
-
 export type CreateThreadArgs = RepoArgs & {
   title?: string
 }
@@ -32,12 +32,34 @@ async function createThread({
   }
 }
 
-export type GetThreadsArgs = RepoArgs
+export type GetThreadsArgs = RepoArgs & {
+  cursor?: string
+  take?: number
+}
 
-async function getThreads({ owner, repo }: GetThreadsArgs): Promise<Thread[]> {
+async function getThreads({
+  owner,
+  repo,
+  cursor,
+  take
+}: GetThreadsArgs): Promise<FetchThreadsResponse> {
   try {
-    const { data } = await Api.get(`/repos/${owner}/${repo}/threads`)
-    return Promise.resolve(data.threads.map(buildThreadFromResponse))
+    const params = new URLSearchParams()
+    if (cursor) {
+      params.append('cursor', cursor)
+    }
+    if (take) {
+      params.append('take', take.toString())
+    }
+
+    const { data } = await Api.get(
+      `/repos/${owner}/${repo}/threads?${params.toString()}`
+    )
+    return Promise.resolve({
+      threads: data.threads.map(buildThreadFromResponse),
+      nextCursor: data.next_cursor || null,
+      previousCursor: cursor ?? undefined
+    })
   } catch (err) {
     return Promise.reject(parseError(err))
   }

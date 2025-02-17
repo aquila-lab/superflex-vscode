@@ -12,6 +12,8 @@ import type {
   ConfigPayload,
   CreateAuthLinkPayload,
   FastApplyPayload,
+  FetchThreadsPayload,
+  FetchThreadsResponse,
   FilePayload,
   InitChatState,
   SendNotificationPayload,
@@ -421,7 +423,7 @@ export interface EventRequestPayload {
   [EventRequestType.FIGMA_OAUTH_DISCONNECT]: void
   [EventRequestType.CREATE_FIGMA_ATTACHMENT]: string
   [EventRequestType.NEW_THREAD]: void
-  [EventRequestType.FETCH_THREADS]: void
+  [EventRequestType.FETCH_THREADS]: FetchThreadsPayload
   [EventRequestType.FETCH_THREAD]: { threadID: string }
   [EventRequestType.STOP_MESSAGE]: void
   [EventRequestType.SEND_MESSAGE]: MessageContent
@@ -449,7 +451,7 @@ export interface EventResponsePayload {
   [EventResponseType.FIGMA_OAUTH_DISCONNECT]: void
   [EventResponseType.CREATE_FIGMA_ATTACHMENT]: FigmaAttachment
   [EventResponseType.NEW_THREAD]: Thread
-  [EventResponseType.FETCH_THREADS]: Thread[]
+  [EventResponseType.FETCH_THREADS]: FetchThreadsResponse
   [EventResponseType.FETCH_THREAD]: Thread
   [EventResponseType.STOP_MESSAGE]: boolean
   [EventResponseType.SEND_MESSAGE]: boolean

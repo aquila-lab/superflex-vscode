@@ -54,7 +54,7 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     ({ command, payload }: TypedEventResponseMessage) => {
       switch (command) {
         case EventResponseType.FETCH_THREADS:
-          setThreads(payload)
+          setThreads(payload.threads)
           setIsInitialFetchDone(true)
           break
         case EventResponseType.FETCH_THREAD:

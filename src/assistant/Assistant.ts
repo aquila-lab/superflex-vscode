@@ -4,6 +4,10 @@ import type {
   Thread,
   ThreadRun
 } from '../../shared/model'
+import type {
+  FetchThreadsPayload,
+  FetchThreadsResponse
+} from '../../shared/protocol'
 
 export interface Assistant {
   /**
@@ -19,7 +23,7 @@ export interface Assistant {
    *
    * @returns A promise that resolves with an array of threads.
    */
-  getThreads(): Promise<Thread[]>
+  getThreads(options?: FetchThreadsPayload): Promise<FetchThreadsResponse>
 
   /**
    * Get a specific thread by ID.

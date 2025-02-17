@@ -8,6 +8,10 @@ import type {
   Thread,
   ThreadRun
 } from '../../shared/model'
+import type {
+  FetchThreadsPayload,
+  FetchThreadsResponse
+} from '../../shared/protocol'
 import * as api from '../api'
 import { SuperflexCache } from '../cache/SuperflexCache'
 import { SUPPORTED_FILE_EXTENSIONS } from '../common/constants'
@@ -55,10 +59,13 @@ export default class SuperflexAssistant implements Assistant {
     return thread
   }
 
-  async getThreads(): Promise<Thread[]> {
+  async getThreads(
+    options?: FetchThreadsPayload
+  ): Promise<FetchThreadsResponse> {
     return api.getThreads({
       owner: this.owner,
-      repo: this.repo
+      repo: this.repo,
+      ...options
     })
   }
 
