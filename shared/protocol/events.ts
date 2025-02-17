@@ -227,6 +227,12 @@ export enum EventResponseType {
    */
   INITIALIZED = 'initialized',
 
+  /**
+   * @triggered by extension.
+   * REFRESH will trigger a refresh of the current view.
+   */
+  REFRESH = 'refresh',
+
   // ---------------- LOGIN EVENTS ----------------
 
   /**
@@ -471,6 +477,7 @@ export interface EventRequestPayload {
 export interface EventResponsePayload {
   [EventResponseType.CONFIG]: ConfigPayload
   [EventResponseType.INITIALIZED]: InitChatState
+  [EventResponseType.REFRESH]: void
   [EventResponseType.CREATE_AUTH_LINK]: AuthLinkPayload
   [EventResponseType.SYNC_PROJECT_PROGRESS]: SyncProjectProgressPayload
   [EventResponseType.FIGMA_OAUTH_CONNECT]: boolean
