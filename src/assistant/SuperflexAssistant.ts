@@ -77,6 +77,23 @@ export default class SuperflexAssistant implements Assistant {
     })
   }
 
+  async updateThread(threadID: string, title: string): Promise<Thread> {
+    return api.updateThread({
+      owner: this.owner,
+      repo: this.repo,
+      threadID,
+      title
+    })
+  }
+
+  async deleteThread(threadID: string): Promise<void> {
+    return api.deleteThread({
+      owner: this.owner,
+      repo: this.repo,
+      threadID
+    })
+  }
+
   async stopMessage(): Promise<void> {
     if (this._currentStream) {
       this._currentStream.abort()

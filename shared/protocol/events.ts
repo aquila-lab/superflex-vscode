@@ -123,6 +123,16 @@ export enum EventRequestType {
   FETCH_THREAD = 'fetch_thread',
 
   /**
+   * UPDATE_THREAD will update a thread in the extension.
+   */
+  UPDATE_THREAD = 'update_thread',
+
+  /**
+   * DELETE_THREAD will delete a thread in the extension.
+   */
+  DELETE_THREAD = 'delete_thread',
+
+  /**
    * STOP_MESSAGE will stop the message stream.
    * @returns {boolean} indicating if the message stream was stopped successfully.
    */
@@ -288,6 +298,18 @@ export enum EventResponseType {
   FETCH_THREAD = 'fetch_thread',
 
   /**
+   * @triggered by {EventRequestType.UPDATE_THREAD}
+   * UPDATE_THREAD is used to send the updated thread to the webview.
+   */
+  UPDATE_THREAD = 'update_thread',
+
+  /**
+   * @triggered by {EventRequestType.DELETE_THREAD}
+   * DELETE_THREAD is used to send the boolean indicating if the thread was deleted successfully to the webview.
+   */
+  DELETE_THREAD = 'delete_thread',
+
+  /**
    * @triggered by {EventRequestType.STOP_MESSAGE}
    * STOP_MESSAGE will send the boolean indicating if the message stream was stopped successfully to the webview.
    */
@@ -397,6 +419,8 @@ export const EventRequestToResponseTypeMap: {
   [EventRequestType.NEW_THREAD]: EventResponseType.NEW_THREAD,
   [EventRequestType.FETCH_THREADS]: EventResponseType.FETCH_THREADS,
   [EventRequestType.FETCH_THREAD]: EventResponseType.FETCH_THREAD,
+  [EventRequestType.UPDATE_THREAD]: EventResponseType.UPDATE_THREAD,
+  [EventRequestType.DELETE_THREAD]: EventResponseType.DELETE_THREAD,
   [EventRequestType.STOP_MESSAGE]: EventResponseType.STOP_MESSAGE,
   [EventRequestType.SEND_MESSAGE]: EventResponseType.SEND_MESSAGE,
   [EventRequestType.FAST_APPLY]: EventResponseType.FAST_APPLY,
@@ -425,6 +449,8 @@ export interface EventRequestPayload {
   [EventRequestType.NEW_THREAD]: void
   [EventRequestType.FETCH_THREADS]: FetchThreadsPayload
   [EventRequestType.FETCH_THREAD]: { threadID: string }
+  [EventRequestType.UPDATE_THREAD]: { threadID: string; title: string }
+  [EventRequestType.DELETE_THREAD]: { threadID: string }
   [EventRequestType.STOP_MESSAGE]: void
   [EventRequestType.SEND_MESSAGE]: MessageContent
   [EventRequestType.UPDATE_MESSAGE]: Message | null
@@ -453,6 +479,8 @@ export interface EventResponsePayload {
   [EventResponseType.NEW_THREAD]: Thread
   [EventResponseType.FETCH_THREADS]: FetchThreadsResponse
   [EventResponseType.FETCH_THREAD]: Thread
+  [EventResponseType.UPDATE_THREAD]: Thread
+  [EventResponseType.DELETE_THREAD]: void
   [EventResponseType.STOP_MESSAGE]: boolean
   [EventResponseType.SEND_MESSAGE]: boolean
   [EventResponseType.MESSAGE_TEXT_DELTA]: string

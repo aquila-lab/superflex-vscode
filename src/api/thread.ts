@@ -84,6 +84,27 @@ async function getThread({
   }
 }
 
+export type UpdateThreadArgs = GetThreadArgs & {
+  title: string
+}
+
+async function updateThread({
+  owner,
+  repo,
+  threadID,
+  title
+}: UpdateThreadArgs): Promise<Thread> {
+  try {
+    const { data } = await Api.patch(
+      `/repos/${owner}/${repo}/threads/${threadID}`,
+      { title }
+    )
+    return Promise.resolve(buildThreadFromResponse(data))
+  } catch (err) {
+    return Promise.reject(parseError(err))
+  }
+}
+
 async function deleteThread({
   owner,
   repo,
@@ -270,4 +291,11 @@ async function sendThreadMessage({
   }
 }
 
-export { createThread, getThreads, getThread, deleteThread, sendThreadMessage }
+export {
+  createThread,
+  getThreads,
+  getThread,
+  updateThread,
+  deleteThread,
+  sendThreadMessage
+}
