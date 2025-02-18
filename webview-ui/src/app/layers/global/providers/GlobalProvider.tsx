@@ -57,8 +57,12 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
       setIsFigmaAuthenticated(isFigmaAuthenticated)
       setIsInitialized(isInitialized)
+
+      if (isInitialized && !isFirstTimeSynced) {
+        postMessage(EventRequestType.SYNC_PROJECT)
+      }
     },
-    []
+    [isFirstTimeSynced, postMessage]
   )
 
   const handleConnectFigma = useCallback(
