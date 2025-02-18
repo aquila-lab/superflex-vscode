@@ -78,7 +78,7 @@ export const FilesProvider = ({
     }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
       if (isEditMode && isMainTextarea && payload !== undefined) {
         // current quick fix (remove undefined check once the issue is fixed)
-        console.warn(`Setting current file: , ${payload?.name}`)
+        console.warn(`Setting current file: ${payload?.name}`)
         setCurrentFile(payload)
       }
     },

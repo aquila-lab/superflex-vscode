@@ -18,7 +18,7 @@ export const SyncProjectCard = () => {
         >
           {isProjectSynced && !isSyncing && 'Resync Index'}
           {!isProjectSynced && !isSyncing && 'Sync Project'}
-          {isSyncing && <Spinner className='w-4 h-4' />}
+          {isSyncing && <Spinner className='size-4' />}
         </Button>
       </ActionButtons>
     </SettingsCard>
