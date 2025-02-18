@@ -23,6 +23,7 @@ const ThreadsContext = createContext<{
   threads: Thread[]
   currentThread: Thread | null
   selectThread: (threadId: string) => void
+  fetchThreads: () => void
   threadKey: string
 } | null>(null)
 
@@ -88,8 +89,8 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const value = useMemo(
-    () => ({ threads, currentThread, threadKey, selectThread }),
-    [threads, currentThread, threadKey, selectThread]
+    () => ({ threads, currentThread, threadKey, selectThread, fetchThreads }),
+    [threads, currentThread, threadKey, selectThread, fetchThreads]
   )
 
   return (

@@ -275,3 +275,5 @@ export const createFileSearchFilter =
 
     return searchTerms.every(term => valueLower.includes(term)) ? 1 : 0
   }
+
+export const RELOAD_DURATION = 1000
