@@ -1,3 +1,5 @@
+import type { Thread } from '../model'
+
 export type ConfigPayload = {
   allowAnonymousTelemetry: boolean
 }
@@ -38,4 +40,15 @@ export type SendNotificationPayload = {
 export type FastApplyPayload = {
   filePath: string
   edits: string
+}
+
+export type FetchThreadsPayload = {
+  cursor?: string
+  take?: number
+}
+
+export type FetchThreadsResponse = {
+  threads: Thread[]
+  nextCursor: string | null
+  previousCursor?: string
 }

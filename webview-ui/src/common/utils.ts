@@ -134,6 +134,16 @@ export interface MarkdownRenderProps {
   children: ReactNode
 }
 
+export const customFilesFilter = (value: string, search: string): boolean => {
+  const searchTerms = search
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(term => term.length > 0)
+
+  const valueLower = value.toLowerCase()
+  return searchTerms.every(term => valueLower.includes(term))
+}
+
 export const getAvatarConfig = (
   role: Role,
   picture?: string | null | undefined,

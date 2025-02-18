@@ -10,14 +10,15 @@ import {
   extractFigmaSelectionUrl
 } from '../../shared/model'
 import {
-  type EventRequestPayload,
   EventRequestType,
-  type EventResponseMessage,
-  type EventResponsePayload,
   EventResponseType,
-  type FastApplyPayload,
+  newEventResponse,
   type FilePayload,
-  newEventResponse
+  type FastApplyPayload,
+  type FetchThreadsPayload,
+  type EventRequestPayload,
+  type EventResponseMessage,
+  type EventResponsePayload
 } from '../../shared/protocol'
 import * as api from '../api'
 import { HttpStatusCode, getFigmaSelectionImageUrl } from '../api'
@@ -176,7 +177,7 @@ export class ChatAPI {
             threadID: this._thread?.id ?? ''
           })
 
-          this._assistant.getThreads().then(threads => {
+          this._assistant.getThreads({ take: 10 }).then(threads => {
             sendEventMessageCb(
               newEventResponse(EventResponseType.FETCH_THREADS, threads)
             )
@@ -193,13 +194,16 @@ export class ChatAPI {
        * @returns A promise that resolves with all threads.
        * @throws An error if the threads cannot be fetched.
        */
-      .registerEvent(EventRequestType.FETCH_THREADS, async () => {
-        if (!this._isInitialized || !this._assistant) {
-          return []
-        }
+      .registerEvent(
+        EventRequestType.FETCH_THREADS,
+        async (payload: FetchThreadsPayload) => {
+          if (!this._isInitialized || !this._assistant) {
+            return []
+          }
 
-        return this._assistant.getThreads()
-      })
+          return this._assistant.getThreads(payload)
+        }
+      )
 
       /**
        * Event (fetch_thread): This event is fired when the webview needs to fetch a specific thread.

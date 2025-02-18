@@ -4,6 +4,10 @@ import type {
   Thread,
   ThreadRun
 } from '../../shared/model'
+import type {
+  FetchThreadsPayload,
+  FetchThreadsResponse
+} from '../../shared/protocol'
 
 export interface Assistant {
   /**
@@ -19,7 +23,7 @@ export interface Assistant {
    *
    * @returns A promise that resolves with an array of threads.
    */
-  getThreads(): Promise<Thread[]>
+  getThreads(options?: FetchThreadsPayload): Promise<FetchThreadsResponse>
 
   /**
    * Get a specific thread by ID.
@@ -28,6 +32,23 @@ export interface Assistant {
    * @returns A promise that resolves with the thread.
    */
   getThread(threadID: string): Promise<Thread>
+
+  /**
+   * Update a thread's title.
+   *
+   * @param threadID - The ID of the thread to update.
+   * @param title - The new title for the thread.
+   * @returns A promise that resolves with the updated thread.
+   */
+  updateThread(threadID: string, title: string): Promise<Thread>
+
+  /**
+   * Delete a thread by ID.
+   *
+   * @param threadID - The ID of the thread to delete.
+   * @returns A promise that resolves when the thread is deleted.
+   */
+  deleteThread(threadID: string): Promise<void>
 
   /**
    * Stop the message generation. It will stop the message stream and remove the message from the thread.

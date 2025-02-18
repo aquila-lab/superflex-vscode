@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from 'react'
-import { CommandEmpty, CommandGroup } from '../../../../../../common/ui/Command'
-import { FileDropdownItem } from './FileDropdownItem'
+import { CommandGroup } from '../../../../../../common/ui/Command'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
+import { FileDropdownItem } from './FileDropdownItem'
 
 export const FileCommandList = ({
   files,
@@ -27,7 +27,6 @@ export const FileCommandList = ({
 
   return (
     <Fragment>
-      <CommandEmpty>No files found.</CommandEmpty>
       <CommandGroup className='overflow-y-hidden'>{fileItems}</CommandGroup>
     </Fragment>
   )

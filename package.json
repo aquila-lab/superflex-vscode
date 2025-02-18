@@ -4,7 +4,7 @@
   "displayName": "Superflex: AI Frontend Assistant, Figma to React/Vue/NextJS/Angular (Powered by GPT & Claude)",
   "description": "Transform Figma designs into production-ready code with Superflex, your AI-powered assistant in VSCode. Built on GPT & Claude, Superflex generates clean, reusable code in seconds, saving hours on frontend work while preserving your design standards and coding style.",
   "icon": "small_logo.png",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Riphal <https://twitter.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
@@ -137,6 +137,11 @@
           "when": "view == superflex.chat && superflex.chat.authenticated"
         },
         {
+          "command": "superflex.chat.refresh",
+          "group": "navigation",
+          "when": "view == superflex.chat && superflex.chat.authenticated"
+        },
+        {
           "command": "superflex.settings",
           "group": "navigation",
           "when": "view == superflex.chat && superflex.chat.authenticated"
@@ -248,6 +253,13 @@
         "command": "superflex.rejectVerticalDiffBlock",
         "category": "Superflex",
         "title": "Reject Vertical Diff Block",
+        "enablement": "view == superflex.chat && superflex.chat.authenticated"
+      },
+      {
+        "command": "superflex.chat.refresh",
+        "category": "Superflex",
+        "title": "Refresh",
+        "icon": "$(refresh)",
         "enablement": "view == superflex.chat && superflex.chat.authenticated"
       }
     ],
