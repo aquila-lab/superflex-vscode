@@ -24,7 +24,10 @@ const ThreadsContext = createContext<{
   currentThread: Thread | null
   selectThread: (threadId: string) => void
   fetchThreads: () => void
+  fetchMoreThreads: () => void
   threadKey: string
+  hasMoreThreads: boolean
+  isLoadingMore: boolean
 } | null>(null)
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
@@ -35,6 +38,10 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   const [threads, setThreads] = useState<Thread[]>([])
   const [currentThread, setCurrentThread] = useState<Thread | null>(null)
   const [threadKey, setThreadKey] = useState(NULL_UUID)
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+
+  const hasMoreThreads = useMemo(() => Boolean(nextCursor), [nextCursor])
 
   useEffect(() => {
     if (currentThread && currentThread.id !== threadKey) {
@@ -55,8 +62,15 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     ({ command, payload }: TypedEventResponseMessage) => {
       switch (command) {
         case EventResponseType.FETCH_THREADS:
-          setThreads(payload.threads)
+          setThreads(prev => {
+            if (payload.previousCursor) {
+              return [...prev, ...payload.threads]
+            }
+            return payload.threads
+          })
+          setNextCursor(payload.nextCursor)
           setIsInitialFetchDone(true)
+          setIsLoadingMore(false)
           break
         case EventResponseType.FETCH_THREAD:
           setCurrentThread(payload)
@@ -72,8 +86,22 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const fetchThreads = useCallback(() => {
-    postMessage(EventRequestType.FETCH_THREADS)
+    postMessage(EventRequestType.FETCH_THREADS, {
+      take: 10
+    })
   }, [postMessage])
+
+  const fetchMoreThreads = useCallback(() => {
+    if (!nextCursor || isLoadingMore) {
+      return
+    }
+
+    setIsLoadingMore(true)
+    postMessage(EventRequestType.FETCH_THREADS, {
+      cursor: nextCursor,
+      take: 10
+    })
+  }, [nextCursor, isLoadingMore, postMessage])
 
   useEffect(() => {
     fetchThreads()
@@ -89,8 +117,26 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const value = useMemo(
-    () => ({ threads, currentThread, threadKey, selectThread, fetchThreads }),
-    [threads, currentThread, threadKey, selectThread, fetchThreads]
+    () => ({
+      threads,
+      currentThread,
+      threadKey,
+      selectThread,
+      fetchThreads,
+      fetchMoreThreads,
+      hasMoreThreads,
+      isLoadingMore
+    }),
+    [
+      threads,
+      currentThread,
+      threadKey,
+      selectThread,
+      fetchThreads,
+      fetchMoreThreads,
+      hasMoreThreads,
+      isLoadingMore
+    ]
   )
 
   return (

@@ -12,7 +12,13 @@ import {
 } from '../../../../../common/ui/Tooltip'
 
 export const ThreadHistory = () => {
-  const { threads, selectThread } = useThreads()
+  const {
+    threads,
+    selectThread,
+    hasMoreThreads,
+    fetchMoreThreads,
+    isLoadingMore
+  } = useThreads()
   const [scrollPosition, setScrollPosition] = useState(0)
   const listRef = useRef<List | null>(null)
 
@@ -30,6 +36,25 @@ export const ThreadHistory = () => {
       listRef.current.scrollToRow(threads.length - 1)
     }
   }, [threads.length])
+
+  const handleScroll = useCallback(
+    ({
+      scrollTop,
+      scrollHeight,
+      clientHeight
+    }: { scrollTop: number; scrollHeight: number; clientHeight: number }) => {
+      setScrollPosition(scrollTop)
+
+      if (
+        hasMoreThreads &&
+        !isLoadingMore &&
+        scrollHeight - scrollTop - clientHeight < 100
+      ) {
+        fetchMoreThreads()
+      }
+    },
+    [hasMoreThreads, isLoadingMore, fetchMoreThreads]
+  )
 
   if (threads.length === 0) {
     return null
@@ -103,7 +128,8 @@ export const ThreadHistory = () => {
         ref={listRef}
         threads={threads}
         onSelect={selectThread}
-        onScroll={setScrollPosition}
+        onScroll={handleScroll}
+        isLoadingMore={isLoadingMore}
       />
     </div>
   )

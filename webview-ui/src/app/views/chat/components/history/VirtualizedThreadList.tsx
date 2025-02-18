@@ -3,15 +3,21 @@ import { List, AutoSizer } from 'react-virtualized'
 import type { Thread } from '../../../../../../../shared/model'
 import { ThreadItem } from './ThreadItem'
 import { cn } from '../../../../../common/utils'
+import { LoadingDots } from '../../../../../common/ui/LoadingDots'
 
 export const VirtualizedThreadList = forwardRef<
   List,
   {
     threads: Thread[]
     onSelect: (threadId: string) => void
-    onScroll: (position: number) => void
+    onScroll: (params: {
+      scrollTop: number
+      scrollHeight: number
+      clientHeight: number
+    }) => void
+    isLoadingMore: boolean
   }
->(({ threads, onSelect, onScroll }, ref) => {
+>(({ threads, onSelect, onScroll, isLoadingMore }, ref) => {
   const [showTopGradient, setShowTopGradient] = useState(false)
   const [showBottomGradient, setShowBottomGradient] = useState(true)
 
@@ -37,13 +43,15 @@ export const VirtualizedThreadList = forwardRef<
     [threads, onSelect]
   )
 
-  const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
-    onScroll(scrollTop)
+  const handleScroll = ({
+    scrollTop,
+    scrollHeight,
+    clientHeight
+  }: { scrollTop: number; scrollHeight: number; clientHeight: number }) => {
+    onScroll({ scrollTop, scrollHeight, clientHeight })
 
     setShowTopGradient(scrollTop > 20)
-
-    const maxScroll = threads.length * 40 - 240
-    setShowBottomGradient(scrollTop < maxScroll - 20)
+    setShowBottomGradient(scrollTop < scrollHeight - clientHeight - 20)
   }
 
   return (
@@ -81,6 +89,12 @@ export const VirtualizedThreadList = forwardRef<
           showBottomGradient ? 'opacity-80' : 'opacity-0'
         )}
       />
+
+      {isLoadingMore && (
+        <div className='absolute bottom-0 left-0 right-0 flex justify-center pb-2'>
+          <LoadingDots isLoading />
+        </div>
+      )}
     </div>
   )
 })
