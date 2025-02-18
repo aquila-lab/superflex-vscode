@@ -3,7 +3,6 @@ import { List, AutoSizer } from 'react-virtualized'
 import type { Thread } from '../../../../../../../shared/model'
 import { ThreadItem } from './ThreadItem'
 import { cn } from '../../../../../common/utils'
-import { LoadingDots } from '../../../../../common/ui/LoadingDots'
 
 export const VirtualizedThreadList = forwardRef<
   List,
@@ -17,7 +16,7 @@ export const VirtualizedThreadList = forwardRef<
     }) => void
     isLoadingMore: boolean
   }
->(({ threads, onSelect, onScroll, isLoadingMore }, ref) => {
+>(({ threads, onSelect, onScroll }, ref) => {
   const [showTopGradient, setShowTopGradient] = useState(false)
   const [showBottomGradient, setShowBottomGradient] = useState(true)
 
@@ -75,26 +74,18 @@ export const VirtualizedThreadList = forwardRef<
           />
         )}
       </AutoSizer>
-
       <div
         className={cn(
           'absolute top-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-b from-sidebar to-transparent transition-opacity duration-200',
           showTopGradient ? 'opacity-80' : 'opacity-0'
         )}
       />
-
       <div
         className={cn(
           'absolute bottom-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-t from-sidebar to-transparent transition-opacity duration-200',
           showBottomGradient ? 'opacity-80' : 'opacity-0'
         )}
       />
-
-      {isLoadingMore && (
-        <div className='absolute bottom-0 left-0 right-0 flex justify-center pb-2'>
-          <LoadingDots isLoading />
-        </div>
-      )}
     </div>
   )
 })

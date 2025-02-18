@@ -1,7 +1,7 @@
 import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
 import { VirtualizedThreadList } from './VirtualizedThreadList'
 import { ChevronUpIcon, ChevronDownIcon } from '@radix-ui/react-icons'
-import { useState, useCallback, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { Button } from '../../../../../common/ui/Button'
 import type { List } from 'react-virtualized'
 import {
@@ -19,36 +19,34 @@ export const ThreadHistory = () => {
     fetchMoreThreads,
     isLoadingMore
   } = useThreads()
-  const [scrollPosition, setScrollPosition] = useState(0)
   const listRef = useRef<List | null>(null)
-
-  const currentPosition = Math.ceil(scrollPosition / 40) + 1
-  const totalThreads = threads.length
 
   const handleScrollToTop = useCallback(() => {
     if (listRef.current) {
-      listRef.current.scrollToRow(0)
+      listRef.current.scrollToPosition(0)
     }
   }, [])
 
   const handleScrollToBottom = useCallback(() => {
     if (listRef.current) {
-      listRef.current.scrollToRow(threads.length - 1)
+      listRef.current.scrollToPosition(Number.MAX_SAFE_INTEGER)
     }
-  }, [threads.length])
+  }, [])
 
   const handleScroll = useCallback(
     ({
       scrollTop,
       scrollHeight,
       clientHeight
-    }: { scrollTop: number; scrollHeight: number; clientHeight: number }) => {
-      setScrollPosition(scrollTop)
-
+    }: {
+      scrollTop: number
+      scrollHeight: number
+      clientHeight: number
+    }) => {
       if (
         hasMoreThreads &&
         !isLoadingMore &&
-        scrollHeight - scrollTop - clientHeight < 100
+        scrollHeight - scrollTop - clientHeight < 300
       ) {
         fetchMoreThreads()
       }
@@ -67,20 +65,6 @@ export const ThreadHistory = () => {
           <h2 className='text-sm font-medium text-muted-foreground'>
             Recent Conversations
           </h2>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className='text-xxs text-muted-secondary-foreground'>
-                  {currentPosition + 5} / {totalThreads}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className='text-xs m-0 text-muted-foreground'>
-                  Scroll to view more conversations
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
         <div className='flex items-center gap-0.5 text-muted-foreground text-sm'>
           <TooltipProvider>
@@ -98,7 +82,7 @@ export const ThreadHistory = () => {
               </TooltipTrigger>
               <TooltipContent>
                 <p className='text-xs m-0 text-muted-foreground'>
-                  Show most recent
+                  Scroll to most recent
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -118,7 +102,7 @@ export const ThreadHistory = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className='text-xs m-0 text-muted-foreground'>Show oldest</p>
+                <p className='text-xs m-0 text-muted-foreground'>Show older</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
