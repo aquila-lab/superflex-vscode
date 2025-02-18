@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { Progress } from '../../../../../common/ui/Progress'
-import { cn } from '../../../../../common/utils'
 import { useProjectSync } from '../../providers/ProjectSyncProvider'
 
 export const SyncProgress = () => {
@@ -8,7 +7,7 @@ export const SyncProgress = () => {
 
   const statusText = useMemo(() => {
     if (isSyncing) {
-      return 'Syncing project...'
+      return 'Project syncing...'
     }
 
     if (!isProjectSynced) {
@@ -20,14 +19,7 @@ export const SyncProgress = () => {
 
   return (
     <div className='space-y-4 mb-4 w-full'>
-      <p
-        className={cn(
-          'text-sm',
-          isSyncing ? 'text-primary' : 'text-muted-foreground'
-        )}
-      >
-        {statusText}
-      </p>
+      <p className='text-sm text-muted-foreground'>{statusText}</p>
       <Progress value={progressValue} />
     </div>
   )
