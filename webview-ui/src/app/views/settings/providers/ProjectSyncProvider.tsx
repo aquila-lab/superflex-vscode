@@ -3,54 +3,68 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState
 } from 'react'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
-import { EventRequestType } from '../../../../../../shared/protocol'
+import {
+  EventRequestType,
+  type EventResponseMessage,
+  EventResponseType
+} from '../../../../../../shared/protocol'
+import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
+import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
 
 const ProjectSyncContext = createContext<{
   isSyncing: boolean
   isProjectSynced: boolean
+  progressValue: number
   sync: () => void
 } | null>(null)
 
 export const ProjectSyncProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
   const [isSyncing, setIsSyncing] = useState(false)
-  const [isProjectSynced, setIsProjectSynced] = useState(true)
+  const [isProjectSynced, setIsProjectSynced] = useState(false)
+  const [progressValue, setProgressValue] = useState(0)
+  const { isFirstTimeSynced } = useGlobal()
 
-  // const handleSync = useCallback(({ command }: TypedEventResponseMessage) => {
-  //   switch (command) {
-  //     case EventResponseType.PROJECT_SYNC_START:
-  //       setIsSyncing(true)
-  //       break
-  //     case EventResponseType.PROJECT_SYNC_COMPLETE:
-  //       setIsSyncing(false)
-  //       setIsProjectSynced(true)
-  //       break
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (isFirstTimeSynced) {
+      setIsProjectSynced(true)
+    }
+  }, [isFirstTimeSynced])
 
-  // useConsumeMessage(
-  //   [
-  //     EventResponseType.PROJECT_SYNC_START,
-  //     EventResponseType.PROJECT_SYNC_COMPLETE
-  //   ],
-  //   handleSync
-  // )
+  const handleSyncProgress = useCallback(
+    ({
+      payload
+    }: EventResponseMessage<EventResponseType.SYNC_PROJECT_PROGRESS>) => {
+      setProgressValue(payload.progress)
+
+      if (payload.progress === 100) {
+        setIsSyncing(false)
+        setIsProjectSynced(true)
+      }
+    },
+    []
+  )
+
+  useConsumeMessage(EventResponseType.SYNC_PROJECT_PROGRESS, handleSyncProgress)
 
   const sync = useCallback(() => {
     postMessage(EventRequestType.SYNC_PROJECT)
+    setIsSyncing(true)
   }, [postMessage])
 
   const value = useMemo(
     () => ({
       isSyncing,
       isProjectSynced,
+      progressValue,
       sync
     }),
-    [isSyncing, isProjectSynced, sync]
+    [isSyncing, isProjectSynced, progressValue, sync]
   )
 
   return (

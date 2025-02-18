@@ -21,6 +21,8 @@ const GlobalContext = createContext<{
   isLoggedIn: boolean | null
   config: Record<string, unknown> | null
   isFigmaAuthenticated: boolean | null
+  isFirstTimeSynced: boolean
+  setIsFirstTimeSynced: (val: boolean) => void
   setIsInitialized: (val: boolean) => void
   setIsLoggedIn: (val: boolean) => void
   connectFigma: () => void
@@ -36,6 +38,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState<
     boolean | null
   >(null)
+  const [isFirstTimeSynced, setIsFirstTimeSynced] = useState<boolean>(false)
 
   useEffect(() => {
     postMessage(EventRequestType.READY)
@@ -121,6 +124,8 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       isLoggedIn,
       config,
       isFigmaAuthenticated,
+      isFirstTimeSynced,
+      setIsFirstTimeSynced,
       setIsInitialized,
       setIsLoggedIn,
       connectFigma,
@@ -132,6 +137,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       isLoggedIn,
       config,
       isFigmaAuthenticated,
+      isFirstTimeSynced,
       connectFigma,
       disconnectFigma,
       signOut
