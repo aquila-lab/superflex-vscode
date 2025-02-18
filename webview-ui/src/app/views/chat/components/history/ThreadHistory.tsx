@@ -81,9 +81,7 @@ export const ThreadHistory = () => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p className='text-xs m-0 text-muted-foreground'>
-                  Scroll to most recent
-                </p>
+                <p className='text-xs m-0 text-muted-foreground'>Show recent</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
