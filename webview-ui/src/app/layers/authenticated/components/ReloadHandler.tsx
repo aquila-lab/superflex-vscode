@@ -8,8 +8,8 @@ import { useThreads } from '../providers/ThreadsProvider'
 
 export const ReloadHandler = ({ children }: { children: ReactNode }) => {
   const [isReloading, setIsReloading] = useState(false)
-  const {fetchSubscription, fetchUserInfo} = useUser()
-  const {fetchThreads} = useThreads()
+  const { fetchSubscription, fetchUserInfo } = useUser()
+  const { fetchThreads } = useThreads()
 
   const handleReload = useCallback(() => {
     setIsReloading(true)
@@ -22,7 +22,7 @@ export const ReloadHandler = ({ children }: { children: ReactNode }) => {
     }, RELOAD_DURATION)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [fetchSubscription, fetchUserInfo, fetchThreads])
 
   useConsumeMessage(EventResponseType.REFRESH, handleReload)
 
