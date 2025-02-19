@@ -72,7 +72,7 @@ export const RenameThreadButton = ({
               variant='text'
               size='icon'
               onClick={handleClick}
-              className='justify-end hidden group-hover:flex hover:text-destructive'
+              className='justify-end hidden group-hover:flex hover:text-foreground'
               aria-label='Rename thread'
             >
               <Pencil1Icon className='size-3' />
