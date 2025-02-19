@@ -724,6 +724,10 @@ export class ChatAPI {
     })
   }
 
+  isReady(): boolean {
+    return this._isReady
+  }
+
   /**
    * Registers a new event handler for the specified command.
    *

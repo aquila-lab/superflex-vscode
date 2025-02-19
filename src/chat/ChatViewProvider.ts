@@ -181,7 +181,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   sendEventMessage(msg: EventResponseMessage<EventResponseType>): void {
     // If the webview is not ready, queue the message
-    if (!this._chatWebview) {
+    if (!this._chatWebview || !this.chatApi.isReady()) {
       this._eventMessagesQueue.push(msg)
       return
     }
