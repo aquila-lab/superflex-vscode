@@ -5,7 +5,6 @@ import { Button } from '../../../../../../../../../common/ui/Button'
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger
 } from '../../../../../../../../../common/ui/Tooltip'
 
@@ -23,18 +22,16 @@ export const CopyButton = ({ content }: { content: string }) => {
       onCopy={() => {}}
     >
       {isCopied ? (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className='text-muted-foreground px-1 py-0.5 rounded-md hover:bg-muted'>
-                <CheckIcon className='size-3.5' />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className='text-xs m-0 text-muted-foreground'>Copied</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className='text-muted-foreground px-1 py-0.5 rounded-md hover:bg-muted'>
+              <CheckIcon className='size-3.5' />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent portal>
+            <p className='text-xs m-0 text-muted-foreground'>Copied</p>
+          </TooltipContent>
+        </Tooltip>
       ) : (
         <Button
           size='xs'
