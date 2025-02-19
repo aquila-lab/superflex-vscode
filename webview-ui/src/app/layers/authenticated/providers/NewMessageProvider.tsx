@@ -125,10 +125,9 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       // CRITICAL: Proper error handling required!
       // Never remove this check it will break the app.
       if (error) {
+        resetNewMessage()
         return
       }
-
-      resetNewMessage()
 
       switch (command) {
         case EventResponseType.MESSAGE_TEXT_DELTA:
