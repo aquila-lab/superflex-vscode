@@ -9,6 +9,7 @@ export const VirtualizedThreadList = forwardRef<
   {
     threads: Thread[]
     onSelect: (threadId: string) => void
+    onDelete: (threadId: string) => void
     onScroll: (params: {
       scrollTop: number
       scrollHeight: number
@@ -16,7 +17,7 @@ export const VirtualizedThreadList = forwardRef<
     }) => void
     isLoadingMore: boolean
   }
->(({ threads, onSelect, onScroll }, ref) => {
+>(({ threads, onSelect, onDelete, onScroll }, ref) => {
   const [showTopGradient, setShowTopGradient] = useState(false)
   const [showBottomGradient, setShowBottomGradient] = useState(true)
 
@@ -36,10 +37,13 @@ export const VirtualizedThreadList = forwardRef<
           style={style}
           onClick={() => onSelect(threads[index].id)}
         >
-          <ThreadItem thread={threads[index]} />
+          <ThreadItem
+            thread={threads[index]}
+            onDelete={() => onDelete(threads[index].id)}
+          />
         </div>
       ),
-    [threads, onSelect]
+    [threads, onSelect, onDelete]
   )
 
   const handleScroll = ({

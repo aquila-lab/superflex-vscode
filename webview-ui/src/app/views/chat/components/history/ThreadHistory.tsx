@@ -15,6 +15,7 @@ export const ThreadHistory = () => {
   const {
     threads,
     selectThread,
+    deleteThread,
     hasMoreThreads,
     fetchMoreThreads,
     isLoadingMore
@@ -110,6 +111,7 @@ export const ThreadHistory = () => {
         ref={listRef}
         threads={threads}
         onSelect={selectThread}
+        onDelete={deleteThread}
         onScroll={handleScroll}
         isLoadingMore={isLoadingMore}
       />

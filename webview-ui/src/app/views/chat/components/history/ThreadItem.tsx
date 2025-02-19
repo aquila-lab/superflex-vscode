@@ -1,8 +1,15 @@
 import { formatDistanceToNow } from 'date-fns'
 import { useMemo } from 'react'
 import type { Thread } from '../../../../../../../shared/model'
+import { DeleteThreadButton } from './DeleteThreadButton'
 
-export const ThreadItem = ({ thread }: { thread: Thread }) => {
+export const ThreadItem = ({
+  thread,
+  onDelete
+}: {
+  thread: Thread
+  onDelete: () => void
+}) => {
   const duration = useMemo(() => {
     return formatDistanceToNow(new Date(thread.updatedAt), { addSuffix: false })
   }, [thread.updatedAt])
@@ -14,9 +21,12 @@ export const ThreadItem = ({ thread }: { thread: Thread }) => {
           {thread.title}
         </p>
       </div>
-      <span className='text-xs text-muted-foreground whitespace-nowrap'>
-        {duration} ago
-      </span>
+      <div className='flex items-center gap-2'>
+        <span className='text-xs text-muted-foreground whitespace-nowrap'>
+          {duration} ago
+        </span>
+        <DeleteThreadButton onDelete={onDelete} />
+      </div>
     </div>
   )
 }

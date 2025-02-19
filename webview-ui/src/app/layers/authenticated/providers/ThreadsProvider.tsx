@@ -28,6 +28,7 @@ const ThreadsContext = createContext<{
   threadKey: string
   hasMoreThreads: boolean
   isLoadingMore: boolean
+  deleteThread: (threadId: string) => void
 } | null>(null)
 
 export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
@@ -103,6 +104,15 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     })
   }, [nextCursor, isLoadingMore, postMessage])
 
+  const deleteThread = useCallback(
+    (threadId: string) => {
+      postMessage(EventRequestType.DELETE_THREAD, {
+        threadID: threadId
+      })
+    },
+    [postMessage]
+  )
+
   useEffect(() => {
     fetchThreads()
   }, [fetchThreads])
@@ -125,7 +135,8 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
       fetchThreads,
       fetchMoreThreads,
       hasMoreThreads,
-      isLoadingMore
+      isLoadingMore,
+      deleteThread
     }),
     [
       threads,
@@ -135,7 +146,8 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
       fetchThreads,
       fetchMoreThreads,
       hasMoreThreads,
-      isLoadingMore
+      isLoadingMore,
+      deleteThread
     ]
   )
 
