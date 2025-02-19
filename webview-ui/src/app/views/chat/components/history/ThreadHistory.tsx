@@ -7,6 +7,7 @@ import type { List } from 'react-virtualized'
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger
 } from '../../../../../common/ui/Tooltip'
 
@@ -67,22 +68,24 @@ export const ThreadHistory = () => {
           </h2>
         </div>
         <div className='flex items-center gap-0.5 text-muted-foreground text-sm'>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant='text'
-                size='icon'
-                onClick={handleScrollToTop}
-                className='hover:text-foreground w-auto h-auto'
-                aria-label='Scroll to top'
-              >
-                <ChevronUpIcon className='size-3' />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent portal>
-              <p className='text-xs m-0 text-muted-foreground'>Show recent</p>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='text'
+                  size='icon'
+                  onClick={handleScrollToTop}
+                  className='hover:text-foreground w-auto h-auto'
+                  aria-label='Scroll to top'
+                >
+                  <ChevronUpIcon className='size-3' />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent portal>
+                <p className='text-xs m-0 text-muted-foreground'>Show recent</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           <Tooltip>
             <TooltipTrigger asChild>

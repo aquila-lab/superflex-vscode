@@ -3,6 +3,7 @@ import { Button } from '../../../../../common/ui/Button'
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger
 } from '../../../../../common/ui/Tooltip'
 import { useCallback, useMemo, useState, type MouseEvent } from 'react'
@@ -64,22 +65,24 @@ export const RenameThreadButton = ({
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant='text'
-            size='icon'
-            onClick={handleClick}
-            className='justify-end hidden group-hover:flex hover:text-destructive'
-            aria-label='Rename thread'
-          >
-            <Pencil1Icon className='size-3' />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent portal>
-          <p className='text-xs m-0 text-muted-foreground'>Rename thread</p>
-        </TooltipContent>
-      </Tooltip>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant='text'
+              size='icon'
+              onClick={handleClick}
+              className='justify-end hidden group-hover:flex hover:text-destructive'
+              aria-label='Rename thread'
+            >
+              <Pencil1Icon className='size-3' />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent portal>
+            <p className='text-xs m-0 text-muted-foreground'>Rename thread</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
       <Dialog
         open={isOpen}
