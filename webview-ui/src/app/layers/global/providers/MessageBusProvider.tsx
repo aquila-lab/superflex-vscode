@@ -55,7 +55,10 @@ export function MessageBusProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
+    return () => {
+      console.warn('event listener is unsubscribed.')
+      window.removeEventListener('message', handleMessage)
+    }
   }, [handleMessage])
 
   const value = useMemo(() => ({ subscribe }), [subscribe])

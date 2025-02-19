@@ -61,7 +61,13 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const handleThreads = useCallback(
-    ({ command, payload }: TypedEventResponseMessage) => {
+    ({ command, payload, error }: TypedEventResponseMessage) => {
+      // CRITICAL: Proper error handling required!
+      // Never remove this check it will break the app.
+      if (error) {
+        return
+      }
+
       switch (command) {
         case EventResponseType.FETCH_THREADS:
           setThreads(prev => {

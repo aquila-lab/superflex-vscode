@@ -89,7 +89,13 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const handleMessage = useCallback(
-    ({ command, payload }: TypedEventResponseMessage) => {
+    ({ command, payload, error }: TypedEventResponseMessage) => {
+      // CRITICAL: Proper error handling required!
+      // Never remove this check it will break the app.
+      if (error) {
+        return
+      }
+
       switch (command) {
         case EventResponseType.CONFIG: {
           handleConfig(payload)

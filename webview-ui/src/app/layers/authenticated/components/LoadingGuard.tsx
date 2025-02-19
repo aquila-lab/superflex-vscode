@@ -9,9 +9,6 @@ export const LoadingGuard = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate()
 
   if (isUserLoading || isSubscriptionLoading || isInitialized === null) {
-    console.info(`User loading: ${isUserLoading}`)
-    console.info(`Subscription loading: ${isSubscriptionLoading}`)
-    console.info(`Initialized: ${isInitialized}`)
     return <LoadingView />
   }
 
