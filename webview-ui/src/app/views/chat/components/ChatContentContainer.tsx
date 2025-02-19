@@ -8,7 +8,7 @@ export const ChatContentContainer = ({ children }: { children: ReactNode }) => {
   return (
     <div
       className={cn(
-        'flex flex-col h-full p-2 pt-6 overflow-auto relative',
+        'flex flex-col h-full p-2 pt-6 overflow-hidden relative',
         !hasMessages && 'justify-center'
       )}
     >
