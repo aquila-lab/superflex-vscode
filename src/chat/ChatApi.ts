@@ -273,7 +273,9 @@ export class ChatAPI {
             return
           }
 
-          return this._assistant.deleteThread(payload.threadID)
+          await this._assistant.deleteThread(payload.threadID)
+
+          return payload.threadID
         }
       )
 

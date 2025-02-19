@@ -311,7 +311,7 @@ export enum EventResponseType {
 
   /**
    * @triggered by {EventRequestType.DELETE_THREAD}
-   * DELETE_THREAD is used to send the boolean indicating if the thread was deleted successfully to the webview.
+   * DELETE_THREAD is used to send the deleted thread ID to the webview.
    */
   DELETE_THREAD = 'delete_thread',
 
@@ -487,7 +487,7 @@ export interface EventResponsePayload {
   [EventResponseType.FETCH_THREADS]: FetchThreadsResponse
   [EventResponseType.FETCH_THREAD]: Thread
   [EventResponseType.UPDATE_THREAD]: Thread
-  [EventResponseType.DELETE_THREAD]: void
+  [EventResponseType.DELETE_THREAD]: { threadID: string }
   [EventResponseType.STOP_MESSAGE]: boolean
   [EventResponseType.SEND_MESSAGE]: boolean
   [EventResponseType.MESSAGE_TEXT_DELTA]: string
