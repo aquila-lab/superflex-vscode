@@ -20,7 +20,7 @@ const buttonVariants = cva(
           'bg-destructive-background text-button-foreground hover:opacity-90'
       },
       size: {
-        default: 'px-4 py-2',
+        default: 'px-4 py-2 h-9',
         xxs: 'rounded-md px-1 py-0.5 text-xs gap-1',
         xs: 'rounded-md px-2 py-1 text-xs gap-1',
         sm: 'rounded-md px-2 py-1',

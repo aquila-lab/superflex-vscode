@@ -242,6 +242,44 @@ export class ChatAPI {
       )
 
       /**
+       * Event (update_thread): This event is fired when the user updates a thread.
+       * It is used to update a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID and title.
+       * @returns A promise that resolves with the updated thread.
+       */
+      .registerEvent(
+        EventRequestType.UPDATE_THREAD,
+        async (payload: { threadID: string; title: string }) => {
+          if (!this._assistant) {
+            return
+          }
+
+          return this._assistant.updateThread(payload.threadID, payload.title)
+        }
+      )
+
+      /**
+       * Event (delete_thread): This event is fired when the user deletes a thread.
+       * It is used to delete a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID.
+       * @returns A promise that resolves when the thread is deleted.
+       */
+      .registerEvent(
+        EventRequestType.DELETE_THREAD,
+        async (payload: { threadID: string }) => {
+          if (!this._assistant) {
+            return
+          }
+
+          await this._assistant.deleteThread(payload.threadID)
+
+          return { threadID: payload.threadID }
+        }
+      )
+
+      /**
        * Event (create_figma_attachment): This event is fired when the user selects a Figma file in the webview.
        * It is used to extract the Figma selection URL get image url and send it back to the webview.
        *
@@ -616,33 +654,28 @@ export class ChatAPI {
        * @returns A promise that resolves with the current open file.
        * @throws An error if the current open file cannot be fetched.
        */
-      .registerEvent(
-        EventRequestType.FETCH_CURRENT_OPEN_FILE,
-        (_, sendEventMessageCb) => {
-          const editor = vscode.window.activeTextEditor
-          if (!editor) {
-            return null
-          }
-
-          const newCurrentOpenFile = decodeUriAndRemoveFilePrefix(
-            editor.document.uri.path
-          )
-          const relativePath = path.relative(
-            this._workspaceDirPath ?? '',
-            newCurrentOpenFile
-          )
-
-          sendEventMessageCb(
-            newEventResponse(EventResponseType.SET_CURRENT_OPEN_FILE, {
-              id: generateFileID(relativePath),
-              name: path.basename(newCurrentOpenFile),
-              path: newCurrentOpenFile,
-              relativePath,
-              isCurrentOpenFile: true
-            } as FilePayload)
-          )
+      .registerEvent(EventRequestType.FETCH_CURRENT_OPEN_FILE, () => {
+        const editor = vscode.window.activeTextEditor
+        if (!editor) {
+          return null
         }
-      )
+
+        const newCurrentOpenFile = decodeUriAndRemoveFilePrefix(
+          editor.document.uri.path
+        )
+        const relativePath = path.relative(
+          this._workspaceDirPath ?? '',
+          newCurrentOpenFile
+        )
+
+        return {
+          id: generateFileID(relativePath),
+          name: path.basename(newCurrentOpenFile),
+          path: newCurrentOpenFile,
+          relativePath,
+          isCurrentOpenFile: true
+        }
+      })
 
       /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
@@ -689,6 +722,10 @@ export class ChatAPI {
     return new Promise(resolve => {
       this._ready.event(resolve)
     })
+  }
+
+  isReady(): boolean {
+    return this._isReady
   }
 
   /**

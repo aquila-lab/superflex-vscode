@@ -7,7 +7,7 @@ const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = ({
   children,
-  delayDuration = 0,
+  delayDuration = 300,
   ...props
 }: TooltipPrimitive.TooltipProps) => (
   <TooltipPrimitive.Root

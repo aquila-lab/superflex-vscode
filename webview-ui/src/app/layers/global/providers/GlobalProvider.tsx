@@ -21,6 +21,8 @@ const GlobalContext = createContext<{
   isLoggedIn: boolean | null
   config: Record<string, unknown> | null
   isFigmaAuthenticated: boolean | null
+  isFirstTimeSynced: boolean
+  setIsFirstTimeSynced: (val: boolean) => void
   setIsInitialized: (val: boolean) => void
   setIsLoggedIn: (val: boolean) => void
   connectFigma: () => void
@@ -36,6 +38,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState<
     boolean | null
   >(null)
+  const [isFirstTimeSynced, setIsFirstTimeSynced] = useState<boolean>(false)
 
   useEffect(() => {
     postMessage(EventRequestType.READY)
@@ -54,8 +57,12 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
       setIsFigmaAuthenticated(isFigmaAuthenticated)
       setIsInitialized(isInitialized)
+
+      if (isInitialized && !isFirstTimeSynced) {
+        postMessage(EventRequestType.SYNC_PROJECT)
+      }
     },
-    []
+    [isFirstTimeSynced, postMessage]
   )
 
   const handleConnectFigma = useCallback(
@@ -82,7 +89,13 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const handleMessage = useCallback(
-    ({ command, payload }: TypedEventResponseMessage) => {
+    ({ command, payload, error }: TypedEventResponseMessage) => {
+      // CRITICAL: Proper error handling required!
+      // Never remove this check it will break the app.
+      if (error) {
+        return
+      }
+
       switch (command) {
         case EventResponseType.CONFIG: {
           handleConfig(payload)
@@ -121,6 +134,8 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       isLoggedIn,
       config,
       isFigmaAuthenticated,
+      isFirstTimeSynced,
+      setIsFirstTimeSynced,
       setIsInitialized,
       setIsLoggedIn,
       connectFigma,
@@ -132,6 +147,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       isLoggedIn,
       config,
       isFigmaAuthenticated,
+      isFirstTimeSynced,
       connectFigma,
       disconnectFigma,
       signOut

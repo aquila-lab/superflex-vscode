@@ -13,7 +13,13 @@ export const NavigationHandler = ({ children }: { children: ReactNode }) => {
   const { setIsLoggedIn } = useGlobal()
 
   const handleMessage = useCallback(
-    ({ command }: TypedEventResponseMessage) => {
+    ({ command, error }: TypedEventResponseMessage) => {
+      // CRITICAL: Proper error handling required!
+      // Never remove this check it will break the app.
+      if (error) {
+        return
+      }
+
       switch (command) {
         case EventResponseType.SHOW_LOGIN_VIEW: {
           setIsLoggedIn(false)
@@ -27,6 +33,7 @@ export const NavigationHandler = ({ children }: { children: ReactNode }) => {
         }
         case EventResponseType.SHOW_SETTINGS_VIEW: {
           navigate('/profile', { replace: true })
+          break
         }
       }
     },

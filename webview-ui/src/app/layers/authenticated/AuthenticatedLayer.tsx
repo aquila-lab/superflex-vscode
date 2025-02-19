@@ -5,6 +5,7 @@ import { NewMessageProvider } from './providers/NewMessageProvider'
 import { ThreadReset } from './components/ThreadReset'
 import { ThreadsProvider } from './providers/ThreadsProvider'
 import { UserProvider } from './providers/UserProvider'
+import { ReloadHandler } from './components/ReloadHandler'
 
 export const AuthenticatedLayer = () => {
   return (
@@ -12,11 +13,13 @@ export const AuthenticatedLayer = () => {
       <LoadingGuard>
         <ThreadsProvider>
           <ThreadReset>
-            <MessagesProvider>
-              <NewMessageProvider>
-                <Outlet />
-              </NewMessageProvider>
-            </MessagesProvider>
+            <ReloadHandler>
+              <MessagesProvider>
+                <NewMessageProvider>
+                  <Outlet />
+                </NewMessageProvider>
+              </MessagesProvider>
+            </ReloadHandler>
           </ThreadReset>
         </ThreadsProvider>
       </LoadingGuard>

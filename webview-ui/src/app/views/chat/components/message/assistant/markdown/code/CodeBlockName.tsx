@@ -34,7 +34,7 @@ export const CodeBlockName = ({ filePath }: { filePath: string }) => {
               {getFileName(filePath)}
             </p>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent portal>
             <p className='text-xs m-0 text-muted-foreground'>{filePath}</p>
           </TooltipContent>
         </Tooltip>

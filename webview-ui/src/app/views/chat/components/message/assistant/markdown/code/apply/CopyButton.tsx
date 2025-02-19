@@ -30,7 +30,7 @@ export const CopyButton = ({ content }: { content: string }) => {
                 <CheckIcon className='size-3.5' />
               </div>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent portal>
               <p className='text-xs m-0 text-muted-foreground'>Copied</p>
             </TooltipContent>
           </Tooltip>

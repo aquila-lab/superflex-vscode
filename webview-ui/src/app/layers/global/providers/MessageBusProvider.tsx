@@ -22,6 +22,7 @@ export function MessageBusProvider({ children }: { children: ReactNode }) {
 
   const handleMessage = useCallback((event: MessageEvent) => {
     const message = event.data as TypedEventResponseMessage
+
     const eventHandlers = handlers.current.get(message.command)
 
     if (eventHandlers) {
@@ -55,7 +56,10 @@ export function MessageBusProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
+    return () => {
+      console.warn('event listener is unsubscribed.')
+      window.removeEventListener('message', handleMessage)
+    }
   }, [handleMessage])
 
   const value = useMemo(() => ({ subscribe }), [subscribe])
@@ -71,7 +75,7 @@ export const useMessageBus = () => {
   const context = useContext(MessageBusContext)
 
   if (!context) {
-    throw new Error('useMessages must be used within MessageBusProvider')
+    throw new Error('useMessageBus must be used within MessageBusProvider')
   }
 
   return context

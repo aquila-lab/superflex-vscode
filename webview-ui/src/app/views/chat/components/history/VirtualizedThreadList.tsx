@@ -9,9 +9,15 @@ export const VirtualizedThreadList = forwardRef<
   {
     threads: Thread[]
     onSelect: (threadId: string) => void
-    onScroll: (position: number) => void
+    onDelete: (threadId: string) => void
+    onScroll: (params: {
+      scrollTop: number
+      scrollHeight: number
+      clientHeight: number
+    }) => void
+    isLoadingMore: boolean
   }
->(({ threads, onSelect, onScroll }, ref) => {
+>(({ threads, onSelect, onDelete, onScroll }, ref) => {
   const [showTopGradient, setShowTopGradient] = useState(false)
   const [showBottomGradient, setShowBottomGradient] = useState(true)
 
@@ -31,19 +37,24 @@ export const VirtualizedThreadList = forwardRef<
           style={style}
           onClick={() => onSelect(threads[index].id)}
         >
-          <ThreadItem thread={threads[index]} />
+          <ThreadItem
+            thread={threads[index]}
+            onDelete={() => onDelete(threads[index].id)}
+          />
         </div>
       ),
-    [threads, onSelect]
+    [threads, onSelect, onDelete]
   )
 
-  const handleScroll = ({ scrollTop }: { scrollTop: number }) => {
-    onScroll(scrollTop)
+  const handleScroll = ({
+    scrollTop,
+    scrollHeight,
+    clientHeight
+  }: { scrollTop: number; scrollHeight: number; clientHeight: number }) => {
+    onScroll({ scrollTop, scrollHeight, clientHeight })
 
     setShowTopGradient(scrollTop > 20)
-
-    const maxScroll = threads.length * 40 - 240
-    setShowBottomGradient(scrollTop < maxScroll - 20)
+    setShowBottomGradient(scrollTop < scrollHeight - clientHeight - 20)
   }
 
   return (
@@ -67,14 +78,12 @@ export const VirtualizedThreadList = forwardRef<
           />
         )}
       </AutoSizer>
-
       <div
         className={cn(
           'absolute top-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-b from-sidebar to-transparent transition-opacity duration-200',
           showTopGradient ? 'opacity-80' : 'opacity-0'
         )}
       />
-
       <div
         className={cn(
           'absolute bottom-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-t from-sidebar to-transparent transition-opacity duration-200',

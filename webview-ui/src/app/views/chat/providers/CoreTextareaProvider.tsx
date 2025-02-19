@@ -113,7 +113,13 @@ export const TextareaHandlersProvider = ({
   )
 
   const handleMessage = useCallback(
-    ({ command, payload }: TypedEventResponseMessage) => {
+    ({ command, payload, error }: TypedEventResponseMessage) => {
+      // CRITICAL: Proper error handling required!
+      // Never remove this check it will break the app.
+      if (error) {
+        return
+      }
+
       switch (command) {
         case EventResponseType.FOCUS_CHAT_INPUT: {
           handleFocusChat()

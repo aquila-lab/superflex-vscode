@@ -181,7 +181,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   sendEventMessage(msg: EventResponseMessage<EventResponseType>): void {
     // If the webview is not ready, queue the message
-    if (!this._chatWebview) {
+    if (!this._chatWebview || !this.chatApi.isReady()) {
       this._eventMessagesQueue.push(msg)
       return
     }
@@ -275,7 +275,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
 
   async focusChatInput(): Promise<void> {
     if (this._chatWebviewView?.visible) {
-      this._chatWebview?.postMessage(
+      this.sendEventMessage(
         newEventResponse(EventResponseType.FOCUS_CHAT_INPUT)
       )
       return Promise.resolve()
@@ -284,9 +284,7 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     vscode.commands.executeCommand('workbench.view.extension.superflex')
     await this.chatApi.onReady()
     this._chatWebviewView?.show(true)
-    this._chatWebview?.postMessage(
-      newEventResponse(EventResponseType.FOCUS_CHAT_INPUT)
-    )
+    this.sendEventMessage(newEventResponse(EventResponseType.FOCUS_CHAT_INPUT))
   }
 
   signout(): void {
