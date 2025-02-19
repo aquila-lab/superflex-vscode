@@ -71,7 +71,7 @@ export const useMessageBus = () => {
   const context = useContext(MessageBusContext)
 
   if (!context) {
-    throw new Error('useMessages must be used within MessageBusProvider')
+    throw new Error('useMessageBus must be used within MessageBusProvider')
   }
 
   return context
