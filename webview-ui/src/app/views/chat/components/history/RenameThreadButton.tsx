@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipTrigger
 } from '../../../../../common/ui/Tooltip'
-import { useCallback, useState, type MouseEvent } from 'react'
+import { useCallback, useMemo, useState, type MouseEvent } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,10 @@ export const RenameThreadButton = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [newTitle, setNewTitle] = useState(title)
+
+  const submitDisabled = useMemo(() => {
+    return newTitle.trim() === title || newTitle.trim() === ''
+  }, [newTitle, title])
 
   const handleClick = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation()
@@ -99,7 +103,12 @@ export const RenameThreadButton = ({
             >
               Cancel
             </Button>
-            <Button onClick={handleRename}>Rename</Button>
+            <Button
+              onClick={handleRename}
+              disabled={submitDisabled}
+            >
+              Rename
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
