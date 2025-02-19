@@ -7,7 +7,6 @@ export const PublicGuard = () => {
   const navigate = useNavigate()
 
   if (isLoggedIn === null) {
-    console.info(`isLoggedIn: ${isLoggedIn}`)
     return <LoadingView />
   }
 

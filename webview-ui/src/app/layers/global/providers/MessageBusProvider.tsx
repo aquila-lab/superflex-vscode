@@ -22,6 +22,7 @@ export function MessageBusProvider({ children }: { children: ReactNode }) {
 
   const handleMessage = useCallback((event: MessageEvent) => {
     const message = event.data as TypedEventResponseMessage
+
     const eventHandlers = handlers.current.get(message.command)
 
     if (eventHandlers) {
