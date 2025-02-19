@@ -62,8 +62,6 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
 
   const handleThreads = useCallback(
     ({ command, payload, error }: TypedEventResponseMessage) => {
-      // CRITICAL: Proper error handling required!
-      // Never remove this check it will break the app.
       if (error) {
         return
       }
@@ -89,8 +87,24 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
           navigate('/chat', { replace: true })
           break
         case EventResponseType.UPDATE_THREAD:
+          setThreads(prev =>
+            prev.map(thread =>
+              thread.id === payload.id
+                ? { ...thread, title: payload.title }
+                : thread
+            )
+          )
+          setCurrentThread(curr =>
+            curr?.id === payload.id ? { ...curr, title: payload.title } : curr
+          )
           break
         case EventResponseType.DELETE_THREAD:
+          setThreads(prev =>
+            prev.filter(thread => thread.id !== payload.threadID)
+          )
+          setCurrentThread(curr =>
+            curr?.id === payload.threadID ? null : curr
+          )
           break
       }
     },
