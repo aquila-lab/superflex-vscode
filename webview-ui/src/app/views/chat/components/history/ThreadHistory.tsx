@@ -87,22 +87,24 @@ export const ThreadHistory = () => {
             </Tooltip>
           </TooltipProvider>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant='text'
-                size='icon'
-                onClick={handleScrollToBottom}
-                className='hover:text-foreground w-auto h-auto'
-                aria-label='Scroll to bottom'
-              >
-                <ChevronDownIcon className='size-3' />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent portal>
-              <p className='text-xs m-0 text-muted-foreground'>Show older</p>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='text'
+                  size='icon'
+                  onClick={handleScrollToBottom}
+                  className='hover:text-foreground w-auto h-auto'
+                  aria-label='Scroll to bottom'
+                >
+                  <ChevronDownIcon className='size-3' />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent portal>
+                <p className='text-xs m-0 text-muted-foreground'>Show older</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
       <VirtualizedThreadList

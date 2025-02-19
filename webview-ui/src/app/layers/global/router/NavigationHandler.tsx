@@ -24,15 +24,18 @@ export const NavigationHandler = ({ children }: { children: ReactNode }) => {
         case EventResponseType.SHOW_LOGIN_VIEW: {
           setIsLoggedIn(false)
           navigate('/login', { replace: true })
+          console.info('SHOW_LOGIN_VIEW')
           break
         }
         case EventResponseType.SHOW_CHAT_VIEW: {
           setIsLoggedIn(true)
           navigate('/chat', { replace: true })
+          console.info('SHOW_CHAT_VIEW')
           break
         }
         case EventResponseType.SHOW_SETTINGS_VIEW: {
           navigate('/profile', { replace: true })
+          console.info('SHOW_SETTINGS_VIEW')
           break
         }
       }

@@ -88,6 +88,10 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
           postMessage(EventRequestType.STOP_MESSAGE)
           navigate('/chat', { replace: true })
           break
+        case EventResponseType.UPDATE_THREAD:
+          break
+        case EventResponseType.DELETE_THREAD:
+          break
       }
     },
     [navigate, postMessage]
@@ -138,7 +142,9 @@ export const ThreadsProvider = ({ children }: { children: ReactNode }) => {
     [
       EventResponseType.FETCH_THREADS,
       EventResponseType.FETCH_THREAD,
-      EventResponseType.NEW_THREAD
+      EventResponseType.NEW_THREAD,
+      EventResponseType.DELETE_THREAD,
+      EventResponseType.UPDATE_THREAD
     ],
     handleThreads
   )
