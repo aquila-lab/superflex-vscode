@@ -242,6 +242,42 @@ export class ChatAPI {
       )
 
       /**
+       * Event (update_thread): This event is fired when the user updates a thread.
+       * It is used to update a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID and title.
+       * @returns A promise that resolves with the updated thread.
+       */
+      .registerEvent(
+        EventRequestType.UPDATE_THREAD,
+        async (payload: { threadID: string; title: string }) => {
+          if (!this._assistant) {
+            return
+          }
+
+          return this._assistant.updateThread(payload.threadID, payload.title)
+        }
+      )
+
+      /**
+       * Event (delete_thread): This event is fired when the user deletes a thread.
+       * It is used to delete a thread by its ID from the assistant.
+       *
+       * @param payload - Payload containing the thread ID.
+       * @returns A promise that resolves when the thread is deleted.
+       */
+      .registerEvent(
+        EventRequestType.DELETE_THREAD,
+        async (payload: { threadID: string }) => {
+          if (!this._assistant) {
+            return
+          }
+
+          return this._assistant.deleteThread(payload.threadID)
+        }
+      )
+
+      /**
        * Event (create_figma_attachment): This event is fired when the user selects a Figma file in the webview.
        * It is used to extract the Figma selection URL get image url and send it back to the webview.
        *
