@@ -30,7 +30,7 @@ export const ThreadItem = ({
           {thread.title ?? 'Untitled'}
         </p>
       </div>
-      <div className='flex items-center gap-2'>
+      <div className='flex items-center'>
         <span className='text-xs text-muted-foreground whitespace-nowrap'>
           {duration} ago
         </span>

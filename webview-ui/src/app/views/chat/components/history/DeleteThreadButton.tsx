@@ -27,7 +27,7 @@ export const DeleteThreadButton = ({
           variant='text'
           size='icon'
           onClick={handleDelete}
-          className='opacity-0 group-hover:opacity-100 hover:text-destructive h-auto transition-[opacity,width] duration-200 group-hover:w-auto w-0 overflow-hidden'
+          className='justify-end hidden group-hover:flex hover:text-destructive'
           aria-label='Delete thread'
         >
           <Cross1Icon className='size-3' />
