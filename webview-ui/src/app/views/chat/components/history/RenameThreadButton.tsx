@@ -29,21 +29,34 @@ export const RenameThreadButton = ({
     setIsOpen(true)
   }, [])
 
-  const handleRename = useCallback(() => {
-    if (newTitle.trim() && newTitle !== title) {
-      onRename(newTitle.trim())
-    }
+  const handleRename = useCallback(
+    (e?: MouseEvent) => {
+      e?.stopPropagation()
+      if (newTitle.trim() && newTitle !== title) {
+        onRename(newTitle.trim())
+      }
+      setIsOpen(false)
+    },
+    [newTitle, title, onRename]
+  )
+
+  const handleCancel = useCallback(() => {
     setIsOpen(false)
-  }, [newTitle, title, onRename])
+  }, [])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      e.stopPropagation()
       if (e.key === 'Enter') {
         handleRename()
       }
     },
     [handleRename]
   )
+
+  const handleDialogClick = useCallback((e: MouseEvent) => {
+    e.stopPropagation()
+  }, [])
 
   return (
     <>
@@ -66,9 +79,9 @@ export const RenameThreadButton = ({
 
       <Dialog
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={handleCancel}
       >
-        <DialogContent>
+        <DialogContent onClick={handleDialogClick}>
           <DialogHeader>
             <DialogTitle>Rename Thread</DialogTitle>
           </DialogHeader>
@@ -82,7 +95,7 @@ export const RenameThreadButton = ({
           <div className='flex justify-end gap-2 mt-4'>
             <Button
               variant='outline'
-              onClick={() => setIsOpen(false)}
+              onClick={handleCancel}
             >
               Cancel
             </Button>
