@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { List, AutoSizer } from 'react-virtualized'
-import { customFilesFilter } from '../../../../../../common/utils'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { CommandEmpty, CommandList } from '../../../../../../common/ui/Command'
 import { FileCommandList } from './FileCommandList'
@@ -16,16 +15,6 @@ export const VirtualizedFileList = ({
   onSelect: (file: FilePayload) => void
   searchValue: string
 }) => {
-  const filteredFiles = useMemo(() => {
-    if (!searchValue) {
-      return files
-    }
-
-    return files.filter(file =>
-      customFilesFilter(file.relativePath, searchValue)
-    )
-  }, [files, searchValue])
-
   const rowRenderer = useMemo(
     () =>
       ({
@@ -38,36 +27,38 @@ export const VirtualizedFileList = ({
           style={style}
         >
           <FileCommandList
-            files={[filteredFiles[index]]}
+            files={[files[index]]}
             selectedFiles={selectedFiles}
             onSelect={onSelect}
           />
         </div>
       ),
-    [filteredFiles, selectedFiles, onSelect]
+    [files, selectedFiles, onSelect]
   )
 
   return (
     <CommandList className='overflow-y-hidden'>
-      <CommandEmpty>No files found.</CommandEmpty>
-
-      <div className='h-[240px]'>
-        <AutoSizer>
-          {({ height, width }) => (
-            <List
-              width={width}
-              height={height}
-              rowCount={filteredFiles.length}
-              rowHeight={28}
-              rowRenderer={rowRenderer}
-              overscanRowCount={5}
-              aria-label='File list'
-              tabIndex={0}
-              role='listbox'
-            />
-          )}
-        </AutoSizer>
-      </div>
+      {files.length === 0 ? (
+        <CommandEmpty>No files found.</CommandEmpty>
+      ) : (
+        <div className='h-[240px]'>
+          <AutoSizer>
+            {({ height, width }) => (
+              <List
+                width={width}
+                height={height}
+                rowCount={files.length}
+                rowHeight={28}
+                rowRenderer={rowRenderer}
+                overscanRowCount={5}
+                aria-label='File list'
+                tabIndex={0}
+                role='listbox'
+              />
+            )}
+          </AutoSizer>
+        </div>
+      )}
     </CommandList>
   )
 }

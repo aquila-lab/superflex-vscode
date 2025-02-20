@@ -13,7 +13,7 @@ export const FileDropdownItem = ({
 }) => (
   <CommandItem
     key={file.id}
-    value={file.relativePath}
+    value={`${file.name} ${file.relativePath}`}
     added={isSelected}
     onSelect={onSelect}
   >
