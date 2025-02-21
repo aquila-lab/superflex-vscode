@@ -2,15 +2,8 @@ import type { Monaco } from '@monaco-editor/react'
 import { type ClassValue, clsx } from 'clsx'
 import type { ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
-import {
-  type MessageAttachment,
-  type MessageContent,
-  Role
-} from '../../../shared/model'
-import type {
-  FilePayload,
-  TypedEventResponseMessage
-} from '../../../shared/protocol'
+import { Role } from '../../../shared/model'
+import type { TypedEventResponseMessage } from '../../../shared/protocol'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -33,75 +26,6 @@ export const getFileName = (filePath: string): string => {
   return filePath.split(/[/\\]/g).pop() ?? ''
 }
 
-export const areMessageContentsEqual = (
-  prevContent: MessageContent,
-  nextContent: MessageContent
-): boolean => {
-  if (prevContent.text !== nextContent.text) {
-    return false
-  }
-
-  if (prevContent.fromMessageID !== nextContent.fromMessageID) {
-    return false
-  }
-
-  if (!areAttachmentsEqual(prevContent.attachment, nextContent.attachment)) {
-    return false
-  }
-
-  return areFilesEqual(prevContent.files, nextContent.files)
-}
-
-const areAttachmentsEqual = (
-  prevAttachment?: MessageAttachment,
-  nextAttachment?: MessageAttachment
-): boolean => {
-  if (!(prevAttachment || nextAttachment)) {
-    return true
-  }
-  if (!(prevAttachment && nextAttachment)) {
-    return false
-  }
-
-  if (prevAttachment.image !== nextAttachment.image) {
-    return false
-  }
-
-  if (prevAttachment.figma && nextAttachment.figma) {
-    return (
-      prevAttachment.figma.fileID === nextAttachment.figma.fileID &&
-      prevAttachment.figma.nodeID === nextAttachment.figma.nodeID &&
-      prevAttachment.figma.imageUrl === nextAttachment.figma.imageUrl
-    )
-  }
-
-  if (prevAttachment.figma ?? nextAttachment.figma) {
-    return false
-  }
-
-  return true
-}
-
-const areFilesEqual = (
-  prevFiles?: FilePayload[],
-  nextFiles?: FilePayload[]
-): boolean => {
-  if (!(prevFiles && nextFiles) || prevFiles.length !== nextFiles.length) {
-    return false
-  }
-
-  return prevFiles.every((prevFile, index) => {
-    const nextFile = nextFiles[index]
-    return (
-      prevFile.path === nextFile.path &&
-      prevFile.content === nextFile.content &&
-      prevFile.startLine === nextFile.startLine &&
-      prevFile.endLine === nextFile.endLine &&
-      prevFile.isCurrentOpenFile === nextFile.isCurrentOpenFile
-    )
-  })
-}
-
 export const roleClassName: Partial<Record<Role, string>> = {
   [Role.Assistant]: 'prose prose-sm text-sm dark:prose-invert w-full max-w-none'
 }
@@ -114,24 +38,11 @@ export const chatInputEnabledClasses =
 
 export type ApplyState = 'idle' | 'applying' | 'applied'
 
-export interface CodeBlockInfo {
-  extension: string
-  filePath?: string
-  startLine?: number
-  endLine?: number
-}
-
 export interface MarkdownCodeProps {
   inline?: boolean
   isStreamingMessage?: boolean
   className?: string
   children?: ReactNode
-}
-
-export interface MarkdownRenderProps {
-  role: Role
-  isStreaming?: boolean
-  children: ReactNode
 }
 
 export const customFilesFilter = (value: string, search: string): boolean => {
