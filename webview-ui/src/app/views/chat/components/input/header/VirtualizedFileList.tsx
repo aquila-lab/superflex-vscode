@@ -3,6 +3,7 @@ import { List, AutoSizer } from 'react-virtualized'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { CommandEmpty, CommandList } from '../../../../../../common/ui/Command'
 import { FileCommandList } from './FileCommandList'
+import { createFileSearchMatcher } from '../../../../../../common/utils'
 
 export const VirtualizedFileList = ({
   files,
@@ -15,30 +16,31 @@ export const VirtualizedFileList = ({
   onSelect: (file: FilePayload) => void
   searchValue: string
 }) => {
-  const rowRenderer = useMemo(
-    () =>
-      ({
-        index,
-        key,
-        style
-      }: { index: number; key: string; style: object }) => (
-        <div
-          key={key}
-          style={style}
-        >
-          <FileCommandList
-            files={[files[index]]}
-            selectedFiles={selectedFiles}
-            onSelect={onSelect}
-          />
-        </div>
-      ),
-    [files, selectedFiles, onSelect]
+  const filteredFiles = useMemo(() => {
+    const matcher = createFileSearchMatcher(searchValue)
+    return files.filter(matcher)
+  }, [files, searchValue])
+
+  const rowRenderer = ({
+    index,
+    key,
+    style
+  }: { index: number; key: string; style: object }) => (
+    <div
+      key={key}
+      style={style}
+    >
+      <FileCommandList
+        files={[filteredFiles[index]]}
+        selectedFiles={selectedFiles}
+        onSelect={onSelect}
+      />
+    </div>
   )
 
   return (
     <CommandList className='overflow-y-hidden'>
-      {files.length === 0 ? (
+      {filteredFiles.length === 0 ? (
         <CommandEmpty>No files found.</CommandEmpty>
       ) : (
         <div className='h-[240px]'>
@@ -47,7 +49,7 @@ export const VirtualizedFileList = ({
               <List
                 width={width}
                 height={height}
-                rowCount={files.length}
+                rowCount={filteredFiles.length}
                 rowHeight={28}
                 rowRenderer={rowRenderer}
                 overscanRowCount={5}

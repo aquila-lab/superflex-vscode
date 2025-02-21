@@ -264,16 +264,17 @@ export interface UseImageDragAndDrop {
   onError?: (error: Error) => void
 }
 
-export const createFileSearchFilter =
-  () =>
-  (value: string, search: string): number => {
-    const searchTerms = search
-      .toLowerCase()
-      .split(/\s+/)
-      .filter(term => term.length > 0)
-    const valueLower = value.toLowerCase()
+export const createFileSearchMatcher = (searchValue: string) => {
+  const terms = searchValue.toLowerCase().trim().split(/\s+/).filter(Boolean)
 
-    return searchTerms.every(term => valueLower.includes(term)) ? 1 : 0
+  return (file: FilePayload) => {
+    if (!terms.length) {
+      return true
+    }
+
+    const searchString = `${file.name} ${file.relativePath}`.toLowerCase()
+    return terms.every(term => searchString.includes(term))
   }
+}
 
 export const RELOAD_DURATION = 1000
