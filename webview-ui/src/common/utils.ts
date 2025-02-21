@@ -265,17 +265,4 @@ export interface UseImageDragAndDrop {
   onError?: (error: Error) => void
 }
 
-export const createFileSearchMatcher = (searchValue: string) => {
-  const terms = searchValue.toLowerCase().trim().split(/\s+/).filter(Boolean)
-
-  return (file: FilePayload) => {
-    if (!terms.length) {
-      return true
-    }
-
-    const searchString = `${file.name} ${file.relativePath}`.toLowerCase()
-    return terms.every(term => searchString.includes(term))
-  }
-}
-
 export const RELOAD_DURATION = 1000
