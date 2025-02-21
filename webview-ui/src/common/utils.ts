@@ -45,10 +45,28 @@ export interface MarkdownCodeProps {
   children?: ReactNode
 }
 
-export const customFilesFilter = (value: string, search: string): boolean => {
-  const searchTerms = search.toLowerCase().split(/\s+/)
-  const valueLower = value.toLowerCase()
-  return searchTerms.every(term => valueLower.includes(term))
+export const getFileSearchKeywords = (filePath: string) => {
+  const parts = filePath.split(/[/\\]/)
+  const fileName = parts[parts.length - 1]
+  const fileNameWithoutExt = fileName.split('.')[0]
+
+  return [
+    filePath,
+    filePath.replace(/\//g, '\\'),
+    ...parts,
+    fileName,
+    fileNameWithoutExt,
+    fileName.split('.').pop() || ''
+  ]
+}
+
+export const customFilesFilter = (filePath: string, searchValue: string) => {
+  const keywords = getFileSearchKeywords(filePath)
+  const searchTerms = searchValue.toLowerCase().split(/\s+/)
+
+  return searchTerms.every(term =>
+    keywords.some(keyword => keyword.toLowerCase().includes(term))
+  )
 }
 
 export const getAvatarConfig = (
