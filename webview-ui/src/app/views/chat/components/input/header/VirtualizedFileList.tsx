@@ -3,7 +3,7 @@ import { List, AutoSizer } from 'react-virtualized'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { CommandEmpty, CommandList } from '../../../../../../common/ui/Command'
 import { FileCommandList } from './FileCommandList'
-import { createFileSearchMatcher } from '../../../../../../common/utils'
+import { customFilesFilter } from '../../../../../../common/utils'
 
 export const VirtualizedFileList = ({
   files,
@@ -17,8 +17,13 @@ export const VirtualizedFileList = ({
   searchValue: string
 }) => {
   const filteredFiles = useMemo(() => {
-    const matcher = createFileSearchMatcher(searchValue)
-    return files.filter(matcher)
+    if (!searchValue) {
+      return files
+    }
+
+    return files.filter(file =>
+      customFilesFilter(file.relativePath, searchValue)
+    )
   }, [files, searchValue])
 
   const rowRenderer = ({
