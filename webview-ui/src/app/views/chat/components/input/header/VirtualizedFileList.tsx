@@ -45,27 +45,25 @@ export const VirtualizedFileList = ({
 
   return (
     <CommandList className='overflow-y-hidden'>
-      {filteredFiles.length === 0 ? (
-        <CommandEmpty>No files found.</CommandEmpty>
-      ) : (
-        <div className='h-[240px]'>
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                width={width}
-                height={height}
-                rowCount={filteredFiles.length}
-                rowHeight={28}
-                rowRenderer={rowRenderer}
-                overscanRowCount={5}
-                aria-label='File list'
-                tabIndex={0}
-                role='listbox'
-              />
-            )}
-          </AutoSizer>
-        </div>
-      )}
+      <CommandEmpty>No files found.</CommandEmpty>
+
+      <div className='h-[240px]'>
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              width={width}
+              height={height}
+              rowCount={filteredFiles.length}
+              rowHeight={28}
+              rowRenderer={rowRenderer}
+              overscanRowCount={5}
+              aria-label='File list'
+              tabIndex={0}
+              role='listbox'
+            />
+          )}
+        </AutoSizer>
+      </div>
     </CommandList>
   )
 }
