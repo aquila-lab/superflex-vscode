@@ -47,13 +47,14 @@ export interface MarkdownCodeProps {
 
 export const customFilesFilter = (value: string, search: string): boolean => {
   const searchTerms = search.toLowerCase().split(/\s+/)
-
-  if (searchTerms.length > 2) {
-    return false
-  }
-
   const valueLower = value.toLowerCase()
-  return searchTerms.every(term => valueLower.includes(term))
+
+  const match = searchTerms.every(term => valueLower.includes(term))
+
+  if (match) {
+    console.log(searchTerms, valueLower)
+  }
+  return match
 }
 
 export const getAvatarConfig = (
