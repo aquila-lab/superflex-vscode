@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { List, AutoSizer } from 'react-virtualized'
-import { customFilesFilter } from '../../../../../../common/utils'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { CommandEmpty, CommandList } from '../../../../../../common/ui/Command'
 import { FileCommandList } from './FileCommandList'
+import { customFilesFilter } from '../../../../../../common/utils'
 
 export const VirtualizedFileList = ({
   files,
@@ -26,25 +26,21 @@ export const VirtualizedFileList = ({
     )
   }, [files, searchValue])
 
-  const rowRenderer = useMemo(
-    () =>
-      ({
-        index,
-        key,
-        style
-      }: { index: number; key: string; style: object }) => (
-        <div
-          key={key}
-          style={style}
-        >
-          <FileCommandList
-            files={[filteredFiles[index]]}
-            selectedFiles={selectedFiles}
-            onSelect={onSelect}
-          />
-        </div>
-      ),
-    [filteredFiles, selectedFiles, onSelect]
+  const rowRenderer = ({
+    index,
+    key,
+    style
+  }: { index: number; key: string; style: object }) => (
+    <div
+      key={key}
+      style={style}
+    >
+      <FileCommandList
+        files={[filteredFiles[index]]}
+        selectedFiles={selectedFiles}
+        onSelect={onSelect}
+      />
+    </div>
   )
 
   return (
