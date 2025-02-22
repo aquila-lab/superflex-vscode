@@ -1,5 +1,5 @@
-[twitter-shield]: https://img.shields.io/twitter/follow/_riphal_?style=social
-[twitter-url]: https://x.com/_riphal_
+[twitter-shield]: https://img.shields.io/twitter/follow/superflex_ai?style=social
+[twitter-url]: https://x.com/superflex_ai
 [github-shield]: https://img.shields.io/github/stars/aquila-lab/superflex-vscode?style=social
 [github-url]: https://github.com/aquila-lab/superflex-vscode
 [vscode-shield]: https://img.shields.io/visual-studio-marketplace/r/aquilalabs.superflex?logo=visual-studio-code&style=social

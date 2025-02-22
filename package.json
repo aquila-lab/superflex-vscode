@@ -5,7 +5,7 @@
   "description": "Transform Figma designs into production-ready code with Superflex, your AI-powered assistant in VSCode. Built on GPT & Claude, Superflex generates clean, reusable code in seconds, saving hours on frontend work while preserving your design standards and coding style.",
   "icon": "small_logo.png",
   "version": "1.0.5",
-  "author": "Riphal <https://twitter.com/_riphal_>",
+  "author": "Riphal <https://x.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
     "color": "#100f11",
@@ -18,9 +18,9 @@
       "href": "https://github.com/aquila-lab/superflex-vscode"
     },
     {
-      "url": "https://img.shields.io/twitter/follow/_riphal_?style=social",
+      "url": "https://img.shields.io/twitter/follow/superflex_ai?style=social",
       "description": "Follow Superflex on X",
-      "href": "https://x.com/_riphal_"
+      "href": "https://x.com/superflex_ai"
     },
     {
       "url": "https://img.shields.io/visual-studio-marketplace/r/aquilalabs.superflex?logo=visual-studio-code&style=social",
