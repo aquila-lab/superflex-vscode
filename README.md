@@ -19,12 +19,16 @@
 
 Superflex is your ultimate frontend assistant that makes frontend development seamless. From transforming Figma designs to coding entire pages in seconds, Superflex ensures your design standards and coding style are always maintained.
 
-## 🌟 **New in Superflex v0.2.0**
+## 🌟 **New in Superflex v1.0.0**
 
-- **Full Page from Figma to Code**: Generate entire page layouts from Figma in seconds!
 - **New Chat UI**: Clean, intuitive chat interface that follows your VSCode theme colors.
-- **Enhanced Usability**: Copy text during generation and hover to preview full file paths.
-- **Shortcuts & Profiles**: Accelerate workflows with keyboard shortcuts and monitor your usage.
+- **Chat Conversation History**: Keep track of your chat history and continue conversations from where you left off.
+- **Edit previous messages**: Edit previous messages in the chat and re-generate the response.
+- **Stop generation**: Stop the generation of a response at any time.
+- **Improved Settings Page**: Manage your Superflex settings with ease.
+- **Better streaming support**: Superflex now supports streaming responses, so you can see the code being generated in real-time.
+- **File Search**: Search for files in your project and add them to your chat.
+- **Hints & Shortcuts**: Get hints and shortcuts for the chat commands.
 
 ## 🚀 Get Started with Superflex
 
