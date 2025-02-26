@@ -97,7 +97,8 @@ export class ChatAPI {
               'local',
               toKebabCase(openWorkspace.name)
             )
-            await this.syncProjectFiles(sendEventMessageCb)
+
+            this.syncProjectFiles(sendEventMessageCb)
 
             this._isInitialized = true
 
