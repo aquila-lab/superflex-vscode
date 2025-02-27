@@ -105,7 +105,7 @@ async function backgroundInit(
       appState.chatViewProvider.handleEventMessage(
         newEventRequest(EventRequestType.SYNC_PROJECT)
       ),
-    5000
+    5 * 60 * 1000 // 5 minutes
   )
 }
 
