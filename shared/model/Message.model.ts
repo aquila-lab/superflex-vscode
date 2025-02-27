@@ -24,6 +24,11 @@ export type MessageContent = {
   fromMessageID?: string
 
   /**
+   * Original user prompt, before any enhancements.
+   */
+  originalText?: string
+
+  /**
    * Optional if there are attachments.
    * This contains the actual message text that will be displayed to the user.
    */
