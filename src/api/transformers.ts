@@ -104,6 +104,7 @@ export function buildThreadRunRequest(
   message: MessageContent
 ): Record<string, any> {
   const reqBody: Record<string, any> = {
+    original_text: message.originalText,
     text: message.text,
     files: []
   }

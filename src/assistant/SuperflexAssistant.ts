@@ -146,7 +146,7 @@ export default class SuperflexAssistant implements Assistant {
   }
 
   async enhancePrompt(text: string, image: string): Promise<string> {
-    return api.enhancePrompt({ text, image })
+    return await api.enhancePrompt({ text, image })
   }
 
   async syncFiles(

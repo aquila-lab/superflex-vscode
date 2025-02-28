@@ -12,7 +12,7 @@ async function enhancePrompt({ text, image }: PromptEnhancerArgs): Promise<strin
       text,
       image
     })
-    return Promise.resolve(data.result)
+    return Promise.resolve(data)
   } catch (err) {
     return Promise.reject(parseError(err))
   }
