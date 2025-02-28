@@ -64,26 +64,17 @@ export async function findWorkspaceFiles(
 
   // Default ignore patterns
   const defaultIgnore = [
+    '**/.env',
+    '**/.DS_Store',
     '**/node_modules/**',
     '**/build/**',
     '**/out/**',
     '**/dist/**',
     '**/.next/**',
     '**/.git/**',
-    '**/coverage/**',
-    '**/test/**',
-    '**/public/**',
     '**/.cache/**',
-    '**/storybook-static/**',
-    '**/.storybook/**',
-    '**/cypress/**',
     '**/__tests__/**',
-    '**/__mocks__/**',
-    '**/e2e/**',
-    '**/.docz/**',
-    '**/static/**',
-    '**/.DS_Store/**',
-    '.env'
+    '**/__mocks__/**'
   ]
 
   // Read .gitignore and .superflexignore
