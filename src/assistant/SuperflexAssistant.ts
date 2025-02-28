@@ -114,17 +114,13 @@ export default class SuperflexAssistant implements Assistant {
     // Create new abort controller for this stream
     this._currentStream = new AbortController()
 
-    if (message.attachment) {
-      const enhancedPrompt = await this.enhancePrompt(message?.text ?? "", message.attachment.image ?? message.attachment.figma!.imageUrl)
-      message.originalText = message?.text;
-      message.text = enhancedPrompt;
-    }
+    const enhancedMessage = await this.enhancePrompt(message)
 
     return api.sendThreadMessage({
       owner: this.owner,
       repo: this.repo,
       threadID,
-      message,
+      message: enhancedMessage,
       options: {
         signal: this._currentStream.signal
       }
@@ -145,8 +141,8 @@ export default class SuperflexAssistant implements Assistant {
     return api.fastApply({ code, edits })
   }
 
-  async enhancePrompt(text: string, image: string): Promise<string> {
-    return await api.enhancePrompt({ text, image })
+  async enhancePrompt(message: MessageContent): Promise<MessageContent> {
+    return api.enhancePrompt(message)
   }
 
   async syncFiles(

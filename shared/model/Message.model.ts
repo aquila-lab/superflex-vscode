@@ -24,7 +24,8 @@ export type MessageContent = {
   fromMessageID?: string
 
   /**
-   * Original user prompt, before any enhancements.
+   * Optional message that user has sent with or without the attachment.
+   * Used as an input for the prompt enhancer.
    */
   originalText?: string
 
