@@ -14,13 +14,13 @@ async function enhancePrompt(messageContent: MessageContent): Promise<MessageCon
     }
     else if (messageContent.attachment.figma) {
       if (!messageContent.attachment.figma.imageUrl) {
-        // TODO: Warning no image url
+        console.warn("No image URL for Figma attachment")
         return messageContent;
       }
       image = messageContent.attachment.figma.imageUrl;
     }
     else {
-      // TODO: Warning unsupported attachment type
+      console.warn("Unsupported attachment type")
       return messageContent;
     }
 
@@ -31,7 +31,7 @@ async function enhancePrompt(messageContent: MessageContent): Promise<MessageCon
     return Promise.resolve({
       ...messageContent,
       originalText: messageContent.text,
-      text: data
+      text: data.text
     });
   } catch (err) {
     return Promise.reject(parseError(err))
