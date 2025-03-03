@@ -149,7 +149,8 @@ export default class SuperflexAssistant implements Assistant {
     progressCb?: (current: number, isFirstTimeSync?: boolean) => void
   ): Promise<void> {
     const packageJsonPath = path.join(this.workspaceDirPath, 'package.json')
-    if (!fs.existsSync(packageJsonPath)) {
+    const indexHtmlPath = path.join(this.workspaceDirPath, 'index.html')
+    if (!fs.existsSync(packageJsonPath) && !fs.existsSync(indexHtmlPath)) {
       return
     }
 
