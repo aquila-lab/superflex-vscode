@@ -148,6 +148,8 @@ export default class SuperflexAssistant implements Assistant {
   async syncFiles(
     progressCb?: (current: number, isFirstTimeSync?: boolean) => void
   ): Promise<void> {
+    // TODO(boris): Replace this with a more robust check for a valid workspace,
+    // we can check if project have more then 100k lines of code it needs to be enroled to enterprise plan.
     const packageJsonPath = path.join(this.workspaceDirPath, 'package.json')
     const indexHtmlPath = path.join(this.workspaceDirPath, 'index.html')
     if (!fs.existsSync(packageJsonPath) && !fs.existsSync(indexHtmlPath)) {
