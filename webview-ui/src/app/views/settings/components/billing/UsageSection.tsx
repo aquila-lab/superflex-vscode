@@ -1,6 +1,6 @@
 import { CardDescription } from '../../../../../common/ui/Card'
-import { UsageDisplay } from './UsageDisplay'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
+import { UsageDisplay } from './UsageDisplay'
 
 export const UsageSection = () => {
   const { subscription } = useUser()

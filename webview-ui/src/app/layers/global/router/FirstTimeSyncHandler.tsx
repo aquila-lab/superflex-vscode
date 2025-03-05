@@ -1,9 +1,9 @@
 import { type ReactNode, useCallback } from 'react'
-import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import {
   type EventResponseMessage,
   EventResponseType
 } from '../../../../../../shared/protocol'
+import { useConsumeMessage } from '../hooks/useConsumeMessage'
 import { useGlobal } from '../providers/GlobalProvider'
 
 export const FirstTimeSyncHandler = ({ children }: { children: ReactNode }) => {

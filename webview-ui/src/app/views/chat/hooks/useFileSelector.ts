@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  type FilePayload,
   type EventResponseMessage,
-  EventResponseType
+  EventResponseType,
+  type FilePayload
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { useFiles } from '../providers/FilesProvider'

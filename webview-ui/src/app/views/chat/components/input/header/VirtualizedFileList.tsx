@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { List, AutoSizer } from 'react-virtualized'
+import { AutoSizer, List } from 'react-virtualized'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { CommandEmpty, CommandList } from '../../../../../../common/ui/Command'
-import { FileCommandList } from './FileCommandList'
 import { customFilesFilter } from '../../../../../../common/utils'
+import { FileCommandList } from './FileCommandList'
 
 export const VirtualizedFileList = ({
   files,

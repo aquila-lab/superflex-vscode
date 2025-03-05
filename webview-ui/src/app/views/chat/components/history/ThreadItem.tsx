@@ -1,9 +1,9 @@
 import { formatDistanceToNow } from 'date-fns'
 import { useMemo } from 'react'
 import type { Thread } from '../../../../../../../shared/model'
+import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
 import { DeleteThreadButton } from './DeleteThreadButton'
 import { RenameThreadButton } from './RenameThreadButton'
-import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
 
 export const ThreadItem = ({
   thread,

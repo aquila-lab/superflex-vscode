@@ -1,7 +1,7 @@
+import { useMemo } from 'react'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { CommandItem } from '../../../../../../common/ui/Command'
 import { FileIcon } from '../../../../../../common/ui/FileIcon'
-import { useMemo } from 'react'
 import { getFileSearchKeywords } from '../../../../../../common/utils'
 
 export const FileDropdownItem = ({

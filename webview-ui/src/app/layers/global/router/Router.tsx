@@ -6,9 +6,9 @@ import { SettingsView } from '../../../views/settings/SettingsView'
 import { AuthenticatedLayer } from '../../authenticated/AuthenticatedLayer'
 import { AuthGuard } from './AuthGuard'
 import { BaseLayout } from './BaseLayout'
+import { FirstTimeSyncHandler } from './FirstTimeSyncHandler'
 import { NavigationHandler } from './NavigationHandler'
 import { PublicGuard } from './PublicGuard'
-import { FirstTimeSyncHandler } from './FirstTimeSyncHandler'
 
 export const Router = () => {
   return (

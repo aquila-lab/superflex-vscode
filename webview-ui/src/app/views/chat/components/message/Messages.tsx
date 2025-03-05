@@ -1,27 +1,32 @@
 import { useMemo } from 'react'
-import { Role } from '../../../../../../../shared/model'
+import { type Message, Role } from '../../../../../../../shared/model'
 import { cn } from '../../../../../common/utils'
 import { useMessages } from '../../../../layers/authenticated/providers/MessagesProvider'
 import { useOverlay } from '../../../../layers/authenticated/providers/OverlayProvider'
 import { EditModeProvider } from '../../providers/EditModeProvider'
+import { AdvancedTextarea } from '../input/AdvancedTextarea'
 import { AssistantMessage } from './assistant/AssistantMessage'
 import { MessageBox } from './shared/MessageBox'
-import { AdvancedTextarea } from '../input/AdvancedTextarea'
 
-export const Messages = () => {
-  const { messages } = useMessages()
+export const Messages = ({
+  messages: propMessages
+}: { messages?: Message[] }) => {
+  const { messages: contextMessages } = useMessages()
   const { activeMessageId } = useOverlay()
+
+  // Use provided messages or fall back to context
+  const messagesToRender = useMemo(
+    () => propMessages ?? contextMessages,
+    [propMessages, contextMessages]
+  )
 
   const renderedMessages = useMemo(
     () =>
-      messages.map(message => {
+      messagesToRender.map(message => {
         const { id, role, content } = message
         const isActive = id === activeMessageId
 
-        const messageClasses = cn(
-          'relative',
-          isActive && 'z-50'
-        )
+        const messageClasses = cn('relative', isActive && 'z-50')
 
         switch (role) {
           case Role.User:
@@ -54,7 +59,7 @@ export const Messages = () => {
             return null
         }
       }),
-    [messages, activeMessageId]
+    [messagesToRender, activeMessageId]
   )
 
   return <div className='flex flex-col relative'>{renderedMessages}</div>
