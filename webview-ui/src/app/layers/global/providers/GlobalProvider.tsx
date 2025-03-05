@@ -7,7 +7,6 @@ import {
   useMemo,
   useState
 } from 'react'
-import { usePostMessage } from '../hooks/usePostMessage'
 import {
   EventRequestType,
   type EventResponsePayload,
@@ -15,6 +14,7 @@ import {
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
+import { usePostMessage } from '../hooks/usePostMessage'
 
 const GlobalContext = createContext<{
   isInitialized: boolean | null

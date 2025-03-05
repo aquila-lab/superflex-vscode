@@ -1,6 +1,6 @@
 import { type ChangeEvent, useCallback, useRef } from 'react'
 import { IoImage } from 'react-icons/io5'
-import { readImageFileAsBase64, cn } from '../../../../../../common/utils'
+import { cn, readImageFileAsBase64 } from '../../../../../../common/utils'
 import { useNewMessage } from '../../../../../layers/authenticated/providers/NewMessageProvider'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'

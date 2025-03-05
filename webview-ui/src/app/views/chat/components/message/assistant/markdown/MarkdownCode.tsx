@@ -5,8 +5,7 @@ import { CodeBlock } from './code/CodeBlock'
 export const MarkdownCode = ({
   inline,
   className,
-  children,
-  isStreamingMessage = false
+  children
 }: MarkdownCodeProps) => {
   const match = useMemo(
     () => /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className ?? ''),
@@ -39,7 +38,6 @@ export const MarkdownCode = ({
   return (
     <CodeBlock
       filePath={codeBlock.filePath}
-      isStreamingMessage={isStreamingMessage}
       draft={draft}
       extension={codeBlock.extension}
     />

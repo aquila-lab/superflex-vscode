@@ -1,6 +1,6 @@
 import { Fragment, useMemo } from 'react'
-import { CommandGroup } from '../../../../../../common/ui/Command'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
+import { CommandGroup } from '../../../../../../common/ui/Command'
 import { FileDropdownItem } from './FileDropdownItem'
 
 export const FileCommandList = ({

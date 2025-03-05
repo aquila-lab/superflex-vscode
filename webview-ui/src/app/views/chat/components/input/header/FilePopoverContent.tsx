@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { Command, CommandInput } from '../../../../../../common/ui/Command'
 import { PopoverContent } from '../../../../../../common/ui/Popover'
 import { KeyboardHints } from './KeyboardHints'
-import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { VirtualizedFileList } from './VirtualizedFileList'
 
 export const FilePopoverContent = ({

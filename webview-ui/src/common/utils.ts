@@ -40,7 +40,6 @@ export type ApplyState = 'idle' | 'applying' | 'applied'
 
 export interface MarkdownCodeProps {
   inline?: boolean
-  isStreamingMessage?: boolean
   className?: string
   children?: ReactNode
 }

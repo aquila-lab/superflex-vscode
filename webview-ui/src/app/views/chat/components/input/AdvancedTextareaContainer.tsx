@@ -1,12 +1,12 @@
 import { type ReactNode, useMemo, useRef } from 'react'
 import {
-  cn,
   chatInputDisabledClasses,
-  chatInputEnabledClasses
+  chatInputEnabledClasses,
+  cn
 } from '../../../../../common/utils'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
-import { useEditMode } from '../../providers/EditModeProvider'
 import { useTextareaClickHandler } from '../../hooks/useTextareaClickHandler'
+import { useEditMode } from '../../providers/EditModeProvider'
 
 export const AdvancedTextareaContainer = ({
   children

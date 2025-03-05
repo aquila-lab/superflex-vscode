@@ -1,10 +1,10 @@
-import { useCallback, useState, type ReactNode } from 'react'
+import { type ReactNode, useCallback, useState } from 'react'
 import { EventResponseType } from '../../../../../../shared/protocol'
-import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
 import { LoadingBar } from '../../../../common/ui/LoadingBar'
 import { RELOAD_DURATION } from '../../../../common/utils'
-import { useUser } from '../providers/UserProvider'
+import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
 import { useThreads } from '../providers/ThreadsProvider'
+import { useUser } from '../providers/UserProvider'
 
 export const ReloadHandler = ({ children }: { children: ReactNode }) => {
   const [isReloading, setIsReloading] = useState(false)

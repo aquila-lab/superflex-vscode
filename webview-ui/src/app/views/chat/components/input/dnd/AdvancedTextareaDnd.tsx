@@ -1,8 +1,8 @@
 import { type ReactNode, useCallback } from 'react'
-import { DropOverlay } from './DropOverlay'
 import { useImageDragAndDrop } from '../../../../../../common/hooks/useImageDragAndDrop'
 import { cn } from '../../../../../../common/utils'
 import { useAttachment } from '../../../providers/AttachmentProvider'
+import { DropOverlay } from './DropOverlay'
 
 export const AdvancedTextareaDnd = ({ children }: { children: ReactNode }) => {
   const { setImageAttachment, removeAttachment } = useAttachment()

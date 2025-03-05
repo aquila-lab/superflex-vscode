@@ -1,12 +1,6 @@
 import { Pencil1Icon } from '@radix-ui/react-icons'
+import { type MouseEvent, useCallback, useMemo, useState } from 'react'
 import { Button } from '../../../../../common/ui/Button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '../../../../../common/ui/Tooltip'
-import { useCallback, useMemo, useState, type MouseEvent } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -14,6 +8,12 @@ import {
   DialogTitle
 } from '../../../../../common/ui/Dialog'
 import { Input } from '../../../../../common/ui/Input'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '../../../../../common/ui/Tooltip'
 
 export const RenameThreadButton = ({
   title,

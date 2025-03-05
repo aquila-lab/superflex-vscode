@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { readImageFileAsBase64, type UseImageDragAndDrop } from '../utils'
+import { type UseImageDragAndDrop, readImageFileAsBase64 } from '../utils'
 import { useDragAndDrop } from './useDragAndDrop'
 
 export const useImageDragAndDrop = ({

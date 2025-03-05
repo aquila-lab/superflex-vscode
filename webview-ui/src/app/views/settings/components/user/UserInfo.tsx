@@ -1,5 +1,5 @@
-import { InfoField } from '../base/InfoField'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
+import { InfoField } from '../base/InfoField'
 
 export const UserInfo = () => {
   const { user } = useUser()

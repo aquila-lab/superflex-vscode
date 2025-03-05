@@ -1,24 +1,16 @@
-import { useMemo, type ReactNode } from 'react'
-import { ApplyControls } from './apply/ApplyControls'
-import { useNewMessage } from '../../../../../../../layers/authenticated/providers/NewMessageProvider'
-import { CopyButton } from './apply/CopyButton'
+import type { ReactNode } from 'react'
 import { CodeBlockName } from './CodeBlockName'
+import { ApplyControls } from './apply/ApplyControls'
+import { CopyButton } from './apply/CopyButton'
 
 export const CodeBlockToolbar = ({
   filePath,
-  isStreamingMessage = false,
   children
 }: {
   filePath?: string
-  isStreamingMessage?: boolean
   children: ReactNode
 }) => {
-  const { isMessageStreaming } = useNewMessage()
   const content = String(children)
-  const canApplyControls = useMemo(
-    () => !isStreamingMessage || !isMessageStreaming,
-    [isStreamingMessage, isMessageStreaming]
-  )
 
   if (!filePath) {
     return null
@@ -29,12 +21,10 @@ export const CodeBlockToolbar = ({
       <CodeBlockName filePath={filePath} />
       <div className='flex flex-row items-center'>
         <CopyButton content={content} />
-        {canApplyControls && (
-          <ApplyControls
-            filePath={filePath}
-            content={content}
-          />
-        )}
+        <ApplyControls
+          filePath={filePath}
+          content={content}
+        />
       </div>
     </div>
   )

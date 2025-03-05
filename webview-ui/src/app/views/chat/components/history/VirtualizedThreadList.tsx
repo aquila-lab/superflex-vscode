@@ -1,8 +1,8 @@
-import { useMemo, forwardRef, useState } from 'react'
-import { List, AutoSizer } from 'react-virtualized'
+import { forwardRef, useMemo, useState } from 'react'
+import { AutoSizer, List } from 'react-virtualized'
 import type { Thread } from '../../../../../../../shared/model'
-import { ThreadItem } from './ThreadItem'
 import { cn } from '../../../../../common/utils'
+import { ThreadItem } from './ThreadItem'
 
 export const VirtualizedThreadList = forwardRef<
   List,

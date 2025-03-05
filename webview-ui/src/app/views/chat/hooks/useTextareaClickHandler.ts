@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import type { RefObject } from 'react'
 import { useMessages } from '../../../layers/authenticated/providers/MessagesProvider'
-import { useInput } from '../providers/InputProvider'
 import { useEditMode } from '../providers/EditModeProvider'
+import { useInput } from '../providers/InputProvider'
 
 export const useTextareaClickHandler = ({
   wrapperRef

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LoadingView } from '../../../views/loading/LoadingView'
-import { useUser } from '../providers/UserProvider'
 import { useGlobal } from '../../global/providers/GlobalProvider'
+import { useUser } from '../providers/UserProvider'
 export const LoadingGuard = ({ children }: { children: ReactNode }) => {
   const { isInitialized } = useGlobal()
   const { isUserLoading, isSubscriptionLoading } = useUser()

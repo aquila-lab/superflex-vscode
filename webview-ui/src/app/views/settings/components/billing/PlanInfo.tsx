@@ -1,8 +1,8 @@
 import { Button } from '../../../../../common/ui/Button'
-import { InfoField } from '../base/InfoField'
-import { ActionButtons } from '../base/ActionButtons'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useSettingsHandlers } from '../../providers/SettingsProvider'
+import { ActionButtons } from '../base/ActionButtons'
+import { InfoField } from '../base/InfoField'
 
 export const PlanInfo = () => {
   const { subscription, user } = useUser()

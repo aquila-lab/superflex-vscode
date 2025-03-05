@@ -1,10 +1,10 @@
+import { Fragment, type ReactNode } from 'react'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useEditMode } from '../../providers/EditModeProvider'
 import { InputProvider } from '../../providers/InputProvider'
 import { UserMessageHeader } from '../message/user/UserMessageHeader'
 import { Attachment } from './attachment/Attachment'
 import { FigmaSelectionModal } from './attachment/FigmaSelectionModal'
-import { Fragment, type ReactNode } from 'react'
 
 export const AdvancedTextareaPresenter = ({
   text,

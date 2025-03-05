@@ -7,13 +7,13 @@ import {
   useMemo,
   useState
 } from 'react'
-import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 import {
   EventRequestType,
   type EventResponseMessage,
   EventResponseType
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
+import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
 
 const ProjectSyncContext = createContext<{

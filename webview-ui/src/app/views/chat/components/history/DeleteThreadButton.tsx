@@ -1,4 +1,5 @@
 import { Cross1Icon } from '@radix-ui/react-icons'
+import { type MouseEvent, useCallback } from 'react'
 import { Button } from '../../../../../common/ui/Button'
 import {
   Tooltip,
@@ -6,7 +7,6 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '../../../../../common/ui/Tooltip'
-import { useCallback, type MouseEvent } from 'react'
 
 export const DeleteThreadButton = ({
   onDelete
