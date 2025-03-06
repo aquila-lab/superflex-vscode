@@ -24,21 +24,25 @@ export const ThreadItem = ({
   )
 
   return (
-    <div className='group flex justify-between items-center gap-6 p-2 rounded-md cursor-pointer hover:bg-muted'>
-      <div className='min-w-0 flex-1'>
+    <div className='group flex justify-between items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted h-10'>
+      <div className='min-w-0 flex-grow'>
         <p className='text-xs font-medium text-foreground truncate pr-2'>
           {thread.title ?? 'Untitled'}
         </p>
       </div>
-      <div className='flex items-center'>
-        <span className='text-xs text-muted-foreground whitespace-nowrap'>
-          {duration} ago
-        </span>
-        <RenameThreadButton
-          title={thread.title ?? 'Untitled'}
-          onRename={handleRename}
-        />
-        <DeleteThreadButton onDelete={onDelete} />
+      <div className='w-0 group-hover:w-auto overflow-hidden flex-shrink-0'>
+        <div className='flex items-center gap-1 whitespace-nowrap'>
+          <span className='text-xs text-muted-foreground text-right'>
+            {duration} ago
+          </span>
+          <div className='flex items-center'>
+            <RenameThreadButton
+              title={thread.title ?? 'Untitled'}
+              onRename={handleRename}
+            />
+            <DeleteThreadButton onDelete={onDelete} />
+          </div>
+        </div>
       </div>
     </div>
   )
