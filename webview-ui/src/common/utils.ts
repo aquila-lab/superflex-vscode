@@ -189,3 +189,73 @@ export interface UseImageDragAndDrop {
 }
 
 export const RELOAD_DURATION = 1000
+
+export type ThreadDateGroup =
+  | 'Today'
+  | 'Yesterday'
+  | 'Previous 7 days'
+  | 'Previous 30 days'
+  | string
+
+export const categorizeThreadsByDate = <T extends { updatedAt: string | Date }>(
+  threads: T[]
+) => {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  const previous7Days = new Date(today)
+  previous7Days.setDate(previous7Days.getDate() - 7)
+  const previous30Days = new Date(today)
+  previous30Days.setDate(previous30Days.getDate() - 30)
+
+  const result: Record<ThreadDateGroup, T[]> = {
+    Today: [],
+    Yesterday: [],
+    'Previous 7 days': [],
+    'Previous 30 days': []
+  }
+
+  threads.forEach(thread => {
+    const threadDate = new Date(thread.updatedAt)
+    const threadDateOnly = new Date(
+      threadDate.getFullYear(),
+      threadDate.getMonth(),
+      threadDate.getDate()
+    )
+
+    if (threadDateOnly.getTime() === today.getTime()) {
+      result.Today.push(thread)
+    } else if (threadDateOnly.getTime() === yesterday.getTime()) {
+      result.Yesterday.push(thread)
+    } else if (threadDateOnly >= previous7Days && threadDateOnly < yesterday) {
+      result['Previous 7 days'].push(thread)
+    } else if (
+      threadDateOnly >= previous30Days &&
+      threadDateOnly < previous7Days
+    ) {
+      result['Previous 30 days'].push(thread)
+    } else {
+      const month = threadDate.toLocaleString('default', { month: 'long' })
+      const year = threadDate.getFullYear()
+
+      const groupName =
+        threadDate.getFullYear() === now.getFullYear() ? month : `${year}`
+
+      if (!result[groupName]) {
+        result[groupName] = []
+      }
+      result[groupName].push(thread)
+    }
+  })
+
+  return Object.entries(result)
+    .filter(([_, threads]) => threads.length > 0)
+    .reduce(
+      (acc, [group, threads]) => {
+        acc[group as ThreadDateGroup] = threads
+        return acc
+      },
+      {} as Record<ThreadDateGroup, T[]>
+    )
+}

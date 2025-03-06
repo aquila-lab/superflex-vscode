@@ -1,15 +1,7 @@
-import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
-import { useCallback, useRef } from 'react'
-import type { List } from 'react-virtualized'
-import { Button } from '../../../../../common/ui/Button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '../../../../../common/ui/Tooltip'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { categorizeThreadsByDate, cn } from '../../../../../common/utils'
 import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
-import { VirtualizedThreadList } from './VirtualizedThreadList'
+import { ThreadGroup } from './ThreadGroup'
 
 export const ThreadHistory = () => {
   const {
@@ -20,40 +12,64 @@ export const ThreadHistory = () => {
     fetchMoreThreads,
     isLoadingMore
   } = useThreads()
-  const listRef = useRef<List | null>(null)
 
-  const handleScrollToTop = useCallback(() => {
-    if (listRef.current) {
-      listRef.current.scrollToPosition(0)
-    }
-  }, [])
+  const [showTopGradient, setShowTopGradient] = useState(false)
+  const [showBottomGradient, setShowBottomGradient] = useState(true)
 
-  const handleScrollToBottom = useCallback(() => {
-    if (listRef.current) {
-      listRef.current.scrollToPosition(Number.MAX_SAFE_INTEGER)
-    }
-  }, [])
+  const categorizedThreads = useMemo(() => {
+    return categorizeThreadsByDate(threads)
+  }, [threads])
 
-  const handleScroll = useCallback(
-    ({
-      scrollTop,
-      scrollHeight,
-      clientHeight
-    }: {
-      scrollTop: number
-      scrollHeight: number
-      clientHeight: number
-    }) => {
-      if (
-        hasMoreThreads &&
-        !isLoadingMore &&
-        scrollHeight - scrollTop - clientHeight < 300
-      ) {
-        fetchMoreThreads()
+  const orderedGroups = useMemo(() => {
+    const groupOrder = [
+      'Today',
+      'Yesterday',
+      'Previous 7 days',
+      'Previous 30 days'
+    ]
+
+    const groups = Object.keys(categorizedThreads)
+
+    return groups.sort((a, b) => {
+      const aIndex = groupOrder.indexOf(a)
+      const bIndex = groupOrder.indexOf(b)
+
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex
       }
-    },
-    [hasMoreThreads, isLoadingMore, fetchMoreThreads]
-  )
+
+      if (aIndex !== -1) {
+        return -1
+      }
+
+      if (bIndex !== -1) {
+        return 1
+      }
+
+      return b.localeCompare(a)
+    })
+  }, [categorizedThreads])
+
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) {
+      return
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+
+    setShowTopGradient(scrollTop > 20)
+    setShowBottomGradient(scrollTop < scrollHeight - clientHeight - 20)
+
+    if (
+      hasMoreThreads &&
+      !isLoadingMore &&
+      scrollHeight - scrollTop - clientHeight < 300
+    ) {
+      fetchMoreThreads()
+    }
+  }, [hasMoreThreads, isLoadingMore, fetchMoreThreads])
 
   if (threads.length === 0) {
     return null
@@ -61,60 +77,40 @@ export const ThreadHistory = () => {
 
   return (
     <div className='flex flex-col mt-6'>
-      <div className='flex items-center justify-between mb-2 px-2'>
-        <div className='flex gap-2 items-baseline'>
-          <h2 className='text-sm font-medium text-muted-foreground'>
-            Recent Conversations
-          </h2>
+      <div className='relative h-[240px]'>
+        <div
+          ref={containerRef}
+          className='h-full overflow-y-auto scrollbar-hide'
+          onScroll={handleScroll}
+        >
+          {orderedGroups.map(group => (
+            <ThreadGroup
+              key={group}
+              title={group}
+              threads={categorizedThreads[group]}
+              onSelect={selectThread}
+              onDelete={deleteThread}
+            />
+          ))}
+          {isLoadingMore && (
+            <div className='text-xs text-center text-muted-foreground py-2'>
+              Loading more...
+            </div>
+          )}
         </div>
-        <div className='flex items-center gap-0.5 text-muted-foreground text-sm'>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant='text'
-                  size='icon'
-                  onClick={handleScrollToTop}
-                  className='hover:text-foreground w-auto h-auto'
-                  aria-label='Scroll to top'
-                >
-                  <ChevronUpIcon className='size-3' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent portal>
-                <p className='text-xs m-0 text-muted-foreground'>Show recent</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant='text'
-                  size='icon'
-                  onClick={handleScrollToBottom}
-                  className='hover:text-foreground w-auto h-auto'
-                  aria-label='Scroll to bottom'
-                >
-                  <ChevronDownIcon className='size-3' />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent portal>
-                <p className='text-xs m-0 text-muted-foreground'>Show older</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        <div
+          className={cn(
+            'absolute top-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-b from-sidebar to-transparent transition-opacity duration-200',
+            showTopGradient ? 'opacity-80' : 'opacity-0'
+          )}
+        />
+        <div
+          className={cn(
+            'absolute bottom-0 left-0 right-0 h-14 pointer-events-none bg-gradient-to-t from-sidebar to-transparent transition-opacity duration-200',
+            showBottomGradient ? 'opacity-80' : 'opacity-0'
+          )}
+        />
       </div>
-      <VirtualizedThreadList
-        ref={listRef}
-        threads={threads}
-        onSelect={selectThread}
-        onDelete={deleteThread}
-        onScroll={handleScroll}
-        isLoadingMore={isLoadingMore}
-      />
     </div>
   )
 }
