@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { useEditMode } from '../../providers/EditModeProvider'
 import { useOverlay } from '../../../../layers/authenticated/providers/OverlayProvider'
+import { useEditMode } from '../../providers/EditModeProvider'
 
 export const TextareaOverlayHandler = ({
   messageId,

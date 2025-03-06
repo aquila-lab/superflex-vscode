@@ -8,9 +8,9 @@ import {
   useState
 } from 'react'
 import {
-  type EventRequestType,
-  type EventRequestPayload,
   type EventRequestMessage,
+  type EventRequestPayload,
+  type EventRequestType,
   newEventRequest
 } from '../../../../../../shared/protocol'
 

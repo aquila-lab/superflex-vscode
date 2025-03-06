@@ -1,15 +1,15 @@
 import type { MessageContent } from '../../../../../../../shared/model'
-import { AddSelectedCodeHandler } from './AddSelectedCodeHandler'
-import { Attachment } from './attachment/Attachment'
-import { CoreTextarea } from './core/CoreTextarea'
+import { TextareaHandlersProvider } from '../../providers/CoreTextareaProvider'
 import { useEditMode } from '../../providers/EditModeProvider'
 import { FilesProvider } from '../../providers/FilesProvider'
 import { SendMessageProvider } from '../../providers/SendMessageProvider'
+import { TextareaFooterProvider } from '../../providers/TextareaFooterProvider'
+import { AddSelectedCodeHandler } from './AddSelectedCodeHandler'
 import { AdvancedTextareaContainer } from './AdvancedTextareaContainer'
+import { Attachment } from './attachment/Attachment'
+import { CoreTextarea } from './core/CoreTextarea'
 import { AdvancedTextareaFooter } from './footer/AdvancedTextareaFooter'
 import { AdvancedTextareaHeader } from './header/AdvancedTextareaHeader'
-import { TextareaHandlersProvider } from '../../providers/CoreTextareaProvider'
-import { TextareaFooterProvider } from '../../providers/TextareaFooterProvider'
 
 export const AdvancedTextareaContent = ({
   content

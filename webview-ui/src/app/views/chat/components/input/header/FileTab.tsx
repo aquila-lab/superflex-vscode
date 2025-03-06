@@ -2,10 +2,10 @@ import { Cross2Icon } from '@radix-ui/react-icons'
 import { type MouseEvent, useCallback } from 'react'
 import type { FilePayload } from '../../../../../../../../shared/protocol'
 import { Button } from '../../../../../../common/ui/Button'
+import { FileIcon } from '../../../../../../common/ui/FileIcon'
 import { cn } from '../../../../../../common/utils'
 import { useEditMode } from '../../../providers/EditModeProvider'
 import { useFiles } from '../../../providers/FilesProvider'
-import { FileIcon } from '../../../../../../common/ui/FileIcon'
 
 export const FileTab = ({ file }: { file: FilePayload }) => {
   const { previewedFile, deselectFile, setPreviewedFile } = useFiles()

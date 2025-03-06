@@ -1,9 +1,9 @@
-import { AdvancedTextareaDnd } from './dnd/AdvancedTextareaDnd'
 import type { MessageContent } from '../../../../../../../shared/model'
 import { AttachmentProvider } from '../../providers/AttachmentProvider'
-import { AdvancedTextareaPresenter } from './AdvancedTextareaPresenter'
 import { AdvancedTextareaContent } from './AdvancedTextareaContent'
+import { AdvancedTextareaPresenter } from './AdvancedTextareaPresenter'
 import { TextareaOverlayHandler } from './TextareaOverlayHandler'
+import { AdvancedTextareaDnd } from './dnd/AdvancedTextareaDnd'
 
 export const AdvancedTextarea = ({
   content,

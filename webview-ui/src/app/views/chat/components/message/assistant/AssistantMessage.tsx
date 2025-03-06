@@ -1,25 +1,21 @@
+import { memo } from 'react'
 import { type Message, Role } from '../../../../../../../../shared/model'
-import { MarkdownRender } from './markdown/MarkdownRender'
-import { FeedbackDialog } from './FeedbackDialog'
 import { MessageContainer } from '../shared/MessageContainer'
 import { MessageHeader } from '../shared/MessageHeader'
+import { FeedbackDialog } from './FeedbackDialog'
+import { MarkdownRender } from './markdown/MarkdownRender'
 
-export const AssistantMessage = ({
+const AssistantMessageComponent = ({
   message,
-  hasFeedback = false,
-  isStreamingMessage = false
+  hasFeedback = false
 }: {
   message: Message
   hasFeedback?: boolean
-  isStreamingMessage?: boolean
 }) => {
   return (
     <MessageContainer role={Role.Assistant}>
       <MessageHeader role={Role.Assistant} />
-      <MarkdownRender
-        role={Role.Assistant}
-        isStreamingMessage={isStreamingMessage}
-      >
+      <MarkdownRender role={Role.Assistant}>
         {message.content.text}
       </MarkdownRender>
       {hasFeedback && !message.feedback && (
@@ -30,3 +26,5 @@ export const AssistantMessage = ({
     </MessageContainer>
   )
 }
+
+export const AssistantMessage = memo(AssistantMessageComponent)

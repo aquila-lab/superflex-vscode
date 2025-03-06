@@ -1,28 +1,28 @@
 import {
   type ChangeEvent,
-  createContext,
-  type ReactNode,
-  type KeyboardEvent,
   type ClipboardEvent,
+  type KeyboardEvent,
+  type ReactNode,
+  createContext,
   useCallback,
   useContext,
   useMemo,
   useRef
 } from 'react'
-import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
-import { useFiles } from './FilesProvider'
-import { useInput } from './InputProvider'
+import {
+  EventRequestType,
+  type EventResponsePayload,
+  EventResponseType,
+  type TypedEventResponseMessage
+} from '../../../../../../shared/protocol'
 import { useNewMessage } from '../../../layers/authenticated/providers/NewMessageProvider'
+import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
+import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 import { useAttachment } from './AttachmentProvider'
 import { useEditMode } from './EditModeProvider'
+import { useFiles } from './FilesProvider'
+import { useInput } from './InputProvider'
 import { useSendMessage } from './SendMessageProvider'
-import {
-  EventResponseType,
-  EventRequestType,
-  type TypedEventResponseMessage,
-  type EventResponsePayload
-} from '../../../../../../shared/protocol'
-import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 
 const TextareaHandlersContext = createContext<{
   handleInputChange: (e: ChangeEvent<HTMLTextAreaElement>) => void

@@ -4,9 +4,9 @@ import { Button } from '../../../../../../common/ui/Button'
 import { cn } from '../../../../../../common/utils'
 import { useNewMessage } from '../../../../../layers/authenticated/providers/NewMessageProvider'
 import { useUser } from '../../../../../layers/authenticated/providers/UserProvider'
+import { useGlobal } from '../../../../../layers/global/providers/GlobalProvider'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvider'
-import { useGlobal } from '../../../../../layers/global/providers/GlobalProvider'
 
 export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()

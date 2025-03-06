@@ -1,17 +1,20 @@
+import { memo, useMemo } from 'react'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 import { AssistantMessage } from './assistant/AssistantMessage'
 
-export const StreamingMessage = () => {
-  const { message } = useNewMessage()
+const StreamingMessageComponent = () => {
+  const { message, isMessageStreaming } = useNewMessage()
 
-  if (!message?.content.text) {
+  const shouldRender = useMemo(
+    () => isMessageStreaming && message?.content.text,
+    [isMessageStreaming, message?.content.text]
+  )
+
+  if (!shouldRender || !message) {
     return null
   }
 
-  return (
-    <AssistantMessage
-      message={message}
-      isStreamingMessage
-    />
-  )
+  return <AssistantMessage message={message} />
 }
+
+export const StreamingMessage = memo(StreamingMessageComponent)

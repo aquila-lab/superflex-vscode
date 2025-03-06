@@ -105,12 +105,18 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         return
       }
 
+      if (message && message.role === Role.Assistant) {
+        payload.id = message.id
+      }
+
       addMessages([payload])
 
-      setMessage(null)
-      setStreamTextDelta('')
+      requestAnimationFrame(() => {
+        setMessage(null)
+        setStreamTextDelta('')
+      })
     },
-    [addMessages, setIdToLastUserMessage]
+    [addMessages, setIdToLastUserMessage, message]
   )
 
   const handleSendMessageContentResponse = useCallback((payload: boolean) => {

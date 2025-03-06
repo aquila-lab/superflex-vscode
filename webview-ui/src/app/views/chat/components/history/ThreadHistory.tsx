@@ -1,15 +1,15 @@
-import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
-import { VirtualizedThreadList } from './VirtualizedThreadList'
-import { ChevronUpIcon, ChevronDownIcon } from '@radix-ui/react-icons'
+import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import { useCallback, useRef } from 'react'
-import { Button } from '../../../../../common/ui/Button'
 import type { List } from 'react-virtualized'
+import { Button } from '../../../../../common/ui/Button'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '../../../../../common/ui/Tooltip'
+import { useThreads } from '../../../../layers/authenticated/providers/ThreadsProvider'
+import { VirtualizedThreadList } from './VirtualizedThreadList'
 
 export const ThreadHistory = () => {
   const {

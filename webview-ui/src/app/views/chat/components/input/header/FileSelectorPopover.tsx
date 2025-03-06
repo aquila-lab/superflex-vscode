@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Popover } from '../../../../../../common/ui/Popover'
-import { useEditMode } from '../../../providers/EditModeProvider'
-import { FileSelectTrigger } from './FileSelectTrigger'
-import { FilePopoverContent } from './FilePopoverContent'
 import { useFileSelector } from '../../../hooks/useFileSelector'
+import { useEditMode } from '../../../providers/EditModeProvider'
+import { FilePopoverContent } from './FilePopoverContent'
+import { FileSelectTrigger } from './FileSelectTrigger'
 
 export const FileSelectorPopover = () => {
   const { isEditMode } = useEditMode()

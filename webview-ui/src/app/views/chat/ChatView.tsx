@@ -1,18 +1,21 @@
-import { FigmaPremiumModal } from './components/modals/FigmaPremiumModal'
-import { FigmaPremiumModalProvider } from './providers/FigmaPremiumModalProvider'
+import { OverlayProvider } from '../../layers/authenticated/providers/OverlayProvider'
 import { ChatContent } from './components/ChatContent'
 import { CurrentFileHandler } from './components/CurrentFileHandler'
-import { OutOfRequestsGuard } from './components/oor/OutOfRequestsGuard'
+import { FigmaPremiumModal } from './components/modals/FigmaPremiumModal'
 import { SoftLimitModal } from './components/modals/SoftLimitModal'
-import { OverlayProvider } from '../../layers/authenticated/providers/OverlayProvider'
+import { OutOfRequestsGuard } from './components/oor/OutOfRequestsGuard'
+import { CodeApplyStateProvider } from './providers/CodeApplyStateProvider'
+import { FigmaPremiumModalProvider } from './providers/FigmaPremiumModalProvider'
 
 export const ChatView = () => (
   <OutOfRequestsGuard>
     <CurrentFileHandler>
       <FigmaPremiumModalProvider>
-        <OverlayProvider>
-          <ChatContent />
-        </OverlayProvider>
+        <CodeApplyStateProvider>
+          <OverlayProvider>
+            <ChatContent />
+          </OverlayProvider>
+        </CodeApplyStateProvider>
         <FigmaPremiumModal />
         <SoftLimitModal />
       </FigmaPremiumModalProvider>
