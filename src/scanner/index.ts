@@ -18,15 +18,46 @@ export async function findFiles(
   globPatterns: string[],
   ignore: string[] = []
 ): Promise<string[]> {
-  const relativePaths = await fg(globPatterns, {
+  const negatedPatterns = ignore.filter(pattern => pattern.startsWith('!'))
+  const regularIgnores = ignore.filter(pattern => !pattern.startsWith('!'))
+
+  const regularFiles = await fg(globPatterns, {
     cwd: baseUri,
-    ignore,
+    ignore: regularIgnores,
     followSymbolicLinks: false,
     suppressErrors: true,
     dot: true
   })
 
-  return relativePaths.map(rp =>
+  let explicitlyIncludedFiles: string[] = []
+  if (negatedPatterns.length > 0) {
+    const includePatterns = negatedPatterns.map(pattern => pattern.substring(1))
+
+    const processedIncludePatterns = includePatterns.flatMap(pattern => {
+      // If the pattern doesn't have a file extension and doesn't end with /**,
+      // it might be a directory, so add a /** to capture all files within it
+      if (!pattern.includes('.') && !pattern.endsWith('/**')) {
+        if (pattern.endsWith('/')) {
+          return [`${pattern}**`]
+        }
+        return [pattern, `${pattern}/**`]
+      }
+      return [pattern]
+    })
+
+    explicitlyIncludedFiles = await fg(processedIncludePatterns, {
+      cwd: baseUri,
+      followSymbolicLinks: false,
+      suppressErrors: true,
+      dot: true
+    })
+  }
+
+  // Merge both sets of files and remove duplicates
+  const allFiles = [...new Set([...regularFiles, ...explicitlyIncludedFiles])]
+
+  // Return formatted paths
+  return allFiles.map(rp =>
     decodeUriAndRemoveFilePrefix(path.join(baseUri, rp))
   )
 }
