@@ -10,9 +10,9 @@ import {
 } from 'react'
 import {
   EventRequestType,
-  type EventResponseMessage,
   EventResponseType,
-  type FilePayload
+  type FilePayload,
+  type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
@@ -21,6 +21,7 @@ import { useEditMode } from './EditModeProvider'
 const FilesContext = createContext<{
   selectedFiles: FilePayload[]
   previewedFile: FilePayload | null
+  superflexRules: FilePayload | null
   fetchFiles: () => void
   fetchFileContent: (file: FilePayload) => void
   setPreviewedFile: Dispatch<SetStateAction<FilePayload | null>>
@@ -39,8 +40,9 @@ export const FilesProvider = ({
   const [manuallySelectedFiles, setManuallySelectedFiles] = useState<
     FilePayload[]
   >(files ?? [])
-  const [previewedFile, setPreviewedFile] = useState<FilePayload | null>(null)
   const [currentFile, setCurrentFile] = useState<FilePayload | null>(null)
+  const [previewedFile, setPreviewedFile] = useState<FilePayload | null>(null)
+  const [superflexRules, setSuperflexRules] = useState<FilePayload | null>(null)
 
   const selectedFiles = useMemo(() => {
     const files = manuallySelectedFiles.map(file =>
@@ -72,12 +74,25 @@ export const FilesProvider = ({
     })
   }, [])
 
-  const handleNewOpenFile = useCallback(
-    ({
-      payload
-    }: EventResponseMessage<EventResponseType.SET_CURRENT_OPEN_FILE>) => {
-      if (isEditMode && isMainTextarea) {
-        setCurrentFile(payload)
+  const handleFiles = useCallback(
+    ({ command, payload, error }: TypedEventResponseMessage) => {
+      // CRITICAL: Proper error handling required!
+      // Never remove this check it will break the app.
+      if (error) {
+        return
+      }
+
+      switch (command) {
+        case EventResponseType.SET_CURRENT_OPEN_FILE: {
+          if (isEditMode && isMainTextarea) {
+            setCurrentFile(payload)
+          }
+          break
+        }
+        case EventResponseType.FETCH_SUPERFLEX_RULES: {
+          setSuperflexRules(payload)
+          break
+        }
       }
     },
     [isEditMode, isMainTextarea]
@@ -102,12 +117,19 @@ export const FilesProvider = ({
     [postMessage]
   )
 
-  useConsumeMessage(EventResponseType.SET_CURRENT_OPEN_FILE, handleNewOpenFile)
+  useConsumeMessage(
+    [
+      EventResponseType.SET_CURRENT_OPEN_FILE,
+      EventResponseType.FETCH_SUPERFLEX_RULES
+    ],
+    handleFiles
+  )
 
   const value = useMemo(
     () => ({
       selectedFiles,
       previewedFile,
+      superflexRules,
       fetchFiles,
       fetchFileContent,
       selectFile,
@@ -118,6 +140,7 @@ export const FilesProvider = ({
     [
       selectedFiles,
       previewedFile,
+      superflexRules,
       fetchFiles,
       fetchFileContent,
       selectFile,

@@ -679,6 +679,35 @@ export class ChatAPI {
       })
 
       /**
+       * Event (fetch_superflex_rules): This event is fired when the webview needs to fetch the superflex rules.
+       * It is used to fetch the superflex rules from the extension.
+       *
+       * @returns A promise that resolves with the superflex rules.
+       * @throws An error if the superflex rules cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_SUPERFLEX_RULES, () => {
+        if (!this._isInitialized || !this._workspaceDirPath) {
+          return null
+        }
+
+        const superflexRulesPath = path.resolve(
+          this._workspaceDirPath,
+          '.superflexrules'
+        )
+
+        if (!fs.existsSync(superflexRulesPath)) {
+          return null
+        }
+
+        return {
+          id: generateFileID('.superflexrules'),
+          name: '.superflexrules',
+          path: superflexRulesPath,
+          relativePath: '.superflexrules'
+        }
+      })
+
+      /**
        * Event (update_message): This event is fired when the user provides feedback for a message in the webview Chat.
        * It is used to update the message with the feedback.
        *
