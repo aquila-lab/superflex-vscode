@@ -14,6 +14,7 @@ import {
   type FilePayload,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
+import { SUPERFLEX_RULES_FILE_NAME } from '../../../../../../shared/common/constants'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 import { useEditMode } from './EditModeProvider'
@@ -50,15 +51,15 @@ export const FilesProvider = ({
       files.push(superflexRules)
     }
 
-    if (currentFile && !files.some(file => file.id === currentFile.id)) {
-      files.push(currentFile)
-    }
-
     files.push(
       ...manuallySelectedFiles.map(file =>
         file.id === currentFile?.id ? currentFile : file
       )
     )
+
+    if (currentFile && !files.some(file => file.id === currentFile.id)) {
+      files.push(currentFile)
+    }
 
     return files
   }, [superflexRules, currentFile, manuallySelectedFiles])
@@ -68,18 +69,27 @@ export const FilesProvider = ({
     []
   )
 
-  const selectFile = useCallback((file: FilePayload) => {
-    setManuallySelectedFiles(prevSelectedFiles => {
-      const isSelected = prevSelectedFiles.some(
-        selected => selected.id === file.id
-      )
-      if (isSelected) {
-        setPreviewedFile(curr => (curr?.id === file.id ? null : curr))
-        return prevSelectedFiles.filter(selected => selected.id !== file.id)
-      }
-      return [...prevSelectedFiles, file]
-    })
-  }, [])
+  const selectFile = useCallback(
+    (file: FilePayload) => {
+      setManuallySelectedFiles(prevSelectedFiles => {
+        const isSelected = prevSelectedFiles.some(
+          selected => selected.id === file.id
+        )
+        if (isSelected || file.id === currentFile?.id) {
+          clearFileFromState(file)
+          return prevSelectedFiles.filter(selected => selected.id !== file.id)
+        }
+
+        if (file.name === SUPERFLEX_RULES_FILE_NAME) {
+          setSuperflexRules(prev => (prev?.id === file.id ? null : file))
+          return prevSelectedFiles
+        }
+
+        return [...prevSelectedFiles, file]
+      })
+    },
+    [currentFile]
+  )
 
   const handleFiles = useCallback(
     ({ command, payload, error }: TypedEventResponseMessage) => {
@@ -108,9 +118,13 @@ export const FilesProvider = ({
   )
 
   const deselectFile = useCallback((file: FilePayload) => {
+    clearFileFromState(file)
     setManuallySelectedFiles(prevSelectedFiles =>
       prevSelectedFiles.filter(selected => selected.id !== file.id)
     )
+  }, [])
+
+  const clearFileFromState = useCallback((file: FilePayload) => {
     setCurrentFile(curr => (curr?.id === file.id ? null : curr))
     setPreviewedFile(curr => (curr?.id === file.id ? null : curr))
     setSuperflexRules(curr => (curr?.id === file.id ? null : curr))
