@@ -45,7 +45,9 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             className='size-5'
           />
           <p className='text-xs text-foreground truncate max-w-16'>
-            {file.name}
+            {file.name.startsWith('.superflex')
+              ? file.name.slice('.superflex'.length)
+              : file.name}
           </p>
           <p className='text-xs text-muted-secondary-foreground'>
             {file.startLine &&

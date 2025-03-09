@@ -20,6 +20,7 @@ import {
   type EventResponseMessage,
   type EventResponsePayload
 } from '../../shared/protocol'
+import { SUPERFLEX_RULES_FILE_NAME } from '../../shared/common/constants'
 import * as api from '../api'
 import { HttpStatusCode, getFigmaSelectionImageUrl } from '../api'
 import type { Assistant } from '../assistant'
@@ -675,6 +676,35 @@ export class ChatAPI {
           path: newCurrentOpenFile,
           relativePath,
           isCurrentOpenFile: true
+        }
+      })
+
+      /**
+       * Event (fetch_superflex_rules): This event is fired when the webview needs to fetch the superflex rules.
+       * It is used to fetch the superflex rules from the extension.
+       *
+       * @returns A promise that resolves with the superflex rules.
+       * @throws An error if the superflex rules cannot be fetched.
+       */
+      .registerEvent(EventRequestType.FETCH_SUPERFLEX_RULES, () => {
+        if (!this._isInitialized || !this._workspaceDirPath) {
+          return null
+        }
+
+        const superflexRulesPath = path.resolve(
+          this._workspaceDirPath,
+          SUPERFLEX_RULES_FILE_NAME
+        )
+
+        if (!fs.existsSync(superflexRulesPath)) {
+          return null
+        }
+
+        return {
+          id: generateFileID(SUPERFLEX_RULES_FILE_NAME),
+          name: SUPERFLEX_RULES_FILE_NAME,
+          path: superflexRulesPath,
+          relativePath: SUPERFLEX_RULES_FILE_NAME
         }
       })
 

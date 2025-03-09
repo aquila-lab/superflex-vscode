@@ -190,6 +190,12 @@ export enum EventRequestType {
   FETCH_CURRENT_OPEN_FILE = 'fetch_current_open_file',
 
   /**
+   * FETCH_SUPERFLEX_RULES will request the superflex rules from the extension.
+   * @returns {FilePayload | null}
+   */
+  FETCH_SUPERFLEX_RULES = 'fetch_superflex_rules',
+
+  /**
    * PASTE_COPIED_CODE trigger extension to return FilePayload of selected text if it is part of the user project.
    * @returns {FilePayload | null}
    */
@@ -372,6 +378,12 @@ export enum EventResponseType {
   SET_CURRENT_OPEN_FILE = 'set_current_open_file',
 
   /**
+   * @triggered by {EventRequestType.FETCH_SUPERFLEX_RULES}
+   * FETCH_SUPERFLEX_RULES will send the superflex rules file to the webview.
+   */
+  FETCH_SUPERFLEX_RULES = 'fetch_superflex_rules',
+
+  /**
    * @triggered by extension.
    * ADD_SELECTED_CODE will add the selected code to the chat.
    */
@@ -435,6 +447,8 @@ export const EventRequestToResponseTypeMap: {
   [EventRequestType.FETCH_FILE_CONTENT]: EventResponseType.FETCH_FILE_CONTENT,
   [EventRequestType.FETCH_CURRENT_OPEN_FILE]:
     EventResponseType.SET_CURRENT_OPEN_FILE,
+  [EventRequestType.FETCH_SUPERFLEX_RULES]:
+    EventResponseType.FETCH_SUPERFLEX_RULES,
   [EventRequestType.PASTE_COPIED_CODE]: EventResponseType.PASTE_COPIED_CODE,
   [EventRequestType.GET_USER_INFO]: EventResponseType.GET_USER_INFO,
   [EventRequestType.GET_USER_SUBSCRIPTION]:
@@ -467,6 +481,7 @@ export interface EventRequestPayload {
   [EventRequestType.FETCH_FILES]: void
   [EventRequestType.FETCH_FILE_CONTENT]: FilePayload
   [EventRequestType.FETCH_CURRENT_OPEN_FILE]: void
+  [EventRequestType.FETCH_SUPERFLEX_RULES]: void
   [EventRequestType.PASTE_COPIED_CODE]: { text: string }
   [EventRequestType.GET_USER_INFO]: void
   [EventRequestType.GET_USER_SUBSCRIPTION]: void
@@ -496,6 +511,7 @@ export interface EventResponsePayload {
   [EventResponseType.FETCH_FILES]: FilePayload[]
   [EventResponseType.FETCH_FILE_CONTENT]: string | null
   [EventResponseType.SET_CURRENT_OPEN_FILE]: FilePayload | null
+  [EventResponseType.FETCH_SUPERFLEX_RULES]: FilePayload | null
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null
   [EventResponseType.FOCUS_CHAT_INPUT]: void

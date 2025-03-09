@@ -5,3 +5,5 @@ export const API_BASE_URL =
   process.env.API_BASE_URL ?? 'https://api.superflex.ai/v1'
 export const SUPERFLEX_POSTHOG_API_KEY =
   'phc_IHjFcEzOyL1UQAOwifm55y0YgMr1Zd5AQwx8RJC6jgq'
+
+export const SUPERFLEX_RULES_FILE_NAME = '.superflexrules'
