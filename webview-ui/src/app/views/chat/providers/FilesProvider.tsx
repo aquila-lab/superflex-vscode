@@ -21,7 +21,6 @@ import { useEditMode } from './EditModeProvider'
 const FilesContext = createContext<{
   selectedFiles: FilePayload[]
   previewedFile: FilePayload | null
-  superflexRules: FilePayload | null
   fetchFiles: () => void
   fetchFileContent: (file: FilePayload) => void
   setPreviewedFile: Dispatch<SetStateAction<FilePayload | null>>
@@ -45,16 +44,24 @@ export const FilesProvider = ({
   const [superflexRules, setSuperflexRules] = useState<FilePayload | null>(null)
 
   const selectedFiles = useMemo(() => {
-    const files = manuallySelectedFiles.map(file =>
-      file.id === currentFile?.id ? currentFile : file
-    )
+    const files: FilePayload[] = []
+
+    if (superflexRules) {
+      files.push(superflexRules)
+    }
 
     if (currentFile && !files.some(file => file.id === currentFile.id)) {
       files.push(currentFile)
     }
 
+    files.push(
+      ...manuallySelectedFiles.map(file =>
+        file.id === currentFile?.id ? currentFile : file
+      )
+    )
+
     return files
-  }, [manuallySelectedFiles, currentFile])
+  }, [superflexRules, currentFile, manuallySelectedFiles])
 
   const clearManuallySelectedFiles = useCallback(
     () => setManuallySelectedFiles([]),
@@ -90,7 +97,9 @@ export const FilesProvider = ({
           break
         }
         case EventResponseType.FETCH_SUPERFLEX_RULES: {
-          setSuperflexRules(payload)
+          if (isEditMode) {
+            setSuperflexRules(payload)
+          }
           break
         }
       }
@@ -104,6 +113,7 @@ export const FilesProvider = ({
     )
     setCurrentFile(curr => (curr?.id === file.id ? null : curr))
     setPreviewedFile(curr => (curr?.id === file.id ? null : curr))
+    setSuperflexRules(curr => (curr?.id === file.id ? null : curr))
   }, [])
 
   const fetchFiles = useCallback(() => {
@@ -129,7 +139,6 @@ export const FilesProvider = ({
     () => ({
       selectedFiles,
       previewedFile,
-      superflexRules,
       fetchFiles,
       fetchFileContent,
       selectFile,
@@ -140,7 +149,6 @@ export const FilesProvider = ({
     [
       selectedFiles,
       previewedFile,
-      superflexRules,
       fetchFiles,
       fetchFileContent,
       selectFile,

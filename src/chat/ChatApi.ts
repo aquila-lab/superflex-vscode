@@ -20,6 +20,7 @@ import {
   type EventResponseMessage,
   type EventResponsePayload
 } from '../../shared/protocol'
+import { SUPERFLEX_RULES_FILE_NAME } from '../../shared/common/constants'
 import * as api from '../api'
 import { HttpStatusCode, getFigmaSelectionImageUrl } from '../api'
 import type { Assistant } from '../assistant'
@@ -692,7 +693,7 @@ export class ChatAPI {
 
         const superflexRulesPath = path.resolve(
           this._workspaceDirPath,
-          '.superflexrules'
+          SUPERFLEX_RULES_FILE_NAME
         )
 
         if (!fs.existsSync(superflexRulesPath)) {
@@ -700,10 +701,10 @@ export class ChatAPI {
         }
 
         return {
-          id: generateFileID('.superflexrules'),
-          name: '.superflexrules',
+          id: generateFileID(SUPERFLEX_RULES_FILE_NAME),
+          name: SUPERFLEX_RULES_FILE_NAME,
           path: superflexRulesPath,
-          relativePath: '.superflexrules'
+          relativePath: SUPERFLEX_RULES_FILE_NAME
         }
       })
 

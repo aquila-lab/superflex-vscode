@@ -4,27 +4,19 @@ import { useFiles } from '../../../providers/FilesProvider'
 import { FileTab } from './FileTab'
 
 export const SelectedFiles = () => {
+  const { selectedFiles } = useFiles()
   const { isEditMode } = useEditMode()
-  const { selectedFiles, superflexRules } = useFiles()
 
-  const renderSelectedFiles = useMemo(() => {
-    return (
-      <>
-        {superflexRules && (
-          <FileTab
-            key={superflexRules.id}
-            file={superflexRules}
-          />
-        )}
-        {selectedFiles.map(file => (
-          <FileTab
-            key={file.id}
-            file={file}
-          />
-        ))}
-      </>
-    )
-  }, [selectedFiles, superflexRules])
+  const renderSelectedFiles = useMemo(
+    () =>
+      selectedFiles.map(file => (
+        <FileTab
+          key={file.id}
+          file={file}
+        />
+      )),
+    [selectedFiles]
+  )
 
   if (!selectedFiles.length) {
     if (!isEditMode) {
