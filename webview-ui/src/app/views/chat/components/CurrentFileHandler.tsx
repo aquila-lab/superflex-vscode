@@ -6,6 +6,7 @@ export const CurrentFileHandler = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
 
   useEffect(() => {
+    postMessage(EventRequestType.FETCH_SUPERFLEX_RULES)
     postMessage(EventRequestType.FETCH_CURRENT_OPEN_FILE)
   })
 

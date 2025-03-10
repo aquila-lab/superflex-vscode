@@ -23,6 +23,17 @@ const iconColors = {
 
 export const FileIcon: React.FC<FileIconProps> = ({ filePath, className }) => {
   const filename = getFileName(filePath)
+
+  if (filename.startsWith('.superflex')) {
+    return (
+      <img
+        src={window.superflexLogoUri}
+        alt='Superflex Logo'
+        className={cn('flex-shrink-0 p-1', className)}
+      />
+    )
+  }
+
   const getIcon = themeIcons(iconColors)
   const { svg, color } = getIcon(filename)
   const sanitizedSVG = DOMPurify.sanitize(svg)
