@@ -22,7 +22,9 @@ import * as api from '../api'
 import { Telemetry } from '../common/analytics/Telemetry'
 import { APP_BASE_URL, AUTH_PROVIDER_ID } from '../common/constants'
 import type AuthService from './SuperflexAuthenticationService'
-import uriEventHandler, { type UriEventHandler } from './UriEventHandler'
+import uriEventHandler, {
+  type UriEventHandler
+} from '../common/UriEventHandler'
 
 const AUTH_PROVIDER_LABEL = 'Superflex Authentication'
 const SESSIONS_SECRET_KEY = `${AUTH_PROVIDER_ID}.sessions`
@@ -65,8 +67,7 @@ export default class SuperflexAuthenticationProvider
         {
           supportsMultipleAccounts: false
         }
-      ),
-      window.registerUriHandler(this._uriHandler) // Register the URI handler
+      )
     )
   }
 

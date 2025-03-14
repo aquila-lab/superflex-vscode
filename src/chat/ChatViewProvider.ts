@@ -20,6 +20,7 @@ import {
   getNonce,
   getOpenWorkspace
 } from '../common/utils'
+import uriEventHandler from '../common/UriEventHandler'
 import type { ChatAPI } from './ChatApi'
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -52,6 +53,19 @@ export default class ChatViewProvider implements vscode.WebviewViewProvider {
     })
 
     this.debouncedShowInlineTip = debounce(this._showInlineTip.bind(this), 100)
+
+    uriEventHandler.event(uri => {
+      const params = new URLSearchParams(uri.query)
+      const open = params.get('open')
+
+      if (open === 'true') {
+        this.focusChatInput()
+        this._chatWebview &&
+          this.handleEventMessage(
+            newEventRequest(EventRequestType.GET_USER_SUBSCRIPTION)
+          )
+      }
+    })
 
     // Register the commands
     context.subscriptions.push(

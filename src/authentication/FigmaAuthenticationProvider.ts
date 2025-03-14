@@ -24,7 +24,9 @@ import {
   FIGMA_OAUTH_CALLBACK_URL,
   FIGMA_OAUTH_CLIENT_ID
 } from '../common/constants'
-import uriEventHandler, { type UriEventHandler } from './UriEventHandler'
+import uriEventHandler, {
+  type UriEventHandler
+} from '../common/UriEventHandler'
 
 const AUTH_PROVIDER_LABEL = 'Figma Authentication'
 const SESSIONS_SECRET_KEY = `${FIGMA_AUTH_PROVIDER_ID}.sessions`

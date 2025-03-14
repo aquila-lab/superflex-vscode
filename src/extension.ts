@@ -25,6 +25,7 @@ import {
   getOpenWorkspace,
   getUniqueID
 } from './common/utils'
+import uriEventHandler from './common/UriEventHandler'
 import { VerticalDiffManager } from './diff/vertical/manager'
 import { registerAllCodeLensProviders } from './lang-server/codeLens/registerAllCodeLensProviders'
 
@@ -75,6 +76,8 @@ async function backgroundInit(
   context: vscode.ExtensionContext,
   appState: AppState
 ) {
+  vscode.window.registerUriHandler(uriEventHandler)
+
   registerSuperflexCache(context)
   registerAuthenticationProviders(context, appState)
   registerChatWidgetWebview(context, appState.chatViewProvider)
