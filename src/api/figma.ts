@@ -1,6 +1,6 @@
 import type { FigmaTokenInformation, User } from '../../shared/model'
 import { PublicApi } from './api'
-import { parseError } from './error'
+import { parseError, parseFigmaApiError } from './error'
 import { FigmaApi } from './figmaApi'
 import { buildUserFromResponse } from './transformers'
 
@@ -53,7 +53,16 @@ async function getFigmaSelectionImageUrl({
       data.images[nodeID.replace('-', ':')] ?? data.images[nodeID]
     )
   } catch (err) {
-    return Promise.reject(parseError(err))
+    const error = parseFigmaApiError(err);
+    
+    // TODO: add user email
+    const userEmail = "user_email@email.com";
+    if (error.statusCode == 404) {
+      error.message = `File not found or you (${userEmail}) don't have access to it.`;
+      return Promise.reject(error)
+    }
+
+    return Promise.reject(error)
   }
 }
 
