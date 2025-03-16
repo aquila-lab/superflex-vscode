@@ -35,6 +35,17 @@ export function parseError(err: any): ApiError {
   )
 }
 
+export function parseFigmaApiError(err: any): ApiError {
+  if (err?.config?.baseURL !== "https://api.figma.com/v1")
+    return parseError(err);
+
+  return new ApiError(
+    err?.status,
+    err?.response?.statusText?.toLowerCase().replace(' ', '_'),
+    err?.message,
+  )
+}
+
 export function getCustomUserError(
   err: ApiError,
   defaultMsg = 'Internal server error'
