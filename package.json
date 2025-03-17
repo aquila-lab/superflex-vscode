@@ -152,6 +152,7 @@
     "crypto": "^1.0.1",
     "diff": "^7.0.0",
     "fast-glob": "^3.3.2",
+    "figma-js": "^1.16.1-0",
     "node-machine-id": "^1.1.12",
     "posthog-node": "^4.2.0",
     "uuidv4": "^6.2.13"

@@ -22,7 +22,7 @@ import {
 } from '../../shared/protocol'
 import { SUPERFLEX_RULES_FILE_NAME } from '../../shared/common/constants'
 import * as api from '../api'
-import { HttpStatusCode, getFigmaSelectionImageUrl } from '../api'
+import { HttpStatusCode, getFigmaSelectionImageUrl, validateFigmaAttachment } from '../api'
 import type { Assistant } from '../assistant'
 import SuperflexAssistant from '../assistant/SuperflexAssistant'
 import { Telemetry } from '../common/analytics/Telemetry'
@@ -305,6 +305,23 @@ export class ChatAPI {
           }
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
+
+          const result = await validateFigmaAttachment(figmaSelectionUrl)
+          // TODO: Add 'Scanning Figma attachment...' loading text
+          if (result.severity !== "success") {
+            const message = result.message + (
+              result.data?.framesWithoutAutoLayout ? `\nFrames without auto layout: ${result.data.framesWithoutAutoLayout.join(", ")}` 
+              : ""
+            )
+
+            if (result.severity === "error")
+              throw new Error(message)
+
+            if (result.severity === "warning") {
+              // TODO: we want this to trigger a modal for user to interact with, also show the message
+              throw new Error(message)
+            }
+          }
 
           return {
             fileID: figmaSelectionUrl.fileID,
