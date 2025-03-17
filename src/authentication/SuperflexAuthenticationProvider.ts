@@ -250,8 +250,8 @@ export default class SuperflexAuthenticationProvider
           return await Promise.race([
             codeExchangePromise.promise,
             new Promise<string>((_, reject) =>
-              setTimeout(() => reject('Cancelled'), 5 * 60 * 1000)
-            ), // 5 minutes
+              setTimeout(() => reject('Cancelled'), 30 * 60 * 1000)
+            ), // 30 minutes
             promiseFromEvent<any, any>(
               token.onCancellationRequested,
               (_, __, reject) => {

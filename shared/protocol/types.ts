@@ -1,6 +1,7 @@
 import type { Thread } from '../model'
 
 export type ConfigPayload = {
+  uriScheme: string
   allowAnonymousTelemetry: boolean
 }
 

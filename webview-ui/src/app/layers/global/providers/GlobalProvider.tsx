@@ -9,8 +9,9 @@ import {
 } from 'react'
 import {
   EventRequestType,
-  type EventResponsePayload,
   EventResponseType,
+  type ConfigPayload,
+  type EventResponsePayload,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'
@@ -19,7 +20,7 @@ import { usePostMessage } from '../hooks/usePostMessage'
 const GlobalContext = createContext<{
   isInitialized: boolean | null
   isLoggedIn: boolean | null
-  config: Record<string, unknown> | null
+  config: ConfigPayload | null
   isFigmaAuthenticated: boolean | null
   isFirstTimeSynced: boolean
   setIsFirstTimeSynced: (val: boolean) => void
@@ -34,7 +35,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
   const [isInitialized, setIsInitialized] = useState<boolean | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
-  const [config, setConfig] = useState<Record<string, unknown> | null>(null)
+  const [config, setConfig] = useState<ConfigPayload | null>(null)
   const [isFigmaAuthenticated, setIsFigmaAuthenticated] = useState<
     boolean | null
   >(null)

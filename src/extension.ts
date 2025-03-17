@@ -62,7 +62,7 @@ export async function activate(
     chatViewProvider: chatWebviewProvider
   }
 
-  await initializeAnalytics(context, appState)
+  await configureExtension(context, appState)
 
   // Do not await on this function as we do not want VSCode to wait for it to finish
   // before considering Superflex ready to operate.
@@ -186,7 +186,7 @@ async function registerAuthenticationProviders(
   state.figmaAuthService.authenticate(state.figmaAuthProvider)
 }
 
-async function initializeAnalytics(
+async function configureExtension(
   context: vscode.ExtensionContext,
   appState: AppState
 ) {
@@ -195,6 +195,7 @@ async function initializeAnalytics(
 
   appState.chatViewProvider.sendEventMessage(
     newEventResponse(EventResponseType.CONFIG, {
+      uriScheme: vscode.env.uriScheme,
       allowAnonymousTelemetry: analyticsEnabled
     })
   )

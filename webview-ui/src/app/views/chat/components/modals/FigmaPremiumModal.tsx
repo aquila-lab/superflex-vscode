@@ -8,17 +8,21 @@ import {
   DialogHeader,
   DialogTitle
 } from '../../../../../common/ui/Dialog'
+import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
 
 export const FigmaPremiumModal = () => {
-  const { isOpen, setIsOpen } = useFigmaPremiumModal()
+  const { config } = useGlobal()
   const { subscribe } = useUser()
+  const { isOpen, setIsOpen } = useFigmaPremiumModal()
 
   const handleSubscribe = useCallback(() => {
-    subscribe('https://app.superflex.ai/pricing?source=figma')
+    subscribe(
+      `https://app.superflex.ai/dashboard/upgrade-subscription?redirect=true&source=${config?.uriScheme}`
+    )
     setIsOpen(false)
-  }, [subscribe, setIsOpen])
+  }, [subscribe, setIsOpen, config?.uriScheme])
 
   const handleCloseModal = useCallback(() => setIsOpen(false), [setIsOpen])
 

@@ -14,8 +14,9 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
-import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
+import { useGlobal } from '../../global/providers/GlobalProvider'
 import { usePostMessage } from '../../global/hooks/usePostMessage'
+import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
 
 const UserContext = createContext<{
   user: User | null
@@ -30,6 +31,7 @@ const UserContext = createContext<{
 } | null>(null)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { config } = useGlobal()
   const postMessage = usePostMessage()
 
   const [user, setUser] = useState<User | null>(null)
@@ -99,11 +101,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const subscribe = useCallback(
     (url?: string) => {
       postMessage(EventRequestType.OPEN_EXTERNAL_URL, {
-        url: url ?? 'https://app.superflex.ai/pricing'
+        url:
+          url ??
+          `https://app.superflex.ai/dashboard/upgrade-subscription?redirect=true&source=${config?.uriScheme}`
       })
       postMessage(EventRequestType.GET_USER_SUBSCRIPTION)
     },
-    [postMessage]
+    [postMessage, config?.uriScheme]
   )
 
   const manageBilling = useCallback(() => {
