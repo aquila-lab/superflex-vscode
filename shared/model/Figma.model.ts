@@ -45,3 +45,21 @@ export function extractFigmaSelectionUrl(
     return undefined
   }
 }
+
+export const FigmaValidationErrorType = {
+  Unknown: "unknown",
+  FileNotFoundOrUnauthorized: "file_not_found_or_unauthorized",
+  TooManyAbsoluteFrames: "too_many_absolute_frames",
+  SomeAbsoluteFrames: "some_absolute_frames",
+  NoFramesFound: "no_frames_found",
+  UnsupportedSelection: "unsupported_selection",
+} as const;
+
+export type FigmaValidationErrorType = typeof FigmaValidationErrorType[keyof typeof FigmaValidationErrorType];
+
+export type FigmaValidationResult = {
+  severity: "error" | "warning" | "success",
+  errorType?: FigmaValidationErrorType,
+  message: string,
+  data?: any
+}
