@@ -1,9 +1,10 @@
 import { Node, FileNodesResponse } from "figma-js";
 import {
+    FigmaImageUrl,
     FigmaValidationErrorType,
     FigmaValidationResult,
+    FigmaValidationSeverityType,
 } from "shared/model/Figma.model";
-import { parseFigmaApiError } from "src/api/error";
 
 function createFigmaValidationResult(
     severity: "error" | "warning" | "success",
@@ -42,9 +43,18 @@ function createFigmaValidationSuccess(
     return createFigmaValidationResult("success", message || "", data);
 }
 
+export const createFigmaImageUrl = (config: Omit<FigmaImageUrl, 'toString'>): FigmaImageUrl => ({
+  ...config,
+  toString: () => config.imageUrl,
+});
+
 export class FigmaService {
-    static extractSelectionUrlFromResponse(data: any, nodeID: string): string {
-        return data.images[nodeID.replace("-", ":")] ?? data.images[nodeID];
+    static extractSelectionUrlFromResponse(data: any, nodeID: string): FigmaImageUrl {
+        const url = data.images[nodeID.replace("-", ":")] ?? data.images[nodeID];
+        return createFigmaImageUrl({
+            imageUrl: url,
+            severity: FigmaValidationSeverityType.Success,
+        });
     }
 
     static validateFigmaSelection(data: FileNodesResponse, nodeID: string): FigmaValidationResult {

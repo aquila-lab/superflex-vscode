@@ -4,6 +4,7 @@ import { Mutex } from 'async-mutex'
 import * as vscode from 'vscode'
 
 import {
+  FigmaValidationSeverityType,
   type Message,
   type MessageContent,
   type Thread,
@@ -305,13 +306,19 @@ export class ChatAPI {
           }
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
+          if (imageUrl.severity === FigmaValidationSeverityType.Error)
+            return {
+              fileID: figmaSelectionUrl.fileID,
+              nodeID: figmaSelectionUrl.nodeID,
+              imageUrl: imageUrl,
+            }
 
           const figmaValidationResult = await validateFigmaSelection(figmaSelectionUrl)
 
           return {
             fileID: figmaSelectionUrl.fileID,
             nodeID: figmaSelectionUrl.nodeID,
-            imageUrl,
+            imageUrl: imageUrl,
             figmaValidationResult
           };
         }
