@@ -1,5 +1,5 @@
-import { FigmaService } from 'src/services/FigmaService'
-import type { FigmaTokenInformation, FigmaValidationResult, User } from '../../shared/model'
+import { createFigmaImageUrl, FigmaService } from 'src/services/FigmaService'
+import { FigmaValidationErrorType, FigmaValidationSeverityType, type FigmaImageUrl, type FigmaTokenInformation, type FigmaValidationResult, type User } from '../../shared/model'
 import { PublicApi } from './api'
 import { parseError, parseFigmaApiError } from './error'
 import { FigmaApi } from './figmaApi'
@@ -44,7 +44,7 @@ type GetFigmaSelectionImageUrlArgs = {
 async function getFigmaSelectionImageUrl({
   fileID,
   nodeID
-}: GetFigmaSelectionImageUrlArgs): Promise<string> {
+}: GetFigmaSelectionImageUrlArgs): Promise<FigmaImageUrl> {
   try {
     const { data } = await FigmaApi.get(`/images/${fileID}?ids=${nodeID}`)
     if (data.err) {
@@ -57,8 +57,12 @@ async function getFigmaSelectionImageUrl({
             
     if (error.statusCode == 404) 
     {
-      error.message = "File not found or you don't have access to it. Please check your account permissions.";
-      return Promise.reject(error);
+      return createFigmaImageUrl({
+            imageUrl: "",
+            message: "File not found or you (%email%) don't have access to it.",
+            severity: FigmaValidationSeverityType.Error,
+            errorType: FigmaValidationErrorType.FileNotFoundOrUnauthorized
+        });
     }
 
     return Promise.reject(error);
