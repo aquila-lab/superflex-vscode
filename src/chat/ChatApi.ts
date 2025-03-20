@@ -38,6 +38,7 @@ import { createDiffStream, myersDiff } from '../diff/myers'
 import type { VerticalDiffManager } from '../diff/vertical/manager'
 import { findWorkspaceFiles } from '../scanner'
 import { EventRegistry, type Handler } from './EventRegistry'
+import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -292,16 +293,16 @@ export class ChatAPI {
         EventRequestType.CREATE_FIGMA_ATTACHMENT,
         async (payload: string, _) => {
           if (!this._isInitialized) {
-            throw new Error('Chat is not initialized')
+            throw new AppError('Chat is not initialized', AppErrorSlug.ChatNotInitialized)
           }
 
           if (!payload) {
-            throw new Error('Figma selection link is required')
+            throw new AppError('Figma selection link is required', AppErrorSlug.FigmaSelectionLinkRequired)
           }
 
           const figmaSelectionUrl = extractFigmaSelectionUrl(payload)
           if (!figmaSelectionUrl) {
-            throw new Error('Invalid Figma selection link')
+            throw new AppError('Invalid Figma selection link', AppErrorSlug.InvalidFigmaSelectionLink)
           }
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
