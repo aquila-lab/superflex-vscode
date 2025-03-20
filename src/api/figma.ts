@@ -1,10 +1,12 @@
-import { createFigmaImageUrl, FigmaService } from 'src/services/FigmaService'
-import { FigmaValidationErrorType, FigmaValidationSeverityType, type FigmaImageUrl, type FigmaTokenInformation, type FigmaValidationResult, type User } from '../../shared/model'
+import {  FigmaService } from 'src/services/FigmaService'
+import { type FigmaTokenInformation, type User } from '../../shared/model'
 import { PublicApi } from './api'
 import { parseError, parseFigmaApiError } from './error'
 import { FigmaApi } from './figmaApi'
 import { buildUserFromResponse } from './transformers'
 import { FileNodesResponse } from "figma-js";
+import { AppWarning } from 'shared/model/AppWarning.model'
+import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 
 type FigmaRefreshAccessTokenArgs = {
   refreshToken: string
@@ -44,7 +46,7 @@ type GetFigmaSelectionImageUrlArgs = {
 async function getFigmaSelectionImageUrl({
   fileID,
   nodeID
-}: GetFigmaSelectionImageUrlArgs): Promise<FigmaImageUrl> {
+}: GetFigmaSelectionImageUrlArgs): Promise<string> {
   try {
     const { data } = await FigmaApi.get(`/images/${fileID}?ids=${nodeID}`)
     if (data.err) {
@@ -55,15 +57,12 @@ async function getFigmaSelectionImageUrl({
   } catch (err) {
     const error = parseFigmaApiError(err);
             
-    if (error.statusCode == 404) 
-    {
-      return createFigmaImageUrl({
-            imageUrl: "",
-            message: "File not found or you (%email%) don't have access to it.",
-            severity: FigmaValidationSeverityType.Error,
-            errorType: FigmaValidationErrorType.FileNotFoundOrUnauthorized
-        });
-    }
+    if (error.statusCode == 404)
+      throw new AppError(
+        "File not found or you (%email%) don't have access to it.",
+        AppErrorSlug.FileNotFoundOrUnauthorized,
+        error
+      );
 
     return Promise.reject(error);
   }
@@ -72,7 +71,7 @@ async function getFigmaSelectionImageUrl({
 async function validateFigmaSelection({
   fileID,
   nodeID
-}: GetFigmaSelectionImageUrlArgs): Promise<FigmaValidationResult> {
+}: GetFigmaSelectionImageUrlArgs): Promise<AppWarning | null> {
   try {
     const { data } = await FigmaApi.get<FileNodesResponse>(`/files/${fileID}/nodes?ids=${nodeID}`)
     return FigmaService.validateFigmaSelection(data, nodeID);

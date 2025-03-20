@@ -66,7 +66,8 @@ function buildMessageContentFromResponse(res: any): MessageContent {
         figma: {
           fileID: res.attachment.figma.file_id,
           nodeID: res.attachment.figma.node_id,
-          imageUrl: res.attachment.figma.image_url
+          imageUrl: res.attachment.figma.image_url,
+          warning: null,
         }
       }
     }
