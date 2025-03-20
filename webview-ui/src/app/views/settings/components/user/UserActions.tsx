@@ -12,7 +12,7 @@ export const UserActions = () => {
     <ActionButtons>
       {isFigmaAuthenticated ? (
         <Button
-          variant='destructive'
+          variant='outline'
           onClick={handleDisconnectFigma}
         >
           Disconnect Figma
@@ -21,7 +21,7 @@ export const UserActions = () => {
         <Button onClick={handleConnectFigma}>Connect Figma</Button>
       )}
       <Button
-        variant='destructive'
+        variant='outline'
         onClick={handleSignOut}
       >
         Sign Out

@@ -9,11 +9,11 @@ import { SettingsHandlersProvider } from './providers/SettingsProvider'
 export const SettingsView = () => (
   <ProjectSyncProvider>
     <SettingsHandlersProvider>
-      <div className='flex-1 w-full p-6 space-y-8'>
+      <div className='flex-1 w-full p-6 space-y-6'>
         <ReturnToChatButton />
+        <UserInfoCard />
         <BillingCard />
         <SyncProjectCard />
-        <UserInfoCard />
         <FeedbackCard />
       </div>
     </SettingsHandlersProvider>

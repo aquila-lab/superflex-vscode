@@ -17,6 +17,6 @@ export const SettingsCard = ({
     <CardHeader>
       <CardTitle>{title}</CardTitle>
     </CardHeader>
-    <CardContent className='space-y-6'>{children}</CardContent>
+    <CardContent className='space-y-4'>{children}</CardContent>
   </Card>
 )
