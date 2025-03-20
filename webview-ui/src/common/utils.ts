@@ -259,3 +259,6 @@ export const categorizeThreadsByDate = <T extends { updatedAt: string | Date }>(
       {} as Record<ThreadDateGroup, T[]>
     )
 }
+
+export const FEEDBACK_URL = 'https://forms.gle/aUZjzeUzLnrmJvdR7'
+export const SUPPORT_EMAIL = 'boris@superflex.ai'
