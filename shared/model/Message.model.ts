@@ -1,5 +1,5 @@
 import type { FilePayload } from '../protocol/types'
-import { FigmaImageUrl, FigmaValidationResult } from './Figma.model'
+import { AppWarning } from './AppWarning.model';
 
 export enum Role {
   User = 'user',
@@ -9,8 +9,8 @@ export enum Role {
 export interface FigmaAttachment {
   fileID: string;
   nodeID: string;
-  imageUrl: FigmaImageUrl;
-  validationResult?: FigmaValidationResult;
+  imageUrl: string;
+  warning: AppWarning | null; 
 }
 
 export interface MessageAttachment {

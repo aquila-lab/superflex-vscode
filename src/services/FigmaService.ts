@@ -1,77 +1,24 @@
 import { Node, FileNodesResponse } from "figma-js";
-import {
-    FigmaImageUrl,
-    FigmaValidationErrorType,
-    FigmaValidationResult,
-    FigmaValidationSeverityType,
-} from "shared/model/Figma.model";
-
-function createFigmaValidationResult(
-    severity: "error" | "warning" | "success",
-    message: string,
-    errorType?: FigmaValidationErrorType,
-    data?: any
-): FigmaValidationResult {
-    return {
-        severity,
-        message,
-        ...(errorType && { errorType }),
-        ...(data && { data }),
-    };
-}
-
-function createFigmaValidationError(
-    message: string,
-    errorType?: FigmaValidationErrorType,
-    data?: any
-): FigmaValidationResult {
-    return createFigmaValidationResult("error", message, errorType, data);
-}
-
-function createFigmaValidationWarning(
-    message: string,
-    errorType?: FigmaValidationErrorType,
-    data?: any
-): FigmaValidationResult {
-    return createFigmaValidationResult("warning", message, errorType, data);
-}
-
-function createFigmaValidationSuccess(
-    message?: string,
-    data?: any
-): FigmaValidationResult {
-    return createFigmaValidationResult("success", message || "", data);
-}
-
-export const createFigmaImageUrl = (config: Omit<FigmaImageUrl, 'toString'>): FigmaImageUrl => ({
-  ...config,
-  toString: () => config.imageUrl,
-});
+import { AppError, AppErrorSlug } from "shared/model/AppError.model";
+import { AppWarning, AppWarningSlug } from "shared/model/AppWarning.model";
 
 export class FigmaService {
-    static extractSelectionUrlFromResponse(data: any, nodeID: string): FigmaImageUrl {
-        const url = data.images[nodeID.replace("-", ":")] ?? data.images[nodeID];
-        return createFigmaImageUrl({
-            imageUrl: url,
-            severity: FigmaValidationSeverityType.Success,
-        });
+    
+    static extractSelectionUrlFromResponse(data: any, nodeID: string): string {
+        return data.images[nodeID.replace("-", ":")] ?? data.images[nodeID];
     }
 
-    static validateFigmaSelection(data: FileNodesResponse, nodeID: string): FigmaValidationResult {
+    static validateFigmaSelection(data: FileNodesResponse, nodeID: string): AppWarning | null {
         const nodeData = data.nodes[nodeID.replace("-", ":")];
 
         const document = nodeData?.document;
         // Making sure the selection is not too big, need a more precise check in future
         if (!document || (document.type as string) === "SECTION")
-            return createFigmaValidationError(
-                "Selection is not supported, please select a frame."
-            );
+            throw new AppError("Selection is not supported, please select a frame.", AppErrorSlug.UnsupportedSelection);
 
         const frames = this._extractFrames(document);
         if (frames.length === 0)
-            return createFigmaValidationError(
-                "No frames found in the selection, please update and try again."
-            );
+            throw new AppError("No frames found in the selection, please update and try again.", AppErrorSlug.NoFramesFound);
 
         const numberOfFrames = frames.length;
         const framesWithoutAutoLayout = frames.filter(
@@ -82,9 +29,10 @@ export class FigmaService {
 
         // If there are more than 50% of frames without auto layout, we don't proceed with the code generation
         if (framesWithAutoLayout < framesWithoutAutoLayout.length)
-            return createFigmaValidationError(
+            throw new AppError(
                 "There are too many frames without auto layout in the given selection, please update and try again.",
-                FigmaValidationErrorType.TooManyAbsoluteFrames,
+                AppErrorSlug.TooManyAbsoluteFrames,
+                null,
                 {
                     framesWithoutAutoLayout: framesWithoutAutoLayout.map(
                         (frame) => frame.name
@@ -93,9 +41,9 @@ export class FigmaService {
             );
 
         if (framesWithAutoLayout < numberOfFrames)
-            return createFigmaValidationWarning(
+            throw new AppWarning(
                 "There are frames without auto layout and generated code may not be pixel-perfect. Would you still like to continue?",
-                FigmaValidationErrorType.SomeAbsoluteFrames,
+                AppWarningSlug.SomeAbsoluteFrames,
                 {
                     framesWithoutAutoLayout: framesWithoutAutoLayout.map(
                         (frame) => frame.name
@@ -103,7 +51,7 @@ export class FigmaService {
                 }
             );
 
-        return createFigmaValidationSuccess();
+        return null;
     }
 
     private static _extractFrames(node: Node, frames: Node[] = []): Node[] {

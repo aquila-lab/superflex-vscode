@@ -8,39 +8,6 @@ export type FigmaSelectionUrlExtract = {
   nodeID: string
 }
 
-export const FigmaValidationErrorType = {
-  Unknown: "unknown",
-  FileNotFoundOrUnauthorized: "file_not_found_or_unauthorized",
-  TooManyAbsoluteFrames: "too_many_absolute_frames",
-  SomeAbsoluteFrames: "some_absolute_frames",
-  NoFramesFound: "no_frames_found",
-  UnsupportedSelection: "unsupported_selection",
-} as const;
-
-export const FigmaValidationSeverityType = {
-  Error: "error", 
-  Warning: "warning",
-  Success: "success",
-} as const;
-
-export type FigmaValidationSeverityType = typeof FigmaValidationSeverityType[keyof typeof FigmaValidationSeverityType];
-export type FigmaValidationErrorType = typeof FigmaValidationErrorType[keyof typeof FigmaValidationErrorType];
-
-export type FigmaValidationResult = {
-  severity: FigmaValidationSeverityType,
-  errorType?: FigmaValidationErrorType,
-  message: string,
-  data?: any
-}
-
-export type FigmaImageUrl = {
-  imageUrl: string;
-  message?: string;
-  severity?: FigmaValidationSeverityType;
-  errorType?: FigmaValidationErrorType;
-  toString: () => string;
-};
-
 /**
  * Extracts the fileID and nodeID from a Figma selection URL
  *
