@@ -6,6 +6,11 @@ export const AppErrorSlug = {
   TooManyAbsoluteFrames: "too_many_absolute_frames",
   NoFramesFound: "no_frames_found",
   UnsupportedSelection: "unsupported_selection",
+  UrlNotSupportedInPrompt: "url_not_supported_in_prompt",
+  FigmaUrlNotSupportedInPrompt: "figma_url_not_supported_in_prompt",
+  ChatNotInitialized: "chat_not_initialized",
+  FigmaSelectionLinkRequired: "figma_selection_link_required",
+  InvalidFigmaSelectionLink: "invalid_figma_selection_link",
 } as const;
 
 type AppErrorSlug = typeof AppErrorSlug[keyof typeof AppErrorSlug];

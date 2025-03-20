@@ -14,11 +14,11 @@ async function enhancePrompt(
     if (messageContent.attachment.image) {
       image = messageContent.attachment.image
     } else if (messageContent.attachment.figma) {
-      if (!messageContent.attachment.figma.imageUrl.toString()) {
+      if (!messageContent.attachment.figma.imageUrl) {
         console.warn('No image URL for Figma attachment')
         return messageContent
       }
-      image = messageContent.attachment.figma.imageUrl.toString()
+      image = messageContent.attachment.figma.imageUrl
     } else {
       console.warn('Unsupported attachment type')
       return messageContent

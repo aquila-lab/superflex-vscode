@@ -1,3 +1,5 @@
+import { AppError, AppErrorSlug } from "shared/model/AppError.model";
+
 // Helper function to create the name of the files map
 export function createFilesMapName(provider: string, version: number): string {
   return `${provider}-files-map-v${version}.json`.toLocaleLowerCase()
@@ -9,10 +11,16 @@ export function validateInputMessage(message: string | undefined): string {
     return "";
 
   if (containsFigmaURL(message))
-    return "Figma URLs are not supported within the text input, please use designated modal for that."
+    throw new AppError(
+      "Figma URLs are not supported within the text input, please use designated modal for that.",
+      AppErrorSlug.FigmaUrlNotSupportedInPrompt
+    )
 
   if (containsURL(message))
-    return "URLs are not yet supported within the text input, please update your message and try again."
+    throw new AppError(
+      "URLs are not yet supported within the text input, please update your message and try again.",
+      AppErrorSlug.UrlNotSupportedInPrompt
+    )
 
   return "";
 }

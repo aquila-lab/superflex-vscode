@@ -84,7 +84,12 @@ export const AttachmentProvider = ({
         if (!error && payload) {
           setFigmaAttachment(payload)
         }
-        setFigmaLink('')
+        if (error)
+        {
+          setFigmaLink("error: " + error.message)
+        }
+        else
+          setFigmaLink('')
         setIsFigmaLoading(false)
         isAwaitingFigmaAttachment.current = false
       }
