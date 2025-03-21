@@ -11,12 +11,12 @@ export class AppWarning {
   id: string;
   slug: AppWarningSlug;
   message: string;
-  data: any | null;
+  data?: any;
 
   constructor(
     message: string,
     slug: AppWarningSlug = AppWarningSlug.Unknown,
-    data: any | null = null
+    data?: any
   ) {
     this.id = uuidv4();
     this.message = message;

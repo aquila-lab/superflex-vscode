@@ -19,14 +19,14 @@ export class AppError extends Error {
   id: string;
   slug: AppErrorSlug;
   message: string;
-  internalError: Error | null;
-  data: any | null;
+  internalError?: Error;
+  data?: any;
 
   constructor(
     message: string,
     slug: AppErrorSlug = AppErrorSlug.Unknown,
-    internalError: Error | null = null,
-    data: any | null = null,
+    internalError?: Error,
+    data?: any,
   ) {
     super(message);
     this.id = uuidv4();

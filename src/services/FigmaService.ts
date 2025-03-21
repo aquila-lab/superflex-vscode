@@ -8,7 +8,7 @@ export class FigmaService {
         return data.images[nodeID.replace("-", ":")] ?? data.images[nodeID];
     }
 
-    static validateFigmaSelection(data: FileNodesResponse, nodeID: string): AppWarning | null {
+    static validateFigmaSelection(data: FileNodesResponse, nodeID: string): AppWarning | undefined {
         const nodeData = data.nodes[nodeID.replace("-", ":")];
 
         const document = nodeData?.document;
@@ -32,7 +32,7 @@ export class FigmaService {
             throw new AppError(
                 "There are too many frames without auto layout in the given selection, please update and try again.",
                 AppErrorSlug.TooManyAbsoluteFrames,
-                null,
+                undefined,
                 {
                     framesWithoutAutoLayout: framesWithoutAutoLayout.map(
                         (frame) => frame.name
@@ -51,7 +51,7 @@ export class FigmaService {
                 }
             );
 
-        return null;
+        return undefined;
     }
 
     private static _extractFrames(node: Node, frames: Node[] = []): Node[] {

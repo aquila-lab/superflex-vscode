@@ -71,7 +71,7 @@ async function getFigmaSelectionImageUrl({
 async function validateFigmaSelection({
   fileID,
   nodeID
-}: GetFigmaSelectionImageUrlArgs): Promise<AppWarning | null> {
+}: GetFigmaSelectionImageUrlArgs): Promise<AppWarning | undefined> {
   try {
     const { data } = await FigmaApi.get<FileNodesResponse>(`/files/${fileID}/nodes?ids=${nodeID}`)
     return FigmaService.validateFigmaSelection(data, nodeID);
