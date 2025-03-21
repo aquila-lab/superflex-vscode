@@ -10,7 +10,7 @@ export interface FigmaAttachment {
   fileID: string;
   nodeID: string;
   imageUrl: string;
-  warning: AppWarning | null; 
+  warning?: AppWarning; 
 }
 
 export interface MessageAttachment {
