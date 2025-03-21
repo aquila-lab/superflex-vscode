@@ -271,3 +271,6 @@ export const categorizeThreadsByDate = <T extends { updatedAt: string | Date }>(
 
 export const FEEDBACK_URL = 'https://forms.gle/aUZjzeUzLnrmJvdR7'
 export const SUPPORT_EMAIL = 'boris@superflex.ai'
+
+export const FIGMA_LINK_REGEX =
+  /https:\/\/www\.figma\.com\/(file|design)\/[a-zA-Z0-9]+\/[^?]+\?node-id=[^&]+/
