@@ -112,17 +112,16 @@ export default class SuperflexAssistant implements Assistant {
     }
 
     // Create new abort controller for this stream
-    this._currentStream = new AbortController()
 
     validateInputMessage(message)
 
-    const enhancedMessage = await this.enhancePrompt(message)
+    this._currentStream = new AbortController()
 
     return api.sendThreadMessage({
       owner: this.owner,
       repo: this.repo,
       threadID,
-      message: enhancedMessage,
+      message: message,
       options: {
         signal: this._currentStream.signal
       }
