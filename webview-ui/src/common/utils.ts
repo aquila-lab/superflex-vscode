@@ -158,20 +158,29 @@ export const getLanguageFromPath = (filePath: string): string => {
 
 export const NULL_UUID = '00000000-0000-0000-0000-000000000000'
 
-export const HINTS = [
-  {
-    text: 'Drop images to chat by holding',
-    shortcut: 'Shift'
-  },
-  {
-    text: 'Quick access with',
-    shortcut: '⌘+;'
-  },
-  {
-    text: 'Add selected code to chat with',
-    shortcut: '⌘+M'
-  }
-]
+export const getPlatformModifierKey = () => {
+  const platform = navigator.platform.toLowerCase()
+  return platform.includes('mac') ? '⌘' : 'Ctrl'
+}
+
+export const getHints = () => {
+  const modKey = getPlatformModifierKey()
+
+  return [
+    {
+      text: 'Drop images to chat by holding',
+      shortcut: 'Shift'
+    },
+    {
+      text: 'Quick access with',
+      shortcut: `${modKey}+;`
+    },
+    {
+      text: 'Add selected code to chat with',
+      shortcut: `${modKey}+M`
+    }
+  ]
+}
 
 export type MessageHandler = (message: TypedEventResponseMessage) => void
 
