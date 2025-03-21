@@ -82,6 +82,14 @@ export interface Assistant {
   fastApply(code: string, edits: string): Promise<string>
 
   /**
+   * Enhances original user's prompt with additional details based on the provided message attachments.
+   *
+   * @param message - The message to enhance.
+   * @returns A promise that resolves with the enhanced message.
+   */
+  enhancePrompt(message: MessageContent): Promise<MessageContent>
+
+  /**
    * Sync files parse and upload small bites of project files to the vector store.
    * NOTE: If there are duplicate files with same relative path, the files will be overwritten only if the content is different.
    * NOTE: The files that are uploaded but missing from the filePaths input will be removed.
