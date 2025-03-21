@@ -23,6 +23,7 @@ import { useEditMode } from './EditModeProvider'
 import { useFiles } from './FilesProvider'
 import { useInput } from './InputProvider'
 import { useSendMessage } from './SendMessageProvider'
+import { readImageFileAsBase64 } from '../../../../common/utils'
 
 const TextareaHandlersContext = createContext<{
   handleInputChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
@@ -38,7 +39,13 @@ export const TextareaHandlersProvider = ({
   const { selectFile, setPreviewedFile } = useFiles()
   const { isMainTextarea } = useEditMode()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { figmaAttachment, imageAttachment, isFigmaLoading } = useAttachment()
+  const {
+    figmaAttachment,
+    imageAttachment,
+    isFigmaLoading,
+    setImageAttachment,
+    removeAttachment
+  } = useAttachment()
   const { sendMessage } = useSendMessage()
   const isAwaiting = useRef(false)
 
@@ -88,10 +95,34 @@ export const TextareaHandlersProvider = ({
   const handlePaste = useCallback(
     (e: ClipboardEvent<HTMLTextAreaElement>) => {
       const text = e.clipboardData.getData('text')
+
+      const hasImageItems = Array.from(e.clipboardData.items).some(
+        item => item.type.indexOf('image/') === 0
+      )
+
+      if (hasImageItems) {
+        e.preventDefault()
+
+        const imageItem = Array.from(e.clipboardData.items).find(
+          item => item.type.indexOf('image/') === 0
+        )
+
+        if (imageItem) {
+          const file = imageItem.getAsFile()
+          if (file) {
+            removeAttachment()
+            readImageFileAsBase64(file).then((imageBase64: string) => {
+              setImageAttachment(imageBase64)
+            })
+            return
+          }
+        }
+      }
+
       postMessage(EventRequestType.PASTE_COPIED_CODE, { text })
       isAwaiting.current = true
     },
-    [postMessage]
+    [postMessage, removeAttachment, setImageAttachment]
   )
 
   const handlePasteResponse = useCallback(
