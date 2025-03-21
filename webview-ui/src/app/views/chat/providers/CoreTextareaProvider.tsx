@@ -23,7 +23,10 @@ import { useEditMode } from './EditModeProvider'
 import { useFiles } from './FilesProvider'
 import { useInput } from './InputProvider'
 import { useSendMessage } from './SendMessageProvider'
-import { readImageFileAsBase64 } from '../../../../common/utils'
+import {
+  FIGMA_LINK_REGEX,
+  readImageFileAsBase64
+} from '../../../../common/utils'
 
 const TextareaHandlersContext = createContext<{
   handleInputChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
@@ -44,7 +47,9 @@ export const TextareaHandlersProvider = ({
     imageAttachment,
     isFigmaLoading,
     setImageAttachment,
-    removeAttachment
+    removeAttachment,
+    openSelectionModal,
+    setFigmaLink
   } = useAttachment()
   const { sendMessage } = useSendMessage()
   const isAwaiting = useRef(false)
@@ -96,6 +101,15 @@ export const TextareaHandlersProvider = ({
     (e: ClipboardEvent<HTMLTextAreaElement>) => {
       const text = e.clipboardData.getData('text')
 
+      const figmaLinkMatch = text.match(FIGMA_LINK_REGEX)
+      if (figmaLinkMatch) {
+        e.preventDefault()
+        removeAttachment()
+        openSelectionModal()
+        setFigmaLink(figmaLinkMatch[0])
+        return
+      }
+
       const hasImageItems = Array.from(e.clipboardData.items).some(
         item => item.type.indexOf('image/') === 0
       )
@@ -122,7 +136,13 @@ export const TextareaHandlersProvider = ({
       postMessage(EventRequestType.PASTE_COPIED_CODE, { text })
       isAwaiting.current = true
     },
-    [postMessage, removeAttachment, setImageAttachment]
+    [
+      postMessage,
+      removeAttachment,
+      setImageAttachment,
+      openSelectionModal,
+      setFigmaLink
+    ]
   )
 
   const handlePasteResponse = useCallback(
