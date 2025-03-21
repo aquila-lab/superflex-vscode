@@ -312,7 +312,7 @@ export class ChatAPI {
           return {
             fileID: figmaSelectionUrl.fileID,
             nodeID: figmaSelectionUrl.nodeID,
-            imageUrl: imageUrl,
+            imageUrl,
             warning
           };
         }
