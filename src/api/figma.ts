@@ -1,8 +1,12 @@
-import type { FigmaTokenInformation, User } from '../../shared/model'
+import {  FigmaService } from 'src/services/FigmaService'
+import { type FigmaTokenInformation, type User } from '../../shared/model'
 import { PublicApi } from './api'
-import { parseError } from './error'
+import { parseError, parseFigmaApiError } from './error'
 import { FigmaApi } from './figmaApi'
 import { buildUserFromResponse } from './transformers'
+import { FileNodesResponse } from "figma-js";
+import { AppWarning } from 'shared/model/AppWarning.model'
+import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 
 type FigmaRefreshAccessTokenArgs = {
   refreshToken: string
@@ -46,15 +50,36 @@ async function getFigmaSelectionImageUrl({
   try {
     const { data } = await FigmaApi.get(`/images/${fileID}?ids=${nodeID}`)
     if (data.err) {
-      return Promise.reject(parseError(data.err))
+      return Promise.reject(parseError(data.err));
     }
 
-    return Promise.resolve(
-      data.images[nodeID.replace('-', ':')] ?? data.images[nodeID]
-    )
+    return FigmaService.extractSelectionUrlFromResponse(data, nodeID);
   } catch (err) {
-    return Promise.reject(parseError(err))
+    const error = parseFigmaApiError(err);
+            
+    if (error.statusCode == 404)
+      throw new AppError(
+        "File not found or you (%email%) don't have access to it.",
+        AppErrorSlug.FileNotFoundOrUnauthorized,
+        error
+      );
+
+    return Promise.reject(error);
   }
 }
 
-export { figmaRefreshAccessToken, getFigmaUserInfo, getFigmaSelectionImageUrl }
+async function validateFigmaSelection({
+  fileID,
+  nodeID
+}: GetFigmaSelectionImageUrlArgs): Promise<AppWarning | undefined> {
+  try {
+    const { data } = await FigmaApi.get<FileNodesResponse>(`/files/${fileID}/nodes?ids=${nodeID}`)
+    return FigmaService.validateFigmaSelection(data, nodeID);
+  } catch (err) {
+    return Promise.reject(parseFigmaApiError(err));
+  }
+}
+
+
+
+export { figmaRefreshAccessToken, getFigmaUserInfo, getFigmaSelectionImageUrl, validateFigmaSelection }
