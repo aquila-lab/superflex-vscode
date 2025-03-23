@@ -11,6 +11,7 @@ export const AppErrorSlug = {
   ChatNotInitialized: "chat_not_initialized",
   FigmaSelectionLinkRequired: "figma_selection_link_required",
   InvalidFigmaSelectionLink: "invalid_figma_selection_link",
+  InvalidMessage: "invalid_message",
 } as const;
 
 type AppErrorSlug = typeof AppErrorSlug[keyof typeof AppErrorSlug];

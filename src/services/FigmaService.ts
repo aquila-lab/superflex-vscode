@@ -13,22 +13,23 @@ export class FigmaService {
 
         const document = nodeData?.document;
         // Making sure the selection is not too big, need a more precise check in future
-        if (!document || (document.type as string) === "SECTION")
+        if (!document || (document.type as string) === "SECTION") {
             throw new AppError("Selection is not supported, please select a frame.", AppErrorSlug.UnsupportedSelection);
+        }
 
         const frames = this._extractFrames(document);
-        if (frames.length === 0)
+        if (frames.length === 0) {
             throw new AppError("No frames found in the selection, please update and try again.", AppErrorSlug.NoFramesFound);
+        }
 
         const numberOfFrames = frames.length;
         const framesWithoutAutoLayout = frames.filter(
             (frame) => !this.hasAutoLayout(frame)
         );
-        const framesWithAutoLayout =
-            numberOfFrames - framesWithoutAutoLayout.length;
+        const framesWithAutoLayout = numberOfFrames - framesWithoutAutoLayout.length;
 
         // If there are more than 50% of frames without auto layout, we don't proceed with the code generation
-        if (framesWithAutoLayout < framesWithoutAutoLayout.length)
+        if (framesWithAutoLayout < framesWithoutAutoLayout.length) {
             throw new AppError(
                 "There are too many frames without auto layout in the given selection, please update and try again.",
                 AppErrorSlug.TooManyAbsoluteFrames,
@@ -39,8 +40,9 @@ export class FigmaService {
                     ),
                 }
             );
+        }
 
-        if (framesWithAutoLayout < numberOfFrames)
+        if (framesWithAutoLayout < numberOfFrames) {
             throw new AppWarning(
                 "There are frames without auto layout and generated code may not be pixel-perfect. Would you still like to continue?",
                 AppWarningSlug.SomeAbsoluteFrames,
@@ -50,6 +52,7 @@ export class FigmaService {
                     ),
                 }
             );
+        }
 
         return undefined;
     }
@@ -79,8 +82,9 @@ export class FigmaService {
      */
     static hasAutoLayout(node: Node): boolean {
         if ("layoutPositioning" in node &&
-            node.layoutPositioning === "ABSOLUTE")
+            node.layoutPositioning === "ABSOLUTE") {
             return false;
+        }
 
         return (
             "layoutMode" in node &&

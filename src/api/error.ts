@@ -36,8 +36,9 @@ export function parseError(err: any): ApiError {
 }
 
 export function parseFigmaApiError(err: any): ApiError {
-  if (err?.config?.baseURL !== "https://api.figma.com/v1")
+  if (err?.config?.baseURL !== "https://api.figma.com/v1") {
     return parseError(err);
+  }
 
   return new ApiError(
     err?.status,

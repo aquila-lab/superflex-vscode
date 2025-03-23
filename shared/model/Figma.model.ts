@@ -22,8 +22,9 @@ export function extractFigmaSelectionUrl(
     const parsedUrl = new URL(figmaSelectionLink)
 
     // Check URL hostname
-    if (!parsedUrl.hostname.endsWith("figma.com"))
+    if (!parsedUrl.hostname.endsWith("figma.com")) {
       return undefined;
+    }
 
     // Get the path segments
     const pathSegments = parsedUrl.pathname.split('/')

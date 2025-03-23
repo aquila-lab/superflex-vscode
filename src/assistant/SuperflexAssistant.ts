@@ -114,7 +114,7 @@ export default class SuperflexAssistant implements Assistant {
     // Create new abort controller for this stream
     this._currentStream = new AbortController()
 
-    validateInputMessage(message.text)
+    validateInputMessage(message)
 
     const enhancedMessage = await this.enhancePrompt(message)
 

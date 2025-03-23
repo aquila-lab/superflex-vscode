@@ -1,3 +1,5 @@
+import { FIGMA_SELECTION_URL_REGEX, URL_REGEX } from "shared/common/constants";
+import { MessageContent } from "shared/model";
 import { AppError, AppErrorSlug } from "shared/model/AppError.model";
 
 // Helper function to create the name of the files map
@@ -6,31 +8,36 @@ export function createFilesMapName(provider: string, version: number): string {
 }
 
 // Validates user's prompt before sending it to the backend
-export function validateInputMessage(message: string | undefined): string {
-  if (!message)
-    return "";
+export function validateInputMessage(messageContent: MessageContent): string {
+  if (!messageContent.text && !messageContent.attachment) {
+    throw new AppError('Message must contain either text or attachment.', AppErrorSlug.InvalidMessage);
+  }
 
-  if (containsFigmaURL(message))
+  if (!messageContent.text) {
+    return "";
+  }
+
+  if (containsFigmaSelectionURL(messageContent.text)) {
     throw new AppError(
-      "Figma URLs are not supported within the text input, please use designated modal for that.",
+      "Figma selection URLs are not supported within the text input, please use designated modal for that.",
       AppErrorSlug.FigmaUrlNotSupportedInPrompt
     )
+  }
 
-  if (containsURL(message))
+  if (containsURL(messageContent.text)) {
     throw new AppError(
       "URLs are not yet supported within the text input, please update your message and try again.",
       AppErrorSlug.UrlNotSupportedInPrompt
     )
+  }
 
   return "";
 }
 
-function containsFigmaURL(inputString: string): boolean {
-    const figmaURLPattern = /https?:\/\/(www\.)?figma\.com\//;    
-    return figmaURLPattern.test(inputString);
+function containsFigmaSelectionURL(inputString: string): boolean {   
+    return FIGMA_SELECTION_URL_REGEX.test(inputString);
 }
 
 function containsURL(inputString: string): boolean {
-    const urlPattern = /https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\S*)?/;
-    return urlPattern.test(inputString);
+    return URL_REGEX.test(inputString);
 }

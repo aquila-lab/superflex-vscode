@@ -57,12 +57,13 @@ async function getFigmaSelectionImageUrl({
   } catch (err) {
     const error = parseFigmaApiError(err);
             
-    if (error.statusCode == 404)
+    if (error.statusCode == 404) {
       throw new AppError(
         "File not found or you (%email%) don't have access to it.",
         AppErrorSlug.FileNotFoundOrUnauthorized,
         error
       );
+    }
 
     return Promise.reject(error);
   }
