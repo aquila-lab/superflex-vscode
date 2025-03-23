@@ -8,5 +8,5 @@ export const SUPERFLEX_POSTHOG_API_KEY =
 
 export const SUPERFLEX_RULES_FILE_NAME = '.superflexrules'
 
-export const URL_REGEX = /https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\S*)?/;
+export const URL_REGEX = /https?:\/\/[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}(\S*)?/;
 export const FIGMA_SELECTION_URL_REGEX = /https:\/\/www\.figma\.com\/(file|design)\/[a-zA-Z0-9]+\/[^?]+\?node-id=[^&]+/;
