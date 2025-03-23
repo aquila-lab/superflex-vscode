@@ -85,9 +85,10 @@ export interface Assistant {
    * Enhances original user's prompt with additional details based on the provided message attachments.
    *
    * @param message - The message to enhance.
+   * @param threadID - ID of the thread, used to retrieve chat history.
    * @returns A promise that resolves with the enhanced message.
    */
-  enhancePrompt(message: MessageContent): Promise<MessageContent>
+  enhancePrompt(message: MessageContent, threadID: string): Promise<MessageContent>
 
   /**
    * Sync files parse and upload small bites of project files to the vector store.
