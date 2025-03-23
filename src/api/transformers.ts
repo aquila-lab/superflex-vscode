@@ -137,7 +137,7 @@ export function buildThreadRunRequest(
   return reqBody
 }
 
-export function buildPromptEnhancementRequest(message: MessageContent): Record<string, any> {
+export function buildPromptEnhancementRequest(message: MessageContent, threadID: string): Record<string, any> {
   const reqBody: Record<string, any> = {
     text: message.text,
     image: message.attachment?.image ?? message.attachment?.figma?.imageUrl,
@@ -146,6 +146,14 @@ export function buildPromptEnhancementRequest(message: MessageContent): Record<s
 
   if (message.files) {
     reqBody.files = _buildFiles(message.files)
+  }
+
+  if (threadID) {
+    reqBody.thread_id = threadID
+  }
+
+  if (message.fromMessageID) {
+    reqBody.from_message_id = message.fromMessageID
   }
 
   return reqBody

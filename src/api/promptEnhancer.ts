@@ -4,10 +4,11 @@ import { parseError } from './error'
 import { buildPromptEnhancementRequest } from './transformers';
 
 async function enhancePrompt(
-  messageContent: MessageContent
+  messageContent: MessageContent,
+  threadID: string
 ): Promise<MessageContent> {
   try {
-    const reqBody = buildPromptEnhancementRequest(messageContent);
+    const reqBody = buildPromptEnhancementRequest(messageContent, threadID);
     const { data } = await Api.post('/prompt/enhance', reqBody)
 
     return Promise.resolve({
