@@ -13,6 +13,7 @@ import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
 import { Alert, AlertDescription } from '../../../../../../common/ui/Alert'
 import { Check, RefreshCw } from 'lucide-react'
+import { Skeleton } from '../../../../../../common/ui/Skeleton'
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()
@@ -27,15 +28,18 @@ export const FigmaSelectionDrawer = () => {
     isFigmaLoading,
     figmaAttachment,
     confirmSelection,
-    figmaError
+    figmaError,
+    removeAttachment
   } = useAttachment()
 
   const [isConfirmStep, setIsConfirmStep] = useState(false)
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
 
   const handleOpenChange = useCallback(() => {
     if (!isFigmaLoading) {
       closeSelectionDrawer()
       setIsConfirmStep(false)
+      setIsImageLoaded(false)
     }
   }, [closeSelectionDrawer, isFigmaLoading])
 
@@ -43,6 +47,7 @@ export const FigmaSelectionDrawer = () => {
     if (isConfirmStep) {
       confirmSelection()
       setIsConfirmStep(false)
+      setIsImageLoaded(false)
       queueMicrotask(focusInput)
     } else {
       submitSelection()
@@ -52,11 +57,14 @@ export const FigmaSelectionDrawer = () => {
 
   const handleCancel = useCallback(() => {
     setIsConfirmStep(false)
+    setIsImageLoaded(false)
+    removeAttachment()
     closeSelectionDrawer()
-  }, [closeSelectionDrawer])
+  }, [closeSelectionDrawer, removeAttachment])
 
   const handleRetry = useCallback(() => {
     setIsConfirmStep(false)
+    setIsImageLoaded(false)
     submitSelection()
   }, [submitSelection])
 
@@ -67,16 +75,22 @@ export const FigmaSelectionDrawer = () => {
     [setFigmaLink]
   )
 
+  const handleImageLoad = useCallback(() => {
+    setIsImageLoaded(true)
+  }, [])
+
   const renderContent = useCallback(() => {
     if (isConfirmStep && figmaAttachment) {
       return (
         <div className='flex flex-col px-4 gap-4'>
           {figmaAttachment.imageUrl && (
             <div className='w-full rounded-md overflow-hidden'>
+              {!isImageLoaded && <Skeleton className='w-full h-64' />}
               <img
                 src={figmaAttachment.imageUrl}
                 alt='Figma Selection'
-                className='w-full object-contain'
+                className={`w-full object-contain max-h-[250px] ${!isImageLoaded ? 'hidden' : ''}`}
+                onLoad={handleImageLoad}
               />
             </div>
           )}
@@ -139,13 +153,15 @@ export const FigmaSelectionDrawer = () => {
     figmaLink,
     inputRef,
     isConfirmStep,
-    handleInputChange
+    handleInputChange,
+    isImageLoaded,
+    handleImageLoad
   ])
 
   const renderFooterButtons = useCallback(() => {
     if (isConfirmStep && figmaAttachment) {
       return (
-        <div className='flex px-4 w-full mb-8'>
+        <div className='flex gap-3 justify-between w-full mb-4'>
           <Button
             variant='outline'
             onClick={handleCancel}
@@ -163,7 +179,7 @@ export const FigmaSelectionDrawer = () => {
           >
             {!isFigmaLoading && (
               <>
-                <Check className='mr-2 h-4 w-4' /> Confirm Selection
+                <Check className='h-4 w-4' /> Confirm Selection
               </>
             )}
           </Button>
@@ -173,7 +189,7 @@ export const FigmaSelectionDrawer = () => {
 
     if (figmaError) {
       return (
-        <div className='flex w-full mb-8 gap-3'>
+        <div className='flex gap-3 justify-between w-full mb-4'>
           <Button
             variant='outline'
             onClick={handleCancel}
@@ -199,15 +215,17 @@ export const FigmaSelectionDrawer = () => {
     }
 
     return (
-      <Button
-        ref={submitButtonRef}
-        onClick={handleSubmit}
-        className='w-full mb-8'
-        disabled={!figmaLink.length || isFigmaLoading}
-        isLoading={isFigmaLoading}
-      >
-        Add Selection
-      </Button>
+      <div className='w-full mb-4'>
+        <Button
+          ref={submitButtonRef}
+          onClick={handleSubmit}
+          className='w-full'
+          disabled={!figmaLink.length || isFigmaLoading}
+          isLoading={isFigmaLoading}
+        >
+          Add Selection
+        </Button>
+      </div>
     )
   }, [
     figmaAttachment,
@@ -227,21 +245,23 @@ export const FigmaSelectionDrawer = () => {
       onOpenChange={handleOpenChange}
     >
       <DrawerContent>
-        <DrawerHeader>
+        <DrawerHeader className='pb-4'>
           <DrawerTitle>
-            {isConfirmStep ? 'Confirm Figma Selection' : 'Add Figma Selection'}
+            {isConfirmStep && !isFigmaLoading
+              ? 'Confirm Figma Selection'
+              : 'Add Figma Selection'}
           </DrawerTitle>
           {figmaError ? (
             <Alert
               variant='destructive'
-              className='mt-2'
+              className='mt-4'
             >
               <AlertDescription>{figmaError}</AlertDescription>
             </Alert>
           ) : isConfirmStep && figmaAttachment?.warning ? (
             <Alert
               variant='warning'
-              className='mt-2'
+              className='mt-4'
             >
               <AlertDescription>
                 {figmaAttachment.warning.message}
@@ -249,7 +269,7 @@ export const FigmaSelectionDrawer = () => {
             </Alert>
           ) : (
             <DrawerDescription>
-              {isConfirmStep
+              {isConfirmStep && !isFigmaLoading
                 ? 'Review your Figma selection below'
                 : 'Paste the link to your Figma selection below'}
             </DrawerDescription>
@@ -258,7 +278,9 @@ export const FigmaSelectionDrawer = () => {
 
         {renderContent()}
 
-        <DrawerFooter>{renderFooterButtons()}</DrawerFooter>
+        <DrawerFooter className='px-4 pt-4 pb-8'>
+          {renderFooterButtons()}
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   )
