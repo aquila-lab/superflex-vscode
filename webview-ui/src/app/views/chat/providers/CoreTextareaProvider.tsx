@@ -18,11 +18,14 @@ import {
 import { useNewMessage } from '../../../layers/authenticated/providers/NewMessageProvider'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
+import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
+import { useUser } from '../../../layers/authenticated/providers/UserProvider'
 import { useAttachment } from './AttachmentProvider'
 import { useEditMode } from './EditModeProvider'
 import { useFiles } from './FilesProvider'
 import { useInput } from './InputProvider'
 import { useSendMessage } from './SendMessageProvider'
+import { useFigmaPremiumModal } from './FigmaPremiumModalProvider'
 import {
   FIGMA_LINK_REGEX,
   readImageFileAsBase64
@@ -42,6 +45,9 @@ export const TextareaHandlersProvider = ({
   const { selectFile, setPreviewedFile } = useFiles()
   const { isMainTextarea } = useEditMode()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
+  const { isFigmaAuthenticated, connectFigma } = useGlobal()
+  const { subscription } = useUser()
+  const { setIsOpen: setFigmaPremiumModalOpen } = useFigmaPremiumModal()
   const {
     figmaAttachment,
     imageAttachment,
@@ -49,7 +55,8 @@ export const TextareaHandlersProvider = ({
     setImageAttachment,
     removeAttachment,
     openSelectionModal,
-    setFigmaLink
+    setFigmaLink,
+    focusSubmitButton
   } = useAttachment()
   const { sendMessage } = useSendMessage()
   const isAwaiting = useRef(false)
@@ -105,8 +112,20 @@ export const TextareaHandlersProvider = ({
       if (figmaLinkMatch) {
         e.preventDefault()
         removeAttachment()
+
+        if (!isFigmaAuthenticated) {
+          connectFigma()
+          return
+        }
+
+        if (subscription?.plan?.name.toLowerCase().includes('free')) {
+          setFigmaPremiumModalOpen(true)
+          return
+        }
+
         openSelectionModal()
         setFigmaLink(figmaLinkMatch[0])
+        focusSubmitButton()
         return
       }
 
@@ -141,7 +160,12 @@ export const TextareaHandlersProvider = ({
       removeAttachment,
       setImageAttachment,
       openSelectionModal,
-      setFigmaLink
+      setFigmaLink,
+      isFigmaAuthenticated,
+      connectFigma,
+      subscription,
+      setFigmaPremiumModalOpen,
+      focusSubmitButton
     ]
   )
 

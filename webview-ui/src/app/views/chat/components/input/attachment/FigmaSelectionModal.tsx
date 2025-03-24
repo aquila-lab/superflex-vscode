@@ -17,7 +17,8 @@ export const FigmaSelectionModal = () => {
     figmaLink,
     setFigmaLink,
     submitSelection,
-    closeSelectionModal
+    closeSelectionModal,
+    submitButtonRef
   } = useAttachment()
 
   const handleOpenChange = useCallback(
@@ -55,6 +56,7 @@ export const FigmaSelectionModal = () => {
           />
 
           <Button
+            ref={submitButtonRef}
             onClick={handleSubmit}
             className='w-full'
             disabled={!figmaLink.length}
