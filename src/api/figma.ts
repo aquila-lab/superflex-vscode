@@ -1,10 +1,10 @@
 import type { FileNodesResponse } from 'figma-js'
-import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
+import { AppErrorSlug } from 'shared/model/AppError.model'
 import type { AppWarning } from 'shared/model/AppWarning.model'
 import { FigmaService } from 'src/services/FigmaService'
 import type { FigmaTokenInformation, User } from '../../shared/model'
 import { PublicApi } from './api'
-import { parseError, parseFigmaApiError } from './error'
+import { ApiError, parseError } from './error'
 import { FigmaApi } from './figmaApi'
 import { buildUserFromResponse } from './transformers'
 
@@ -55,13 +55,13 @@ async function getFigmaSelectionImageUrl({
 
     return FigmaService.extractSelectionUrlFromResponse(data, nodeID)
   } catch (err) {
-    const error = parseFigmaApiError(err)
+    const error = parseError(err)
 
-    if (error.statusCode === 404) {
-      throw new AppError(
-        "File not found or you (%email%) don't have access to it.",
+    if (error instanceof ApiError && error.statusCode === 404) {
+      throw new ApiError(
+        404,
         AppErrorSlug.FileNotFoundOrUnauthorized,
-        error
+        "File not found or you (%email%) don't have access to it."
       )
     }
 
@@ -79,7 +79,7 @@ async function validateFigmaSelection({
     )
     return FigmaService.validateFigmaSelection(data, nodeID)
   } catch (err) {
-    return Promise.reject(parseFigmaApiError(err))
+    return Promise.reject(parseError(err))
   }
 }
 

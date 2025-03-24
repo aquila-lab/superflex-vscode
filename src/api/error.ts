@@ -1,3 +1,4 @@
+import { AppError } from 'shared/model/AppError.model'
 import { IS_PROD } from '../common/constants'
 
 export class ApiError extends Error {
@@ -20,9 +21,21 @@ const internalServerError: ApiError = new ApiError(
   'Internal server error'
 )
 
-export function parseError(err: any): ApiError {
+export function parseError(err: any): Error {
   if (!IS_PROD) {
     console.error(err)
+  }
+
+  if (err instanceof AppError) {
+    return err
+  }
+
+  return parseApiError(err)
+}
+
+export function parseApiError(err: any): ApiError {
+  if (_isFigmaApiError(err)) {
+    return parseFigmaApiError(err)
   }
 
   if (!err?.response?.data?.error) {
@@ -36,8 +49,8 @@ export function parseError(err: any): ApiError {
 }
 
 export function parseFigmaApiError(err: any): ApiError {
-  if (err?.config?.baseURL !== 'https://api.figma.com/v1') {
-    return parseError(err)
+  if (!_isFigmaApiError(err)) {
+    return parseApiError(err)
   }
 
   return new ApiError(
@@ -55,4 +68,8 @@ export function getCustomUserError(
     return err.message
   }
   return defaultMsg
+}
+
+function _isFigmaApiError(err: any): boolean {
+  return err?.config?.baseURL === 'https://api.figma.com/v1'
 }
