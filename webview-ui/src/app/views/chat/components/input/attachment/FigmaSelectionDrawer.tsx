@@ -20,7 +20,8 @@ export const FigmaSelectionDrawer = () => {
     setFigmaLink,
     submitSelection,
     closeSelectionDrawer,
-    submitButtonRef
+    submitButtonRef,
+    inputRef
   } = useAttachment()
 
   const handleOpenChange = useCallback(
@@ -60,6 +61,7 @@ export const FigmaSelectionDrawer = () => {
             placeholder='https://www.figma.com/design/GAo9lY4bI...'
             onChange={handleInputChange}
             className='w-full'
+            ref={inputRef}
           />
 
           <div className='flex-1 h-full w-full min-h-[11rem] figma-copy-selection-example rounded-md overflow-hidden' />

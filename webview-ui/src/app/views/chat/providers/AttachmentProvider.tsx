@@ -35,6 +35,8 @@ const AttachmentContext = createContext<{
   setImageAttachment: Dispatch<SetStateAction<string | null>>
   submitButtonRef: React.RefObject<HTMLButtonElement | null>
   focusSubmitButton: () => void
+  inputRef: React.RefObject<HTMLInputElement | null>
+  focusInput: () => void
 } | null>(null)
 
 export const AttachmentProvider = ({
@@ -46,6 +48,7 @@ export const AttachmentProvider = ({
 }) => {
   const postMessage = usePostMessage()
   const submitButtonRef = useRef<HTMLButtonElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
   const [isSelectionDrawerOpen, setIsSelectionDrawerOpen] = useState(false)
   const [isFigmaLoading, setIsFigmaLoading] = useState(false)
@@ -60,6 +63,12 @@ export const AttachmentProvider = ({
   const focusSubmitButton = useCallback(() => {
     queueMicrotask(() => {
       submitButtonRef.current?.focus()
+    })
+  }, [])
+
+  const focusInput = useCallback(() => {
+    queueMicrotask(() => {
+      inputRef.current?.focus()
     })
   }, [])
 
@@ -120,7 +129,9 @@ export const AttachmentProvider = ({
       submitSelection,
       setImageAttachment,
       submitButtonRef,
-      focusSubmitButton
+      focusSubmitButton,
+      focusInput,
+      inputRef
     }),
     [
       isSelectionDrawerOpen,
@@ -132,7 +143,8 @@ export const AttachmentProvider = ({
       openSelectionDrawer,
       closeSelectionDrawer,
       submitSelection,
-      focusSubmitButton
+      focusSubmitButton,
+      focusInput
     ]
   )
 
