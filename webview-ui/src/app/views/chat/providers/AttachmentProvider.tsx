@@ -27,11 +27,13 @@ const AttachmentContext = createContext<{
   imageAttachment: string | null
   figmaAttachment: FigmaAttachment | null
   figmaLink: string
+  figmaError: string | null
   setFigmaLink: Dispatch<SetStateAction<string>>
   removeAttachment: () => void
   openSelectionDrawer: () => void
   closeSelectionDrawer: () => void
   submitSelection: () => void
+  confirmSelection: () => void
   setImageAttachment: Dispatch<SetStateAction<string | null>>
   submitButtonRef: React.RefObject<HTMLButtonElement | null>
   focusSubmitButton: () => void
@@ -53,6 +55,7 @@ export const AttachmentProvider = ({
   const [isSelectionDrawerOpen, setIsSelectionDrawerOpen] = useState(false)
   const [isFigmaLoading, setIsFigmaLoading] = useState(false)
   const [figmaLink, setFigmaLink] = useState('')
+  const [figmaError, setFigmaError] = useState<string | null>(null)
   const [imageAttachment, setImageAttachment] = useState<string | null>(
     attachment?.image ?? null
   )
@@ -73,11 +76,18 @@ export const AttachmentProvider = ({
   }, [])
 
   const openSelectionDrawer = useCallback(() => {
+    setFigmaError(null)
     setIsSelectionDrawerOpen(true)
   }, [])
 
   const closeSelectionDrawer = useCallback(() => {
     setIsSelectionDrawerOpen(false)
+    setFigmaLink('')
+    setFigmaError(null)
+    if (isAwaitingFigmaAttachment.current) {
+      setIsFigmaLoading(false)
+      isAwaitingFigmaAttachment.current = false
+    }
   }, [])
 
   const removeAttachment = useCallback(() => {
@@ -86,12 +96,15 @@ export const AttachmentProvider = ({
   }, [])
 
   const submitSelection = useCallback(() => {
+    setFigmaError(null)
     postMessage(EventRequestType.CREATE_FIGMA_ATTACHMENT, figmaLink)
     isAwaitingFigmaAttachment.current = true
-    removeAttachment()
     setIsFigmaLoading(true)
+  }, [postMessage, figmaLink])
+
+  const confirmSelection = useCallback(() => {
     closeSelectionDrawer()
-  }, [postMessage, figmaLink, closeSelectionDrawer, removeAttachment])
+  }, [closeSelectionDrawer])
 
   const handleCreateFigmaAttachment = useCallback(
     ({
@@ -101,10 +114,10 @@ export const AttachmentProvider = ({
       if (isAwaitingFigmaAttachment.current) {
         if (!error && payload) {
           setFigmaAttachment(payload)
+        } else if (error) {
+          setFigmaError(error.message || 'Failed to create Figma attachment')
         }
-        setFigmaLink('')
         setIsFigmaLoading(false)
-        isAwaitingFigmaAttachment.current = false
       }
     },
     []
@@ -122,11 +135,13 @@ export const AttachmentProvider = ({
       imageAttachment,
       figmaAttachment,
       figmaLink,
+      figmaError,
       setFigmaLink,
       removeAttachment,
       openSelectionDrawer,
       closeSelectionDrawer,
       submitSelection,
+      confirmSelection,
       setImageAttachment,
       submitButtonRef,
       focusSubmitButton,
@@ -139,10 +154,12 @@ export const AttachmentProvider = ({
       imageAttachment,
       figmaAttachment,
       figmaLink,
+      figmaError,
       removeAttachment,
       openSelectionDrawer,
       closeSelectionDrawer,
       submitSelection,
+      confirmSelection,
       focusSubmitButton,
       focusInput
     ]
