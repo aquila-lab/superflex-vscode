@@ -36,7 +36,8 @@
     "react-textarea-autosize": "^8.5.7",
     "react-virtualized": "^9.22.6",
     "seti-file-icons": "^0.0.8",
-    "tailwind-merge": "^3.0.1"
+    "tailwind-merge": "^3.0.1",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -52,7 +53,7 @@
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1",
+    "vite": "^6.2.3",
     "vite-plugin-svgr": "^4.3.0"
   }
 }
