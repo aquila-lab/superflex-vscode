@@ -1,9 +1,9 @@
 import { ExternalLinkIcon } from '@radix-ui/react-icons'
-import { Button } from '../../../../../common/ui/Button'
 import { useCallback } from 'react'
+import { EventRequestType } from '../../../../../../../shared/protocol/events'
+import { Button } from '../../../../../common/ui/Button'
 import { FEEDBACK_URL } from '../../../../../common/utils'
 import { usePostMessage } from '../../../../layers/global/hooks/usePostMessage'
-import { EventRequestType } from '../../../../../../../shared/protocol/events'
 
 export const FeedbackButton = () => {
   const postMessage = usePostMessage()

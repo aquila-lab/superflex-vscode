@@ -8,10 +8,10 @@ import {
   useState
 } from 'react'
 import {
-  EventRequestType,
-  EventResponseType,
   type ConfigPayload,
+  EventRequestType,
   type EventResponsePayload,
+  EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../hooks/useConsumeMessage'

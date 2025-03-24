@@ -8,13 +8,13 @@ import {
   useMemo,
   useState
 } from 'react'
+import { SUPERFLEX_RULES_FILE_NAME } from '../../../../../../shared/common/constants'
 import {
   EventRequestType,
   EventResponseType,
   type FilePayload,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
-import { SUPERFLEX_RULES_FILE_NAME } from '../../../../../../shared/common/constants'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 import { useEditMode } from './EditModeProvider'

@@ -15,21 +15,21 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
-import { useNewMessage } from '../../../layers/authenticated/providers/NewMessageProvider'
-import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
-import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
-import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
-import { useUser } from '../../../layers/authenticated/providers/UserProvider'
-import { useAttachment } from './AttachmentProvider'
-import { useEditMode } from './EditModeProvider'
-import { useFiles } from './FilesProvider'
-import { useInput } from './InputProvider'
-import { useSendMessage } from './SendMessageProvider'
-import { useFigmaPremiumModal } from './FigmaPremiumModalProvider'
 import {
   FIGMA_LINK_REGEX,
   readImageFileAsBase64
 } from '../../../../common/utils'
+import { useNewMessage } from '../../../layers/authenticated/providers/NewMessageProvider'
+import { useUser } from '../../../layers/authenticated/providers/UserProvider'
+import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
+import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
+import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
+import { useAttachment } from './AttachmentProvider'
+import { useEditMode } from './EditModeProvider'
+import { useFigmaPremiumModal } from './FigmaPremiumModalProvider'
+import { useFiles } from './FilesProvider'
+import { useInput } from './InputProvider'
+import { useSendMessage } from './SendMessageProvider'
 
 const TextareaHandlersContext = createContext<{
   handleInputChange: (e: ChangeEvent<HTMLTextAreaElement>) => void

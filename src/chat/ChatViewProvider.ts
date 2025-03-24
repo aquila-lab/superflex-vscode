@@ -12,6 +12,7 @@ import {
   newEventRequest,
   newEventResponse
 } from '../../shared/protocol'
+import uriEventHandler from '../common/UriEventHandler'
 import { getMetaKeyLabel } from '../common/operatingSystem'
 import {
   debounce,
@@ -20,7 +21,6 @@ import {
   getNonce,
   getOpenWorkspace
 } from '../common/utils'
-import uriEventHandler from '../common/UriEventHandler'
 import type { ChatAPI } from './ChatApi'
 
 export default class ChatViewProvider implements vscode.WebviewViewProvider {

@@ -3,6 +3,8 @@ import path from 'node:path'
 import { Mutex } from 'async-mutex'
 import * as vscode from 'vscode'
 
+import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
+import { SUPERFLEX_RULES_FILE_NAME } from '../../shared/common/constants'
 import {
   type Message,
   type MessageContent,
@@ -10,19 +12,22 @@ import {
   extractFigmaSelectionUrl
 } from '../../shared/model'
 import {
+  type EventRequestPayload,
   EventRequestType,
+  type EventResponseMessage,
+  type EventResponsePayload,
   EventResponseType,
-  newEventResponse,
-  type FilePayload,
   type FastApplyPayload,
   type FetchThreadsPayload,
-  type EventRequestPayload,
-  type EventResponseMessage,
-  type EventResponsePayload
+  type FilePayload,
+  newEventResponse
 } from '../../shared/protocol'
-import { SUPERFLEX_RULES_FILE_NAME } from '../../shared/common/constants'
 import * as api from '../api'
-import { HttpStatusCode, getFigmaSelectionImageUrl, validateFigmaSelection } from '../api'
+import {
+  HttpStatusCode,
+  getFigmaSelectionImageUrl,
+  validateFigmaSelection
+} from '../api'
 import type { Assistant } from '../assistant'
 import SuperflexAssistant from '../assistant/SuperflexAssistant'
 import { Telemetry } from '../common/analytics/Telemetry'
@@ -38,7 +43,6 @@ import { createDiffStream, myersDiff } from '../diff/myers'
 import type { VerticalDiffManager } from '../diff/vertical/manager'
 import { findWorkspaceFiles } from '../scanner'
 import { EventRegistry, type Handler } from './EventRegistry'
-import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 
 /**
  * ChatAPI class for interacting with the chat service.
@@ -293,16 +297,25 @@ export class ChatAPI {
         EventRequestType.CREATE_FIGMA_ATTACHMENT,
         async (payload: string, _) => {
           if (!this._isInitialized) {
-            throw new AppError('Chat is not initialized', AppErrorSlug.ChatNotInitialized)
+            throw new AppError(
+              'Chat is not initialized',
+              AppErrorSlug.ChatNotInitialized
+            )
           }
 
           if (!payload) {
-            throw new AppError('Figma selection link is required', AppErrorSlug.FigmaSelectionLinkRequired)
+            throw new AppError(
+              'Figma selection link is required',
+              AppErrorSlug.FigmaSelectionLinkRequired
+            )
           }
 
           const figmaSelectionUrl = extractFigmaSelectionUrl(payload)
           if (!figmaSelectionUrl) {
-            throw new AppError('Invalid Figma selection link', AppErrorSlug.InvalidFigmaSelectionLink)
+            throw new AppError(
+              'Invalid Figma selection link',
+              AppErrorSlug.InvalidFigmaSelectionLink
+            )
           }
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
@@ -314,7 +327,7 @@ export class ChatAPI {
             nodeID: figmaSelectionUrl.nodeID,
             imageUrl,
             warning
-          };
+          }
         }
       )
 

@@ -1,7 +1,7 @@
 import { SettingsCard } from '../base/SettingsCard'
+import { FeedbackButton } from './FeedbackButton'
 import { FeedbackSection } from './FeedbackSection'
 import { SupportSection } from './SupportSection'
-import { FeedbackButton } from './FeedbackButton'
 
 export const FeedbackCard = () => (
   <SettingsCard title='Support & Feedback'>
