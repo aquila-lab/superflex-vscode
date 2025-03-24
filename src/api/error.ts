@@ -4,9 +4,11 @@ import { IS_PROD } from '../common/constants'
 export class ApiError extends Error {
   statusCode: number
   slug: string
+  message: string
 
   constructor(statusCode: number, slug: string, message: string) {
     super(message)
+    this.message = message
     this.statusCode = statusCode
     this.slug = slug
 
