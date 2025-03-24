@@ -33,6 +33,8 @@ const AttachmentContext = createContext<{
   closeSelectionModal: () => void
   submitSelection: () => void
   setImageAttachment: Dispatch<SetStateAction<string | null>>
+  submitButtonRef: React.RefObject<HTMLButtonElement | null>
+  focusSubmitButton: () => void
 } | null>(null)
 
 export const AttachmentProvider = ({
@@ -43,6 +45,7 @@ export const AttachmentProvider = ({
   children: ReactNode
 }) => {
   const postMessage = usePostMessage()
+  const submitButtonRef = useRef<HTMLButtonElement | null>(null)
 
   const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false)
   const [isFigmaLoading, setIsFigmaLoading] = useState(false)
@@ -53,6 +56,12 @@ export const AttachmentProvider = ({
   const [figmaAttachment, setFigmaAttachment] =
     useState<FigmaAttachment | null>(attachment?.figma ?? null)
   const isAwaitingFigmaAttachment = useRef(false)
+
+  const focusSubmitButton = useCallback(() => {
+    queueMicrotask(() => {
+      submitButtonRef.current?.focus()
+    })
+  }, [])
 
   const openSelectionModal = useCallback(() => {
     setIsSelectionModalOpen(true)
@@ -109,7 +118,9 @@ export const AttachmentProvider = ({
       openSelectionModal,
       closeSelectionModal,
       submitSelection,
-      setImageAttachment
+      setImageAttachment,
+      submitButtonRef,
+      focusSubmitButton
     }),
     [
       isSelectionModalOpen,
@@ -120,7 +131,8 @@ export const AttachmentProvider = ({
       removeAttachment,
       openSelectionModal,
       closeSelectionModal,
-      submitSelection
+      submitSelection,
+      focusSubmitButton
     ]
   )
 
