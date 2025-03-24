@@ -22,15 +22,15 @@ import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessag
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 
 const AttachmentContext = createContext<{
-  isSelectionModalOpen: boolean
+  isSelectionDrawerOpen: boolean
   isFigmaLoading: boolean
   imageAttachment: string | null
   figmaAttachment: FigmaAttachment | null
   figmaLink: string
   setFigmaLink: Dispatch<SetStateAction<string>>
   removeAttachment: () => void
-  openSelectionModal: () => void
-  closeSelectionModal: () => void
+  openSelectionDrawer: () => void
+  closeSelectionDrawer: () => void
   submitSelection: () => void
   setImageAttachment: Dispatch<SetStateAction<string | null>>
   submitButtonRef: React.RefObject<HTMLButtonElement | null>
@@ -47,7 +47,7 @@ export const AttachmentProvider = ({
   const postMessage = usePostMessage()
   const submitButtonRef = useRef<HTMLButtonElement | null>(null)
 
-  const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false)
+  const [isSelectionDrawerOpen, setIsSelectionDrawerOpen] = useState(false)
   const [isFigmaLoading, setIsFigmaLoading] = useState(false)
   const [figmaLink, setFigmaLink] = useState('')
   const [imageAttachment, setImageAttachment] = useState<string | null>(
@@ -63,12 +63,12 @@ export const AttachmentProvider = ({
     })
   }, [])
 
-  const openSelectionModal = useCallback(() => {
-    setIsSelectionModalOpen(true)
+  const openSelectionDrawer = useCallback(() => {
+    setIsSelectionDrawerOpen(true)
   }, [])
 
-  const closeSelectionModal = useCallback(() => {
-    setIsSelectionModalOpen(false)
+  const closeSelectionDrawer = useCallback(() => {
+    setIsSelectionDrawerOpen(false)
   }, [])
 
   const removeAttachment = useCallback(() => {
@@ -81,8 +81,8 @@ export const AttachmentProvider = ({
     isAwaitingFigmaAttachment.current = true
     removeAttachment()
     setIsFigmaLoading(true)
-    closeSelectionModal()
-  }, [postMessage, figmaLink, closeSelectionModal, removeAttachment])
+    closeSelectionDrawer()
+  }, [postMessage, figmaLink, closeSelectionDrawer, removeAttachment])
 
   const handleCreateFigmaAttachment = useCallback(
     ({
@@ -108,29 +108,29 @@ export const AttachmentProvider = ({
 
   const value = useMemo(
     () => ({
-      isSelectionModalOpen,
+      isSelectionDrawerOpen,
       isFigmaLoading,
       imageAttachment,
       figmaAttachment,
       figmaLink,
       setFigmaLink,
       removeAttachment,
-      openSelectionModal,
-      closeSelectionModal,
+      openSelectionDrawer,
+      closeSelectionDrawer,
       submitSelection,
       setImageAttachment,
       submitButtonRef,
       focusSubmitButton
     }),
     [
-      isSelectionModalOpen,
+      isSelectionDrawerOpen,
       isFigmaLoading,
       imageAttachment,
       figmaAttachment,
       figmaLink,
       removeAttachment,
-      openSelectionModal,
-      closeSelectionModal,
+      openSelectionDrawer,
+      closeSelectionDrawer,
       submitSelection,
       focusSubmitButton
     ]

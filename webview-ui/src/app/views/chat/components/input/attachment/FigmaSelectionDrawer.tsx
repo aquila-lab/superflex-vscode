@@ -76,7 +76,7 @@ export const FigmaSelectionDrawer = () => {
           <Button
             ref={submitButtonRef}
             onClick={handleSubmit}
-            className='w-full'
+            className='w-full mb-8'
             disabled={!figmaLink.length}
           >
             Add Selection

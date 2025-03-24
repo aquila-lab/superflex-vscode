@@ -10,7 +10,7 @@ import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvid
 
 export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
-  const { isFigmaLoading, openSelectionModal } = useAttachment()
+  const { isFigmaLoading, openSelectionDrawer } = useAttachment()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
   const { setIsOpen } = useFigmaPremiumModal()
   const { subscription } = useUser()
@@ -25,14 +25,14 @@ export const SelectFigmaButton = () => {
     }
 
     if (isFigmaAuthenticated) {
-      openSelectionModal()
+      openSelectionDrawer()
       return
     }
 
     connectFigma()
   }, [
     isFigmaAuthenticated,
-    openSelectionModal,
+    openSelectionDrawer,
     connectFigma,
     setIsOpen,
     subscription

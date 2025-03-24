@@ -54,7 +54,7 @@ export const TextareaHandlersProvider = ({
     isFigmaLoading,
     setImageAttachment,
     removeAttachment,
-    openSelectionModal,
+    openSelectionDrawer,
     setFigmaLink,
     focusSubmitButton
   } = useAttachment()
@@ -123,7 +123,7 @@ export const TextareaHandlersProvider = ({
           return
         }
 
-        openSelectionModal()
+        openSelectionDrawer()
         setFigmaLink(figmaLinkMatch[0])
         focusSubmitButton()
         return
@@ -159,7 +159,7 @@ export const TextareaHandlersProvider = ({
       postMessage,
       removeAttachment,
       setImageAttachment,
-      openSelectionModal,
+      openSelectionDrawer,
       setFigmaLink,
       isFigmaAuthenticated,
       connectFigma,
