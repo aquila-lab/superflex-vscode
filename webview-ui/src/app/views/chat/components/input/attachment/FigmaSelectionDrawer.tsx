@@ -70,7 +70,7 @@ export const FigmaSelectionDrawer = () => {
   const renderContent = useCallback(() => {
     if (isConfirmStep && figmaAttachment) {
       return (
-        <div className='flex flex-col px-4'>
+        <div className='flex flex-col px-4 gap-4'>
           {figmaAttachment.imageUrl && (
             <div className='w-full rounded-md overflow-hidden'>
               <img
@@ -90,7 +90,7 @@ export const FigmaSelectionDrawer = () => {
 
     if (figmaError) {
       return (
-        <div className='flex flex-col px-4'>
+        <div className='flex flex-col px-4 gap-4'>
           <Input
             type='text'
             value={figmaLink}
@@ -113,7 +113,7 @@ export const FigmaSelectionDrawer = () => {
     }
 
     return (
-      <div className='flex flex-col px-4'>
+      <div className='flex flex-col px-4 gap-4'>
         <Input
           type='text'
           value={figmaLink}
