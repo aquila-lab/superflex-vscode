@@ -51,7 +51,7 @@ export class FigmaService {
     }
 
     if (framesWithAutoLayout < numberOfFrames) {
-      throw new AppWarning(
+      return new AppWarning(
         'There are frames without auto layout and generated code may not be pixel-perfect. Would you still like to continue?',
         AppWarningSlug.SomeAbsoluteFrames,
         {
