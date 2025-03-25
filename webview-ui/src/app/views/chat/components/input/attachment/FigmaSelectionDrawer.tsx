@@ -1,19 +1,19 @@
+import { Check, RefreshCw } from 'lucide-react'
 import { type ChangeEvent, useCallback, useState } from 'react'
+import { Alert, AlertDescription } from '../../../../../../common/ui/Alert'
 import { Button } from '../../../../../../common/ui/Button'
 import {
   Drawer,
   DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
   DrawerDescription,
-  DrawerFooter
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle
 } from '../../../../../../common/ui/Drawer'
 import { Input } from '../../../../../../common/ui/Input'
+import { Skeleton } from '../../../../../../common/ui/Skeleton'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
-import { Alert, AlertDescription } from '../../../../../../common/ui/Alert'
-import { Check, RefreshCw } from 'lucide-react'
-import { Skeleton } from '../../../../../../common/ui/Skeleton'
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()
