@@ -39,6 +39,10 @@ const AttachmentContext = createContext<{
   focusSubmitButton: () => void
   inputRef: React.RefObject<HTMLInputElement | null>
   focusInput: () => void
+  setFigmaPlaceholderAttachment: Dispatch<
+    SetStateAction<FigmaAttachment | null>
+  >
+  figmaPlaceholderAttachment: FigmaAttachment | null
 } | null>(null)
 
 export const AttachmentProvider = ({
@@ -61,6 +65,8 @@ export const AttachmentProvider = ({
   )
   const [figmaAttachment, setFigmaAttachment] =
     useState<FigmaAttachment | null>(attachment?.figma ?? null)
+  const [figmaPlaceholderAttachment, setFigmaPlaceholderAttachment] =
+    useState<FigmaAttachment | null>(null)
   const isAwaitingFigmaAttachment = useRef(false)
 
   const focusSubmitButton = useCallback(() => {
@@ -88,11 +94,13 @@ export const AttachmentProvider = ({
       setIsFigmaLoading(false)
       isAwaitingFigmaAttachment.current = false
     }
+    setFigmaPlaceholderAttachment(null)
   }, [])
 
   const removeAttachment = useCallback(() => {
     setImageAttachment(null)
     setFigmaAttachment(null)
+    setFigmaPlaceholderAttachment(null)
   }, [])
 
   const submitSelection = useCallback(() => {
@@ -103,8 +111,12 @@ export const AttachmentProvider = ({
   }, [postMessage, figmaLink])
 
   const confirmSelection = useCallback(() => {
+    if (figmaPlaceholderAttachment) {
+      setFigmaAttachment(figmaPlaceholderAttachment)
+      setFigmaPlaceholderAttachment(null)
+    }
     closeSelectionDrawer()
-  }, [closeSelectionDrawer])
+  }, [closeSelectionDrawer, figmaPlaceholderAttachment])
 
   const handleCreateFigmaAttachment = useCallback(
     ({
@@ -113,7 +125,7 @@ export const AttachmentProvider = ({
     }: EventResponseMessage<EventResponseType.CREATE_FIGMA_ATTACHMENT>) => {
       if (isAwaitingFigmaAttachment.current) {
         if (!error && payload) {
-          setFigmaAttachment(payload)
+          setFigmaPlaceholderAttachment(payload)
         } else if (error) {
           setFigmaError(error.message || 'Failed to create Figma attachment')
         }
@@ -143,6 +155,8 @@ export const AttachmentProvider = ({
       submitSelection,
       confirmSelection,
       setImageAttachment,
+      setFigmaPlaceholderAttachment,
+      figmaPlaceholderAttachment,
       submitButtonRef,
       focusSubmitButton,
       focusInput,
@@ -155,6 +169,7 @@ export const AttachmentProvider = ({
       figmaAttachment,
       figmaLink,
       figmaError,
+      figmaPlaceholderAttachment,
       removeAttachment,
       openSelectionDrawer,
       closeSelectionDrawer,

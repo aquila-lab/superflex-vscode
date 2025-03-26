@@ -4,8 +4,7 @@ import { useEditMode } from '../../../providers/EditModeProvider'
 import { ImagePreview } from './ImagePreview'
 
 export const Attachment = () => {
-  const { imageAttachment, figmaAttachment, isFigmaLoading, removeAttachment } =
-    useAttachment()
+  const { imageAttachment, figmaAttachment, removeAttachment } = useAttachment()
   const { isEditMode, isMainTextarea } = useEditMode()
 
   const handleRemoveAttachment = useCallback(
@@ -18,7 +17,7 @@ export const Attachment = () => {
     [figmaAttachment, imageAttachment]
   )
 
-  if (!(imageAttachment || figmaAttachment || isFigmaLoading)) {
+  if (!(imageAttachment || figmaAttachment)) {
     return null
   }
 
@@ -30,7 +29,6 @@ export const Attachment = () => {
           spinnerSize='sm'
           alt='preview image'
           src={src}
-          isLoading={isFigmaLoading}
           {...(isEditMode && { onRemove: handleRemoveAttachment })}
         />
       </div>
@@ -44,7 +42,6 @@ export const Attachment = () => {
           size='default'
           alt='preview image'
           src={src}
-          isLoading={isFigmaLoading}
           {...(isEditMode && { onRemove: handleRemoveAttachment })}
         />
       </div>

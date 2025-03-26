@@ -26,10 +26,10 @@ export const FigmaSelectionDrawer = () => {
     submitButtonRef,
     inputRef,
     isFigmaLoading,
-    figmaAttachment,
     confirmSelection,
     figmaError,
-    removeAttachment
+    setFigmaPlaceholderAttachment,
+    figmaPlaceholderAttachment
   } = useAttachment()
 
   const [isConfirmStep, setIsConfirmStep] = useState(false)
@@ -40,8 +40,9 @@ export const FigmaSelectionDrawer = () => {
       closeSelectionDrawer()
       setIsConfirmStep(false)
       setIsImageLoaded(false)
+      setFigmaPlaceholderAttachment(null)
     }
-  }, [closeSelectionDrawer, isFigmaLoading])
+  }, [closeSelectionDrawer, isFigmaLoading, setFigmaPlaceholderAttachment])
 
   const handleSubmit = useCallback(() => {
     if (isConfirmStep) {
@@ -58,9 +59,9 @@ export const FigmaSelectionDrawer = () => {
   const handleCancel = useCallback(() => {
     setIsConfirmStep(false)
     setIsImageLoaded(false)
-    removeAttachment()
+    setFigmaPlaceholderAttachment(null)
     closeSelectionDrawer()
-  }, [closeSelectionDrawer, removeAttachment])
+  }, [closeSelectionDrawer, setFigmaPlaceholderAttachment])
 
   const handleRetry = useCallback(() => {
     setIsConfirmStep(false)
@@ -80,16 +81,16 @@ export const FigmaSelectionDrawer = () => {
   }, [])
 
   const renderContent = useCallback(() => {
-    if (isConfirmStep && figmaAttachment) {
+    if (isConfirmStep && figmaPlaceholderAttachment) {
       return (
         <div className='flex flex-col px-4 gap-4'>
-          {figmaAttachment.imageUrl && (
+          {figmaPlaceholderAttachment.imageUrl && (
             <div className='w-full rounded-md overflow-hidden'>
               {!isImageLoaded && <Skeleton className='w-full h-64' />}
               <img
-                src={figmaAttachment.imageUrl}
+                src={figmaPlaceholderAttachment.imageUrl}
                 alt='Figma Selection'
-                className={`w-full object-contain max-h-[250px] ${!isImageLoaded ? 'hidden' : ''}`}
+                className={`w-full object-contain max-h-64 ${!isImageLoaded ? 'hidden' : ''}`}
                 onLoad={handleImageLoad}
               />
             </div>
@@ -148,7 +149,7 @@ export const FigmaSelectionDrawer = () => {
       </div>
     )
   }, [
-    figmaAttachment,
+    figmaPlaceholderAttachment,
     figmaError,
     figmaLink,
     inputRef,
@@ -159,7 +160,7 @@ export const FigmaSelectionDrawer = () => {
   ])
 
   const renderFooterButtons = useCallback(() => {
-    if (isConfirmStep && figmaAttachment) {
+    if (isConfirmStep && figmaPlaceholderAttachment) {
       return (
         <div className='flex gap-3 justify-between w-full mb-4'>
           <Button
@@ -228,7 +229,7 @@ export const FigmaSelectionDrawer = () => {
       </div>
     )
   }, [
-    figmaAttachment,
+    figmaPlaceholderAttachment,
     figmaError,
     figmaLink,
     handleCancel,
@@ -258,13 +259,13 @@ export const FigmaSelectionDrawer = () => {
             >
               <AlertDescription>{figmaError}</AlertDescription>
             </Alert>
-          ) : isConfirmStep && figmaAttachment?.warning ? (
+          ) : isConfirmStep && figmaPlaceholderAttachment?.warning ? (
             <Alert
               variant='warning'
               className='mt-4'
             >
               <AlertDescription>
-                {figmaAttachment.warning.message}
+                {figmaPlaceholderAttachment.warning.message}
               </AlertDescription>
             </Alert>
           ) : (
