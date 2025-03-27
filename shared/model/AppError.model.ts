@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 export const AppErrorSlug = {
   Unknown: 'unknown',
   FileNotFoundOrUnauthorized: 'file_not_found_or_unauthorized',
-  TooManyAbsoluteFrames: 'too_many_absolute_frames',
+  MissingFramesWithoutAutoLayout: 'missing_frames_without_auto_layout',
   NoFramesFound: 'no_frames_found',
   UnsupportedSelection: 'unsupported_selection',
   UrlNotSupportedInPrompt: 'url_not_supported_in_prompt',
@@ -12,7 +12,7 @@ export const AppErrorSlug = {
   FigmaSelectionLinkRequired: 'figma_selection_link_required',
   InvalidFigmaSelectionLink: 'invalid_figma_selection_link',
   InvalidMessage: 'invalid_message'
-} as const
+}
 
 type AppErrorSlug = (typeof AppErrorSlug)[keyof typeof AppErrorSlug]
 

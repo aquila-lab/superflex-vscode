@@ -36,11 +36,10 @@ export class FigmaService {
     )
     const framesWithAutoLayout = numberOfFrames - framesWithoutAutoLayout.length
 
-    // If there are more than 50% of frames without auto layout, we don't proceed with the code generation
-    if (framesWithAutoLayout < framesWithoutAutoLayout.length) {
+    if (framesWithAutoLayout === 0) {
       throw new AppError(
-        'There are too many frames without auto layout in the given selection, please update and try again.',
-        AppErrorSlug.TooManyAbsoluteFrames,
+        'There are no frames with auto layout in the given Figma selection, please add auto layout to the Figma selection and try again.',
+        AppErrorSlug.MissingFramesWithoutAutoLayout,
         undefined,
         {
           framesWithoutAutoLayout: framesWithoutAutoLayout.map(

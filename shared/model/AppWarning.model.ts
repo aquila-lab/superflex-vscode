@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 export const AppWarningSlug = {
   Unknown: 'unknown',
   SomeAbsoluteFrames: 'some_absolute_frames'
-} as const
+}
 
 type AppWarningSlug = (typeof AppWarningSlug)[keyof typeof AppWarningSlug]
 
