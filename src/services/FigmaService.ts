@@ -90,10 +90,6 @@ export class FigmaService {
    * @returns True if the node has auto layout.
    */
   static hasAutoLayout(node: Node): boolean {
-    if ('layoutPositioning' in node && node.layoutPositioning === 'ABSOLUTE') {
-      return false
-    }
-
     return (
       'layoutMode' in node &&
       (node.layoutMode === 'HORIZONTAL' || node.layoutMode === 'VERTICAL')
