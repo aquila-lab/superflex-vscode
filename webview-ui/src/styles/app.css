@@ -45,6 +45,11 @@ code {
   background-image: url("../assets/logo.png");
 }
 
+[role="dialog"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .npm__react-simple-code-editor__textarea:focus {
   outline: none;
 }

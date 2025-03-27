@@ -109,9 +109,7 @@
     "node": ">=20.11.0"
   },
   "engine-strict": true,
-  "activationEvents": [
-    "onStartupFinished"
-  ],
+  "activationEvents": ["onStartupFinished"],
   "main": "./dist/extension.js",
   "scripts": {
     "compile": "npm run check-types && node esbuild.js",
@@ -127,7 +125,11 @@
     "package": "npm run check-types && node esbuild.js --production",
     "vscode:prepublish": "npm --prefix webview-ui/ run build && npm run package",
     "vsce:package": "vsce package --no-dependencies --no-yarn",
-    "vsce:publish": "vsce publish"
+    "vsce:publish": "vsce publish",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -152,6 +154,7 @@
     "crypto": "^1.0.1",
     "diff": "^7.0.0",
     "fast-glob": "^3.3.2",
+    "figma-js": "^1.16.1-0",
     "node-machine-id": "^1.1.12",
     "posthog-node": "^4.2.0",
     "uuidv4": "^6.2.13"

@@ -6,8 +6,8 @@ import type {
 } from '../../shared/model'
 import type { FetchThreadsResponse } from '../../shared/protocol'
 import { Api } from './api'
-import type { RepoArgs } from './repo'
 import { ApiError, parseError } from './error'
+import type { RepoArgs } from './repo'
 import {
   buildMessageFromResponse,
   buildThreadFromResponse,

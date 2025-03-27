@@ -22,19 +22,27 @@ import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessag
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 
 const AttachmentContext = createContext<{
-  isSelectionModalOpen: boolean
+  isSelectionDrawerOpen: boolean
   isFigmaLoading: boolean
   imageAttachment: string | null
   figmaAttachment: FigmaAttachment | null
   figmaLink: string
+  figmaError: string | null
   setFigmaLink: Dispatch<SetStateAction<string>>
   removeAttachment: () => void
-  openSelectionModal: () => void
-  closeSelectionModal: () => void
+  openSelectionDrawer: () => void
+  closeSelectionDrawer: () => void
   submitSelection: () => void
+  confirmSelection: () => void
   setImageAttachment: Dispatch<SetStateAction<string | null>>
   submitButtonRef: React.RefObject<HTMLButtonElement | null>
   focusSubmitButton: () => void
+  inputRef: React.RefObject<HTMLInputElement | null>
+  focusInput: () => void
+  setFigmaPlaceholderAttachment: Dispatch<
+    SetStateAction<FigmaAttachment | null>
+  >
+  figmaPlaceholderAttachment: FigmaAttachment | null
 } | null>(null)
 
 export const AttachmentProvider = ({
@@ -46,15 +54,19 @@ export const AttachmentProvider = ({
 }) => {
   const postMessage = usePostMessage()
   const submitButtonRef = useRef<HTMLButtonElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false)
+  const [isSelectionDrawerOpen, setIsSelectionDrawerOpen] = useState(false)
   const [isFigmaLoading, setIsFigmaLoading] = useState(false)
   const [figmaLink, setFigmaLink] = useState('')
+  const [figmaError, setFigmaError] = useState<string | null>(null)
   const [imageAttachment, setImageAttachment] = useState<string | null>(
     attachment?.image ?? null
   )
   const [figmaAttachment, setFigmaAttachment] =
     useState<FigmaAttachment | null>(attachment?.figma ?? null)
+  const [figmaPlaceholderAttachment, setFigmaPlaceholderAttachment] =
+    useState<FigmaAttachment | null>(null)
   const isAwaitingFigmaAttachment = useRef(false)
 
   const focusSubmitButton = useCallback(() => {
@@ -63,26 +75,48 @@ export const AttachmentProvider = ({
     })
   }, [])
 
-  const openSelectionModal = useCallback(() => {
-    setIsSelectionModalOpen(true)
+  const focusInput = useCallback(() => {
+    queueMicrotask(() => {
+      inputRef.current?.focus()
+    })
   }, [])
 
-  const closeSelectionModal = useCallback(() => {
-    setIsSelectionModalOpen(false)
+  const openSelectionDrawer = useCallback(() => {
+    setFigmaError(null)
+    setIsSelectionDrawerOpen(true)
+  }, [])
+
+  const closeSelectionDrawer = useCallback(() => {
+    setIsSelectionDrawerOpen(false)
+    setFigmaLink('')
+    setFigmaError(null)
+    if (isAwaitingFigmaAttachment.current) {
+      setIsFigmaLoading(false)
+      isAwaitingFigmaAttachment.current = false
+    }
+    setFigmaPlaceholderAttachment(null)
   }, [])
 
   const removeAttachment = useCallback(() => {
     setImageAttachment(null)
     setFigmaAttachment(null)
+    setFigmaPlaceholderAttachment(null)
   }, [])
 
   const submitSelection = useCallback(() => {
+    setFigmaError(null)
     postMessage(EventRequestType.CREATE_FIGMA_ATTACHMENT, figmaLink)
     isAwaitingFigmaAttachment.current = true
-    removeAttachment()
     setIsFigmaLoading(true)
-    closeSelectionModal()
-  }, [postMessage, figmaLink, closeSelectionModal, removeAttachment])
+  }, [postMessage, figmaLink])
+
+  const confirmSelection = useCallback(() => {
+    if (figmaPlaceholderAttachment) {
+      setFigmaAttachment(figmaPlaceholderAttachment)
+      setFigmaPlaceholderAttachment(null)
+    }
+    closeSelectionDrawer()
+  }, [closeSelectionDrawer, figmaPlaceholderAttachment])
 
   const handleCreateFigmaAttachment = useCallback(
     ({
@@ -91,11 +125,11 @@ export const AttachmentProvider = ({
     }: EventResponseMessage<EventResponseType.CREATE_FIGMA_ATTACHMENT>) => {
       if (isAwaitingFigmaAttachment.current) {
         if (!error && payload) {
-          setFigmaAttachment(payload)
+          setFigmaPlaceholderAttachment(payload)
+        } else if (error) {
+          setFigmaError(error.message || 'Failed to create Figma attachment')
         }
-        setFigmaLink('')
         setIsFigmaLoading(false)
-        isAwaitingFigmaAttachment.current = false
       }
     },
     []
@@ -108,31 +142,41 @@ export const AttachmentProvider = ({
 
   const value = useMemo(
     () => ({
-      isSelectionModalOpen,
+      isSelectionDrawerOpen,
       isFigmaLoading,
       imageAttachment,
       figmaAttachment,
       figmaLink,
+      figmaError,
       setFigmaLink,
       removeAttachment,
-      openSelectionModal,
-      closeSelectionModal,
+      openSelectionDrawer,
+      closeSelectionDrawer,
       submitSelection,
+      confirmSelection,
       setImageAttachment,
+      setFigmaPlaceholderAttachment,
+      figmaPlaceholderAttachment,
       submitButtonRef,
-      focusSubmitButton
+      focusSubmitButton,
+      focusInput,
+      inputRef
     }),
     [
-      isSelectionModalOpen,
+      isSelectionDrawerOpen,
       isFigmaLoading,
       imageAttachment,
       figmaAttachment,
       figmaLink,
+      figmaError,
+      figmaPlaceholderAttachment,
       removeAttachment,
-      openSelectionModal,
-      closeSelectionModal,
+      openSelectionDrawer,
+      closeSelectionDrawer,
       submitSelection,
-      focusSubmitButton
+      confirmSelection,
+      focusSubmitButton,
+      focusInput
     ]
   )
 

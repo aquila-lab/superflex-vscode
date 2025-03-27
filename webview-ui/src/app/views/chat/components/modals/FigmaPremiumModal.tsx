@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle
 } from '../../../../../common/ui/Dialog'
-import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
+import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
 
 export const FigmaPremiumModal = () => {
