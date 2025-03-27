@@ -64,7 +64,6 @@ export const FigmaSelectionDrawer = () => {
   }, [closeSelectionDrawer, setFigmaPlaceholderAttachment])
 
   const handleRetry = useCallback(() => {
-    setIsConfirmStep(false)
     setIsImageLoaded(false)
     submitSelection()
   }, [submitSelection])
