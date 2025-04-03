@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { CircleIcon } from '@radix-ui/react-icons'
 
 import { Button } from '../../../../../common/ui/Button'
@@ -23,6 +23,7 @@ export const FigmaPremiumModal = () => {
   const { isOpen, setIsOpen, onContinue } = useFigmaPremiumModal()
   const { isFigmaAuthenticated } = useGlobal()
   const { hasReachedFigmaRequestLimit, figmaLimits } = useFigmaFreePlanLimits()
+  const { fetchSubscription } = useUser()
 
   const handleSubscribe = useCallback(() => {
     subscribe(
@@ -40,6 +41,10 @@ export const FigmaPremiumModal = () => {
   }, [setIsOpen, isFigmaAuthenticated, onContinue])
 
   const showContinueButton = !hasReachedFigmaRequestLimit
+
+  useEffect(() => {
+    fetchSubscription()
+  }, [fetchSubscription])
 
   return (
     <Dialog
