@@ -39,8 +39,6 @@ export const FigmaPremiumModal = () => {
     }
   }, [setIsOpen, isFigmaAuthenticated, onContinue])
 
-  const remainingRequests = figmaLimits.maxRequests - figmaLimits.requestsUsed
-  const continueButtonText = isFigmaAuthenticated ? 'Continue' : 'Connect Figma'
   const showContinueButton = !hasReachedFigmaRequestLimit
 
   return (
@@ -70,9 +68,12 @@ export const FigmaPremiumModal = () => {
             </div>
           ) : (
             <div>
-              <Badge variant='destructive'>
-                {remainingRequests}{' '}
-                {remainingRequests === 1 ? 'request' : 'requests'} remaining
+              <Badge
+                variant='secondary'
+                className='bg-amber-500/10 text-amber-500 border border-amber-500/50'
+              >
+                {figmaLimits.requestsUsed}/{figmaLimits.maxRequests} requests
+                used
               </Badge>
               <p className='text-xs text-muted-foreground mt-4'>
                 Your free plan includes limited Figma access with the following
@@ -112,7 +113,7 @@ export const FigmaPremiumModal = () => {
               onClick={handleContinue}
               className='flex-1'
             >
-              {continueButtonText}
+              {isFigmaAuthenticated ? 'Continue' : 'Connect Figma'}
             </Button>
           )}
         </DialogFooter>
