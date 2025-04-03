@@ -97,12 +97,18 @@ export const FigmaPremiumModal = () => {
             design-to-code capabilities!
           </p>
         </DialogDescription>
-        <DialogFooter className='flex flex-col sm:flex-row sm:justify-start gap-2'>
-          <Button onClick={handleSubscribe}>Upgrade to Premium</Button>
+        <DialogFooter className='flex flex-col sm:flex-row sm:space-x-0 gap-2 w-full'>
+          <Button
+            onClick={handleSubscribe}
+            className='flex-1'
+          >
+            Upgrade to Premium
+          </Button>
           {showContinueButton && (
             <Button
               variant='secondary'
               onClick={handleContinue}
+              className='flex-1'
             >
               {continueButtonText}
             </Button>
