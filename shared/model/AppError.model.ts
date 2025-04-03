@@ -12,8 +12,7 @@ export const AppErrorSlug = {
   FigmaSelectionLinkRequired: 'figma_selection_link_required',
   InvalidFigmaSelectionLink: 'invalid_figma_selection_link',
   InvalidMessage: 'invalid_message',
-  FigmaFreePlanNodeLimit: 'figma_free_plan_node_limit',
-  FigmaFreePlanRequestLimit: 'figma_free_plan_request_limit'
+  FigmaFreePlanNodeLimit: 'figma_free_plan_node_limit'
 }
 
 type AppErrorSlug = (typeof AppErrorSlug)[keyof typeof AppErrorSlug]

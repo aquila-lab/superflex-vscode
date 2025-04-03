@@ -318,9 +318,19 @@ export class ChatAPI {
             )
           }
 
+          // TODO: Check if user is on free plan
+          const subscription = await api.getUserSubscription()
+          const isFreePlan = subscription?.plan?.name
+            .toLowerCase()
+            .includes('free')
+
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
 
-          const warning = await validateFigmaSelection(figmaSelectionUrl)
+          const warning = await validateFigmaSelection({
+            fileID: figmaSelectionUrl.fileID,
+            nodeID: figmaSelectionUrl.nodeID,
+            isFreePlan
+          })
 
           return {
             fileID: figmaSelectionUrl.fileID,
