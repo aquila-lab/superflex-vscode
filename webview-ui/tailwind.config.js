@@ -34,6 +34,12 @@ export default {
           background: 'var(--vscode-errorForeground)',
           foreground: 'var(--vscode-editor-background)'
         },
+        warning: {
+          DEFAULT: 'var(--vscode-editorWarning-foreground)',
+          background: 'var(--vscode-editorMarkerNavigationWarning-background)',
+          foreground: 'var(--vscode-editorWarning-foreground)',
+          border: 'var(--vscode-editorWarning-border)'
+        },
         button: {
           background: {
             DEFAULT: 'var(--vscode-button-background)',
