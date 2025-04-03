@@ -11,13 +11,17 @@ import {
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
+import { useFigmaFreePlanLimits } from '../../hooks/useFigmaFreePlanLimits'
 import { MAX_FREE_NODES } from '../../../../../common/utils'
+import { Badge } from '../../../../../common/ui/Badge'
+import { CircleIcon } from '@radix-ui/react-icons'
 
 export const FigmaPremiumModal = () => {
   const { config } = useGlobal()
   const { subscribe } = useUser()
   const { isOpen, setIsOpen, onContinue } = useFigmaPremiumModal()
   const { isFigmaAuthenticated } = useGlobal()
+  const { hasReachedFigmaRequestLimit, figmaLimits } = useFigmaFreePlanLimits()
 
   const handleSubscribe = useCallback(() => {
     subscribe(
@@ -34,6 +38,10 @@ export const FigmaPremiumModal = () => {
     }
   }, [setIsOpen, isFigmaAuthenticated, onContinue])
 
+  const remainingRequests = figmaLimits.maxRequests - figmaLimits.requestsUsed
+  const continueButtonText = isFigmaAuthenticated ? 'Continue' : 'Connect Figma'
+  const showContinueButton = !hasReachedFigmaRequestLimit
+
   return (
     <Dialog
       open={isOpen}
@@ -45,29 +53,60 @@ export const FigmaPremiumModal = () => {
             Limited Figma Access on Free Plan
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription className='space-y-2'>
-          <p>
-            Your free plan includes limited Figma access with the following
-            restrictions:
-          </p>
-          <ul className='list-disc pl-5'>
-            <li>1 free Figma request</li>
-            <li>Maximum {MAX_FREE_NODES} nodes per request</li>
-            <li>Slow response times</li>
-          </ul>
-          <p className='mt-2'>
+        <DialogDescription>
+          {hasReachedFigmaRequestLimit ? (
+            <div className='mb-4'>
+              <Badge
+                variant='destructive'
+                className='mb-2'
+              >
+                No requests remaining
+              </Badge>
+              <p className='text-xs text-muted-foreground'>
+                You have used your free Figma request for this billing period.
+                Upgrade to Premium for unlimited Figma requests.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <Badge variant='destructive'>
+                {remainingRequests}{' '}
+                {remainingRequests === 1 ? 'request' : 'requests'} remaining
+              </Badge>
+              <p className='text-xs text-muted-foreground mt-4'>
+                Your free plan includes limited Figma access with the following
+                restrictions:
+              </p>
+              <ul className='text-foreground mt-2'>
+                <li className='flex items-center gap-2'>
+                  <CircleIcon className='w-1 h-1' /> 1 free request per billing
+                  period
+                </li>
+                <li className='flex items-center gap-2'>
+                  <CircleIcon className='w-1 h-1' /> Maximum {MAX_FREE_NODES}{' '}
+                  nodes per request
+                </li>
+                <li className='flex items-center gap-2'>
+                  <CircleIcon className='w-1 h-1' /> Slow response times
+                </li>
+              </ul>
+            </div>
+          )}
+          <p className='text-xs text-muted-foreground mt-2'>
             Upgrade to Premium for unlimited Figma integration and more powerful
             design-to-code capabilities!
           </p>
         </DialogDescription>
         <DialogFooter className='flex flex-col sm:flex-row sm:justify-start gap-2'>
           <Button onClick={handleSubscribe}>Upgrade to Premium</Button>
-          <Button
-            variant='secondary'
-            onClick={handleContinue}
-          >
-            Continue
-          </Button>
+          {showContinueButton && (
+            <Button
+              variant='secondary'
+              onClick={handleContinue}
+            >
+              {continueButtonText}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
