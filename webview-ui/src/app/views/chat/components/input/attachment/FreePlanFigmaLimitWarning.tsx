@@ -16,10 +16,7 @@ export const FreePlanFigmaLimitWarning = () => {
   }
 
   return (
-    <Alert
-      variant='warning'
-      className='mb-4'
-    >
+    <Alert variant='warning'>
       <AlertDescription>
         Free plan is limited to 1 Figma request with max {MAX_FREE_NODES} nodes.
         Upgrade for unlimited access.
