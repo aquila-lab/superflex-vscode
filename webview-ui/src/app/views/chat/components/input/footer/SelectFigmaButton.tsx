@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { FaFigma } from 'react-icons/fa'
 import { Button } from '../../../../../../common/ui/Button'
 import { cn } from '../../../../../../common/utils'
@@ -14,21 +14,45 @@ export const SelectFigmaButton = () => {
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
   const { subscription } = useUser()
   const { setIsOpen, setOnContinue } = useFigmaPremiumModal()
+  const { fetchSubscription, fetchUserInfo } = useUser()
 
-  const isFreePlan = subscription?.plan?.name.toLowerCase().includes('free')
-  const isDisabled = isFigmaLoading || isMessageProcessing || isMessageStreaming
-  const label = isFigmaAuthenticated ? 'Figma' : 'Connect Figma'
+  const isFreePlan = useMemo(
+    () => subscription?.plan?.name.toLowerCase().includes('free'),
+    [subscription]
+  )
+
+  const isDisabled = useMemo(
+    () => isFigmaLoading || isMessageProcessing || isMessageStreaming,
+    [isFigmaLoading, isMessageProcessing, isMessageStreaming]
+  )
+
+  const label = useMemo(
+    () => (isFigmaAuthenticated ? 'Figma' : 'Connect Figma'),
+    [isFigmaAuthenticated]
+  )
 
   const handleFigmaAction = useCallback(
     (isAuthenticated: boolean) => {
       if (isAuthenticated) {
+        if (isFreePlan) {
+          fetchSubscription()
+          fetchUserInfo()
+        }
+
         openSelectionDrawer()
         focusInput()
       } else {
         connectFigma()
       }
     },
-    [openSelectionDrawer, focusInput, connectFigma]
+    [
+      openSelectionDrawer,
+      focusInput,
+      connectFigma,
+      fetchSubscription,
+      fetchUserInfo,
+      isFreePlan
+    ]
   )
 
   const handleButtonClicked = useCallback(() => {
