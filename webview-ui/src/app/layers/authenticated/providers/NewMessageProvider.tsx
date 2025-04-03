@@ -20,7 +20,6 @@ import {
 import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../global/hooks/usePostMessage'
 import { useMessages } from './MessagesProvider'
-import { useUser } from './UserProvider'
 
 const NewMessageContext = createContext<{
   message: Message | null
@@ -33,7 +32,6 @@ const NewMessageContext = createContext<{
 
 export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
-  const { fetchSubscription } = useUser()
   const { messages, addMessages, removeMessagesFrom, setIdToLastUserMessage } =
     useMessages()
 
@@ -96,8 +94,6 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
 
   const handleMessageComplete = useCallback(
     (payload: Message) => {
-      fetchSubscription()
-
       if (!payload) {
         setMessage(null)
         setStreamTextDelta('')
@@ -120,7 +116,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         setStreamTextDelta('')
       })
     },
-    [addMessages, setIdToLastUserMessage, message, fetchSubscription]
+    [addMessages, setIdToLastUserMessage, message]
   )
 
   const handleSendMessageContentResponse = useCallback((payload: boolean) => {
