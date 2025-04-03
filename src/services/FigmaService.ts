@@ -1,10 +1,9 @@
 import type { FileNodesResponse, Node } from 'figma-js'
 import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 import { AppWarning, AppWarningSlug } from 'shared/model/AppWarning.model'
-import type { UserSubscription } from 'shared/model/User.model'
 
 // Free plan limitations
-export const MAX_FREE_NODES = 30
+export const MAX_FREE_NODES = 100
 
 export class FigmaService {
   static extractSelectionUrlFromResponse(data: any, nodeID: string): string {
@@ -14,7 +13,7 @@ export class FigmaService {
   static validateFigmaSelection(
     data: FileNodesResponse,
     nodeID: string,
-    subscription?: UserSubscription
+    isFreePlan = false
   ): AppWarning | undefined {
     const nodeData = data.nodes[nodeID.replace('-', ':')]
 
@@ -36,17 +35,10 @@ export class FigmaService {
     }
 
     // Free plan limitations check
-    if (subscription?.plan?.name.toLowerCase().includes('free')) {
-      // Check if the user has used their free Figma request
-      if (subscription.figmaRequestsUsed >= 1) {
-        throw new AppError(
-          'You have reached your free plan limit of 1 Figma request. Upgrade to continue using Figma integration.',
-          AppErrorSlug.FigmaFreePlanRequestLimit
-        )
-      }
-
-      // Check total node count for free plan
+    if (isFreePlan) {
       const totalNodes = FigmaService._countNodes(document)
+      console.log('totalNodes', totalNodes)
+
       if (totalNodes > MAX_FREE_NODES) {
         throw new AppError(
           `Free plan is limited to ${MAX_FREE_NODES} nodes. Your selection contains ${totalNodes} nodes. Upgrade to process more complex designs.`,

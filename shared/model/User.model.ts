@@ -11,6 +11,7 @@ export type Plan = {
   name: string
   basicRequestLimit: number
   premiumRequestLimit: number
+  figmaRequestLimit: number
 }
 
 export type UserSubscription = {
