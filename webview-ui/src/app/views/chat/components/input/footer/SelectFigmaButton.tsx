@@ -12,32 +12,39 @@ export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
   const { isFigmaLoading, openSelectionDrawer, focusInput } = useAttachment()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { setIsOpen } = useFigmaPremiumModal()
   const { subscription } = useUser()
+  const { setIsOpen, setOnContinue } = useFigmaPremiumModal()
 
+  const isFreePlan = subscription?.plan?.name.toLowerCase().includes('free')
   const isDisabled = isFigmaLoading || isMessageProcessing || isMessageStreaming
   const label = isFigmaAuthenticated ? 'Figma' : 'Connect Figma'
 
+  const handleFigmaAction = useCallback(
+    (isAuthenticated: boolean) => {
+      if (isAuthenticated) {
+        openSelectionDrawer()
+        focusInput()
+      } else {
+        connectFigma()
+      }
+    },
+    [openSelectionDrawer, focusInput, connectFigma]
+  )
+
   const handleButtonClicked = useCallback(() => {
-    if (subscription?.plan?.name.toLowerCase().includes('free')) {
+    if (isFreePlan) {
+      setOnContinue(() => handleFigmaAction)
       setIsOpen(true)
       return
     }
 
-    if (isFigmaAuthenticated) {
-      openSelectionDrawer()
-      focusInput()
-      return
-    }
-
-    connectFigma()
+    handleFigmaAction(!!isFigmaAuthenticated)
   }, [
     isFigmaAuthenticated,
-    openSelectionDrawer,
-    connectFigma,
+    handleFigmaAction,
+    isFreePlan,
     setIsOpen,
-    subscription,
-    focusInput
+    setOnContinue
   ])
 
   return (

@@ -35,6 +35,7 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
     plan: res.plan ? buildPlanFromResponse(res.plan) : null,
     basicRequestsUsed: res.basic_requests_used,
     premiumRequestsUsed: res.premium_requests_used,
+    figmaRequestsUsed: res.figma_requests_used || 0,
     lastResetDate: new Date(res.last_reset_date),
     createdAt: new Date(res.created_at),
     endDate: res.end_date ? new Date(res.end_date) : null

@@ -17,6 +17,7 @@ export type UserSubscription = {
   plan: Plan | null
   basicRequestsUsed: number
   premiumRequestsUsed: number
+  figmaRequestsUsed: number
   lastResetDate: Date
   createdAt: Date
   endDate: Date | null
