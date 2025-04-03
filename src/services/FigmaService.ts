@@ -1,6 +1,10 @@
 import type { FileNodesResponse, Node } from 'figma-js'
 import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 import { AppWarning, AppWarningSlug } from 'shared/model/AppWarning.model'
+import type { UserSubscription } from 'shared/model/User.model'
+
+// Free plan limitations
+export const MAX_FREE_NODES = 30
 
 export class FigmaService {
   static extractSelectionUrlFromResponse(data: any, nodeID: string): string {
@@ -9,7 +13,8 @@ export class FigmaService {
 
   static validateFigmaSelection(
     data: FileNodesResponse,
-    nodeID: string
+    nodeID: string,
+    subscription?: UserSubscription
   ): AppWarning | undefined {
     const nodeData = data.nodes[nodeID.replace('-', ':')]
 
@@ -28,6 +33,26 @@ export class FigmaService {
         'No frames found in the selection, please update and try again.',
         AppErrorSlug.NoFramesFound
       )
+    }
+
+    // Free plan limitations check
+    if (subscription?.plan?.name.toLowerCase().includes('free')) {
+      // Check if the user has used their free Figma request
+      if (subscription.figmaRequestsUsed >= 1) {
+        throw new AppError(
+          'You have reached your free plan limit of 1 Figma request. Upgrade to continue using Figma integration.',
+          AppErrorSlug.FigmaFreePlanRequestLimit
+        )
+      }
+
+      // Check total node count for free plan
+      const totalNodes = FigmaService._countNodes(document)
+      if (totalNodes > MAX_FREE_NODES) {
+        throw new AppError(
+          `Free plan is limited to ${MAX_FREE_NODES} nodes. Your selection contains ${totalNodes} nodes. Upgrade to process more complex designs.`,
+          AppErrorSlug.FigmaFreePlanNodeLimit
+        )
+      }
     }
 
     const numberOfFrames = frames.length
@@ -82,6 +107,25 @@ export class FigmaService {
     }
 
     return frames
+  }
+
+  /**
+   * Counts the total number of nodes in a Figma document or node
+   * @param node - The Figma node to count children for
+   * @returns The total number of nodes including the node itself
+   */
+  private static _countNodes(node: Node): number {
+    // Start with 1 for the current node
+    let count = 1
+
+    // If has children, recursively count them
+    if ('children' in node && Array.isArray(node.children)) {
+      node.children.forEach((child: any) => {
+        count += FigmaService._countNodes(child)
+      })
+    }
+
+    return count
   }
 
   /**

@@ -1,6 +1,7 @@
 import type { FileNodesResponse } from 'figma-js'
 import { AppErrorSlug } from 'shared/model/AppError.model'
 import type { AppWarning } from 'shared/model/AppWarning.model'
+import type { UserSubscription } from 'shared/model/User.model'
 import { FigmaService } from 'src/services/FigmaService'
 import type { FigmaTokenInformation, User } from '../../shared/model'
 import { PublicApi } from './api'
@@ -69,15 +70,20 @@ async function getFigmaSelectionImageUrl({
   }
 }
 
+type ValidateFigmaSelectionArgs = GetFigmaSelectionImageUrlArgs & {
+  subscription?: UserSubscription
+}
+
 async function validateFigmaSelection({
   fileID,
-  nodeID
-}: GetFigmaSelectionImageUrlArgs): Promise<AppWarning | undefined> {
+  nodeID,
+  subscription
+}: ValidateFigmaSelectionArgs): Promise<AppWarning | undefined> {
   try {
     const { data } = await FigmaApi.get<FileNodesResponse>(
       `/files/${fileID}/nodes?ids=${nodeID}`
     )
-    return FigmaService.validateFigmaSelection(data, nodeID)
+    return FigmaService.validateFigmaSelection(data, nodeID, subscription)
   } catch (err) {
     return Promise.reject(parseError(err))
   }

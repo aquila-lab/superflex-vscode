@@ -274,3 +274,7 @@ export const SUPPORT_EMAIL = 'boris@superflex.ai'
 
 export const FIGMA_LINK_REGEX =
   /https:\/\/www\.figma\.com\/(file|design)\/[a-zA-Z0-9]+\/[^?]+\?node-id=[^&]+/
+
+export const MAX_FREE_NODES = 30
+
+export type ContinueCallback = (isFigmaAuthenticated: boolean) => void

@@ -14,9 +14,12 @@ import { Input } from '../../../../../../common/ui/Input'
 import { Skeleton } from '../../../../../../common/ui/Skeleton'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
+import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
+import { FreePlanFigmaLimitWarning } from './FreePlanFigmaLimitWarning'
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()
+  const { isFreePlan, hasReachedFigmaRequestLimit } = useFigmaFreePlanLimits()
   const {
     isSelectionDrawerOpen,
     figmaLink,
@@ -80,9 +83,24 @@ export const FigmaSelectionDrawer = () => {
   }, [])
 
   const renderContent = useCallback(() => {
+    if (isFreePlan && hasReachedFigmaRequestLimit) {
+      return (
+        <div className='flex flex-col px-4 gap-4'>
+          <Alert variant='destructive'>
+            <AlertDescription>
+              You have reached your free plan limit of 1 Figma request. Upgrade
+              to premium for unlimited Figma access.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )
+    }
+
     if (isConfirmStep && figmaPlaceholderAttachment) {
       return (
         <div className='flex flex-col px-4 gap-4'>
+          {isFreePlan && <FreePlanFigmaLimitWarning />}
+
           {figmaPlaceholderAttachment.imageUrl && (
             <div className='w-full rounded-md overflow-hidden'>
               {!isImageLoaded && <Skeleton className='w-full h-64' />}
@@ -105,6 +123,8 @@ export const FigmaSelectionDrawer = () => {
     if (figmaError) {
       return (
         <div className='flex flex-col px-4 gap-4'>
+          {isFreePlan && <FreePlanFigmaLimitWarning />}
+
           <Input
             type='text'
             value={figmaLink}
@@ -115,6 +135,10 @@ export const FigmaSelectionDrawer = () => {
           />
 
           <div className='flex-1 h-full w-full min-h-[11rem] figma-copy-selection-example rounded-md overflow-hidden' />
+
+          <Alert variant='destructive'>
+            <AlertDescription>{figmaError}</AlertDescription>
+          </Alert>
 
           <p className='text-xs text-muted-foreground'>
             To copy the link, right-click on your Figma selection and select{' '}
@@ -128,6 +152,8 @@ export const FigmaSelectionDrawer = () => {
 
     return (
       <div className='flex flex-col px-4 gap-4'>
+        {isFreePlan && <FreePlanFigmaLimitWarning />}
+
         <Input
           type='text'
           value={figmaLink}
@@ -155,10 +181,37 @@ export const FigmaSelectionDrawer = () => {
     isConfirmStep,
     handleInputChange,
     isImageLoaded,
-    handleImageLoad
+    handleImageLoad,
+    isFreePlan,
+    hasReachedFigmaRequestLimit
   ])
 
   const renderFooterButtons = useCallback(() => {
+    if (isFreePlan && hasReachedFigmaRequestLimit) {
+      return (
+        <div className='flex justify-between w-full mb-4'>
+          <Button
+            variant='outline'
+            onClick={handleCancel}
+            className='flex-1 mr-2'
+          >
+            Back
+          </Button>
+          <Button
+            onClick={() =>
+              window.open(
+                'https://app.superflex.ai/dashboard/upgrade-subscription?redirect=true',
+                '_blank'
+              )
+            }
+            className='flex-1'
+          >
+            Upgrade to Premium
+          </Button>
+        </div>
+      )
+    }
+
     if (isConfirmStep && figmaPlaceholderAttachment) {
       return (
         <div className='flex gap-3 justify-between w-full mb-4'>
@@ -236,7 +289,9 @@ export const FigmaSelectionDrawer = () => {
     handleSubmit,
     isConfirmStep,
     isFigmaLoading,
-    submitButtonRef
+    submitButtonRef,
+    isFreePlan,
+    hasReachedFigmaRequestLimit
   ])
 
   return (

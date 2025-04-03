@@ -38,6 +38,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [subscription, setSubscription] = useState<UserSubscription | null>(
     null
   )
+
+  console.log('subscription', subscription)
+
   const [isUserLoading, setIsUserLoading] = useState(true)
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true)
 

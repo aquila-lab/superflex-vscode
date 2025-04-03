@@ -47,7 +47,8 @@ export const TextareaHandlersProvider = ({
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
   const { subscription } = useUser()
-  const { setIsOpen: setFigmaPremiumModalOpen } = useFigmaPremiumModal()
+  const { setIsOpen: setFigmaPremiumModalOpen, setOnContinue } =
+    useFigmaPremiumModal()
   const {
     figmaAttachment,
     imageAttachment,
@@ -119,6 +120,17 @@ export const TextareaHandlersProvider = ({
         }
 
         if (subscription?.plan?.name.toLowerCase().includes('free')) {
+          const handleFigmaAction = (isAuthenticated: boolean) => {
+            if (isAuthenticated) {
+              openSelectionDrawer()
+              setFigmaLink(figmaLinkMatch[0])
+              focusSubmitButton()
+            } else {
+              connectFigma()
+            }
+          }
+
+          setOnContinue(() => handleFigmaAction)
           setFigmaPremiumModalOpen(true)
           return
         }
@@ -165,7 +177,8 @@ export const TextareaHandlersProvider = ({
       connectFigma,
       subscription,
       setFigmaPremiumModalOpen,
-      focusSubmitButton
+      focusSubmitButton,
+      setOnContinue
     ]
   )
 
