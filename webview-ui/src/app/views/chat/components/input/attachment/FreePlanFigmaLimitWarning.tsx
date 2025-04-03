@@ -11,6 +11,11 @@ export const FreePlanFigmaLimitWarning = () => {
     [subscription]
   )
 
+  const figmaRequestLimit = useMemo(
+    () => subscription?.plan?.figmaRequestLimit || 0,
+    [subscription?.plan]
+  )
+
   if (!isFreePlan) {
     return null
   }
@@ -18,8 +23,9 @@ export const FreePlanFigmaLimitWarning = () => {
   return (
     <Alert variant='warning'>
       <AlertDescription>
-        Free plan is limited to 1 Figma request with max {MAX_FREE_NODES} nodes.
-        Upgrade for unlimited access.
+        Free plan is limited to {figmaRequestLimit} Figma{' '}
+        {figmaRequestLimit === 1 ? 'request' : 'requests'} with max{' '}
+        {MAX_FREE_NODES} nodes. Upgrade for unlimited access.
       </AlertDescription>
     </Alert>
   )

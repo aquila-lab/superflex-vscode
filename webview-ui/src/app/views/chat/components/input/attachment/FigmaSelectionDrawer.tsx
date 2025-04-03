@@ -19,7 +19,8 @@ import { FreePlanFigmaLimitWarning } from './FreePlanFigmaLimitWarning'
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()
-  const { isFreePlan, hasReachedFigmaRequestLimit } = useFigmaFreePlanLimits()
+  const { isFreePlan, hasReachedFigmaRequestLimit, figmaLimits } =
+    useFigmaFreePlanLimits()
   const {
     isSelectionDrawerOpen,
     figmaLink,
@@ -84,12 +85,15 @@ export const FigmaSelectionDrawer = () => {
 
   const renderContent = useCallback(() => {
     if (isFreePlan && hasReachedFigmaRequestLimit) {
+      const figmaRequestLimit = figmaLimits.maxRequests
+
       return (
         <div className='flex flex-col px-4 gap-4'>
           <Alert variant='destructive'>
             <AlertDescription>
-              You have reached your free plan limit of 1 Figma request. Upgrade
-              to premium for unlimited Figma access.
+              You have reached your free plan limit of {figmaRequestLimit} Figma{' '}
+              {figmaRequestLimit === 1 ? 'request' : 'requests'}. Upgrade to
+              premium for unlimited Figma access.
             </AlertDescription>
           </Alert>
         </div>
@@ -136,10 +140,6 @@ export const FigmaSelectionDrawer = () => {
 
           <div className='flex-1 h-full w-full min-h-[11rem] figma-copy-selection-example rounded-md overflow-hidden' />
 
-          <Alert variant='destructive'>
-            <AlertDescription>{figmaError}</AlertDescription>
-          </Alert>
-
           <p className='text-xs text-muted-foreground'>
             To copy the link, right-click on your Figma selection and select{' '}
             <span className='font-medium'>
@@ -183,7 +183,8 @@ export const FigmaSelectionDrawer = () => {
     isImageLoaded,
     handleImageLoad,
     isFreePlan,
-    hasReachedFigmaRequestLimit
+    hasReachedFigmaRequestLimit,
+    figmaLimits
   ])
 
   const renderFooterButtons = useCallback(() => {
