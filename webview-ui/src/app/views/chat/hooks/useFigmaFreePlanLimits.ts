@@ -7,18 +7,23 @@ export const useFigmaFreePlanLimits = () => {
 
   const isFreePlan = useMemo(
     () => subscription?.plan?.name.toLowerCase().includes('free'),
-    [subscription]
+    [subscription, subscription.plan, subscription.plan?.name]
   )
 
   const figmaRequestLimit = useMemo(
     () => subscription?.plan?.figmaRequestLimit || 0,
-    [subscription?.plan?.figmaRequestLimit]
+    [subscription?.plan?.figmaRequestLimit, subscription?.plan, subscription]
   )
 
   const hasReachedFigmaRequestLimit = useMemo(
     () =>
       isFreePlan && (subscription?.figmaRequestsUsed || 0) >= figmaRequestLimit,
-    [isFreePlan, subscription?.figmaRequestsUsed, figmaRequestLimit]
+    [
+      isFreePlan,
+      subscription,
+      subscription?.figmaRequestsUsed,
+      figmaRequestLimit
+    ]
   )
 
   const figmaLimits = useMemo(
@@ -27,12 +32,15 @@ export const useFigmaFreePlanLimits = () => {
       requestsUsed: subscription?.figmaRequestsUsed || 0,
       maxRequests: figmaRequestLimit
     }),
-    [subscription?.figmaRequestsUsed, figmaRequestLimit]
+    [subscription, subscription?.figmaRequestsUsed, figmaRequestLimit]
   )
 
-  return {
-    isFreePlan,
-    hasReachedFigmaRequestLimit,
-    figmaLimits
-  }
+  return useMemo(
+    () => ({
+      isFreePlan,
+      hasReachedFigmaRequestLimit,
+      figmaLimits
+    }),
+    [isFreePlan, hasReachedFigmaRequestLimit, figmaLimits]
+  )
 }

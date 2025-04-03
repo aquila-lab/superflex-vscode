@@ -91,8 +91,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     [handleUserInfo, handleUserSubscription]
   )
 
-  console.log('subscription', subscription)
-
   const fetchUserInfo = useCallback(() => {
     postMessage(EventRequestType.GET_USER_INFO)
   }, [postMessage])

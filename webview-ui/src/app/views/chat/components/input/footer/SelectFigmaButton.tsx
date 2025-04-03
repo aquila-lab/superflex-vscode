@@ -14,6 +14,7 @@ export const SelectFigmaButton = () => {
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
   const { subscription } = useUser()
   const { setIsOpen, setOnContinue } = useFigmaPremiumModal()
+  const { fetchSubscription } = useUser()
 
   const isFreePlan = useMemo(
     () => subscription?.plan?.name.toLowerCase().includes('free'),
@@ -44,6 +45,7 @@ export const SelectFigmaButton = () => {
 
   const handleButtonClicked = useCallback(() => {
     if (isFreePlan) {
+      fetchSubscription()
       setOnContinue(() => handleFigmaAction)
       setIsOpen(true)
       return
@@ -55,7 +57,8 @@ export const SelectFigmaButton = () => {
     handleFigmaAction,
     isFreePlan,
     setIsOpen,
-    setOnContinue
+    setOnContinue,
+    fetchSubscription
   ])
 
   return (
