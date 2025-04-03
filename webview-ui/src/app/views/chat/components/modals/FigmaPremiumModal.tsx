@@ -68,10 +68,7 @@ export const FigmaPremiumModal = () => {
             </div>
           ) : (
             <div>
-              <Badge
-                variant='secondary'
-                className='bg-amber-500/10 text-amber-500 border border-amber-500/50'
-              >
+              <Badge variant='warning'>
                 {figmaLimits.requestsUsed}/{figmaLimits.maxRequests} requests
                 used
               </Badge>
