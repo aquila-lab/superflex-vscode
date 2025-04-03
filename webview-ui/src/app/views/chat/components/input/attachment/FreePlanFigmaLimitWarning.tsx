@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Alert, AlertDescription } from '../../../../../../common/ui/Alert'
 import { useUser } from '../../../../../layers/authenticated/providers/UserProvider'
-import { MAX_FREE_NODES } from '../../../../../../common/utils'
+import { MAX_FREE_NODES } from '../../../../../../../../shared/common/constants'
 
 export const FreePlanFigmaLimitWarning = () => {
   const { subscription } = useUser()

@@ -1,9 +1,7 @@
 import type { FileNodesResponse, Node } from 'figma-js'
-import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
-import { AppWarning, AppWarningSlug } from 'shared/model/AppWarning.model'
-
-// Free plan limitations
-export const MAX_FREE_NODES = 100
+import { MAX_FREE_NODES } from '../../shared/common/constants'
+import { AppError, AppErrorSlug } from '../../shared/model/AppError.model'
+import { AppWarning, AppWarningSlug } from '../../shared/model/AppWarning.model'
 
 export class FigmaService {
   static extractSelectionUrlFromResponse(data: any, nodeID: string): string {
@@ -37,8 +35,6 @@ export class FigmaService {
     // Free plan limitations check
     if (isFreePlan) {
       const totalNodes = FigmaService._countNodes(document)
-      console.log('totalNodes', totalNodes)
-
       if (totalNodes > MAX_FREE_NODES) {
         throw new AppError(
           `Free plan is limited to ${MAX_FREE_NODES} nodes. Your selection contains ${totalNodes} nodes. Upgrade to process more complex designs.`,

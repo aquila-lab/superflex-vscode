@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useUser } from '../../../layers/authenticated/providers/UserProvider'
-import { MAX_FREE_NODES } from '../../../../common/utils'
+import { MAX_FREE_NODES } from '../../../../../../shared/common/constants'
 
 export const useFigmaFreePlanLimits = () => {
   const { subscription } = useUser()

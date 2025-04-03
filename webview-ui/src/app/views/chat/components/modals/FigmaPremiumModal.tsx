@@ -1,4 +1,6 @@
 import { useCallback } from 'react'
+import { CircleIcon } from '@radix-ui/react-icons'
+
 import { Button } from '../../../../../common/ui/Button'
 import {
   Dialog,
@@ -12,9 +14,8 @@ import { useUser } from '../../../../layers/authenticated/providers/UserProvider
 import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
 import { useFigmaFreePlanLimits } from '../../hooks/useFigmaFreePlanLimits'
-import { MAX_FREE_NODES } from '../../../../../common/utils'
+import { MAX_FREE_NODES } from '../../../../../../../shared/common/constants'
 import { Badge } from '../../../../../common/ui/Badge'
-import { CircleIcon } from '@radix-ui/react-icons'
 
 export const FigmaPremiumModal = () => {
   const { config } = useGlobal()

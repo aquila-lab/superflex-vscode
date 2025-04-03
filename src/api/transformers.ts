@@ -26,7 +26,8 @@ export function buildPlanFromResponse(res: any): Plan {
   return {
     name: res.name,
     basicRequestLimit: res.basic_request_limit,
-    premiumRequestLimit: res.premium_request_limit
+    premiumRequestLimit: res.premium_request_limit,
+    figmaRequestLimit: res.figma_request_limit
   }
 }
 
