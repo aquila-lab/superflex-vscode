@@ -79,8 +79,9 @@ export const FigmaPremiumModal = () => {
               </p>
               <ul className='text-foreground mt-2'>
                 <li className='flex items-center gap-2'>
-                  <CircleIcon className='w-1 h-1' /> 1 free request per billing
-                  period
+                  <CircleIcon className='w-1 h-1' /> {figmaLimits.maxRequests}{' '}
+                  free {figmaLimits.maxRequests === 1 ? 'request' : 'requests'}{' '}
+                  per billing period
                 </li>
                 <li className='flex items-center gap-2'>
                   <CircleIcon className='w-1 h-1' /> Maximum {MAX_FREE_NODES}{' '}

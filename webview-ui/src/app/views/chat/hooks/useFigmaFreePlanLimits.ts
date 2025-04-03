@@ -10,18 +10,24 @@ export const useFigmaFreePlanLimits = () => {
     [subscription]
   )
 
+  const figmaRequestLimit = useMemo(
+    () => subscription?.plan?.figmaRequestLimit || 0,
+    [subscription?.plan?.figmaRequestLimit]
+  )
+
   const hasReachedFigmaRequestLimit = useMemo(
-    () => isFreePlan && (subscription?.figmaRequestsUsed || 0) >= 1,
-    [isFreePlan, subscription?.figmaRequestsUsed]
+    () =>
+      isFreePlan && (subscription?.figmaRequestsUsed || 0) >= figmaRequestLimit,
+    [isFreePlan, subscription?.figmaRequestsUsed, figmaRequestLimit]
   )
 
   const figmaLimits = useMemo(
     () => ({
       maxNodes: MAX_FREE_NODES,
       requestsUsed: subscription?.figmaRequestsUsed || 0,
-      maxRequests: 1
+      maxRequests: figmaRequestLimit
     }),
-    [subscription?.figmaRequestsUsed]
+    [subscription?.figmaRequestsUsed, figmaRequestLimit]
   )
 
   return {
