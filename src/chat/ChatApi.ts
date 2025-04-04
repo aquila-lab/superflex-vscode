@@ -332,6 +332,10 @@ export class ChatAPI {
             isFreePlan
           })
 
+          Telemetry.capture('figma_request_used', {
+            isFreePlan
+          })
+
           return {
             fileID: figmaSelectionUrl.fileID,
             nodeID: figmaSelectionUrl.nodeID,
