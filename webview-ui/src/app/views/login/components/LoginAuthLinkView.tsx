@@ -21,9 +21,9 @@ export const LoginAuthLinkView = ({
     <div className='flex flex-col items-center justify-center h-full px-5 pb-4'>
       <Card className='max-w-md my-auto'>
         <CardHeader className='flex justify-center items-center'>
-          <CardTitle className='text-lg font-semibold'>
+          <CardTitle className='text-base font-semibold text-center'>
             If you are not redirected to the webpage, copy this link to your
-            browser:
+            browser
           </CardTitle>
         </CardHeader>
 
@@ -31,18 +31,18 @@ export const LoginAuthLinkView = ({
           <CardDescription className='text-center text-muted-foreground truncate max-w-72'>
             {authUniqueLink}
           </CardDescription>
+        </CardContent>
 
+        <CardFooter className='flex justify-center items-center gap-2'>
           <Button
-            className='mt-4'
+            className='flex-1'
             onClick={onCopyLink}
           >
             Copy Link
           </Button>
-        </CardContent>
-
-        <CardFooter className='flex justify-center items-center'>
           <Button
-            variant='link'
+            className='flex-1'
+            variant='outline'
             onClick={onReturnToLogin}
           >
             Return to Login
