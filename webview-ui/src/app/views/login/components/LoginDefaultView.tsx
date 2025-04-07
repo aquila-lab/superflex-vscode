@@ -43,7 +43,7 @@ export const LoginDefaultView = () => {
           <CardTitle className='text-center'>
             Supercharge Your Frontend
           </CardTitle>
-          <CardDescription>
+          <CardDescription className='text-center'>
             An AI-powered assistant for engineers
           </CardDescription>
         </CardHeader>

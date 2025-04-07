@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type MarkdownCodeProps, cn } from '../../../../../../../common/utils'
-import { CodeBlock } from './code/CodeBlock'
+import { CollapsibleCodeBlock } from './code/CollapsibleCodeBlock'
 
 export const MarkdownCode = ({
   inline,
@@ -36,7 +36,7 @@ export const MarkdownCode = ({
   const draft = String(children).replace(/\n$/, '')
 
   return (
-    <CodeBlock
+    <CollapsibleCodeBlock
       filePath={codeBlock.filePath}
       draft={draft}
       extension={codeBlock.extension}

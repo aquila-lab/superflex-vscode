@@ -276,3 +276,11 @@ export const FIGMA_LINK_REGEX =
   /https:\/\/www\.figma\.com\/(file|design)\/[a-zA-Z0-9]+\/[^?]+\?node-id=[^&]+/
 
 export type ContinueCallback = (isFigmaAuthenticated: boolean) => void
+
+export const COLLAPSED_HEIGHT = 300
+export const LINE_HEIGHT = 18
+export const PADDING = 18
+
+export const getLinesCount = (code: string): number => {
+  return code.split('\n').length
+}
