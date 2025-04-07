@@ -177,9 +177,9 @@ function _buildFiles(files: FilePayload[]): ThreadRunRequestFile[]{
     const requestFile: ThreadRunRequestFile = {
       path: file.relativePath,
       content: file.content,
-      start_line: file.startLine,
-      end_line: file.endLine,
-      is_current_open_file: file.isCurrentOpenFile
+      startLine: file.startLine,
+      endLine: file.endLine,
+      isCurrentOpenFile: file.isCurrentOpenFile
     }
 
     _files.push(requestFile)

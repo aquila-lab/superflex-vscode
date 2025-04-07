@@ -37,9 +37,9 @@ export type FilePayload = {
 export type ThreadRunRequestFile = {
   path: string
   content?: string
-  start_line?: number
-  end_line?: number
-  is_current_open_file?: boolean
+  startLine?: number
+  endLine?: number
+  isCurrentOpenFile?: boolean
 }
 
 export type SendNotificationPayload = {
