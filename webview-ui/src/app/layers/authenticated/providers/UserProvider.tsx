@@ -14,9 +14,9 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
-import { useGlobal } from '../../global/providers/GlobalProvider'
-import { usePostMessage } from '../../global/hooks/usePostMessage'
 import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
+import { usePostMessage } from '../../global/hooks/usePostMessage'
+import { useGlobal } from '../../global/providers/GlobalProvider'
 
 const UserContext = createContext<{
   user: User | null
@@ -38,6 +38,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [subscription, setSubscription] = useState<UserSubscription | null>(
     null
   )
+
   const [isUserLoading, setIsUserLoading] = useState(true)
   const [isSubscriptionLoading, setIsSubscriptionLoading] = useState(true)
 

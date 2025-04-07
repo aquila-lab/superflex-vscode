@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { FaFigma } from 'react-icons/fa'
 import { Button } from '../../../../../../common/ui/Button'
 import { cn } from '../../../../../../common/utils'
@@ -10,32 +10,55 @@ import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvid
 
 export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
-  const { isFigmaLoading, openSelectionModal } = useAttachment()
+  const { isFigmaLoading, openSelectionDrawer, focusInput } = useAttachment()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { setIsOpen } = useFigmaPremiumModal()
   const { subscription } = useUser()
+  const { setIsOpen, setOnContinue } = useFigmaPremiumModal()
+  const { fetchSubscription } = useUser()
 
-  const isDisabled = isFigmaLoading || isMessageProcessing || isMessageStreaming
-  const label = isFigmaAuthenticated ? 'Figma' : 'Connect Figma'
+  const isFreePlan = useMemo(
+    () => subscription?.plan?.name.toLowerCase().includes('free'),
+    [subscription]
+  )
+
+  const isDisabled = useMemo(
+    () => isFigmaLoading || isMessageProcessing || isMessageStreaming,
+    [isFigmaLoading, isMessageProcessing, isMessageStreaming]
+  )
+
+  const label = useMemo(
+    () => (isFigmaAuthenticated ? 'Figma' : 'Connect Figma'),
+    [isFigmaAuthenticated]
+  )
+
+  const handleFigmaAction = useCallback(
+    (isAuthenticated: boolean) => {
+      if (isAuthenticated) {
+        openSelectionDrawer()
+        focusInput()
+      } else {
+        connectFigma()
+      }
+    },
+    [openSelectionDrawer, focusInput, connectFigma]
+  )
 
   const handleButtonClicked = useCallback(() => {
-    if (subscription?.plan?.name.toLowerCase().includes('free')) {
+    if (isFreePlan) {
+      fetchSubscription()
+      setOnContinue(() => handleFigmaAction)
       setIsOpen(true)
       return
     }
 
-    if (isFigmaAuthenticated) {
-      openSelectionModal()
-      return
-    }
-
-    connectFigma()
+    handleFigmaAction(!!isFigmaAuthenticated)
   }, [
     isFigmaAuthenticated,
-    openSelectionModal,
-    connectFigma,
+    handleFigmaAction,
+    isFreePlan,
     setIsOpen,
-    subscription
+    setOnContinue,
+    fetchSubscription
   ])
 
   return (

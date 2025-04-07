@@ -158,20 +158,29 @@ export const getLanguageFromPath = (filePath: string): string => {
 
 export const NULL_UUID = '00000000-0000-0000-0000-000000000000'
 
-export const HINTS = [
-  {
-    text: 'Drop images to chat by holding',
-    shortcut: 'Shift'
-  },
-  {
-    text: 'Quick access with',
-    shortcut: '⌘+;'
-  },
-  {
-    text: 'Add selected code to chat with',
-    shortcut: '⌘+M'
-  }
-]
+export const getPlatformModifierKey = () => {
+  const platform = navigator.platform.toLowerCase()
+  return platform.includes('mac') ? '⌘' : 'Ctrl'
+}
+
+export const getHints = () => {
+  const modKey = getPlatformModifierKey()
+
+  return [
+    {
+      text: 'Drop images to chat by holding',
+      shortcut: 'Shift'
+    },
+    {
+      text: 'Quick access with',
+      shortcut: `${modKey}+;`
+    },
+    {
+      text: 'Add selected code to chat with',
+      shortcut: `${modKey}+M`
+    }
+  ]
+}
 
 export type MessageHandler = (message: TypedEventResponseMessage) => void
 
@@ -262,3 +271,16 @@ export const categorizeThreadsByDate = <T extends { updatedAt: string | Date }>(
 
 export const FEEDBACK_URL = 'https://forms.gle/aUZjzeUzLnrmJvdR7'
 export const SUPPORT_EMAIL = 'boris@superflex.ai'
+
+export const FIGMA_LINK_REGEX =
+  /https:\/\/www\.figma\.com\/(file|design)\/[a-zA-Z0-9]+\/[^?]+\?node-id=[^&]+/
+
+export type ContinueCallback = (isFigmaAuthenticated: boolean) => void
+
+export const COLLAPSED_HEIGHT = 300
+export const LINE_HEIGHT = 18
+export const PADDING = 18
+
+export const getLinesCount = (code: string): number => {
+  return code.split('\n').length
+}

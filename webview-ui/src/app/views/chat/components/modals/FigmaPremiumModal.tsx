@@ -1,4 +1,6 @@
 import { useCallback } from 'react'
+import { CircleIcon } from '@radix-ui/react-icons'
+
 import { Button } from '../../../../../common/ui/Button'
 import {
   Dialog,
@@ -8,14 +10,19 @@ import {
   DialogHeader,
   DialogTitle
 } from '../../../../../common/ui/Dialog'
-import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
+import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
+import { useFigmaFreePlanLimits } from '../../hooks/useFigmaFreePlanLimits'
+import { MAX_FREE_NODES } from '../../../../../../../shared/common/constants'
+import { Badge } from '../../../../../common/ui/Badge'
 
 export const FigmaPremiumModal = () => {
   const { config } = useGlobal()
   const { subscribe } = useUser()
-  const { isOpen, setIsOpen } = useFigmaPremiumModal()
+  const { isOpen, setIsOpen, onContinue } = useFigmaPremiumModal()
+  const { isFigmaAuthenticated } = useGlobal()
+  const { hasReachedFigmaRequestLimit, figmaLimits } = useFigmaFreePlanLimits()
 
   const handleSubscribe = useCallback(() => {
     subscribe(
@@ -24,31 +31,88 @@ export const FigmaPremiumModal = () => {
     setIsOpen(false)
   }, [subscribe, setIsOpen, config?.uriScheme])
 
-  const handleCloseModal = useCallback(() => setIsOpen(false), [setIsOpen])
+  const handleContinue = useCallback(() => {
+    setIsOpen(false)
+
+    if (onContinue) {
+      onContinue(!!isFigmaAuthenticated)
+    }
+  }, [setIsOpen, isFigmaAuthenticated, onContinue])
+
+  const showContinueButton = !hasReachedFigmaRequestLimit
 
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={handleCloseModal}
+      onOpenChange={setIsOpen}
     >
       <DialogContent className='w-full'>
         <DialogHeader>
           <DialogTitle className='text-left'>
-            Upgrade to Access Figma to Code
+            Limited Figma Access on Free Plan
           </DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Figma integration is a premium feature. Upgrade your plan to connect
-          your Figma account and unlock powerful design-to-code capabilities!
+          {hasReachedFigmaRequestLimit ? (
+            <div className='mb-4'>
+              <Badge
+                variant='destructive'
+                className='mb-2'
+              >
+                No requests remaining
+              </Badge>
+              <p className='text-xs text-muted-foreground'>
+                You have used your free Figma request for this billing period.
+                Upgrade to Premium for unlimited Figma requests.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <Badge variant='warning'>
+                {figmaLimits.requestsUsed}/{figmaLimits.maxRequests} requests
+                used
+              </Badge>
+              <p className='text-xs text-muted-foreground mt-4'>
+                Your free plan includes limited Figma access with the following
+                restrictions:
+              </p>
+              <ul className='text-foreground mt-2'>
+                <li className='flex items-center gap-2'>
+                  <CircleIcon className='w-1 h-1' /> {figmaLimits.maxRequests}{' '}
+                  free {figmaLimits.maxRequests === 1 ? 'request' : 'requests'}{' '}
+                  per billing period
+                </li>
+                <li className='flex items-center gap-2'>
+                  <CircleIcon className='w-1 h-1' /> Maximum {MAX_FREE_NODES}{' '}
+                  nodes per request
+                </li>
+                <li className='flex items-center gap-2'>
+                  <CircleIcon className='w-1 h-1' /> Slow response times
+                </li>
+              </ul>
+            </div>
+          )}
+          <p className='text-xs text-muted-foreground mt-2'>
+            Upgrade to Premium for unlimited Figma integration and more powerful
+            design-to-code capabilities!
+          </p>
         </DialogDescription>
-        <DialogFooter className='flex flex-col sm:flex-row sm:justify-start gap-2'>
-          <Button onClick={handleSubscribe}>Upgrade to Premium</Button>
+        <DialogFooter className='flex flex-col sm:flex-row sm:space-x-0 gap-2 w-full'>
           <Button
-            variant='secondary'
-            onClick={handleCloseModal}
+            onClick={handleSubscribe}
+            className='flex-1'
           >
-            Back to Chat
+            Upgrade to Premium
           </Button>
+          {showContinueButton && (
+            <Button
+              variant='secondary'
+              onClick={handleContinue}
+              className='flex-1'
+            >
+              {isFigmaAuthenticated ? 'Continue' : 'Connect Figma'}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

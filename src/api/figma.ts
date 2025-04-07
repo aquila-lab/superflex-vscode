@@ -1,6 +1,10 @@
+import type { FileNodesResponse } from 'figma-js'
+import { AppErrorSlug } from 'shared/model/AppError.model'
+import type { AppWarning } from 'shared/model/AppWarning.model'
+import { FigmaService } from 'src/services/FigmaService'
 import type { FigmaTokenInformation, User } from '../../shared/model'
 import { PublicApi } from './api'
-import { parseError } from './error'
+import { ApiError, parseError } from './error'
 import { FigmaApi } from './figmaApi'
 import { buildUserFromResponse } from './transformers'
 
@@ -49,12 +53,44 @@ async function getFigmaSelectionImageUrl({
       return Promise.reject(parseError(data.err))
     }
 
-    return Promise.resolve(
-      data.images[nodeID.replace('-', ':')] ?? data.images[nodeID]
+    return FigmaService.extractSelectionUrlFromResponse(data, nodeID)
+  } catch (err) {
+    const error = parseError(err)
+
+    if (error instanceof ApiError && error.statusCode === 404) {
+      throw new ApiError(
+        404,
+        AppErrorSlug.FileNotFoundOrUnauthorized,
+        "File not found or you (%email%) don't have access to it."
+      )
+    }
+
+    return Promise.reject(error)
+  }
+}
+
+type ValidateFigmaSelectionArgs = GetFigmaSelectionImageUrlArgs & {
+  isFreePlan?: boolean
+}
+
+async function validateFigmaSelection({
+  fileID,
+  nodeID,
+  isFreePlan
+}: ValidateFigmaSelectionArgs): Promise<AppWarning | undefined> {
+  try {
+    const { data } = await FigmaApi.get<FileNodesResponse>(
+      `/files/${fileID}/nodes?ids=${nodeID}`
     )
+    return FigmaService.validateFigmaSelection(data, nodeID, isFreePlan)
   } catch (err) {
     return Promise.reject(parseError(err))
   }
 }
 
-export { figmaRefreshAccessToken, getFigmaUserInfo, getFigmaSelectionImageUrl }
+export {
+  figmaRefreshAccessToken,
+  getFigmaUserInfo,
+  getFigmaSelectionImageUrl,
+  validateFigmaSelection
+}

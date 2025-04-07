@@ -14,10 +14,10 @@ export const ChatView = () => (
         <CodeApplyStateProvider>
           <OverlayProvider>
             <ChatContent />
+            <FigmaPremiumModal />
+            <SoftLimitModal />
           </OverlayProvider>
         </CodeApplyStateProvider>
-        <FigmaPremiumModal />
-        <SoftLimitModal />
       </FigmaPremiumModalProvider>
     </CurrentFileHandler>
   </OutOfRequestsGuard>

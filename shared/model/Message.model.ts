@@ -1,4 +1,5 @@
 import type { FilePayload } from '../protocol/types'
+import type { AppWarning } from './AppWarning.model'
 
 export enum Role {
   User = 'user',
@@ -9,6 +10,7 @@ export interface FigmaAttachment {
   fileID: string
   nodeID: string
   imageUrl: string
+  warning?: AppWarning
 }
 
 export interface MessageAttachment {

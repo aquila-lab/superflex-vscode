@@ -4,7 +4,7 @@ import { useEditMode } from '../../providers/EditModeProvider'
 import { InputProvider } from '../../providers/InputProvider'
 import { UserMessageHeader } from '../message/user/UserMessageHeader'
 import { Attachment } from './attachment/Attachment'
-import { FigmaSelectionModal } from './attachment/FigmaSelectionModal'
+import { FigmaSelectionDrawer } from './attachment/FigmaSelectionDrawer'
 
 export const AdvancedTextareaPresenter = ({
   text,
@@ -24,7 +24,7 @@ export const AdvancedTextareaPresenter = ({
         <Attachment />
         <InputProvider text={text}>
           {children}
-          <FigmaSelectionModal />
+          <FigmaSelectionDrawer />
         </InputProvider>
       </Fragment>
     )
@@ -41,7 +41,7 @@ export const AdvancedTextareaPresenter = ({
         isDraft={isDraft}
       />
       {children}
-      <FigmaSelectionModal />
+      <FigmaSelectionDrawer />
     </InputProvider>
   )
 }

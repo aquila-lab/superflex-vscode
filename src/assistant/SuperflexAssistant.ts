@@ -18,7 +18,7 @@ import { SUPPORTED_FILE_EXTENSIONS } from '../common/constants'
 import { jsonToMap, mapToJson } from '../common/utils'
 import { findWorkspaceFiles } from '../scanner'
 import type { Assistant } from './Assistant'
-import { createFilesMapName } from './common'
+import { createFilesMapName, validateInputMessage } from './common'
 
 const ASSISTENT_NAME = 'superflex'
 const FILES_MAP_VERSION = 1 // Increment the version when we need to reindex all files
@@ -112,7 +112,9 @@ export default class SuperflexAssistant implements Assistant {
     }
 
     // Create new abort controller for this stream
-    this._currentStream = new AbortController()    
+    this._currentStream = new AbortController()
+
+    validateInputMessage(message)
 
     return api.sendThreadMessage({
       owner: this.owner,
@@ -139,7 +141,10 @@ export default class SuperflexAssistant implements Assistant {
     return api.fastApply({ code, edits })
   }
 
-  async enhancePrompt(message: MessageContent, threadID: string): Promise<MessageContent> {
+  async enhancePrompt(
+    message: MessageContent,
+    threadID: string
+  ): Promise<MessageContent> {
     return api.enhancePrompt(message, threadID)
   }
 

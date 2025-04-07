@@ -22,6 +22,11 @@ export const UsageSection = () => {
         used={subscription.basicRequestsUsed}
         limit={subscription.plan.basicRequestLimit}
       />
+      <UsageDisplay
+        label='Figma Requests'
+        used={subscription.figmaRequestsUsed}
+        limit={subscription.plan.figmaRequestLimit}
+      />
     </div>
   )
 }

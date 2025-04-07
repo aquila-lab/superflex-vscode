@@ -1,8 +1,8 @@
 import { ReturnToChatButton } from './components/ReturnToChatButton'
 import { BillingCard } from './components/billing/BillingCard'
+import { FeedbackCard } from './components/feedback/FeedbackCard'
 import { SyncProjectCard } from './components/sync/SyncProjectCard'
 import { UserInfoCard } from './components/user/UserInfoCard'
-import { FeedbackCard } from './components/feedback/FeedbackCard'
 import { ProjectSyncProvider } from './providers/ProjectSyncProvider'
 import { SettingsHandlersProvider } from './providers/SettingsProvider'
 

@@ -14,6 +14,7 @@ import { SuperflexCache } from './cache/SuperflexCache'
 import { ChatAPI } from './chat/ChatApi'
 import ChatViewProvider from './chat/ChatViewProvider'
 import registerChatWidgetWebview from './chat/chatWidgetWebview'
+import uriEventHandler from './common/UriEventHandler'
 import { Telemetry } from './common/analytics/Telemetry'
 import {
   AUTH_PROVIDER_ID,
@@ -25,7 +26,6 @@ import {
   getOpenWorkspace,
   getUniqueID
 } from './common/utils'
-import uriEventHandler from './common/UriEventHandler'
 import { VerticalDiffManager } from './diff/vertical/manager'
 import { registerAllCodeLensProviders } from './lang-server/codeLens/registerAllCodeLensProviders'
 

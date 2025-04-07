@@ -38,11 +38,13 @@ export const LoginDefaultView = () => {
           <img
             src={window.superflexLogoUri}
             alt='Superflex Logo'
-            className='size-12'
+            className='w-12 mb-4'
           />
-          <CardTitle>Welcome to Superflex!</CardTitle>
-          <CardDescription>
-            Your Frontend Engineering Assistant.
+          <CardTitle className='text-center'>
+            Supercharge Your Frontend
+          </CardTitle>
+          <CardDescription className='text-center'>
+            An AI-powered assistant for engineers
           </CardDescription>
         </CardHeader>
 
@@ -51,15 +53,17 @@ export const LoginDefaultView = () => {
             className='w-full'
             onClick={handleCreateAccount}
           >
-            Start for Free
+            Sign Up
           </Button>
-          <p className='text-muted-foreground mt-4'>Already have an account?</p>
-          <Button
-            variant='link'
-            onClick={handleSignIn}
-          >
-            Sign In
-          </Button>
+          <div className='text-muted-foreground w-full flex flex-row items-center justify-center gap-1 mt-4'>
+            <p>Already have an account?</p>
+            <span
+              onClick={handleSignIn}
+              className='cursor-pointer underline'
+            >
+              Sign In
+            </span>
+          </div>
         </CardContent>
       </Card>
 

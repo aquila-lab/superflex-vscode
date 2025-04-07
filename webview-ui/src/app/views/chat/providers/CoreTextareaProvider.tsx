@@ -15,11 +15,18 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
+import {
+  FIGMA_LINK_REGEX,
+  readImageFileAsBase64
+} from '../../../../common/utils'
 import { useNewMessage } from '../../../layers/authenticated/providers/NewMessageProvider'
+import { useUser } from '../../../layers/authenticated/providers/UserProvider'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
+import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
 import { useAttachment } from './AttachmentProvider'
 import { useEditMode } from './EditModeProvider'
+import { useFigmaPremiumModal } from './FigmaPremiumModalProvider'
 import { useFiles } from './FilesProvider'
 import { useInput } from './InputProvider'
 import { useSendMessage } from './SendMessageProvider'
@@ -38,7 +45,20 @@ export const TextareaHandlersProvider = ({
   const { selectFile, setPreviewedFile } = useFiles()
   const { isMainTextarea } = useEditMode()
   const { isMessageProcessing, isMessageStreaming } = useNewMessage()
-  const { figmaAttachment, imageAttachment, isFigmaLoading } = useAttachment()
+  const { isFigmaAuthenticated, connectFigma } = useGlobal()
+  const { subscription } = useUser()
+  const { setIsOpen: setFigmaPremiumModalOpen, setOnContinue } =
+    useFigmaPremiumModal()
+  const {
+    figmaAttachment,
+    imageAttachment,
+    isFigmaLoading,
+    setImageAttachment,
+    removeAttachment,
+    openSelectionDrawer,
+    setFigmaLink,
+    focusSubmitButton
+  } = useAttachment()
   const { sendMessage } = useSendMessage()
   const isAwaiting = useRef(false)
 
@@ -88,10 +108,78 @@ export const TextareaHandlersProvider = ({
   const handlePaste = useCallback(
     (e: ClipboardEvent<HTMLTextAreaElement>) => {
       const text = e.clipboardData.getData('text')
+
+      const figmaLinkMatch = text.match(FIGMA_LINK_REGEX)
+      if (figmaLinkMatch) {
+        e.preventDefault()
+        removeAttachment()
+
+        if (!isFigmaAuthenticated) {
+          connectFigma()
+          return
+        }
+
+        if (subscription?.plan?.name.toLowerCase().includes('free')) {
+          const handleFigmaAction = (isAuthenticated: boolean) => {
+            if (isAuthenticated) {
+              openSelectionDrawer()
+              setFigmaLink(figmaLinkMatch[0])
+              focusSubmitButton()
+            } else {
+              connectFigma()
+            }
+          }
+
+          setOnContinue(() => handleFigmaAction)
+          setFigmaPremiumModalOpen(true)
+          return
+        }
+
+        openSelectionDrawer()
+        setFigmaLink(figmaLinkMatch[0])
+        focusSubmitButton()
+        return
+      }
+
+      const hasImageItems = Array.from(e.clipboardData.items).some(
+        item => item.type.indexOf('image/') === 0
+      )
+
+      if (hasImageItems) {
+        e.preventDefault()
+
+        const imageItem = Array.from(e.clipboardData.items).find(
+          item => item.type.indexOf('image/') === 0
+        )
+
+        if (imageItem) {
+          const file = imageItem.getAsFile()
+          if (file) {
+            removeAttachment()
+            readImageFileAsBase64(file).then((imageBase64: string) => {
+              setImageAttachment(imageBase64)
+            })
+            return
+          }
+        }
+      }
+
       postMessage(EventRequestType.PASTE_COPIED_CODE, { text })
       isAwaiting.current = true
     },
-    [postMessage]
+    [
+      postMessage,
+      removeAttachment,
+      setImageAttachment,
+      openSelectionDrawer,
+      setFigmaLink,
+      isFigmaAuthenticated,
+      connectFigma,
+      subscription,
+      setFigmaPremiumModalOpen,
+      focusSubmitButton,
+      setOnContinue
+    ]
   )
 
   const handlePasteResponse = useCallback(
