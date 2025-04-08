@@ -24,7 +24,7 @@ async function enhancePrompt({
       signal: options.signal
     })
 
-    const messages: Message[] = []
+    const messages: string[] = []
     let streamError: Error | null = null
 
     const streamGenerator = (async function* () {
@@ -101,9 +101,8 @@ async function enhancePrompt({
 
               // Handle complete message with nested structure
               if (data.is_complete && data.message) {
-                const message = buildMessageFromResponse(data.message)
-                messages.push(message)
-                yield { type: 'complete' as const, message }
+                messages.push(data.message)
+                yield { type: 'complete' as const, text: data.message.text }
               }
               // Handle delta update
               else if (data.text_delta !== undefined) {
@@ -131,9 +130,8 @@ async function enhancePrompt({
         try {
           const data = JSON.parse(buffer)
           if (data.is_complete && data.message) {
-            const message = buildMessageFromResponse(data.message)
-            messages.push(message)
-            yield { type: 'complete' as const, message }
+            messages.push(data.message)
+            yield { type: 'complete' as const, text: data.message.text }
           }
         } catch (_) {
           // Ignore parsing errors for final buffer
@@ -144,7 +142,7 @@ async function enhancePrompt({
     return {
       stream: streamGenerator,
 
-      async response(): Promise<{ messages: Message[]; isPremium: boolean }> {
+      async response(): Promise<{ text: string }> {
         // Wait for all chunks to be processed by consuming the stream
         for await (const _ of streamGenerator) {
           // Consume the iterator
@@ -155,8 +153,7 @@ async function enhancePrompt({
         }
 
         return {
-          messages,
-          isPremium: response.headers['x-is-premium-request'] === 'true'
+          text: messages.join('')
         }
       }
     }

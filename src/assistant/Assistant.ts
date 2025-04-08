@@ -1,4 +1,5 @@
 import type {
+  EnhanceRun,
   Message,
   MessageContent,
   Thread,
@@ -91,7 +92,7 @@ export interface Assistant {
   enhancePrompt(
     threadID: string,
     message: MessageContent
-  ): Promise<MessageContent>
+  ): Promise<EnhanceRun>
 
   /**
    * Sync files parse and upload small bites of project files to the vector store.

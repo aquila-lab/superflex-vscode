@@ -3,6 +3,7 @@ import path from 'node:path'
 import asyncQ from 'async'
 
 import type {
+  EnhanceRun,
   Message,
   MessageContent,
   Thread,

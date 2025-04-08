@@ -384,14 +384,36 @@ export class ChatAPI {
             this._thread = thread
           }
 
-          const enhancedMessage = await this._assistant.enhancePrompt(
+          const enhanceRun = await this._assistant.enhancePrompt(
             thread.id,
             payload
           )
 
-          sendEventMessageCb(
-            newEventResponse(EventResponseType.PROMPT_ENHANCED, enhancedMessage)
-          )
+          const enhancedMessage = payload;
+          for await (const delta of enhanceRun.stream) {
+            switch (delta.type) {
+              case 'delta': {
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.ENHANCED_PROMPT_DELTA,
+                    delta.textDelta
+                  )
+                )
+                break
+              }
+              case 'complete': {
+                enhancedMessage.enhancedText = delta.text;
+
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.ENHANCED_PROMPT_COMPLETE,
+                    enhancedMessage
+                  )
+                )
+                break
+              }
+            }
+          }
 
           const { stream, response } = await this._assistant.sendMessage(
             thread.id,
