@@ -142,10 +142,19 @@ export default class SuperflexAssistant implements Assistant {
   }
 
   async enhancePrompt(
-    message: MessageContent,
-    threadID: string
+    threadID: string,
+    message: MessageContent
   ): Promise<MessageContent> {
-    return api.enhancePrompt(message, threadID)
+    // Create new abort controller for this stream
+    this._currentStream = new AbortController()
+
+    return api.enhancePrompt({
+      threadID,
+      message,
+      options: {
+        signal: this._currentStream.signal
+      }
+    })
   }
 
   async syncFiles(

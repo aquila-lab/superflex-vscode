@@ -139,8 +139,8 @@ export function buildThreadRunRequest(
 }
 
 export function buildPromptEnhancementRequest(
-  message: MessageContent,
-  threadID: string
+  threadID: string,
+  message: MessageContent
 ): Record<string, any> {
   const reqBody: Record<string, any> = {
     text: message.text,

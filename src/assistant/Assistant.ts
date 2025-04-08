@@ -84,13 +84,13 @@ export interface Assistant {
   /**
    * Enhances user's prompt with additional details based on the provided message attachments.
    *
-   * @param message - The message to enhance.
    * @param threadID - ID of the thread, used to retrieve chat history.
+   * @param message - The message to enhance.
    * @returns A promise that resolves with the enhanced message.
    */
   enhancePrompt(
-    message: MessageContent,
-    threadID: string
+    threadID: string,
+    message: MessageContent
   ): Promise<MessageContent>
 
   /**
