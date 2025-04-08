@@ -357,12 +357,6 @@ export enum EventResponseType {
    */
   FOCUS_CHAT_INPUT = 'focus_chat_input',
 
-   /**
-   * @triggered by extension.
-   * PROMPT_ENHANCED will trigger webview to show enhanced prompt.
-   */
-  PROMPT_ENHANCED = 'prompt_enhanced',
-
   // ---------------- FILE EVENTS ----------------
 
   /**
@@ -521,7 +515,6 @@ export interface EventResponsePayload {
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null
   [EventResponseType.FOCUS_CHAT_INPUT]: void
-  [EventResponseType.PROMPT_ENHANCED]: MessageContent
   [EventResponseType.SHOW_LOGIN_VIEW]: void
   [EventResponseType.SHOW_CHAT_VIEW]: void
   [EventResponseType.SHOW_SETTINGS_VIEW]: void

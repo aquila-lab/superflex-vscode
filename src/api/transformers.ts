@@ -9,7 +9,7 @@ import type {
   User,
   UserSubscription
 } from '../../shared/model'
-import type { FilePayload, ThreadRunRequestFile } from '../../shared/protocol/types'
+import type { FilePayload } from '../../shared/protocol/types'
 import { generateFileID } from '../common/utils'
 
 export function buildUserFromResponse(res: any): User {
@@ -111,8 +111,26 @@ export function buildThreadRunRequest(
     files: []
   }
 
-  if (message.files) {
-    reqBody.files = _buildFiles(message.files)
+  for (const file of message.files ?? []) {
+    if (!file.path) {
+      continue
+    }
+
+    if (!fs.existsSync(file.path)) {
+      continue
+    }
+
+    if (file.startLine === undefined && file.endLine === undefined) {
+      file.content = fs.readFileSync(file.path, 'utf8')
+    }
+
+    reqBody.files.push({
+      path: file.relativePath, // It is important to use the relative path we do not want to send the absolute path to the server
+      content: file.content,
+      start_line: file.startLine,
+      end_line: file.endLine,
+      is_current_open_file: file.isCurrentOpenFile
+    })
   }
 
   if (message.attachment) {
@@ -135,55 +153,4 @@ export function buildThreadRunRequest(
   }
 
   return reqBody
-}
-
-export function buildPromptEnhancementRequest(message: MessageContent, threadID: string): Record<string, any> {
-  const reqBody: Record<string, any> = {
-    text: message.text,
-    image: message.attachment?.image ?? message.attachment?.figma?.imageUrl,
-    files: []
-  }
-
-  if (message.files) {
-    reqBody.files = _buildFiles(message.files)
-  }
-
-  if (threadID) {
-    reqBody.thread_id = threadID
-  }
-
-  if (message.fromMessageID) {
-    reqBody.from_message_id = message.fromMessageID
-  }
-
-  return reqBody
-}
-
-function _buildFiles(files: FilePayload[]): ThreadRunRequestFile[]{
-  const _files: ThreadRunRequestFile[] = []
-  for (const file of files ?? []) {
-    if (!file.path) {
-      continue
-    }
-
-    if (!fs.existsSync(file.path)) {
-      continue
-    }
-
-    if (file.startLine === undefined && file.endLine === undefined) {
-      file.content = fs.readFileSync(file.path, 'utf8')
-    }
-
-    const requestFile: ThreadRunRequestFile = {
-      path: file.relativePath,
-      content: file.content,
-      startLine: file.startLine,
-      endLine: file.endLine,
-      isCurrentOpenFile: file.isCurrentOpenFile
-    }
-
-    _files.push(requestFile)
-  }
-
-  return _files
 }

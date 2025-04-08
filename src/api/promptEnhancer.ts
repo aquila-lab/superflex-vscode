@@ -1,15 +1,32 @@
 import type { MessageContent } from '../../shared/model'
 import { Api } from './api'
 import { parseError } from './error'
-import { buildPromptEnhancementRequest } from './transformers';
 
 async function enhancePrompt(
-  messageContent: MessageContent,
-  threadID: string
+  messageContent: MessageContent
 ): Promise<MessageContent> {
   try {
-    const reqBody = buildPromptEnhancementRequest(messageContent, threadID);
-    const { data } = await Api.post('/prompt/enhance', reqBody)
+    if (!messageContent.attachment) {
+      return messageContent
+    }
+
+    let image: string
+    if (messageContent.attachment.image) {
+      image = messageContent.attachment.image
+    } else if (messageContent.attachment.figma) {
+      if (!messageContent.attachment.figma.imageUrl) {
+        console.warn('No image URL for Figma attachment')
+        return messageContent
+      }
+      image = messageContent.attachment.figma.imageUrl
+    } else {
+      console.warn('Unsupported attachment type')
+      return messageContent
+    }
+
+    const text = messageContent.text ?? ''
+
+    const { data } = await Api.post('/prompt/enhance', { text, image })
 
     return Promise.resolve({
       ...messageContent,
