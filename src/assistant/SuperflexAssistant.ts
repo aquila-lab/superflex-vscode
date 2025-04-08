@@ -144,7 +144,7 @@ export default class SuperflexAssistant implements Assistant {
   async enhancePrompt(
     threadID: string,
     message: MessageContent
-  ): Promise<MessageContent> {
+  ): Promise<EnhanceRun> {
     // Create new abort controller for this stream
     this._currentStream = new AbortController()
 
