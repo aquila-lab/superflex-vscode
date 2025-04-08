@@ -116,13 +116,11 @@ export default class SuperflexAssistant implements Assistant {
 
     validateInputMessage(message)
 
-    const enhancedMessage = await this.enhancePrompt(message)
-
     return api.sendThreadMessage({
       owner: this.owner,
       repo: this.repo,
       threadID,
-      message: enhancedMessage,
+      message: message,
       options: {
         signal: this._currentStream.signal
       }
@@ -143,8 +141,11 @@ export default class SuperflexAssistant implements Assistant {
     return api.fastApply({ code, edits })
   }
 
-  async enhancePrompt(message: MessageContent): Promise<MessageContent> {
-    return api.enhancePrompt(message)
+  async enhancePrompt(
+    message: MessageContent,
+    threadID: string
+  ): Promise<MessageContent> {
+    return api.enhancePrompt(message, threadID)
   }
 
   async syncFiles(
