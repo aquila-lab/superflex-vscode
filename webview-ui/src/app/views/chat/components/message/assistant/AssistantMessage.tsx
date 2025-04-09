@@ -1,7 +1,6 @@
 import { memo } from 'react'
 import { type Message, Role } from '../../../../../../../../shared/model'
 import { MessageContainer } from '../shared/MessageContainer'
-import { MessageHeader } from '../shared/MessageHeader'
 import { FeedbackDialog } from './FeedbackDialog'
 import { MarkdownRender } from './markdown/MarkdownRender'
 
@@ -14,7 +13,6 @@ const AssistantMessageComponent = ({
 }) => {
   return (
     <MessageContainer role={Role.Assistant}>
-      <MessageHeader role={Role.Assistant} />
       <MarkdownRender role={Role.Assistant}>
         {message.content.text}
       </MarkdownRender>
