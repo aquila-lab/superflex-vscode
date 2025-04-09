@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type Message, Role } from '../../../../../../../shared/model'
-import { cn } from '../../../../../common/utils'
+import { cn, extractThinkingContent } from '../../../../../common/utils'
 import { useMessages } from '../../../../layers/authenticated/providers/MessagesProvider'
 import { useOverlay } from '../../../../layers/authenticated/providers/OverlayProvider'
 import { EditModeProvider } from '../../providers/EditModeProvider'
@@ -9,18 +9,12 @@ import { AssistantMessage } from './assistant/AssistantMessage'
 import { MessageBox } from './shared/MessageBox'
 import { ThinkingMessage } from './thinking/ThinkingMessage'
 
-const extractThinkingContent = (text: string): string | null => {
-  const thinkingMatch = text.match(/<Thinking>([\s\S]*?)<\/Thinking>/)
-  return thinkingMatch ? thinkingMatch[1].trim() : null
-}
-
 export const Messages = ({
   messages: propMessages
 }: { messages?: Message[] }) => {
   const { messages: contextMessages } = useMessages()
   const { activeMessageId } = useOverlay()
 
-  // Use provided messages or fall back to context
   const messagesToRender = useMemo(
     () => propMessages ?? contextMessages,
     [propMessages, contextMessages]
@@ -70,6 +64,12 @@ export const Messages = ({
 
             return (
               <div key={id}>
+                {content.enhancedText && (
+                  <ThinkingMessage
+                    content={content.enhancedText}
+                    type='enhance'
+                  />
+                )}
                 {thinkingContent && (
                   <ThinkingMessage
                     content={thinkingContent}

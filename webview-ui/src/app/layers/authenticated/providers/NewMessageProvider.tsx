@@ -26,6 +26,7 @@ const NewMessageContext = createContext<{
   isMessageProcessing: boolean
   isMessageStreaming: boolean
   hasMessageStopped: boolean
+  enhancedTextDelta: string
   sendMessageContent: (content: MessageContent) => void
   stopStreaming: (messageId?: string | null) => void
 } | null>(null)
@@ -37,6 +38,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
 
   const [message, setMessage] = useState<Message | null>(null)
   const [streamTextDelta, setStreamTextDelta] = useState('')
+  const [enhancedTextDelta, setEnhancedTextDelta] = useState('')
   const [isMessageProcessing, setIsMessageProcessing] = useState(false)
   const [isMessageStreaming, setIsMessageStreaming] = useState(false)
   const [hasMessageStopped, setHasMessageStopped] = useState(false)
@@ -47,6 +49,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
     setIsMessageProcessing(false)
     setMessage(null)
     setStreamTextDelta('')
+    setEnhancedTextDelta('')
   }, [])
 
   const stopStreaming = useCallback(() => {
@@ -97,12 +100,17 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       if (!payload) {
         setMessage(null)
         setStreamTextDelta('')
+        setEnhancedTextDelta('')
         return
       }
 
       if (payload.role === Role.User) {
         setIdToLastUserMessage(payload.id)
         return
+      }
+
+      if (payload.role === Role.Assistant && enhancedTextDelta) {
+        payload.content.enhancedText = enhancedTextDelta
       }
 
       if (message && message.role === Role.Assistant) {
@@ -114,9 +122,10 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       requestAnimationFrame(() => {
         setMessage(null)
         setStreamTextDelta('')
+        setEnhancedTextDelta('')
       })
     },
-    [addMessages, setIdToLastUserMessage, message]
+    [addMessages, setIdToLastUserMessage, message, enhancedTextDelta]
   )
 
   const handleSendMessageContentResponse = useCallback((payload: boolean) => {
@@ -145,6 +154,9 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         case EventResponseType.SEND_MESSAGE:
           handleSendMessageContentResponse(payload)
           break
+        case EventResponseType.ENHANCED_PROMPT_DELTA:
+          setEnhancedTextDelta(prev => prev + payload)
+          break
       }
     },
     [
@@ -160,7 +172,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       EventResponseType.MESSAGE_TEXT_DELTA,
       EventResponseType.MESSAGE_COMPLETE,
       EventResponseType.SEND_MESSAGE,
-      EventResponseType.STOP_MESSAGE
+      EventResponseType.STOP_MESSAGE,
+      EventResponseType.ENHANCED_PROMPT_DELTA
     ],
     handleMessage
   )
@@ -214,6 +227,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       isMessageProcessing,
       isMessageStreaming,
       hasMessageStopped,
+      enhancedTextDelta,
       sendMessageContent,
       stopStreaming
     }),
@@ -222,6 +236,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       isMessageProcessing,
       isMessageStreaming,
       hasMessageStopped,
+      enhancedTextDelta,
       sendMessageContent,
       stopStreaming
     ]

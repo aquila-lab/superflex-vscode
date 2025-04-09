@@ -13,32 +13,38 @@ import { MarkdownRender } from '../assistant/markdown/MarkdownRender'
 
 export const ThinkingMessage = ({
   content,
-  type = 'enhance'
+  type = 'enhance',
+  open = false,
+  isStreaming = false
 }: {
   content: string
   type?: 'enhance' | 'thinking'
+  open?: boolean
+  isStreaming?: boolean
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(open)
 
   const thinkingSeconds = useMemo(() => {
-    // Calculate seconds based on content complexity
     const charCount = content.length
     const lineCount = content.split('\n').length
     const codeBlockCount = (content.match(/```/g) || []).length / 2
 
-    // Base calculation on character count
-    // Average thinking content is around 1800-2000 chars
     const baseSeconds = Math.max(2, Math.ceil(charCount / 400))
 
-    // Add time for code blocks and structure
     const complexityFactor = 1 + codeBlockCount * 0.5 + lineCount / 100
 
-    // Final calculation with some randomness
     const seconds = Math.ceil(baseSeconds * complexityFactor)
 
-    // For very short content, ensure minimum of 2 seconds
     return Math.max(2, seconds)
   }, [content])
+
+  const shimmerClass = useMemo(() => {
+    if (!isStreaming) {
+      return ''
+    }
+
+    return 'relative after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:animate-shimmer'
+  }, [isStreaming])
 
   return (
     <MessageContainer
@@ -62,9 +68,15 @@ export const ThinkingMessage = ({
             ) : (
               <RiBrainLine className='h-3 w-3' />
             )}
-            {type === 'enhance'
-              ? 'Enhanced prompt'
-              : `Thought for ${thinkingSeconds} seconds`}
+            <span className={cn(shimmerClass, 'inline-block overflow-hidden')}>
+              {type === 'enhance'
+                ? isStreaming
+                  ? 'Enhancing prompt'
+                  : 'Enhanced prompt'
+                : isStreaming
+                  ? 'Thinking'
+                  : `Thought for ${thinkingSeconds} seconds`}
+            </span>
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent>

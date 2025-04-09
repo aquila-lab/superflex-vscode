@@ -123,6 +123,10 @@ export default {
           '50%': { backgroundPosition: '100% 100%' },
           '75%': { backgroundPosition: '0% 100%' },
           '100%': { backgroundPosition: '0% 0%' }
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
         }
       },
       animation: {
@@ -130,7 +134,8 @@ export default {
         'accordion-up': 'accordion-up 0.15s ease-out',
         'collapsible-down': 'collapsible-down 0.15s ease-out',
         'collapsible-up': 'collapsible-up 0.15s ease-out',
-        gradient: 'gradient'
+        gradient: 'gradient',
+        shimmer: 'shimmer 1.5s infinite'
       }
     }
   },

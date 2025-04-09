@@ -284,3 +284,8 @@ export const PADDING = 18
 export const getLinesCount = (code: string): number => {
   return code.split('\n').length
 }
+
+export const extractThinkingContent = (text: string): string | null => {
+  const thinkingMatch = text.match(/<Thinking>([\s\S]*?)<\/Thinking>/)
+  return thinkingMatch ? thinkingMatch[1].trim() : null
+}
