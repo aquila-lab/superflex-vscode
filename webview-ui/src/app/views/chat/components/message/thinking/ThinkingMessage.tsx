@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Role } from '../../../../../../../../shared/model'
 import { cn } from '../../../../../../common/utils'
 import {
@@ -23,6 +23,10 @@ export const ThinkingMessage = ({
   isStreaming?: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(open)
+
+  useEffect(() => {
+    setIsOpen(open)
+  }, [open])
 
   const thinkingSeconds = useMemo(() => {
     const charCount = content.length

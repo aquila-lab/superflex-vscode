@@ -363,6 +363,12 @@ export enum EventResponseType {
    */
   ENHANCED_PROMPT_DELTA = 'enhanced_prompt_delta',
 
+  /**
+   * @triggered by extension.
+   * ENHANCE_PROMPT_COMPLETE is used to send the complete enhanced prompt to the webview.
+   */
+  ENHANCE_PROMPT_COMPLETE = 'enhance_prompt_complete',
+
   // ---------------- FILE EVENTS ----------------
 
   /**
@@ -522,6 +528,7 @@ export interface EventResponsePayload {
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null
   [EventResponseType.FOCUS_CHAT_INPUT]: void
   [EventResponseType.ENHANCED_PROMPT_DELTA]: string
+  [EventResponseType.ENHANCE_PROMPT_COMPLETE]: string
   [EventResponseType.SHOW_LOGIN_VIEW]: void
   [EventResponseType.SHOW_CHAT_VIEW]: void
   [EventResponseType.SHOW_SETTINGS_VIEW]: void

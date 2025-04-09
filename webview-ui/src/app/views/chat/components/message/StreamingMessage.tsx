@@ -2,53 +2,74 @@ import { memo, useMemo } from 'react'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 import { AssistantMessage } from './assistant/AssistantMessage'
 import { ThinkingMessage } from './thinking/ThinkingMessage'
+import { LoadingDots } from '../../../../../common/ui/LoadingDots'
 
 const StreamingMessageComponent = () => {
   const {
     message,
     isMessageStreaming,
     isMessageProcessing,
+    isEnhanceComplete,
     enhancedTextDelta
   } = useNewMessage()
 
-  const { thinkingContent, assistantContent } = useMemo(() => {
-    if (!message?.content?.text) {
-      return { thinkingContent: '', assistantContent: null }
-    }
-
-    const text = message.content.text
-    const thinkingEndIndex = text.indexOf('</Thinking>')
-
-    if (thinkingEndIndex === -1) {
-      const thinkingStartIndex = text.indexOf('<Thinking>')
-      if (thinkingStartIndex !== -1) {
+  const { thinkingContent, assistantContent, isThinkingComplete } =
+    useMemo(() => {
+      if (!message?.content?.text) {
         return {
-          thinkingContent: text.substring(thinkingStartIndex + 10),
-          assistantContent: null
+          thinkingContent: null,
+          assistantContent: null,
+          isThinkingComplete: false
         }
       }
-      return { thinkingContent: '', assistantContent: message }
-    }
 
-    const thinkingStartIndex = text.indexOf('<Thinking>')
-    const extractedThinkingContent =
-      thinkingStartIndex !== -1
-        ? text.substring(thinkingStartIndex + 10, thinkingEndIndex).trim()
-        : ''
+      const text = message.content.text
+      const thinkingStartIndex = text.indexOf('<Thinking>')
+      const thinkingEndIndex = text.indexOf('</Thinking>')
 
-    const modifiedText = text
-      .replace(/<Thinking>[\s\S]*?<\/Thinking>/, '')
-      .trim()
-    const modifiedMessage = {
-      ...message,
-      content: { ...message.content, text: modifiedText }
-    }
+      // Case 1: Thinking tags not found - could be regular assistant message or not started yet
+      if (thinkingStartIndex === -1) {
+        return {
+          thinkingContent: null,
+          assistantContent: message,
+          isThinkingComplete: true // No thinking to complete
+        }
+      }
 
-    return {
-      thinkingContent: extractedThinkingContent,
-      assistantContent: modifiedMessage
-    }
-  }, [message])
+      // Case 2: Thinking started but not completed (still streaming thinking content)
+      if (thinkingEndIndex === -1) {
+        const thinkingPartialContent = text
+          .substring(thinkingStartIndex + 10)
+          .trim()
+        return {
+          thinkingContent: thinkingPartialContent,
+          assistantContent: null,
+          isThinkingComplete: false
+        }
+      }
+
+      // Case 3: Thinking completed, now extract both parts
+      const extractedThinkingContent = text
+        .substring(thinkingStartIndex + 10, thinkingEndIndex)
+        .trim()
+
+      // Get everything after the thinking closing tag
+      const remainingText = text.substring(thinkingEndIndex + 11).trim()
+
+      // Only create assistant message if there's content after thinking
+      const modifiedMessage = remainingText
+        ? {
+            ...message,
+            content: { ...message.content, text: remainingText }
+          }
+        : null
+
+      return {
+        thinkingContent: extractedThinkingContent,
+        assistantContent: modifiedMessage,
+        isThinkingComplete: true
+      }
+    }, [message])
 
   if (!isMessageProcessing && !isMessageStreaming) {
     return null
@@ -59,17 +80,23 @@ const StreamingMessageComponent = () => {
       <ThinkingMessage
         content={enhancedTextDelta}
         type='enhance'
-        open={isMessageProcessing}
-        isStreaming={isMessageProcessing && !isMessageStreaming}
+        open={!thinkingContent && !assistantContent}
+        isStreaming={!isEnhanceComplete}
       />
-      {(isMessageStreaming || thinkingContent) && (
+
+      {isEnhanceComplete && !thinkingContent && !assistantContent && (
+        <LoadingDots isLoading={true} />
+      )}
+
+      {thinkingContent && (
         <ThinkingMessage
           content={thinkingContent}
           type='thinking'
-          isStreaming={isMessageStreaming && !assistantContent}
-          open={isMessageProcessing || isMessageStreaming}
+          open={!assistantContent}
+          isStreaming={!isThinkingComplete}
         />
       )}
+
       {assistantContent && <AssistantMessage message={assistantContent} />}
     </>
   )
