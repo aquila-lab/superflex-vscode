@@ -38,9 +38,7 @@ const StreamingMessageComponent = () => {
 
       // Case 2: Thinking started but not completed (still streaming thinking content)
       if (thinkingEndIndex === -1) {
-        const thinkingPartialContent = text
-          .substring(thinkingStartIndex + 10)
-          .trim()
+        const thinkingPartialContent = text.substring(thinkingStartIndex + 10)
         return {
           thinkingContent: thinkingPartialContent,
           assistantContent: null,
@@ -49,12 +47,13 @@ const StreamingMessageComponent = () => {
       }
 
       // Case 3: Thinking completed, now extract both parts
-      const extractedThinkingContent = text
-        .substring(thinkingStartIndex + 10, thinkingEndIndex)
-        .trim()
+      const extractedThinkingContent = text.substring(
+        thinkingStartIndex + 10,
+        thinkingEndIndex
+      )
 
       // Get everything after the thinking closing tag
-      const remainingText = text.substring(thinkingEndIndex + 11).trim()
+      const remainingText = text.substring(thinkingEndIndex + 11)
 
       // Only create assistant message if there's content after thinking
       const modifiedMessage = remainingText

@@ -285,7 +285,29 @@ export const getLinesCount = (code: string): number => {
   return code.split('\n').length
 }
 
-export const extractThinkingContent = (text: string): string | null => {
-  const thinkingMatch = text.match(/<Thinking>([\s\S]*?)<\/Thinking>/)
-  return thinkingMatch ? thinkingMatch[1].trim() : null
+export const extractThinkingContent = (
+  text: string | undefined
+): { thinkingContent: string | null; assistantContent: string } => {
+  if (!text) {
+    return { thinkingContent: null, assistantContent: '' }
+  }
+
+  const startTag = '<Thinking>'
+  const endTag = '</Thinking>'
+
+  const startIndex = text.indexOf(startTag)
+  if (startIndex === -1) {
+    return { thinkingContent: null, assistantContent: text }
+  }
+
+  const contentStartIndex = startIndex + startTag.length
+  const endIndex = text.indexOf(endTag, contentStartIndex)
+  if (endIndex === -1) {
+    return { thinkingContent: null, assistantContent: text }
+  }
+
+  return {
+    thinkingContent: text.substring(contentStartIndex, endIndex),
+    assistantContent: text.substring(endIndex + endTag.length)
+  }
 }

@@ -61,7 +61,7 @@ export const ThinkingMessage = ({
       >
         <CollapsibleTrigger
           className={cn(
-            'text-xs font-medium flex items-center gap-1.5',
+            'font-medium flex items-center gap-1.5',
             'text-muted-foreground hover:text-foreground'
           )}
           isOpen={isOpen}
@@ -84,10 +84,8 @@ export const ThinkingMessage = ({
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div
-            className={cn('text-xs mt-2 leading-snug', 'text-muted-foreground')}
-          >
-            <MarkdownRender role={Role.User}>{content}</MarkdownRender>
+          <div className='mt-2 text-muted-foreground'>
+            <MarkdownRender role={Role.Assistant}>{content}</MarkdownRender>
           </div>
         </CollapsibleContent>
       </Collapsible>

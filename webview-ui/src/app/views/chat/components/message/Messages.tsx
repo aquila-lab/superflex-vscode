@@ -50,16 +50,13 @@ export const Messages = ({
             )
 
           case Role.Assistant: {
-            const thinkingContent = content.text
-              ? extractThinkingContent(content.text)
-              : null
+            const { thinkingContent, assistantContent } =
+              extractThinkingContent(content.text)
 
             const messageContent = { ...content }
 
             if (thinkingContent && messageContent.text) {
-              messageContent.text = messageContent.text
-                .replace(/<Thinking>[\s\S]*?<\/Thinking>/, '')
-                .trim()
+              messageContent.text = assistantContent
             }
 
             return (
