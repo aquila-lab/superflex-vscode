@@ -357,6 +357,12 @@ export enum EventResponseType {
    */
   FOCUS_CHAT_INPUT = 'focus_chat_input',
 
+  /**
+   * @triggered by extension.
+   * ENHANCED_PROMPT_DELTA is used to stream enhanced prompt text delta to the webview.
+   */
+  ENHANCED_PROMPT_DELTA = 'enhanced_prompt_delta',
+
   // ---------------- FILE EVENTS ----------------
 
   /**
@@ -515,6 +521,7 @@ export interface EventResponsePayload {
   [EventResponseType.ADD_SELECTED_CODE]: FilePayload
   [EventResponseType.PASTE_COPIED_CODE]: FilePayload | null
   [EventResponseType.FOCUS_CHAT_INPUT]: void
+  [EventResponseType.ENHANCED_PROMPT_DELTA]: string
   [EventResponseType.SHOW_LOGIN_VIEW]: void
   [EventResponseType.SHOW_CHAT_VIEW]: void
   [EventResponseType.SHOW_SETTINGS_VIEW]: void

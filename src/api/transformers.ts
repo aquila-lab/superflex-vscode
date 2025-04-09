@@ -46,6 +46,7 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
 function buildMessageContentFromResponse(res: any): MessageContent {
   const content: MessageContent = {
     text: res.text,
+    enhancedText: res.enhanced_text,
     files: res.files.map(
       (file: any) =>
         ({
@@ -106,31 +107,13 @@ export function buildThreadRunRequest(
   message: MessageContent
 ): Record<string, any> {
   const reqBody: Record<string, any> = {
-    original_text: message.originalText,
-    text: message.text,
+    original_text: message.enhancedText ? message.text : undefined,
+    text: message.enhancedText ?? message.text,
     files: []
   }
 
-  for (const file of message.files ?? []) {
-    if (!file.path) {
-      continue
-    }
-
-    if (!fs.existsSync(file.path)) {
-      continue
-    }
-
-    if (file.startLine === undefined && file.endLine === undefined) {
-      file.content = fs.readFileSync(file.path, 'utf8')
-    }
-
-    reqBody.files.push({
-      path: file.relativePath, // It is important to use the relative path we do not want to send the absolute path to the server
-      content: file.content,
-      start_line: file.startLine,
-      end_line: file.endLine,
-      is_current_open_file: file.isCurrentOpenFile
-    })
+  if (message.files) {
+    reqBody.files = _buildFiles(message.files)
   }
 
   if (message.attachment) {
@@ -153,4 +136,66 @@ export function buildThreadRunRequest(
   }
 
   return reqBody
+}
+
+export function buildPromptEnhancementRequest(
+  threadID: string,
+  message: MessageContent
+): Record<string, any> {
+  const reqBody: Record<string, any> = {
+    text: message.text,
+    image: message.attachment?.image ?? message.attachment?.figma?.imageUrl,
+    files: []
+  }
+
+  if (message.files) {
+    reqBody.files = _buildFiles(message.files)
+  }
+
+  if (threadID) {
+    reqBody.thread_id = threadID
+  }
+
+  if (message.fromMessageID) {
+    reqBody.from_message_id = message.fromMessageID
+  }
+
+  return reqBody
+}
+
+type ThreadRunRequestFile = {
+  path: string
+  content?: string
+  start_line?: number
+  end_line?: number
+  is_current_open_file?: boolean
+}
+
+function _buildFiles(files: FilePayload[]): ThreadRunRequestFile[] {
+  const _files: ThreadRunRequestFile[] = []
+  for (const file of files ?? []) {
+    if (!file.path) {
+      continue
+    }
+
+    if (!fs.existsSync(file.path)) {
+      continue
+    }
+
+    if (file.startLine === undefined && file.endLine === undefined) {
+      file.content = fs.readFileSync(file.path, 'utf8')
+    }
+
+    const requestFile: ThreadRunRequestFile = {
+      path: file.relativePath,
+      content: file.content,
+      start_line: file.startLine,
+      end_line: file.endLine,
+      is_current_open_file: file.isCurrentOpenFile
+    }
+
+    _files.push(requestFile)
+  }
+
+  return _files
 }
