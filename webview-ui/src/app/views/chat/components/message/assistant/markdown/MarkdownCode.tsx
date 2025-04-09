@@ -42,6 +42,8 @@ export const MarkdownCode = ({
     return !isComplete
   }, [children, isMessageStreaming, codeBlock])
 
+  console.log('isCodeBlockLoading', isCodeBlockLoading)
+
   if (!codeBlock) {
     return (
       <code className={cn('text-sm text-button-background', className)}>
@@ -57,7 +59,8 @@ export const MarkdownCode = ({
       filePath={codeBlock.filePath}
       draft={draft}
       extension={codeBlock.extension}
-      isLoading={isCodeBlockLoading}
+      // isLoading={isCodeBlockLoading}
+      isLoading={false}
     />
   )
 }
