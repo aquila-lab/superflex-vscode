@@ -1,12 +1,15 @@
 import { useMemo } from 'react'
 import { type MarkdownCodeProps, cn } from '../../../../../../../common/utils'
 import { CollapsibleCodeBlock } from './code/CollapsibleCodeBlock'
+import { useNewMessage } from '../../../../../../layers/authenticated/providers/NewMessageProvider'
 
 export const MarkdownCode = ({
   inline,
   className,
   children
 }: MarkdownCodeProps) => {
+  const { isMessageStreaming } = useNewMessage()
+
   const match = useMemo(
     () => /language-(\w+)(?::([^#]+))?(?:#(\d+)-(\d+))?/.exec(className ?? ''),
     [className]
@@ -25,6 +28,20 @@ export const MarkdownCode = ({
     }
   }, [match, inline])
 
+  const isCodeBlockLoading = useMemo(() => {
+    if (!isMessageStreaming || !codeBlock) {
+      return false
+    }
+
+    // Check if the code block is still being streamed
+    // If the content doesn't end with a triple backtick, it's still streaming
+    const content = String(children)
+    const isComplete =
+      content.trim().endsWith('```') || content.trim().endsWith('`')
+
+    return !isComplete
+  }, [children, isMessageStreaming, codeBlock])
+
   if (!codeBlock) {
     return (
       <code className={cn('text-sm text-button-background', className)}>
@@ -40,6 +57,7 @@ export const MarkdownCode = ({
       filePath={codeBlock.filePath}
       draft={draft}
       extension={codeBlock.extension}
+      isLoading={isCodeBlockLoading}
     />
   )
 }
