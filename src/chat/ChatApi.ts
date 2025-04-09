@@ -389,7 +389,7 @@ export class ChatAPI {
             payload
           )
 
-          const enhancedMessage = payload;
+          const enhancedMessage = payload
           for await (const delta of enhanceRun.stream) {
             switch (delta.type) {
               case 'delta': {
@@ -402,14 +402,7 @@ export class ChatAPI {
                 break
               }
               case 'complete': {
-                enhancedMessage.enhancedText = delta.text;
-
-                sendEventMessageCb(
-                  newEventResponse(
-                    EventResponseType.ENHANCED_PROMPT_COMPLETE,
-                    enhancedMessage
-                  )
-                )
+                enhancedMessage.enhancedText = delta.text
                 break
               }
             }
