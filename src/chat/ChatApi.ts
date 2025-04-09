@@ -402,6 +402,12 @@ export class ChatAPI {
                 break
               }
               case 'complete': {
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.ENHANCE_PROMPT_COMPLETE,
+                    delta.text
+                  )
+                )
                 enhancedMessage.enhancedText = delta.text
                 break
               }

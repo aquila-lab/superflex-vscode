@@ -18,11 +18,13 @@ export const CollapsibleCodeBlock = memo(
   ({
     filePath,
     draft,
-    extension
+    extension,
+    isLoading = false
   }: {
     filePath?: string
     draft: string
     extension: string
+    isLoading?: boolean
   }) => {
     const [isOpen, setIsOpen] = useState(false)
 
@@ -42,13 +44,19 @@ export const CollapsibleCodeBlock = memo(
           filePath={filePath}
           draft={draft}
           extension={extension}
+          isLoading={isLoading}
         />
       )
     }
 
     return (
       <div className='rounded-md border border-border bg-background mt-1'>
-        <CodeBlockToolbar filePath={filePath}>{draft}</CodeBlockToolbar>
+        <CodeBlockToolbar
+          filePath={filePath}
+          isLoading={isLoading}
+        >
+          {draft}
+        </CodeBlockToolbar>
 
         <div className='relative'>
           <Collapsible
