@@ -1,4 +1,5 @@
 import type {
+  EnhanceRun,
   Message,
   MessageContent,
   Thread,
@@ -82,13 +83,16 @@ export interface Assistant {
   fastApply(code: string, edits: string): Promise<string>
 
   /**
-   * Enhances original user's prompt with additional details based on the provided message attachments.
+   * Enhances user's prompt with additional details based on the provided message attachments.
    *
-   * @param message - The message to enhance.
    * @param threadID - ID of the thread, used to retrieve chat history.
+   * @param message - The message to enhance.
    * @returns A promise that resolves with the enhanced message.
    */
-  enhancePrompt(message: MessageContent, threadID: string): Promise<MessageContent>
+  enhancePrompt(
+    threadID: string,
+    message: MessageContent
+  ): Promise<EnhanceRun>
 
   /**
    * Sync files parse and upload small bites of project files to the vector store.

@@ -9,7 +9,7 @@ import type {
   User,
   UserSubscription
 } from '../../shared/model'
-import type { FilePayload, ThreadRunRequestFile } from '../../shared/protocol/types'
+import type { FilePayload } from '../../shared/protocol/types'
 import { generateFileID } from '../common/utils'
 
 export function buildUserFromResponse(res: any): User {
@@ -46,6 +46,7 @@ export function buildUserSubscriptionFromResponse(res: any): UserSubscription {
 function buildMessageContentFromResponse(res: any): MessageContent {
   const content: MessageContent = {
     text: res.text,
+    enhancedText: res.enhanced_text,
     files: res.files.map(
       (file: any) =>
         ({
@@ -106,8 +107,8 @@ export function buildThreadRunRequest(
   message: MessageContent
 ): Record<string, any> {
   const reqBody: Record<string, any> = {
-    original_text: message.originalText,
-    text: message.text,
+    original_text: message.enhancedText ? message.text : undefined,
+    text: message.enhancedText ?? message.text,
     files: []
   }
 
@@ -137,7 +138,10 @@ export function buildThreadRunRequest(
   return reqBody
 }
 
-export function buildPromptEnhancementRequest(message: MessageContent, threadID: string): Record<string, any> {
+export function buildPromptEnhancementRequest(
+  threadID: string,
+  message: MessageContent
+): Record<string, any> {
   const reqBody: Record<string, any> = {
     text: message.text,
     image: message.attachment?.image ?? message.attachment?.figma?.imageUrl,
@@ -159,7 +163,15 @@ export function buildPromptEnhancementRequest(message: MessageContent, threadID:
   return reqBody
 }
 
-function _buildFiles(files: FilePayload[]): ThreadRunRequestFile[]{
+type ThreadRunRequestFile = {
+  path: string
+  content?: string
+  start_line?: number
+  end_line?: number
+  is_current_open_file?: boolean
+}
+
+function _buildFiles(files: FilePayload[]): ThreadRunRequestFile[] {
   const _files: ThreadRunRequestFile[] = []
   for (const file of files ?? []) {
     if (!file.path) {
@@ -177,9 +189,9 @@ function _buildFiles(files: FilePayload[]): ThreadRunRequestFile[]{
     const requestFile: ThreadRunRequestFile = {
       path: file.relativePath,
       content: file.content,
-      startLine: file.startLine,
-      endLine: file.endLine,
-      isCurrentOpenFile: file.isCurrentOpenFile
+      start_line: file.startLine,
+      end_line: file.endLine,
+      is_current_open_file: file.isCurrentOpenFile
     }
 
     _files.push(requestFile)

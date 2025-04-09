@@ -8,7 +8,7 @@ export function createFilesMapName(provider: string, version: number): string {
 }
 
 // Validates user's prompt before sending it to the backend
-export function validateInputMessage(messageContent: MessageContent): string {
+export function validateInputMessage(messageContent: MessageContent): void {
   if (!messageContent.text && !messageContent.attachment) {
     throw new AppError(
       'Message must contain either text or attachment.',
@@ -17,7 +17,7 @@ export function validateInputMessage(messageContent: MessageContent): string {
   }
 
   if (!messageContent.text) {
-    return ''
+    return
   }
 
   if (containsFigmaSelectionURL(messageContent.text)) {
@@ -34,7 +34,7 @@ export function validateInputMessage(messageContent: MessageContent): string {
     )
   }
 
-  return ''
+  return
 }
 
 function containsFigmaSelectionURL(inputString: string): boolean {

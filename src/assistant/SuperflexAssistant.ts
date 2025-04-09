@@ -3,6 +3,7 @@ import path from 'node:path'
 import asyncQ from 'async'
 
 import type {
+  EnhanceRun,
   Message,
   MessageContent,
   Thread,
@@ -142,10 +143,19 @@ export default class SuperflexAssistant implements Assistant {
   }
 
   async enhancePrompt(
-    message: MessageContent,
-    threadID: string
-  ): Promise<MessageContent> {
-    return api.enhancePrompt(message, threadID)
+    threadID: string,
+    message: MessageContent
+  ): Promise<EnhanceRun> {
+    // Create new abort controller for this stream
+    this._currentStream = new AbortController()
+
+    return api.enhancePrompt({
+      threadID,
+      message,
+      options: {
+        signal: this._currentStream.signal
+      }
+    })
   }
 
   async syncFiles(

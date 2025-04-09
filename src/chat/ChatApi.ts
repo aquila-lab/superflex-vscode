@@ -384,12 +384,36 @@ export class ChatAPI {
             this._thread = thread
           }
 
-          // TODO: Enable streaming for better UX
-          const enhancedMessage = await this._assistant.enhancePrompt(payload, thread.id)
-
-          sendEventMessageCb(
-            newEventResponse(EventResponseType.PROMPT_ENHANCED, enhancedMessage)
+          const enhanceRun = await this._assistant.enhancePrompt(
+            thread.id,
+            payload
           )
+
+          const enhancedMessage = payload;
+          for await (const delta of enhanceRun.stream) {
+            switch (delta.type) {
+              case 'delta': {
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.ENHANCED_PROMPT_DELTA,
+                    delta.textDelta
+                  )
+                )
+                break
+              }
+              case 'complete': {
+                enhancedMessage.enhancedText = delta.text;
+
+                sendEventMessageCb(
+                  newEventResponse(
+                    EventResponseType.ENHANCED_PROMPT_COMPLETE,
+                    enhancedMessage
+                  )
+                )
+                break
+              }
+            }
+          }
 
           const { stream, response } = await this._assistant.sendMessage(
             thread.id,
