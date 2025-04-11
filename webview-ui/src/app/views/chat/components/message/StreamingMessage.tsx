@@ -4,7 +4,13 @@ import { AssistantMessage } from './assistant/AssistantMessage'
 import { ThinkingMessage } from './thinking/ThinkingMessage'
 import { LoadingDots } from '../../../../../common/ui/LoadingDots'
 
-const StreamingMessageComponent = () => {
+interface StreamingMessageProps {
+  isFollowUp?: boolean
+}
+
+const StreamingMessageComponent = ({
+  isFollowUp = false
+}: StreamingMessageProps) => {
   const {
     message,
     isMessageStreaming,
@@ -76,16 +82,18 @@ const StreamingMessageComponent = () => {
 
   return (
     <>
-      <ThinkingMessage
-        content={enhancedTextDelta}
-        type='enhance'
-        open={!thinkingContent && !assistantContent}
-        isStreaming={!isEnhanceComplete}
-      />
-
-      {isEnhanceComplete && !thinkingContent && !assistantContent && (
-        <LoadingDots isLoading={true} />
+      {!isFollowUp && (
+        <ThinkingMessage
+          content={enhancedTextDelta}
+          type='enhance'
+          open={!thinkingContent && !assistantContent}
+          isStreaming={!isEnhanceComplete}
+        />
       )}
+
+      {(isFollowUp || isEnhanceComplete) &&
+        !thinkingContent &&
+        !assistantContent && <LoadingDots isLoading={true} />}
 
       {thinkingContent && (
         <ThinkingMessage

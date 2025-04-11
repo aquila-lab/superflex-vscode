@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
+
+import { Role } from '../../../../../../../shared/model'
 import { useMessages } from '../../../../layers/authenticated/providers/MessagesProvider'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
-import { MessageListContainer } from './MessageListContainer'
 import { Messages } from './Messages'
 import { StreamingMessage } from './StreamingMessage'
+import { MessageListContainer } from './MessageListContainer'
 
 const MessageRenderer = () => {
   const { messages } = useMessages()
@@ -26,10 +28,14 @@ const MessageRenderer = () => {
     return messages
   }, [messages, streamingMessage])
 
+  const isLastMessageAssistant =
+    messagesToRender.length > 1 &&
+    messagesToRender[messagesToRender.length - 1].role === Role.Assistant
+
   return (
     <>
       <Messages messages={messagesToRender} />
-      <StreamingMessage />
+      <StreamingMessage isFollowUp={isLastMessageAssistant} />
     </>
   )
 }

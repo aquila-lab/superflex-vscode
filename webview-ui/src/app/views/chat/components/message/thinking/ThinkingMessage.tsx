@@ -68,9 +68,9 @@ export const ThinkingMessage = ({
         >
           <div className='flex items-center justify-center gap-1.5'>
             {type === 'enhance' ? (
-              <StarsIcon className='h-3 w-3' />
+              <StarsIcon className='size-3.5' />
             ) : (
-              <RiBrainLine className='h-3 w-3' />
+              <RiBrainLine className='size-3.5' />
             )}
             <span className={cn(shimmerClass, 'inline-block overflow-hidden')}>
               {type === 'enhance'
