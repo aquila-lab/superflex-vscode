@@ -31,7 +31,10 @@ import {
 import type { Assistant } from '../assistant'
 import SuperflexAssistant from '../assistant/SuperflexAssistant'
 import { Telemetry } from '../common/analytics/Telemetry'
-import { FIGMA_AUTH_PROVIDER_ID } from '../common/constants'
+import {
+  BINARY_FILE_EXTENSIONS,
+  FIGMA_AUTH_PROVIDER_ID
+} from '../common/constants'
 import { enrichFilePayloads } from '../common/files'
 import {
   decodeUriAndRemoveFilePrefix,
@@ -667,7 +670,8 @@ export class ChatAPI {
         const workspaceDirPath = this._workspaceDirPath
         const documentPaths: string[] = await findWorkspaceFiles(
           workspaceDirPath,
-          ['**/*']
+          ['**/*'],
+          BINARY_FILE_EXTENSIONS
         )
         return documentPaths
           .sort((a, b) => {

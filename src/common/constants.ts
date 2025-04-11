@@ -38,3 +38,73 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   '.tsx',
   '.vue'
 ]
+
+// Binary and non-programming file types to ignore when scanning workspace
+export const BINARY_FILE_EXTENSIONS = [
+  // Images
+  '**/*.png',
+  '**/*.jpg',
+  '**/*.jpeg',
+  '**/*.gif',
+  '**/*.svg',
+  '**/*.webp',
+  '**/*.ico',
+
+  // Audio
+  '**/*.mp3',
+  '**/*.wav',
+  '**/*.ogg',
+  '**/*.flac',
+  '**/*.m4a',
+
+  // Video
+  '**/*.mp4',
+  '**/*.webm',
+  '**/*.mov',
+  '**/*.avi',
+  '**/*.mkv',
+
+  // Documents
+  '**/*.pdf',
+  '**/*.doc',
+  '**/*.docx',
+  '**/*.ppt',
+  '**/*.pptx',
+  '**/*.xls',
+  '**/*.xlsx',
+
+  // Archives
+  '**/*.zip',
+  '**/*.rar',
+  '**/*.tar',
+  '**/*.gz',
+  '**/*.7z',
+
+  // Binaries
+  '**/*.exe',
+  '**/*.dll',
+  '**/*.so',
+  '**/*.dylib',
+
+  // Fonts
+  '**/*.ttf',
+  '**/*.otf',
+  '**/*.woff',
+  '**/*.woff2',
+  '**/*.eot',
+
+  // Database files
+  '**/*.db',
+  '**/*.sqlite',
+  '**/*.db3',
+
+  // ML models
+  '**/*.model',
+  '**/*.weights',
+  '**/*.onnx',
+  '**/*.pb',
+
+  // Binary data
+  '**/*.bin',
+  '**/*.dat'
+]
