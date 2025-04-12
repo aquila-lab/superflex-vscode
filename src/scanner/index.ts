@@ -2,7 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import fg from 'fast-glob'
 
-import { SUPPORTED_FILE_EXTENSIONS } from '../common/constants'
+import {
+  SUPPORTED_FILE_EXTENSIONS,
+  RELEVANT_JSON_FILES
+} from '../common/constants'
 import { decodeUriAndRemoveFilePrefix } from '../common/utils'
 
 /**
@@ -90,7 +93,10 @@ export async function findWorkspaceFiles(
   ignore?: string[]
 ): Promise<string[]> {
   if (!globPatterns) {
-    globPatterns = SUPPORTED_FILE_EXTENSIONS.map(ext => `**/*${ext}`)
+    globPatterns = [
+      ...SUPPORTED_FILE_EXTENSIONS.map(ext => `**/*${ext}`),
+      ...RELEVANT_JSON_FILES.map(file => `**/${file}`)
+    ]
   }
 
   // Default ignore patterns
