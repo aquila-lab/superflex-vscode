@@ -108,6 +108,20 @@ export async function findWorkspaceFiles(
     '**/__mocks__/**'
   ]
 
+  // Ignore business logic files
+  const businessLogicIgnore = [
+    '**/services/*',
+    '**/data/*',
+    '**/errors/*',
+    '**/tests/**',
+    '**/migrations/**',
+    '**/middleware/**',
+    '**/validators/**',
+    '**/helpers/**',
+    '**/domain/**',
+    '**/infrastructure/**',
+  ]
+
   // Read .gitignore and .superflexignore
   const gitignorePatterns = readIgnoreFile(
     path.join(workspaceDirPath, '.gitignore')
@@ -121,7 +135,8 @@ export async function findWorkspaceFiles(
     ...(ignore || []),
     ...defaultIgnore,
     ...gitignorePatterns,
-    ...superflexignorePatterns
+    ...superflexignorePatterns,
+    ...businessLogicIgnore
   ]
 
   return findFiles(workspaceDirPath, globPatterns, combinedIgnore)
