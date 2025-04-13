@@ -4,7 +4,7 @@ import { Button } from '../../../../common/ui/Button'
 import { useUser } from '../../../layers/authenticated/providers/UserProvider'
 import { usePostMessage } from '../../../layers/global/hooks/usePostMessage'
 import { useGlobal } from '../../../layers/global/providers/GlobalProvider'
-
+import { isFreeTierSubscription } from '../../../../../../shared/model'
 export const UpgradeButton = () => {
   const { config } = useGlobal()
   const { subscription } = useUser()
@@ -16,7 +16,7 @@ export const UpgradeButton = () => {
     })
   }, [postMessage, config?.uriScheme])
 
-  if (!subscription.plan?.name.toLowerCase().includes('free')) {
+  if (!isFreeTierSubscription(subscription)) {
     return null
   }
 

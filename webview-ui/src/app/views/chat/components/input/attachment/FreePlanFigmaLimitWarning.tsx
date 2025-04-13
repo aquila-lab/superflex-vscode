@@ -2,12 +2,13 @@ import { useMemo } from 'react'
 import { Alert, AlertDescription } from '../../../../../../common/ui/Alert'
 import { useUser } from '../../../../../layers/authenticated/providers/UserProvider'
 import { MAX_FREE_NODES } from '../../../../../../../../shared/common/constants'
+import { isFreeTierSubscription } from '../../../../../../../../shared/model'
 
 export const FreePlanFigmaLimitWarning = () => {
   const { subscription } = useUser()
 
   const isFreePlan = useMemo(
-    () => subscription?.plan?.name.toLowerCase().includes('free'),
+    () => isFreeTierSubscription(subscription),
     [subscription]
   )
 

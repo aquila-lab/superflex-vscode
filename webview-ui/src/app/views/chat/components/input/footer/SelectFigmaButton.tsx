@@ -7,6 +7,7 @@ import { useUser } from '../../../../../layers/authenticated/providers/UserProvi
 import { useGlobal } from '../../../../../layers/global/providers/GlobalProvider'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvider'
+import { isFreeTierSubscription } from '../../../../../../../../shared/model'
 
 export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
@@ -17,7 +18,7 @@ export const SelectFigmaButton = () => {
   const { fetchSubscription } = useUser()
 
   const isFreePlan = useMemo(
-    () => subscription?.plan?.name.toLowerCase().includes('free'),
+    () => isFreeTierSubscription(subscription),
     [subscription]
   )
 

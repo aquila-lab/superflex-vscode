@@ -3,12 +3,13 @@ import { useUser } from '../../../../layers/authenticated/providers/UserProvider
 import { useSettingsHandlers } from '../../providers/SettingsProvider'
 import { ActionButtons } from '../base/ActionButtons'
 import { InfoField } from '../base/InfoField'
+import { isFreeTierSubscription } from '../../../../../../../shared/model'
 
 export const PlanInfo = () => {
   const { subscription, user } = useUser()
   const { handleManageBilling, handleSubscribe } = useSettingsHandlers()
 
-  const isFreePlan = subscription.plan?.name.toLowerCase().includes('free')
+  const isFreePlan = isFreeTierSubscription(subscription)
   const hasStripeAccount = Boolean(user.stripeCustomerID)
   const showManageBilling = hasStripeAccount && !isFreePlan
   const planName = subscription.plan?.name
