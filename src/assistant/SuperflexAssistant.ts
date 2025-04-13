@@ -19,7 +19,7 @@ import { SUPPORTED_FILE_EXTENSIONS } from '../common/constants'
 import { jsonToMap, mapToJson } from '../common/utils'
 import { findWorkspaceFiles } from '../scanner'
 import type { Assistant } from './Assistant'
-import { createFilesMapName, validateInputMessage } from './common'
+import { createFilesMapName, isUploadAllowedByTierAndSize, validateInputMessage } from './common'
 
 const ASSISTENT_NAME = 'superflex'
 const FILES_MAP_VERSION = 1 // Increment the version when we need to reindex all files
@@ -161,8 +161,6 @@ export default class SuperflexAssistant implements Assistant {
   async syncFiles(
     progressCb?: (current: number, isFirstTimeSync?: boolean) => void
   ): Promise<void> {
-    // TODO(boris): Replace this with a more robust check for a valid workspace,
-    // we can check if project have more then 100k lines of code it needs to be enroled to enterprise plan.
     const packageJsonPath = path.join(this.workspaceDirPath, 'package.json')
     const indexHtmlPath = path.join(this.workspaceDirPath, 'index.html')
     if (!fs.existsSync(packageJsonPath) && !fs.existsSync(indexHtmlPath)) {
@@ -179,6 +177,12 @@ export default class SuperflexAssistant implements Assistant {
     if (documentPaths.length === 0) {
       throw Error(
         `No supported files found in the workspace.\nSupported file extensions are: ${SUPPORTED_FILE_EXTENSIONS}`
+      )
+    }
+
+    if (!await isUploadAllowedByTierAndSize(documentPaths)) {
+      throw new Error(
+        'Repository is too large to be fully indexed. Upgrade your subscription plan to get results better aligned with your existing codebase.'
       )
     }
 

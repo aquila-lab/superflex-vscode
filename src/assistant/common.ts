@@ -1,6 +1,9 @@
+import { readFile } from 'node:fs/promises'
+
 import { FIGMA_SELECTION_URL_REGEX, URL_REGEX } from 'shared/common/constants'
-import type { MessageContent } from 'shared/model'
+import { isFreeTierSubscription, type MessageContent } from 'shared/model'
 import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
+import * as api from '../api'
 
 // Helper function to create the name of the files map
 export function createFilesMapName(provider: string, version: number): string {
@@ -43,4 +46,34 @@ function containsFigmaSelectionURL(inputString: string): boolean {
 
 function containsURL(inputString: string): boolean {
   return URL_REGEX.test(inputString)
+}
+
+export async function isUploadAllowedByTierAndSize(
+  filePaths: string[]
+): Promise<boolean> {
+  const userSubscription = await api.getUserSubscription()
+  if (!isFreeTierSubscription(userSubscription)) {
+    return true
+  }
+
+  // We are taking into account only filtered files
+  const totalLines = await countTotalLinesInFiles(filePaths)
+  return totalLines <= 20000 && false
+}
+
+async function countTotalLinesInFiles(filePaths: string[]): Promise<number> {
+  let totalLines = 0
+
+  for (const filePath of filePaths) {
+    try {
+      const content = await readFile(filePath, 'utf-8')
+      const lines = content.split('\n')
+      totalLines += lines.length
+    } catch (error) {
+      console.error(`Error reading file ${filePath}:`, error)
+      // Continue with other files even if one fails
+    }
+  }
+
+  return totalLines
 }

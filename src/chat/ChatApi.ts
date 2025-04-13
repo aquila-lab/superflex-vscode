@@ -9,7 +9,8 @@ import {
   type Message,
   type MessageContent,
   type Thread,
-  extractFigmaSelectionUrl
+  extractFigmaSelectionUrl,
+  isFreeTierSubscription
 } from '../../shared/model'
 import {
   type EventRequestPayload,
@@ -321,11 +322,8 @@ export class ChatAPI {
             )
           }
 
-          // TODO: Check if user is on free plan
           const subscription = await api.getUserSubscription()
-          const isFreePlan = subscription?.plan?.name
-            .toLowerCase()
-            .includes('free')
+          const isFreePlan = isFreeTierSubscription(subscription)
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
 
@@ -884,7 +882,8 @@ export class ChatAPI {
         throw err
       }
       if (
-        err?.message?.startsWith('No supported files found in the workspace')
+        err?.message?.startsWith('No supported files found in the workspace') ||
+        err?.message?.startsWith('Repository is too large to be fully indexed')
       ) {
         vscode.window.showWarningMessage(err.message)
       }
