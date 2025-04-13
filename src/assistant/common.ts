@@ -1,7 +1,8 @@
+import * as fs from 'node:fs'
+
 import { FIGMA_SELECTION_URL_REGEX, URL_REGEX } from 'shared/common/constants'
 import type { MessageContent } from 'shared/model'
 import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
-import * as fs from 'node:fs'
 
 // Helper function to create the name of the files map
 export function createFilesMapName(provider: string, version: number): string {
