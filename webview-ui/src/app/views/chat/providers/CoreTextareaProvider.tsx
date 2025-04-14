@@ -15,6 +15,7 @@ import {
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
+import { isFreeTierSubscription } from '../../../../../../shared/model'
 import {
   FIGMA_LINK_REGEX,
   readImageFileAsBase64
@@ -119,7 +120,7 @@ export const TextareaHandlersProvider = ({
           return
         }
 
-        if (subscription?.plan?.name.toLowerCase().includes('free')) {
+        if (isFreeTierSubscription(subscription)) {
           const handleFigmaAction = (isAuthenticated: boolean) => {
             if (isAuthenticated) {
               openSelectionDrawer()

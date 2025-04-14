@@ -23,3 +23,14 @@ export type UserSubscription = {
   createdAt: Date
   endDate: Date | null
 }
+
+/**
+ * Checks if a given subscription is a free plan
+ * @param subscription - The user subscription to check
+ * @returns boolean indicating if the subscription is a free plan
+ */
+export const isFreeTierSubscription = (
+  subscription: UserSubscription | null
+): boolean => {
+  return subscription?.plan?.name.toLowerCase().includes('free') ?? false
+}
