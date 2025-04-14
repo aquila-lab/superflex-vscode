@@ -19,7 +19,7 @@ import { SUPPORTED_FILE_EXTENSIONS } from '../common/constants'
 import { jsonToMap, mapToJson } from '../common/utils'
 import { findWorkspaceFiles } from '../scanner'
 import type { Assistant } from './Assistant'
-import { createFilesMapName, validateInputMessage } from './common'
+import { createFilesMapName, stripPackageJsonFile, validateInputMessage } from './common'
 
 const ASSISTENT_NAME = 'superflex'
 const FILES_MAP_VERSION = 1 // Increment the version when we need to reindex all files
@@ -230,6 +230,13 @@ export default class SuperflexAssistant implements Assistant {
     const workers = asyncQ.queue(async (documentPaths: string[]) => {
       const files = documentPaths.map(documentPath => {
         const relativePath = path.relative(this.workspaceDirPath, documentPath)
+        if (relativePath.endsWith('package.json')) {
+          return {
+            relativePath,
+            source: stripPackageJsonFile(documentPath),
+            modifiedTime: fs.statSync(documentPath).mtime.getTime()
+          }
+        }
         return {
           relativePath,
           source: fs.readFileSync(documentPath, 'utf8'),

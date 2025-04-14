@@ -36,7 +36,23 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   '.ts',
   '.jsx',
   '.tsx',
-  '.vue'
+  '.vue',
+  '.md',
+  '.markdown'
+]
+
+// project json files that are relevant for code generation
+export const RELEVANT_JSON_FILES = [
+  'theme.json',
+  'tailwind.config.json',
+  'menu.json',
+  'forms.json',
+  'components.json',
+  'manifest.json',
+  'package.json',
+  'tsconfig.json',
+  'eslint.json',
+  'prettier.config.json'
 ]
 
 // Binary and non-programming file types to ignore when scanning workspace
