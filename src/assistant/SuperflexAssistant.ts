@@ -22,6 +22,7 @@ import type { Assistant } from './Assistant'
 import {
   createFilesMapName,
   isUploadAllowedByTierAndSize,
+  stripPackageJsonFile,
   validateInputMessage
 } from './common'
 
@@ -239,6 +240,13 @@ export default class SuperflexAssistant implements Assistant {
     const workers = asyncQ.queue(async (documentPaths: string[]) => {
       const files = documentPaths.map(documentPath => {
         const relativePath = path.relative(this.workspaceDirPath, documentPath)
+        if (relativePath.endsWith('package.json')) {
+          return {
+            relativePath,
+            source: stripPackageJsonFile(documentPath),
+            modifiedTime: fs.statSync(documentPath).mtime.getTime()
+          }
+        }
         return {
           relativePath,
           source: fs.readFileSync(documentPath, 'utf8'),

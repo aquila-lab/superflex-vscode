@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises'
+import * as fs from 'node:fs'
 
 import { FIGMA_SELECTION_URL_REGEX, URL_REGEX } from 'shared/common/constants'
 import { isFreeTierSubscription, type MessageContent } from 'shared/model'
@@ -76,4 +77,30 @@ async function countTotalLinesInFiles(filePaths: string[]): Promise<number> {
   }
 
   return totalLines
+}
+
+export function stripPackageJsonFile(documentPath: string): string {
+  const fileContent = fs.readFileSync(documentPath, 'utf8')
+
+  try {
+    const packageJson = JSON.parse(fileContent)
+    const filteredPackageJson: Record<string, any> = {}
+
+    if (packageJson.name) {
+      filteredPackageJson.name = packageJson.name
+    }
+    if (packageJson.description) {
+      filteredPackageJson.description = packageJson.description
+    }
+    if (packageJson.dependencies) {
+      filteredPackageJson.dependencies = packageJson.dependencies
+    }
+    if (packageJson.devDependencies) {
+      filteredPackageJson.devDependencies = packageJson.devDependencies
+    }
+
+    return JSON.stringify(filteredPackageJson, null, 2)
+  } catch {
+    return fileContent
+  }
 }
