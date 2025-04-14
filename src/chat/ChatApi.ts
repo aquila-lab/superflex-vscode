@@ -883,7 +883,9 @@ export class ChatAPI {
       }
       if (
         err?.message?.startsWith('No supported files found in the workspace') ||
-        err?.message?.startsWith('Repository is too large to be fully indexed')
+        err?.message?.startsWith(
+          'This repository is too large to fully index on the free plan'
+        )
       ) {
         vscode.window.showWarningMessage(err.message)
       }

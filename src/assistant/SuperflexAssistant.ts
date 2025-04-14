@@ -184,9 +184,10 @@ export default class SuperflexAssistant implements Assistant {
       )
     }
 
-    if (!(await isUploadAllowedByTierAndSize(documentPaths))) {
+    const uploadAllowed = await isUploadAllowedByTierAndSize(documentPaths)
+    if (!uploadAllowed) {
       throw new Error(
-        'Repository is too large to be fully indexed. Upgrade your subscription plan to get results better aligned with your existing codebase.'
+        'This repository is too large to fully index on the free plan. Upgrade to index the entire codebase and get more accurate results.'
       )
     }
 
