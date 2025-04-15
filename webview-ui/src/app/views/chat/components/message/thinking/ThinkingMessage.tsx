@@ -10,6 +10,7 @@ import { MessageContainer } from '../shared/MessageContainer'
 import { RiBrainLine } from 'react-icons/ri'
 import { StarsIcon } from 'lucide-react'
 import { MarkdownRender } from '../assistant/markdown/MarkdownRender'
+import { ShiningText } from '../../../../../../common/ui/ShiningText'
 
 export const ThinkingMessage = ({
   content,
@@ -42,13 +43,13 @@ export const ThinkingMessage = ({
     return Math.max(2, seconds)
   }, [content])
 
-  const shimmerClass = useMemo(() => {
-    if (!isStreaming) {
-      return ''
+  const messageText = useMemo(() => {
+    if (type === 'enhance') {
+      return isStreaming ? 'Enhancing prompt' : 'Enhanced prompt'
     }
 
-    return 'relative after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:animate-shimmer'
-  }, [isStreaming])
+    return isStreaming ? 'Thinking' : `Thought for ${thinkingSeconds} seconds`
+  }, [type, isStreaming, thinkingSeconds])
 
   return (
     <MessageContainer
@@ -72,14 +73,12 @@ export const ThinkingMessage = ({
             ) : (
               <RiBrainLine className='size-3.5' />
             )}
-            <span className={cn(shimmerClass, 'inline-block overflow-hidden')}>
-              {type === 'enhance'
-                ? isStreaming
-                  ? 'Enhancing prompt'
-                  : 'Enhanced prompt'
-                : isStreaming
-                  ? 'Thinking'
-                  : `Thought for ${thinkingSeconds} seconds`}
+            <span className='inline-block overflow-hidden'>
+              {isStreaming ? (
+                <ShiningText>{messageText}</ShiningText>
+              ) : (
+                messageText
+              )}
             </span>
           </div>
         </CollapsibleTrigger>
