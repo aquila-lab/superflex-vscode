@@ -44,7 +44,7 @@ export const SUPPORTED_FILE_EXTENSIONS = [
 // project json files that are relevant for code generation
 export const RELEVANT_JSON_FILES = [
   'theme.json',
-  'tailwind.config.json',
+  'tailwind.json',
   'menu.json',
   'forms.json',
   'components.json',
@@ -52,7 +52,9 @@ export const RELEVANT_JSON_FILES = [
   'package.json',
   'tsconfig.json',
   'eslint.json',
-  'prettier.config.json'
+  'prettier.json',
+  'biome.json',
+  'vite.json'
 ]
 
 // Binary and non-programming file types to ignore when scanning workspace
