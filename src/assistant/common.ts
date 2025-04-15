@@ -59,7 +59,7 @@ export async function isUploadAllowedByTierAndSize(
 
   // We are taking into account only filtered files
   const totalLines = await countTotalLinesInFiles(filePaths)
-  return totalLines <= 20000 && false
+  return totalLines <= 20000
 }
 
 async function countTotalLinesInFiles(filePaths: string[]): Promise<number> {
