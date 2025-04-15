@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { ShiningText } from './ShiningText'
 
 export const DotLoader = ({
-  prefix,
+  prefix = 'Generating',
   className = 'text-xs px-2.5 py-2 text-muted-foreground'
 }: {
   prefix?: string
