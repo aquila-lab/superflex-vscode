@@ -13,6 +13,7 @@ import {
 } from '../../../../../../../../common/utils'
 import { CodeBlock } from './CodeBlock'
 import { CodeBlockToolbar } from './CodeBlockToolbar'
+import { useCodeBlockLoading } from '../../../../../providers/CodeBlockLoadingProvider'
 
 export const CollapsibleCodeBlock = memo(
   ({
@@ -25,6 +26,12 @@ export const CollapsibleCodeBlock = memo(
     extension: string
   }) => {
     const [isOpen, setIsOpen] = useState(false)
+    const { isLoading } = useCodeBlockLoading()
+
+    const isLoadingState = useMemo(
+      () => (filePath ? isLoading(filePath) : false),
+      [filePath, isLoading]
+    )
 
     const linesCount = useMemo(() => getLinesCount(draft), [draft])
     const estimatedHeight = useMemo(
@@ -53,12 +60,13 @@ export const CollapsibleCodeBlock = memo(
         <div className='relative'>
           <Collapsible
             open={isOpen}
-            onOpenChange={setIsOpen}
+            onOpenChange={isLoadingState ? undefined : setIsOpen}
           >
             <div
               className={cn(
                 'relative',
-                !isOpen && 'max-h-[500px] overflow-hidden'
+                !isOpen && 'max-h-[500px] overflow-hidden',
+                isLoadingState && 'pointer-events-none'
               )}
             >
               <CodeEditor
@@ -76,8 +84,11 @@ export const CollapsibleCodeBlock = memo(
 
             <div className='flex justify-center'>
               <CollapsibleTrigger
-                className='flex items-center justify-center pb-1 text-muted-secondary-foreground ml-0 absolute bottom-0 left-0 right-0'
+                className={
+                  'flex items-center justify-center pb-1 text-muted-secondary-foreground ml-0 absolute bottom-0 left-0 right-0'
+                }
                 isOpen={isOpen}
+                disabled={isLoadingState}
               />
             </div>
           </Collapsible>

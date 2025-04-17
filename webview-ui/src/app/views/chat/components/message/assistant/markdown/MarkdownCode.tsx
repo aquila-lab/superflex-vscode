@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { type MarkdownCodeProps, cn } from '../../../../../../../common/utils'
 import { CollapsibleCodeBlock } from './code/CollapsibleCodeBlock'
+import { useCodeBlockLoading } from '../../../../providers/CodeBlockLoadingProvider'
 
 export const MarkdownCode = ({
   inline,
@@ -12,18 +13,23 @@ export const MarkdownCode = ({
     [className]
   )
 
+  const { setLoading } = useCodeBlockLoading()
+
   const codeBlock = useMemo(() => {
     if (!match || inline) {
       return null
     }
     const [, extension, filePath, startLine, endLine] = match
+
+    setLoading(filePath)
+
     return {
       extension,
       ...(filePath && { filePath: filePath.trim() }),
       ...(startLine && { startLine: Number.parseInt(startLine, 10) }),
       ...(endLine && { endLine: Number.parseInt(endLine, 10) })
     }
-  }, [match, inline])
+  }, [match, inline, setLoading])
 
   if (!codeBlock) {
     return (

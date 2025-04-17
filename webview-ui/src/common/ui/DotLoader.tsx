@@ -4,10 +4,12 @@ import { ShiningText } from './ShiningText'
 
 export const DotLoader = ({
   prefix = 'Generating',
-  className = 'text-sm px-2.5 py-2 text-muted-foreground flex items-center justify-start gap-1.5'
+  className = 'text-sm px-2.5 py-2 text-muted-foreground flex items-center justify-start gap-1.5',
+  noIcon = false
 }: {
   prefix?: string
   className?: string
+  noIcon?: boolean
 }) => {
   const [dotCount, setDotCount] = useState(0)
 
@@ -23,6 +25,10 @@ export const DotLoader = ({
     const interval = setInterval(updateDots, 200)
     return () => clearInterval(interval)
   }, [updateDots])
+
+  if (noIcon) {
+    return <ShiningText>{loadingText}</ShiningText>
+  }
 
   return (
     <div className={className}>
