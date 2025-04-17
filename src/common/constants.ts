@@ -37,6 +37,7 @@ export const SUPPORTED_FILE_EXTENSIONS = [
   '.jsx',
   '.tsx',
   '.vue',
+  '.svelte',
   '.md',
   '.markdown'
 ]
