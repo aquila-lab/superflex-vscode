@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { ShiningText } from './ShiningText'
+import { ZapIcon } from 'lucide-react'
 
 export const DotLoader = ({
   prefix = 'Generating',
-  className = 'text-xs px-2.5 py-2 text-muted-foreground'
+  className = 'text-sm px-2.5 py-2 text-muted-foreground flex items-center justify-start gap-1.5'
 }: {
   prefix?: string
   className?: string
@@ -25,6 +26,7 @@ export const DotLoader = ({
 
   return (
     <div className={className}>
+      <ZapIcon className='size-3.5' />
       <ShiningText>{loadingText}</ShiningText>
     </div>
   )
