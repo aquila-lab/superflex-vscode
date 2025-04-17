@@ -82,9 +82,9 @@ export const CollapsibleCodeBlock = memo(
               )}
             </div>
 
-            <div className='flex justify-center border-t border-border'>
+            <div className='flex justify-center'>
               <CollapsibleTrigger
-                className='flex items-center justify-center py-1'
+                className='flex items-center justify-center pb-1 text-muted-secondary-foreground ml-0 absolute bottom-0 left-0 right-0'
                 isOpen={isOpen}
               />
             </div>
