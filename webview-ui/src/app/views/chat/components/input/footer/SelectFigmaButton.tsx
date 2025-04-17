@@ -47,7 +47,7 @@ export const SelectFigmaButton = () => {
   const handleButtonClicked = useCallback(() => {
     if (isFreePlan) {
       fetchSubscription()
-      setOnContinue(() => handleFigmaAction)
+      setOnContinue(null)
       setIsOpen(true)
       return
     }

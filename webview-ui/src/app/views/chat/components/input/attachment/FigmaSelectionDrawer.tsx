@@ -15,12 +15,10 @@ import { Skeleton } from '../../../../../../common/ui/Skeleton'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
 import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
-import { FreePlanFigmaLimitWarning } from './FreePlanFigmaLimitWarning'
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()
-  const { isFreePlan, hasReachedFigmaRequestLimit, figmaLimits } =
-    useFigmaFreePlanLimits()
+  const { isFreePlan } = useFigmaFreePlanLimits()
   const {
     isSelectionDrawerOpen,
     figmaLink,
@@ -84,16 +82,13 @@ export const FigmaSelectionDrawer = () => {
   }, [])
 
   const renderContent = useCallback(() => {
-    if (isFreePlan && hasReachedFigmaRequestLimit) {
-      const figmaRequestLimit = figmaLimits.maxRequests
-
+    if (isFreePlan) {
       return (
         <div className='flex flex-col px-4 gap-4'>
           <Alert variant='destructive'>
             <AlertDescription>
-              You have reached your free plan limit of {figmaRequestLimit} Figma{' '}
-              {figmaRequestLimit === 1 ? 'request' : 'requests'}. Upgrade to
-              premium for unlimited Figma access.
+              Figma integration is a premium feature. Upgrade to Premium or Team
+              plan for access.
             </AlertDescription>
           </Alert>
         </div>
@@ -103,8 +98,6 @@ export const FigmaSelectionDrawer = () => {
     if (isConfirmStep && figmaPlaceholderAttachment) {
       return (
         <div className='flex flex-col px-4 gap-4'>
-          {isFreePlan && <FreePlanFigmaLimitWarning />}
-
           {figmaPlaceholderAttachment.imageUrl && (
             <div className='w-full rounded-md overflow-hidden'>
               {!isImageLoaded && <Skeleton className='w-full h-64' />}
@@ -127,8 +120,6 @@ export const FigmaSelectionDrawer = () => {
     if (figmaError) {
       return (
         <div className='flex flex-col px-4 gap-4'>
-          {isFreePlan && <FreePlanFigmaLimitWarning />}
-
           <Input
             type='text'
             value={figmaLink}
@@ -152,8 +143,6 @@ export const FigmaSelectionDrawer = () => {
 
     return (
       <div className='flex flex-col px-4 gap-4'>
-        {isFreePlan && <FreePlanFigmaLimitWarning />}
-
         <Input
           type='text'
           value={figmaLink}
@@ -182,13 +171,11 @@ export const FigmaSelectionDrawer = () => {
     handleInputChange,
     isImageLoaded,
     handleImageLoad,
-    isFreePlan,
-    hasReachedFigmaRequestLimit,
-    figmaLimits
+    isFreePlan
   ])
 
   const renderFooterButtons = useCallback(() => {
-    if (isFreePlan && hasReachedFigmaRequestLimit) {
+    if (isFreePlan) {
       return (
         <div className='flex justify-between w-full mb-4'>
           <Button
@@ -291,8 +278,7 @@ export const FigmaSelectionDrawer = () => {
     isConfirmStep,
     isFigmaLoading,
     submitButtonRef,
-    isFreePlan,
-    hasReachedFigmaRequestLimit
+    isFreePlan
   ])
 
   return (
@@ -303,9 +289,11 @@ export const FigmaSelectionDrawer = () => {
       <DrawerContent>
         <DrawerHeader className='pb-4'>
           <DrawerTitle>
-            {isConfirmStep && !isFigmaLoading
-              ? 'Confirm Figma Selection'
-              : 'Add Figma Selection'}
+            {isFreePlan
+              ? 'Figma Integration - Premium Feature'
+              : isConfirmStep && !isFigmaLoading
+                ? 'Confirm Figma Selection'
+                : 'Add Figma Selection'}
           </DrawerTitle>
           {figmaError ? (
             <Alert
@@ -325,9 +313,11 @@ export const FigmaSelectionDrawer = () => {
             </Alert>
           ) : (
             <DrawerDescription>
-              {isConfirmStep && !isFigmaLoading
-                ? 'Review your Figma selection below'
-                : 'Paste the link to your Figma selection below'}
+              {isFreePlan
+                ? 'Upgrade to Premium or Team plan to access Figma integration'
+                : isConfirmStep && !isFigmaLoading
+                  ? 'Review your Figma selection below'
+                  : 'Paste the link to your Figma selection below'}
             </DrawerDescription>
           )}
         </DrawerHeader>

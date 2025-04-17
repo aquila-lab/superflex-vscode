@@ -1,6 +1,8 @@
+import { useMemo } from 'react'
 import { CardDescription } from '../../../../../common/ui/Card'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { UsageDisplay } from './UsageDisplay'
+import { isFreeTierSubscription } from '../../../../../../../shared/model'
 
 export const UsageSection = () => {
   const { subscription } = useUser()
@@ -8,6 +10,11 @@ export const UsageSection = () => {
   if (!subscription.plan) {
     return null
   }
+
+  const isFreePlan = useMemo(
+    () => isFreeTierSubscription(subscription),
+    [subscription]
+  )
 
   return (
     <div className='space-y-4'>
@@ -22,11 +29,13 @@ export const UsageSection = () => {
         used={subscription.basicRequestsUsed}
         limit={subscription.plan.basicRequestLimit}
       />
-      <UsageDisplay
-        label='Figma Requests'
-        used={subscription.figmaRequestsUsed}
-        limit={subscription.plan.figmaRequestLimit}
-      />
+      {!isFreePlan && (
+        <UsageDisplay
+          label='Figma Requests'
+          used={subscription.figmaRequestsUsed}
+          limit={subscription.plan.figmaRequestLimit}
+        />
+      )}
     </div>
   )
 }

@@ -16,16 +16,7 @@ export const useFigmaFreePlanLimits = () => {
     [subscription?.plan?.figmaRequestLimit, subscription?.plan, subscription]
   )
 
-  const hasReachedFigmaRequestLimit = useMemo(
-    () =>
-      isFreePlan && (subscription?.figmaRequestsUsed || 0) >= figmaRequestLimit,
-    [
-      isFreePlan,
-      subscription,
-      subscription?.figmaRequestsUsed,
-      figmaRequestLimit
-    ]
-  )
+  const hasReachedFigmaRequestLimit = useMemo(() => isFreePlan, [isFreePlan])
 
   const figmaLimits = useMemo(
     () => ({

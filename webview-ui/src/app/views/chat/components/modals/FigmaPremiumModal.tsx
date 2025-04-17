@@ -13,16 +13,11 @@ import {
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useFigmaPremiumModal } from '../../providers/FigmaPremiumModalProvider'
-import { useFigmaFreePlanLimits } from '../../hooks/useFigmaFreePlanLimits'
-import { MAX_FREE_NODES } from '../../../../../../../shared/common/constants'
-import { Badge } from '../../../../../common/ui/Badge'
 
 export const FigmaPremiumModal = () => {
   const { config } = useGlobal()
   const { subscribe } = useUser()
-  const { isOpen, setIsOpen, onContinue } = useFigmaPremiumModal()
-  const { isFigmaAuthenticated } = useGlobal()
-  const { hasReachedFigmaRequestLimit, figmaLimits } = useFigmaFreePlanLimits()
+  const { isOpen, setIsOpen } = useFigmaPremiumModal()
 
   const handleSubscribe = useCallback(() => {
     subscribe(
@@ -31,16 +26,6 @@ export const FigmaPremiumModal = () => {
     setIsOpen(false)
   }, [subscribe, setIsOpen, config?.uriScheme])
 
-  const handleContinue = useCallback(() => {
-    setIsOpen(false)
-
-    if (onContinue) {
-      onContinue(!!isFigmaAuthenticated)
-    }
-  }, [setIsOpen, isFigmaAuthenticated, onContinue])
-
-  const showContinueButton = !hasReachedFigmaRequestLimit
-
   return (
     <Dialog
       open={isOpen}
@@ -48,52 +33,33 @@ export const FigmaPremiumModal = () => {
     >
       <DialogContent className='w-full'>
         <DialogHeader>
-          <DialogTitle className='text-left'>
-            Limited Figma Access on Free Plan
-          </DialogTitle>
+          <DialogTitle className='text-left'>Figma to Code</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          {hasReachedFigmaRequestLimit ? (
-            <div className='mb-4'>
-              <Badge
-                variant='destructive'
-                className='mb-2'
-              >
-                No requests remaining
-              </Badge>
-              <p className='text-xs text-muted-foreground'>
-                You have used your free Figma request for this billing period.
-                Upgrade to Premium for unlimited Figma requests.
-              </p>
-            </div>
-          ) : (
-            <div>
-              <Badge variant='warning'>
-                {figmaLimits.requestsUsed}/{figmaLimits.maxRequests} requests
-                used
-              </Badge>
-              <p className='text-xs text-muted-foreground mt-4'>
-                Your free plan includes limited Figma access with the following
-                restrictions:
-              </p>
-              <ul className='text-foreground mt-2'>
-                <li className='flex items-center gap-2'>
-                  <CircleIcon className='w-1 h-1' /> {figmaLimits.maxRequests}{' '}
-                  free {figmaLimits.maxRequests === 1 ? 'request' : 'requests'}{' '}
-                  per billing period
-                </li>
-                <li className='flex items-center gap-2'>
-                  <CircleIcon className='w-1 h-1' /> Maximum {MAX_FREE_NODES}{' '}
-                  nodes per request
-                </li>
-                <li className='flex items-center gap-2'>
-                  <CircleIcon className='w-1 h-1' /> Slow response times
-                </li>
-              </ul>
-            </div>
-          )}
+          <div>
+            <p className='text-xs text-muted-foreground'>
+              Figma integration is a premium feature available exclusively for
+              Premium and Team plans.
+            </p>
+            <ul className='text-foreground mt-2'>
+              <li className='flex items-center gap-2'>
+                <CircleIcon className='w-1 h-1' /> Connect to Figma for
+                design-to-code
+              </li>
+              <li className='flex items-center gap-2'>
+                <CircleIcon className='w-1 h-1' /> Extract code from Figma
+                designs
+              </li>
+              <li className='flex items-center gap-2'>
+                <CircleIcon className='w-1 h-1' /> Process unlimited nodes
+              </li>
+              <li className='flex items-center gap-2'>
+                <CircleIcon className='w-1 h-1' /> Make unlimited requests
+              </li>
+            </ul>
+          </div>
           <p className='text-xs text-muted-foreground mt-2'>
-            Upgrade to Premium for unlimited Figma integration and more powerful
+            Upgrade to Premium for full Figma integration and more powerful
             design-to-code capabilities!
           </p>
         </DialogDescription>
@@ -104,15 +70,6 @@ export const FigmaPremiumModal = () => {
           >
             Upgrade to Premium
           </Button>
-          {showContinueButton && (
-            <Button
-              variant='secondary'
-              onClick={handleContinue}
-              className='flex-1'
-            >
-              {isFigmaAuthenticated ? 'Continue' : 'Connect Figma'}
-            </Button>
-          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
