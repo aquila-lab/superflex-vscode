@@ -95,7 +95,10 @@ export async function findWorkspaceFiles(
   if (!globPatterns) {
     globPatterns = [
       ...SUPPORTED_FILE_EXTENSIONS.map(ext => `**/*${ext}`),
-      ...RELEVANT_JSON_FILES.map(file => `**/${file}`)
+      ...RELEVANT_JSON_FILES.map(filename => {
+        const name = filename.split('.')[0]
+        return `**/${name}*`
+      })
     ]
   }
 
@@ -111,7 +114,8 @@ export async function findWorkspaceFiles(
     '**/.git/**',
     '**/.cache/**',
     '**/__tests__/**',
-    '**/__mocks__/**'
+    '**/__mocks__/**',
+    '**package-lock.json**'
   ]
 
   // Ignore business logic files
@@ -125,7 +129,7 @@ export async function findWorkspaceFiles(
     '**/validators/**',
     '**/helpers/**',
     '**/domain/**',
-    '**/infrastructure/**',
+    '**/infrastructure/**'
   ]
 
   // Read .gitignore and .superflexignore
