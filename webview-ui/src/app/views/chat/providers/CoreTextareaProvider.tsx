@@ -9,13 +9,13 @@ import {
   useMemo,
   useRef
 } from 'react'
+import { isFreeTierSubscription } from '../../../../../../shared/model'
 import {
   EventRequestType,
   type EventResponsePayload,
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
-import { isFreeTierSubscription } from '../../../../../../shared/model'
 import {
   FIGMA_LINK_REGEX,
   readImageFileAsBase64

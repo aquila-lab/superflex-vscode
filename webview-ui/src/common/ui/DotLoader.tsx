@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
-import { ShiningText } from './ShiningText'
 import { ZapIcon } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ShiningText } from './ShiningText'
 
 export const DotLoader = ({
   prefix = 'Generating',

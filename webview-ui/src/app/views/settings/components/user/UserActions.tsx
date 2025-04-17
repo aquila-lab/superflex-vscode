@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
+import { isFreeTierSubscription } from '../../../../../../../shared/model'
 import { Button } from '../../../../../common/ui/Button'
+import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useGlobal } from '../../../../layers/global/providers/GlobalProvider'
 import { useSettingsHandlers } from '../../providers/SettingsProvider'
 import { ActionButtons } from '../base/ActionButtons'
-import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
-import { isFreeTierSubscription } from '../../../../../../../shared/model'
 
 export const UserActions = () => {
   const { isFigmaAuthenticated } = useGlobal()

@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react'
+import { DotLoader } from '../../../../../common/ui/DotLoader'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 import { AssistantMessage } from './assistant/AssistantMessage'
 import { ThinkingMessage } from './thinking/ThinkingMessage'
-import { DotLoader } from '../../../../../common/ui/DotLoader'
 
 const StreamingMessageComponent = ({
   isFollowUp = false

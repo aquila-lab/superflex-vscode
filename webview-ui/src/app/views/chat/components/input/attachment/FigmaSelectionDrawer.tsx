@@ -12,9 +12,9 @@ import {
 } from '../../../../../../common/ui/Drawer'
 import { Input } from '../../../../../../common/ui/Input'
 import { Skeleton } from '../../../../../../common/ui/Skeleton'
+import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
-import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()

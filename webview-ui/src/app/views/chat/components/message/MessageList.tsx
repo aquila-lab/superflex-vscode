@@ -3,9 +3,9 @@ import { useMemo } from 'react'
 import { Role } from '../../../../../../../shared/model'
 import { useMessages } from '../../../../layers/authenticated/providers/MessagesProvider'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
+import { MessageListContainer } from './MessageListContainer'
 import { Messages } from './Messages'
 import { StreamingMessage } from './StreamingMessage'
-import { MessageListContainer } from './MessageListContainer'
 
 const MessageRenderer = () => {
   const { messages } = useMessages()

@@ -40,7 +40,6 @@ export const MarkdownCode = ({
       filePath={codeBlock.filePath}
       draft={draft}
       extension={codeBlock.extension}
-      isLoading={false}
     />
   )
 }

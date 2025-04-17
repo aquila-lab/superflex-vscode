@@ -1,8 +1,8 @@
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import { forwardRef } from 'react'
-import { cn } from '../utils'
 import ScrollToBottom from 'react-scroll-to-bottom'
+import { cn } from '../utils'
 
 const Collapsible = CollapsiblePrimitive.Root
 

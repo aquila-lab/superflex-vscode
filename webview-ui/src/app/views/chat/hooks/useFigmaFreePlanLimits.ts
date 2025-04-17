@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { useUser } from '../../../layers/authenticated/providers/UserProvider'
 import { MAX_FREE_NODES } from '../../../../../../shared/common/constants'
 import { isFreeTierSubscription } from '../../../../../../shared/model'
+import { useUser } from '../../../layers/authenticated/providers/UserProvider'
 
 export const useFigmaFreePlanLimits = () => {
   const { subscription } = useUser()

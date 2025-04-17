@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
+import { isFreeTierSubscription } from '../../../../../../../../shared/model'
 import { Alert, AlertDescription } from '../../../../../../common/ui/Alert'
 import { useUser } from '../../../../../layers/authenticated/providers/UserProvider'
-import { isFreeTierSubscription } from '../../../../../../../../shared/model'
 
 export const FreePlanFigmaLimitWarning = () => {
   const { subscription } = useUser()

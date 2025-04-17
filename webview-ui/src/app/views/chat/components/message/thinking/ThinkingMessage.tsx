@@ -1,16 +1,16 @@
-import { useState, useMemo, useEffect } from 'react'
+import { StarsIcon } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { RiBrainLine } from 'react-icons/ri'
 import { Role } from '../../../../../../../../shared/model'
-import { cn } from '../../../../../../common/utils'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
 } from '../../../../../../common/ui/Collapsible'
-import { MessageContainer } from '../shared/MessageContainer'
-import { RiBrainLine } from 'react-icons/ri'
-import { StarsIcon } from 'lucide-react'
-import { MarkdownRender } from '../assistant/markdown/MarkdownRender'
 import { ShiningText } from '../../../../../../common/ui/ShiningText'
+import { cn } from '../../../../../../common/utils'
+import { MarkdownRender } from '../assistant/markdown/MarkdownRender'
+import { MessageContainer } from '../shared/MessageContainer'
 
 export const ThinkingMessage = ({
   content,

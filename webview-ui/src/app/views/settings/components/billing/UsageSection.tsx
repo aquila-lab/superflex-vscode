@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
+import { isFreeTierSubscription } from '../../../../../../../shared/model'
 import { CardDescription } from '../../../../../common/ui/Card'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { UsageDisplay } from './UsageDisplay'
-import { isFreeTierSubscription } from '../../../../../../../shared/model'
 
 export const UsageSection = () => {
   const { subscription } = useUser()

@@ -1,30 +1,28 @@
-import { memo, useState, useMemo } from 'react'
+import { memo, useMemo, useState } from 'react'
+import { CodeEditor } from '../../../../../../../../common/ui/CodeEditor'
 import {
   Collapsible,
   CollapsibleTrigger
 } from '../../../../../../../../common/ui/Collapsible'
 import {
-  cn,
+  COLLAPSED_HEIGHT,
   LINE_HEIGHT,
-  getLinesCount,
   PADDING,
-  COLLAPSED_HEIGHT
+  cn,
+  getLinesCount
 } from '../../../../../../../../common/utils'
 import { CodeBlock } from './CodeBlock'
-import { CodeEditor } from '../../../../../../../../common/ui/CodeEditor'
 import { CodeBlockToolbar } from './CodeBlockToolbar'
 
 export const CollapsibleCodeBlock = memo(
   ({
     filePath,
     draft,
-    extension,
-    isLoading = false
+    extension
   }: {
     filePath?: string
     draft: string
     extension: string
-    isLoading?: boolean
   }) => {
     const [isOpen, setIsOpen] = useState(false)
 
@@ -44,19 +42,13 @@ export const CollapsibleCodeBlock = memo(
           filePath={filePath}
           draft={draft}
           extension={extension}
-          isLoading={isLoading}
         />
       )
     }
 
     return (
       <div className='rounded-md border border-border bg-background mt-1'>
-        <CodeBlockToolbar
-          filePath={filePath}
-          isLoading={isLoading}
-        >
-          {draft}
-        </CodeBlockToolbar>
+        <CodeBlockToolbar filePath={filePath}>{draft}</CodeBlockToolbar>
 
         <div className='relative'>
           <Collapsible

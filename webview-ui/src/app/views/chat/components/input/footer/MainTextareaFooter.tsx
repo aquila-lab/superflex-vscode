@@ -1,9 +1,9 @@
 import { TrashIcon } from '@radix-ui/react-icons'
 import { Button } from '../../../../../../common/ui/Button'
+import { DotLoader } from '../../../../../../common/ui/DotLoader'
 import { useTextareaFooter } from '../../../providers/TextareaFooterProvider'
 import { AddAttachmentButtons } from './AddAttachmentButtons'
 import { SendButton } from './SendButton'
-import { DotLoader } from '../../../../../../common/ui/DotLoader'
 
 export const MainTextareaFooter = () => {
   const { isDisabled, hasContent, handleStop, handleSend } = useTextareaFooter()
