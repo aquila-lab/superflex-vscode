@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import * as fs from 'node:fs'
 
-import { FIGMA_SELECTION_URL_REGEX, URL_REGEX } from 'shared/common/constants'
+import { FIGMA_SELECTION_URL_REGEX } from 'shared/common/constants'
 import { isFreeTierSubscription, type MessageContent } from 'shared/model'
 import { AppError, AppErrorSlug } from 'shared/model/AppError.model'
 import * as api from '../api'
@@ -31,22 +31,11 @@ export function validateInputMessage(messageContent: MessageContent): void {
     )
   }
 
-  if (containsURL(messageContent.text)) {
-    throw new AppError(
-      'URLs are not yet supported within the text input, please update your message and try again.',
-      AppErrorSlug.UrlNotSupportedInPrompt
-    )
-  }
-
   return
 }
 
 function containsFigmaSelectionURL(inputString: string): boolean {
   return FIGMA_SELECTION_URL_REGEX.test(inputString)
-}
-
-function containsURL(inputString: string): boolean {
-  return URL_REGEX.test(inputString)
 }
 
 export async function isUploadAllowedByTierAndSize(
