@@ -118,20 +118,6 @@ export async function findWorkspaceFiles(
     '**package-lock.json**'
   ]
 
-  // Ignore business logic files
-  const businessLogicIgnore = [
-    '**/services/*',
-    '**/data/*',
-    '**/errors/*',
-    '**/tests/**',
-    '**/migrations/**',
-    '**/middleware/**',
-    '**/validators/**',
-    '**/helpers/**',
-    '**/domain/**',
-    '**/infrastructure/**'
-  ]
-
   // Read .gitignore and .superflexignore
   const gitignorePatterns = readIgnoreFile(
     path.join(workspaceDirPath, '.gitignore')
@@ -145,8 +131,7 @@ export async function findWorkspaceFiles(
     ...(ignore || []),
     ...defaultIgnore,
     ...gitignorePatterns,
-    ...superflexignorePatterns,
-    ...businessLogicIgnore
+    ...superflexignorePatterns
   ]
 
   return findFiles(workspaceDirPath, globPatterns, combinedIgnore)
