@@ -1,4 +1,4 @@
-import type { FileNodesResponse } from 'figma-js'
+import type { FileNodesResponse, Node } from 'figma-js'
 import { AppErrorSlug } from 'shared/model/AppError.model'
 import type { AppWarning } from 'shared/model/AppWarning.model'
 import { FigmaService } from 'src/services/FigmaService'
@@ -38,7 +38,7 @@ async function getFigmaUserInfo(): Promise<User> {
   }
 }
 
-type GetFigmaSelectionImageUrlArgs = {
+type GetFigmaSelectionUrlArgs = {
   fileID: string
   nodeID: string
 }
@@ -46,7 +46,7 @@ type GetFigmaSelectionImageUrlArgs = {
 async function getFigmaSelectionImageUrl({
   fileID,
   nodeID
-}: GetFigmaSelectionImageUrlArgs): Promise<string> {
+}: GetFigmaSelectionUrlArgs): Promise<string> {
   try {
     const { data } = await FigmaApi.get(`/images/${fileID}?ids=${nodeID}`)
     if (data.err) {
@@ -69,20 +69,41 @@ async function getFigmaSelectionImageUrl({
   }
 }
 
-type ValidateFigmaSelectionArgs = GetFigmaSelectionImageUrlArgs & {
-  isFreePlan?: boolean
-}
-
-async function validateFigmaSelection({
+async function getFigmaSelectionDocument({
   fileID,
-  nodeID,
-  isFreePlan
-}: ValidateFigmaSelectionArgs): Promise<AppWarning | undefined> {
+  nodeID
+}: GetFigmaSelectionUrlArgs): Promise<Node | undefined> {
   try {
     const { data } = await FigmaApi.get<FileNodesResponse>(
       `/files/${fileID}/nodes?ids=${nodeID}`
     )
-    return FigmaService.validateFigmaSelection(data, nodeID, isFreePlan)
+    return data.nodes[nodeID.replace('-', ':')]?.document
+  } catch (err) {
+    return Promise.reject(parseError(err))
+  }
+}
+
+type ValidateFigmaSelectionArgs = {
+  document: Node | undefined
+  isFreePlan?: boolean
+}
+
+async function validateFigmaSelection({
+  document,
+  isFreePlan
+}: ValidateFigmaSelectionArgs): Promise<AppWarning | undefined> {
+  try {
+    return FigmaService.validateFigmaSelection(document, isFreePlan)
+  } catch (err) {
+    return Promise.reject(parseError(err))
+  }
+}
+
+async function getFigmaSelectionColorPalette(
+  document: Node | undefined
+): Promise<string[]> {
+  try {
+    return FigmaService.getFigmaSelectionColorPalette(document)
   } catch (err) {
     return Promise.reject(parseError(err))
   }
@@ -92,5 +113,7 @@ export {
   figmaRefreshAccessToken,
   getFigmaUserInfo,
   getFigmaSelectionImageUrl,
-  validateFigmaSelection
+  getFigmaSelectionDocument as getFigmaSelectionData,
+  validateFigmaSelection,
+  getFigmaSelectionColorPalette
 }

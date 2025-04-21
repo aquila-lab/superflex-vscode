@@ -1,7 +1,8 @@
-import type { FileNodesResponse, Node } from 'figma-js'
+import type { Node } from 'figma-js'
 import { MAX_FREE_NODES } from '../../shared/common/constants'
 import { AppError, AppErrorSlug } from '../../shared/model/AppError.model'
 import { AppWarning, AppWarningSlug } from '../../shared/model/AppWarning.model'
+import { rgbaToHex } from '../common/utils'
 
 export class FigmaService {
   static extractSelectionUrlFromResponse(data: any, nodeID: string): string {
@@ -9,13 +10,9 @@ export class FigmaService {
   }
 
   static validateFigmaSelection(
-    data: FileNodesResponse,
-    nodeID: string,
+    document: Node | undefined,
     isFreePlan = false
   ): AppWarning | undefined {
-    const nodeData = data.nodes[nodeID.replace('-', ':')]
-
-    const document = nodeData?.document
     // Making sure the selection is not too big, need a more precise check in future
     if (!document || (document.type as string) === 'SECTION') {
       throw new AppError(
@@ -126,5 +123,63 @@ export class FigmaService {
       'layoutMode' in node &&
       (node.layoutMode === 'HORIZONTAL' || node.layoutMode === 'VERTICAL')
     )
+  }
+
+  static getFigmaSelectionColorPalette(
+    node: Node | undefined,
+    colorPalette: Set<string> = new Set()
+  ): string[] {
+    if (!node) {
+      return []
+    }
+
+    if ('visible' in node && node.visible === false) {
+      return []
+    }
+
+    if ('fills' in node && Array.isArray(node.fills) && node.fills.length > 0) {
+      const fill = node.fills[0]
+      if (fill.type === 'SOLID' && 'color' in fill && fill.color) {
+        colorPalette.add(rgbaToHex(fill.color))
+      }
+    }
+
+    if (
+      'strokes' in node &&
+      Array.isArray(node.strokes) &&
+      node.strokes.length > 0
+    ) {
+      // Add stroke color and width if available
+      const stroke = node.strokes[0]
+      if (stroke.type === 'SOLID' && 'color' in stroke && stroke.color) {
+        colorPalette.add(rgbaToHex(stroke.color))
+      }
+    }
+
+    if (
+      'effects' in node &&
+      Array.isArray(node.effects) &&
+      node.effects.length > 0
+    ) {
+      node.effects
+        .filter(effect => effect.visible)
+        .forEach(effect => {
+          if (effect.color) {
+            colorPalette.add(rgbaToHex(effect.color))
+          }
+        })
+    }
+
+    if (
+      'children' in node &&
+      Array.isArray(node.children) &&
+      node.children.length > 0
+    ) {
+      node.children.forEach((child: any) =>
+        FigmaService.getFigmaSelectionColorPalette(child, colorPalette)
+      )
+    }
+
+    return Array.from(colorPalette)
   }
 }

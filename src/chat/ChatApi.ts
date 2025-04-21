@@ -26,6 +26,8 @@ import {
 import * as api from '../api'
 import {
   HttpStatusCode,
+  getFigmaSelectionColorPalette,
+  getFigmaSelectionData as getFigmaSelectionDocument,
   getFigmaSelectionImageUrl,
   validateFigmaSelection
 } from '../api'
@@ -327,16 +329,24 @@ export class ChatAPI {
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
 
+          const figmaSelectionDocument =
+            await getFigmaSelectionDocument(figmaSelectionUrl)
+
           const warning = await validateFigmaSelection({
-            fileID: figmaSelectionUrl.fileID,
-            nodeID: figmaSelectionUrl.nodeID,
+            document: figmaSelectionDocument,
             isFreePlan
           })
+
+          const colorPalette = await getFigmaSelectionColorPalette(
+            figmaSelectionDocument
+          )
+          console.log('colorPalette', colorPalette)
 
           Telemetry.capture('figma_request_used', {
             isFreePlan
           })
 
+          // TODO: Extend return type to include color palette
           return {
             fileID: figmaSelectionUrl.fileID,
             nodeID: figmaSelectionUrl.nodeID,
