@@ -6,7 +6,10 @@ import {
   useMemo,
   useState
 } from 'react'
-import { EventResponseType } from '../../../../../../shared/protocol'
+import {
+  EventResponseType,
+  type TypedEventResponseMessage
+} from '../../../../../../shared/protocol'
 import { useConsumeMessage } from '../../../layers/global/hooks/useConsumeMessage'
 import { useNewMessage } from '../../../layers/authenticated/providers/NewMessageProvider'
 
@@ -49,11 +52,28 @@ export const CodeBlockLoadingProvider = ({
     [loadingStates, isMessageProcessing, isMessageStreaming]
   )
 
-  const handleMessageComplete = useCallback(() => {
+  const handleNewMessage = useCallback(() => {
     clearLoadingStates()
   }, [clearLoadingStates])
 
-  useConsumeMessage(EventResponseType.MESSAGE_COMPLETE, handleMessageComplete)
+  const handleMessage = useCallback(
+    ({ command }: TypedEventResponseMessage) => {
+      switch (command) {
+        case EventResponseType.MESSAGE_COMPLETE:
+          handleNewMessage()
+          break
+        case EventResponseType.SEND_MESSAGE:
+          handleNewMessage()
+          break
+      }
+    },
+    [handleNewMessage]
+  )
+
+  useConsumeMessage(
+    [EventResponseType.MESSAGE_COMPLETE, EventResponseType.SEND_MESSAGE],
+    handleMessage
+  )
 
   const value = useMemo(
     () => ({
