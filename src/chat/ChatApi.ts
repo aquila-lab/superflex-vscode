@@ -636,6 +636,59 @@ export class ChatAPI {
       .registerEvent(
         EventRequestType.OPEN_FILE,
         async (payload: { filePath: string }) => {
+          // Check if this is an attachment file path
+          if (payload.filePath.startsWith('attachment://')) {
+            const [, type, id] = payload.filePath.split('/')
+
+            // Create a temporary HTML file to preview the attachment
+            const panel = vscode.window.createWebviewPanel(
+              `superflex.attachment.${type}`,
+              `${type === 'figma' ? 'Figma' : 'Image'} Preview`,
+              vscode.ViewColumn.One,
+              {
+                enableScripts: true,
+                retainContextWhenHidden: true
+              }
+            )
+
+            // For Figma attachments, we need to fetch the actual data
+            // TODO: Implement proper data retrieval mechanism
+            // For now, show a placeholder
+            panel.webview.html = `
+              <html>
+                <head>
+                  <style>
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                      padding: 20px;
+                      text-align: center;
+                    }
+                    h1 {
+                      color: #333;
+                    }
+                    .placeholder {
+                      margin-top: 20px;
+                      padding: 20px;
+                      background-color: #f5f5f5;
+                      border-radius: 5px;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <h1>${type === 'figma' ? 'Figma' : 'Image'} Preview</h1>
+                  <div class="placeholder">
+                    <p>Attachment preview will be implemented in a future update.</p>
+                    <p>Type: ${type}</p>
+                    <p>ID: ${id}</p>
+                  </div>
+                </body>
+              </html>
+            `
+
+            return
+          }
+
+          // Handle regular file opening
           if (!this._workspaceDirPath) {
             return
           }
