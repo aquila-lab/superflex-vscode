@@ -1,9 +1,8 @@
-import { Fragment, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useUser } from '../../../../layers/authenticated/providers/UserProvider'
 import { useEditMode } from '../../providers/EditModeProvider'
 import { InputProvider } from '../../providers/InputProvider'
 import { UserMessageHeader } from '../message/user/UserMessageHeader'
-import { Attachment } from './attachment/Attachment'
 import { FigmaSelectionDrawer } from './attachment/FigmaSelectionDrawer'
 
 export const AdvancedTextareaPresenter = ({
@@ -20,13 +19,10 @@ export const AdvancedTextareaPresenter = ({
 
   if (isMainTextarea) {
     return (
-      <Fragment>
-        <Attachment />
-        <InputProvider text={text}>
-          {children}
-          <FigmaSelectionDrawer />
-        </InputProvider>
-      </Fragment>
+      <InputProvider text={text}>
+        {children}
+        <FigmaSelectionDrawer />
+      </InputProvider>
     )
   }
 
