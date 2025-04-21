@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Role } from '../../../shared/model'
 import type { TypedEventResponseMessage } from '../../../shared/protocol'
+import { cva } from 'class-variance-authority'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -311,3 +312,49 @@ export const extractThinkingContent = (
     assistantContent: text.substring(endIndex + endTag.length)
   }
 }
+
+export const isBase64Image = (src: string): boolean => {
+  if (src.startsWith('data:image/')) {
+    return true
+  }
+
+  try {
+    atob(src.slice(0, 20))
+    return true
+  } catch {
+    return false
+  }
+}
+
+export const isValidImageUrl = (src: string): boolean => {
+  try {
+    const url = new URL(src)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+export const formatImageSrc = (src: string): string => {
+  if (src.startsWith('data:image/')) {
+    return src
+  }
+
+  if (isBase64Image(src)) {
+    return `data:image/png;base64,${src}`
+  }
+
+  return src
+}
+
+export const imagePreviewVariants = cva('object-cover rounded-md', {
+  variants: {
+    size: {
+      default: 'w-full h-auto',
+      sm: 'size-12'
+    }
+  },
+  defaultVariants: {
+    size: 'default'
+  }
+})

@@ -53,3 +53,16 @@ export type FetchThreadsResponse = {
   nextCursor: string | null
   previousCursor?: string
 }
+
+export type AttachmentPreviewData = {
+  type: 'figma' | 'image'
+  imageUrl?: string
+  fileID?: string
+  nodeID?: string
+  base64Data?: string
+}
+
+export type OpenFilePayload = {
+  filePath: string
+  attachmentData?: AttachmentPreviewData
+}

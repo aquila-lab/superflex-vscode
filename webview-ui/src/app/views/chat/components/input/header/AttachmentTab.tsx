@@ -1,6 +1,10 @@
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { type MouseEvent, useCallback, useMemo } from 'react'
 import { EventRequestType } from '../../../../../../../../shared/protocol'
+import type {
+  AttachmentPreviewData,
+  OpenFilePayload
+} from '../../../../../../../../shared/protocol/types'
 import { Button } from '../../../../../../common/ui/Button'
 import { cn } from '../../../../../../common/utils'
 import { useAttachment } from '../../../providers/AttachmentProvider'
@@ -27,14 +31,38 @@ export const AttachmentTab = () => {
   )
 
   const handlePreviewAttachment = useCallback(() => {
-    if (figmaAttachment) {
-      postMessage(EventRequestType.OPEN_FILE, {
-        filePath: `attachment://figma/${Date.now()}`
-      })
+    const hasFigmaWithImage =
+      figmaAttachment &&
+      typeof figmaAttachment === 'object' &&
+      'imageUrl' in figmaAttachment &&
+      figmaAttachment.imageUrl
+
+    if (hasFigmaWithImage) {
+      const figmaPreviewData: AttachmentPreviewData = {
+        type: 'figma',
+        imageUrl: figmaAttachment.imageUrl,
+        fileID: figmaAttachment.fileID,
+        nodeID: figmaAttachment.nodeID
+      }
+
+      const payload: OpenFilePayload = {
+        filePath: `attachment://figma/${Date.now()}`,
+        attachmentData: figmaPreviewData
+      }
+
+      postMessage(EventRequestType.OPEN_FILE, payload)
     } else if (imageAttachment) {
-      postMessage(EventRequestType.OPEN_FILE, {
-        filePath: `attachment://image/${Date.now()}`
-      })
+      const imagePreviewData: AttachmentPreviewData = {
+        type: 'image',
+        base64Data: imageAttachment
+      }
+
+      const payload: OpenFilePayload = {
+        filePath: `attachment://image/${Date.now()}`,
+        attachmentData: imagePreviewData
+      }
+
+      postMessage(EventRequestType.OPEN_FILE, payload)
     }
   }, [figmaAttachment, imageAttachment, postMessage])
 

@@ -1,64 +1,17 @@
 import { Cross2Icon } from '@radix-ui/react-icons'
-import { type VariantProps, cva } from 'class-variance-authority'
+import type { VariantProps } from 'class-variance-authority'
 import { Spinner } from '../../../../../../common/ui/Spinner'
-import { cn } from '../../../../../../common/utils'
+import {
+  cn,
+  formatImageSrc,
+  imagePreviewVariants,
+  isBase64Image,
+  isValidImageUrl
+} from '../../../../../../common/utils'
 import { useEditMode } from '../../../providers/EditModeProvider'
+import type { ImgHTMLAttributes } from 'react'
 
-const imagePreviewVariants = cva('object-cover rounded-md', {
-  variants: {
-    size: {
-      default: 'w-full h-auto',
-      sm: 'size-12'
-    }
-  },
-  defaultVariants: {
-    size: 'default'
-  }
-})
-
-interface ImagePreviewProps
-  extends React.ImgHTMLAttributes<HTMLImageElement>,
-    VariantProps<typeof imagePreviewVariants> {
-  isLoading?: boolean
-  onRemove?: () => void
-  spinnerSize?: 'sm' | 'default'
-}
-
-const isBase64Image = (src: string): boolean => {
-  if (src.startsWith('data:image/')) {
-    return true
-  }
-
-  try {
-    atob(src.slice(0, 20))
-    return true
-  } catch {
-    return false
-  }
-}
-
-const isValidImageUrl = (src: string): boolean => {
-  try {
-    const url = new URL(src)
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch {
-    return false
-  }
-}
-
-const formatImageSrc = (src: string): string => {
-  if (src.startsWith('data:image/')) {
-    return src
-  }
-
-  if (isBase64Image(src)) {
-    return `data:image/png;base64,${src}`
-  }
-
-  return src
-}
-
-const ImagePreview: React.FC<ImagePreviewProps> = ({
+export const ImagePreview = ({
   isLoading = false,
   onRemove,
   size,
@@ -66,7 +19,12 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
   src,
   className,
   ...props
-}) => {
+}: ImgHTMLAttributes<HTMLImageElement> &
+  VariantProps<typeof imagePreviewVariants> & {
+    isLoading?: boolean
+    onRemove?: () => void
+    spinnerSize?: 'sm' | 'default'
+  }) => {
   const { isMainTextarea } = useEditMode()
   const isValidSrc = src && (isBase64Image(src) || isValidImageUrl(src))
 
@@ -104,5 +62,3 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
     </div>
   )
 }
-
-export { ImagePreview }
