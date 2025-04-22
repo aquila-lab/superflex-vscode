@@ -73,7 +73,8 @@ export const CodeEditor = ({
           useShadows: false,
           vertical: 'hidden',
           horizontalScrollbarSize: 8,
-          alwaysConsumeMouseWheel: false
+          alwaysConsumeMouseWheel: false,
+          horizontal: 'hidden'
         },
         scrollBeyondLastLine: false,
         fontSize: 12,

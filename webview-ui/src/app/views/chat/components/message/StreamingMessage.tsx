@@ -1,16 +1,14 @@
 import { memo, useMemo } from 'react'
+import { DotLoader } from '../../../../../common/ui/DotLoader'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 import { AssistantMessage } from './assistant/AssistantMessage'
 import { ThinkingMessage } from './thinking/ThinkingMessage'
-import { LoadingDots } from '../../../../../common/ui/LoadingDots'
-
-interface StreamingMessageProps {
-  isFollowUp?: boolean
-}
 
 const StreamingMessageComponent = ({
   isFollowUp = false
-}: StreamingMessageProps) => {
+}: {
+  isFollowUp?: boolean
+}) => {
   const {
     message,
     isMessageStreaming,
@@ -33,16 +31,14 @@ const StreamingMessageComponent = ({
       const thinkingStartIndex = text.indexOf('<Thinking>')
       const thinkingEndIndex = text.indexOf('</Thinking>')
 
-      // Case 1: Thinking tags not found - could be regular assistant message or not started yet
       if (thinkingStartIndex === -1) {
         return {
           thinkingContent: null,
           assistantContent: message,
-          isThinkingComplete: true // No thinking to complete
+          isThinkingComplete: true
         }
       }
 
-      // Case 2: Thinking started but not completed (still streaming thinking content)
       if (thinkingEndIndex === -1) {
         const thinkingPartialContent = text.substring(thinkingStartIndex + 10)
         return {
@@ -52,16 +48,13 @@ const StreamingMessageComponent = ({
         }
       }
 
-      // Case 3: Thinking completed, now extract both parts
       const extractedThinkingContent = text.substring(
         thinkingStartIndex + 10,
         thinkingEndIndex
       )
 
-      // Get everything after the thinking closing tag
       const remainingText = text.substring(thinkingEndIndex + 11)
 
-      // Only create assistant message if there's content after thinking
       const modifiedMessage = remainingText
         ? {
             ...message,
@@ -93,7 +86,7 @@ const StreamingMessageComponent = ({
 
       {(isFollowUp || isEnhanceComplete) &&
         !thinkingContent &&
-        !assistantContent && <LoadingDots isLoading={true} />}
+        !assistantContent && <DotLoader />}
 
       {thinkingContent && (
         <ThinkingMessage

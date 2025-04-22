@@ -2,7 +2,6 @@ import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import { forwardRef } from 'react'
 import { cn } from '../utils'
-import ScrollToBottom from 'react-scroll-to-bottom'
 
 const Collapsible = CollapsiblePrimitive.Root
 
@@ -54,15 +53,7 @@ const CollapsibleContent = forwardRef<
     }}
     {...props}
   >
-    <div className='py-2'>
-      <ScrollToBottom
-        className='flex flex-col gap-y-2 overflow-y-auto scroll-to-bottom'
-        initialScrollBehavior='auto'
-        mode='bottom'
-      >
-        {children}
-      </ScrollToBottom>
-    </div>
+    <div className='py-2'>{children}</div>
   </CollapsiblePrimitive.Content>
 ))
 CollapsibleContent.displayName = CollapsiblePrimitive.Content.displayName

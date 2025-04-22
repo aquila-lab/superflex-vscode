@@ -1,4 +1,4 @@
-html[data-ide='VisualStudio'] {
+html[data-ide="VisualStudio"] {
   /* --vscode-actionBar-toggledBackground: var(); */
   /* --vscode-activityBar-background: var(); */
   /* --vscode-activityBar-border: var(); */
@@ -18,11 +18,15 @@ html[data-ide='VisualStudio'] {
   /* --vscode-breadcrumb-focusForeground: var(); */
   /* --vscode-breadcrumb-foreground: var(); */
   /* --vscode-breadcrumbPicker-background: var(); */
-  --vscode-button-border: var(--visualstudio-filetabbuttonhoverselectedactiveborder);
+  --vscode-button-border: var(
+    --visualstudio-filetabbuttonhoverselectedactiveborder
+  );
   --vscode-button-background: var(--visualstudio-filetabbackground);
   --vscode-button-hoverBackground: var(--visualstudio-filetabselectedbackground);
   --vscode-button-foreground: var(--visualstudio-filetabparenttext);
-  --vscode-button-secondaryHoverBackground: var(--visualstudio-filetabprovisionalhover);
+  --vscode-button-secondaryHoverBackground: var(
+    --visualstudio-filetabprovisionalhover
+  );
   --vscode-button-secondaryBackground: var(--visualstudio-filetabbackground);
   --vscode-button-secondaryForeground: var(--visualstudio-filetabinactivetext);
   --vscode-button-separator: var(--visualstudio-filetabprimaryseparator);
@@ -101,7 +105,9 @@ html[data-ide='VisualStudio'] {
   --vscode-dropdown-background: var(--visualstudio-dropdownbackground);
   --vscode-dropdown-border: var(--visualstudio-dropdownborder);
   --vscode-dropdown-foreground: var(--visualstudio-dropdowntext);
-  --vscode-dropdown-listBackground: var(--visualstudio-dropdownmouseoverbackgroundend);
+  --vscode-dropdown-listBackground: var(
+    --visualstudio-dropdownmouseoverbackgroundend
+  );
   --vscode-editor-background: var(--visualstudio-editorexpansionfill);
   /* --vscode-editor-findMatchBorder: var(); */
   /* --vscode-editor-findMatchHighlightBorder: var(); */
@@ -164,7 +170,9 @@ html[data-ide='VisualStudio'] {
   /* --vscode-editorGroup-focusedEmptyBorder: var(); */
   /* --vscode-editorGroupHeader-border: var(); */
   /* --vscode-editorGroupHeader-noTabsBackground: var(); */
-  --vscode-editorGutter-addedBackground: var(--visualstudio-editorgutteraddedbackground);
+  --vscode-editorGutter-addedBackground: var(
+    --visualstudio-editorgutteraddedbackground
+  );
   /* --vscode-editorGutter-background: var(); */
   /* --vscode-editorGutter-commentGlyphForeground: var(); */
   /* --vscode-editorGutter-commentRangeForeground: var(); */
@@ -264,11 +272,17 @@ html[data-ide='VisualStudio'] {
   --vscode-input-background: var(--visualstudio-comboboxbackground);
   --vscode-input-border: var(--visualstudio-comboboxborder);
   --vscode-input-foreground: var(--visualstudio-comboboxtext);
-  --vscode-input-placeholderForeground: var(--visualstudio-comboboxitemtextinactive);
-  --vscode-inputOption-activeBackground: var(--visualstudio-startpagebuttonunpinned);
+  --vscode-input-placeholderForeground: var(
+    --visualstudio-comboboxitemtextinactive
+  );
+  --vscode-inputOption-activeBackground: var(
+    --visualstudio-startpagebuttonunpinned
+  );
   --vscode-inputOption-activeBorder: var(--visualstudio-startpagebuttonborder);
   --vscode-inputOption-activeForeground: var(--visualstudio-startpagebuttontext);
-  --vscode-inputValidation-errorBackground: var(--visualstudio-statusbardebugging);
+  --vscode-inputValidation-errorBackground: var(
+    --visualstudio-statusbardebugging
+  );
   --vscode-inputValidation-errorBorder: var(--visualstudio-statusbardebugging);
   --vscode-inputValidation-infoBackground: var(--visualstudio-statusbarbuilding);
   --vscode-inputValidation-infoBorder: var(--visualstudio-statusbarbuilding);
@@ -278,7 +292,9 @@ html[data-ide='VisualStudio'] {
   /* --vscode-interactive-inactiveCodeBorder: var(); */
   --vscode-keybindingLabel-background: var(--visualstudio-helpsearchbackground);
   --vscode-keybindingLabel-border: var(--visualstudio-helpsearchborder);
-  --vscode-keybindingLabel-bottomBorder: var(--visualstudio-helpsearchfilterborder);
+  --vscode-keybindingLabel-bottomBorder: var(
+    --visualstudio-helpsearchfilterborder
+  );
   --vscode-keybindingLabel-foreground: var(--visualstudio-helpsearchtext);
   /* --vscode-list-deemphasizedForeground: var(); */
   /* --vscode-list-filterMatchBorder: var(); */
@@ -286,7 +302,9 @@ html[data-ide='VisualStudio'] {
   /* --vscode-list-focusOutline: var(); */
   /* --vscode-list-highlightForeground: var(); */
   /* --vscode-list-hoverBackground: var(); */
-  --vscode-list-invalidItemForeground: var(--visualstudio-toolwindowvalidationerrortext);
+  --vscode-list-invalidItemForeground: var(
+    --visualstudio-toolwindowvalidationerrortext
+  );
   --vscode-list-inactiveSelectionBackground: var(--visualstudio-sortbackground);
   --vscode-list-activeSelectionForeground: var(--visualstudio-filetabparenttext);
   --vscode-list-activeSelectionBackground: var(--visualstudio-filetabbackground);
@@ -383,7 +401,9 @@ html[data-ide='VisualStudio'] {
   /* --vscode-progressBar-background: var(); */
   --vscode-quickInput-background: var(--visualstudio-filetabbackground);
   --vscode-quickInput-foreground: var(--visualstudio-comboboxtext);
-  --vscode-quickInputTitle-background: var(--visualstudio---visualstudio-filetabselectedbackground);
+  --vscode-quickInputTitle-background: var(
+    --visualstudio---visualstudio-filetabselectedbackground
+  );
   /* --vscode-remoteHub-decorations-addedForegroundColor: var(); */
   /* --vscode-remoteHub-decorations-conflictForegroundColor: var(); */
   /* --vscode-remoteHub-decorations-deletedForegroundColor: var(); */
@@ -395,11 +415,17 @@ html[data-ide='VisualStudio'] {
   /* --vscode-remoteHub-decorations-modifiedForegroundColor: var(); */
   /* --vscode-remoteHub-decorations-submoduleForegroundColor: var(); */
   /* --vscode-remoteHub-decorations-workspaceRepositoriesView-hasUncommittedChangesForegroundColor: var(); */
-  --vscode-scm-historyItemStatisticsBorder: var(--visualstudio-scrollbararrowglyph);
+  --vscode-scm-historyItemStatisticsBorder: var(
+    --visualstudio-scrollbararrowglyph
+  );
   --vscode-scrollbar-shadow: var(--visualstudio-scrollbarthumbglyph);
-  --vscode-scrollbarSlider-activeBackground: var(--visualstudio-scrollbarthumbpressedbackground);
+  --vscode-scrollbarSlider-activeBackground: var(
+    --visualstudio-scrollbarthumbpressedbackground
+  );
   --vscode-scrollbarSlider-background: var(--visualstudio-scrollbarbackground);
-  --vscode-scrollbarSlider-hoverBackground: var(--visualstudio-scrollbarthumbmouseoverbackground);
+  --vscode-scrollbarSlider-hoverBackground: var(
+    --visualstudio-scrollbarthumbmouseoverbackground
+  );
   /* --vscode-search-resultsInfoForeground: var(); */
   /* --vscode-searchEditor-findMatchBorder: var(); */
   /* --vscode-searchEditor-textInputBorder: var(); */
@@ -410,7 +436,9 @@ html[data-ide='VisualStudio'] {
   --vscode-settings-dropdownBackground: var(--visualstudio-dropdownbackground);
   --vscode-settings-dropdownBorder: var(--visualstudio-dropdownborder);
   --vscode-settings-dropdownForeground: var(--visualstudio-dropdowntext);
-  --vscode-settings-dropdownListBorder: var(--visualstudio-dropdownmouseoverbackground);
+  --vscode-settings-dropdownListBorder: var(
+    --visualstudio-dropdownmouseoverbackground
+  );
   /* --vscode-settings-focusedRowBorder: var(); */
   /* --vscode-settings-headerBorder: var(); */
   /* --vscode-settings-headerForeground: var(); */
@@ -428,9 +456,13 @@ html[data-ide='VisualStudio'] {
   --vscode-sideBar-border: var(--visualstudio-toolwindowborder);
   /* --vscode-sideBarActivityBarTop-border: var(); */
   /* --vscode-sideBarSectionHeader-border: var(); */
-  --vscode-sideBarStickyScroll-background: var(--visualstudio-dropdownbackground);
+  --vscode-sideBarStickyScroll-background: var(
+    --visualstudio-dropdownbackground
+  );
   --vscode-sideBarTitle-background: var(--visualstudio-dropdownbackground);
-  --vscode-sideBarTitle-foreground: var(--visualstudio-toolwindowtabselectedactivetext);
+  --vscode-sideBarTitle-foreground: var(
+    --visualstudio-toolwindowtabselectedactivetext
+  );
   /* --vscode-sideBySideEditor-horizontalBorder: var(); */
   /* --vscode-sideBySideEditor-verticalBorder: var(); */
   /* --vscode-simpleFindWidget-sashBorder: var(); */
@@ -496,18 +528,36 @@ html[data-ide='VisualStudio'] {
   /* --vscode-symbolIcon-typeParameterForeground: var(); */
   /* --vscode-symbolIcon-unitForeground: var(); */
   /* --vscode-symbolIcon-variableForeground: var(); */
-  --vscode-tab-activeBackground: var(--visualstudio-filetabactivegrouptitlebackground);
+  --vscode-tab-activeBackground: var(
+    --visualstudio-filetabactivegrouptitlebackground
+  );
   --vscode-tab-activeForeground: var(--visualstudio-filetabhottext);
   --vscode-tab-border: var(--visualstudio-filetabborder);
-  --vscode-tab-dragAndDropBorder: var(--visualstudio-filetabbuttonprovisionalhoverinactiveborder);
+  --vscode-tab-dragAndDropBorder: var(
+    --visualstudio-filetabbuttonprovisionalhoverinactiveborder
+  );
   --vscode-tab-inactiveForeground: var(--visualstudio-filetabinactivetext);
-  --vscode-tab-inactiveModifiedBorder: var(--visualstudio-filetabbuttonhoverinactiveborder);
-  --vscode-tab-lastPinnedBorder: var(--visualstudio-filetabbuttonhoverselectedactiveborder);
-  --vscode-tab-unfocusedActiveBackground: var(--visualstudio-filetabprovisionalhover);
-  --vscode-tab-unfocusedActiveForeground: var(--visualstudio-filetabprovisionalhoverforeground);
-  --vscode-tab-unfocusedActiveModifiedBorder: var(--visualstudio-FileTabProvisionalHoverBorder);
-  --vscode-tab-unfocusedInactiveForeground: var(--visualstudio-filetabprovisionalinactiveforeground);
-  --vscode-tab-unfocusedInactiveModifiedBorder: var(--visualstudio-filetabprovisionalselectedactiveborder);
+  --vscode-tab-inactiveModifiedBorder: var(
+    --visualstudio-filetabbuttonhoverinactiveborder
+  );
+  --vscode-tab-lastPinnedBorder: var(
+    --visualstudio-filetabbuttonhoverselectedactiveborder
+  );
+  --vscode-tab-unfocusedActiveBackground: var(
+    --visualstudio-filetabprovisionalhover
+  );
+  --vscode-tab-unfocusedActiveForeground: var(
+    --visualstudio-filetabprovisionalhoverforeground
+  );
+  --vscode-tab-unfocusedActiveModifiedBorder: var(
+    --visualstudio-FileTabProvisionalHoverBorder
+  );
+  --vscode-tab-unfocusedInactiveForeground: var(
+    --visualstudio-filetabprovisionalinactiveforeground
+  );
+  --vscode-tab-unfocusedInactiveModifiedBorder: var(
+    --visualstudio-filetabprovisionalselectedactiveborder
+  );
   /* --vscode-terminal-ansiBlack: var(); */
   /* --vscode-terminal-ansiBlue: var(); */
   /* --vscode-terminal-ansiBrightBlack: var(); */
@@ -594,7 +644,8 @@ html[data-ide='VisualStudio'] {
   --vscode-widget-shadow: var(--visualstudio-buttonshadow);
 
   /* Mimic rules injected by VSCode */
-  scrollbar-color: var(--vscode-scrollbarSlider-background) var(--vscode-editor-background);
+  scrollbar-color: var(--vscode-scrollbarSlider-background)
+    var(--vscode-editor-background);
 }
 
 html[data-ide="VisualStudio"] body {

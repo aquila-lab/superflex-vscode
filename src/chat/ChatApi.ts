@@ -21,7 +21,8 @@ import {
   type FastApplyPayload,
   type FetchThreadsPayload,
   type FilePayload,
-  newEventResponse
+  newEventResponse,
+  type OpenFilePayload
 } from '../../shared/protocol'
 import * as api from '../api'
 import {
@@ -644,7 +645,167 @@ export class ChatAPI {
        */
       .registerEvent(
         EventRequestType.OPEN_FILE,
-        async (payload: { filePath: string }) => {
+        async (payload: OpenFilePayload) => {
+          // Check if this is an attachment file path
+          if (payload.filePath.startsWith('attachment://')) {
+            // Extract type from the path - use a more reliable method
+            let type = 'unknown'
+            if (payload.filePath.includes('figma')) {
+              type = 'figma'
+            } else if (payload.filePath.includes('image')) {
+              type = 'image'
+            }
+
+            // Get attachment data
+            const attachmentData = payload.attachmentData
+
+            // Create a temporary HTML file to preview the attachment
+            const panel = vscode.window.createWebviewPanel(
+              `superflex.attachment.${type}`,
+              `${type === 'figma' ? 'Figma' : 'Image'} Preview`,
+              vscode.ViewColumn.One,
+              {
+                enableScripts: true,
+                retainContextWhenHidden: true
+              }
+            )
+
+            let htmlContent = ''
+
+            if (type === 'figma' && attachmentData?.imageUrl) {
+              // Figma preview
+              htmlContent = `
+              <html>
+                <head>
+                  <style>
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                      padding: 20px;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                    }
+                    h1 {
+                      color: #fff;
+                      margin-bottom: 20px;
+                    }
+                    .image-container {
+                      max-width: 90%;
+                      border-radius: 8px;
+                      overflow: hidden;
+                    }
+                    img {
+                      max-width: 100%;
+                      height: auto;
+                      display: block;
+                    }
+                    .info {
+                      margin-top: 40px;
+                      font-size: 12px;
+                      color: #666;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <h1>Figma Preview</h1>
+                  <div class="image-container">
+                    <img src="${attachmentData.imageUrl}" alt="Figma Design" />
+                  </div>
+                  <div class="info">
+                    <p>File ID: ${attachmentData.fileID || 'N/A'}</p>
+                    <p>Node ID: ${attachmentData.nodeID || 'N/A'}</p>
+                  </div>
+                </body>
+              </html>
+              `
+            } else if (type === 'image' && attachmentData?.base64Data) {
+              // Image preview (base64)
+              // Make sure the base64 data includes the data URL prefix if needed
+              const imageData = attachmentData.base64Data.startsWith('data:')
+                ? attachmentData.base64Data
+                : `data:image/png;base64,${attachmentData.base64Data}`
+
+              htmlContent = `
+              <html>
+                <head>
+                  <style>
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                      padding: 20px;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                    }
+                    h1 {
+                      color: #fff;
+                      margin-bottom: 20px;
+                    }
+                    .image-container {
+                      max-width: 90%;
+                      border-radius: 8px;
+                      overflow: hidden;
+                    }
+                    img {
+                      max-width: 100%;
+                      height: auto;
+                      display: block;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <h1>Image Preview</h1>
+                  <div class="image-container">
+                    <img src="${imageData}" alt="Image Attachment" />
+                  </div>
+                </body>
+              </html>
+              `
+            } else {
+              // Fallback preview (if data is missing)
+              htmlContent = `
+              <html>
+                <head>
+                  <style>
+                    body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                      padding: 20px;
+                      text-align: center;
+                    }
+                    h1 {
+                      color: #fff;
+                    }
+                    .placeholder {
+                      margin-top: 20px;
+                      padding: 20px;
+                      background-color: #f5f5f5;
+                      border-radius: 5px;
+                    }
+                    pre {
+                      text-align: left;
+                      background: #f0f0f0;
+                      padding: 10px;
+                      border-radius: 4px;
+                      overflow: auto;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <h1>${type === 'figma' ? 'Figma' : 'Image'} Preview</h1>
+                  <div class="placeholder">
+                    <p>Could not load attachment preview. Missing data.</p>
+                    <p>Type: ${type}</p>
+                    <pre>${JSON.stringify(attachmentData || {}, null, 2)}</pre>
+                  </div>
+                </body>
+              </html>
+              `
+            }
+
+            panel.webview.html = htmlContent
+            return
+          }
+
+          // Handle regular file opening
           if (!this._workspaceDirPath) {
             return
           }

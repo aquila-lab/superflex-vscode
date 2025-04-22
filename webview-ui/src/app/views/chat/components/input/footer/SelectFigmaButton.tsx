@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { FaFigma } from 'react-icons/fa'
+import { isFreeTierSubscription } from '../../../../../../../../shared/model'
 import { Button } from '../../../../../../common/ui/Button'
 import { cn } from '../../../../../../common/utils'
 import { useNewMessage } from '../../../../../layers/authenticated/providers/NewMessageProvider'
@@ -7,7 +8,6 @@ import { useUser } from '../../../../../layers/authenticated/providers/UserProvi
 import { useGlobal } from '../../../../../layers/global/providers/GlobalProvider'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useFigmaPremiumModal } from '../../../providers/FigmaPremiumModalProvider'
-import { isFreeTierSubscription } from '../../../../../../../../shared/model'
 
 export const SelectFigmaButton = () => {
   const { isFigmaAuthenticated, connectFigma } = useGlobal()
@@ -47,7 +47,7 @@ export const SelectFigmaButton = () => {
   const handleButtonClicked = useCallback(() => {
     if (isFreePlan) {
       fetchSubscription()
-      setOnContinue(() => handleFigmaAction)
+      setOnContinue(null)
       setIsOpen(true)
       return
     }

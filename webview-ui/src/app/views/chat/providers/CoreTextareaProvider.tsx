@@ -9,13 +9,13 @@ import {
   useMemo,
   useRef
 } from 'react'
+import { isFreeTierSubscription } from '../../../../../../shared/model'
 import {
   EventRequestType,
   type EventResponsePayload,
   EventResponseType,
   type TypedEventResponseMessage
 } from '../../../../../../shared/protocol'
-import { isFreeTierSubscription } from '../../../../../../shared/model'
 import {
   FIGMA_LINK_REGEX,
   readImageFileAsBase64
@@ -115,24 +115,14 @@ export const TextareaHandlersProvider = ({
         e.preventDefault()
         removeAttachment()
 
-        if (!isFigmaAuthenticated) {
-          connectFigma()
+        if (isFreeTierSubscription(subscription)) {
+          setOnContinue(null)
+          setFigmaPremiumModalOpen(true)
           return
         }
 
-        if (isFreeTierSubscription(subscription)) {
-          const handleFigmaAction = (isAuthenticated: boolean) => {
-            if (isAuthenticated) {
-              openSelectionDrawer()
-              setFigmaLink(figmaLinkMatch[0])
-              focusSubmitButton()
-            } else {
-              connectFigma()
-            }
-          }
-
-          setOnContinue(() => handleFigmaAction)
-          setFigmaPremiumModalOpen(true)
+        if (!isFigmaAuthenticated) {
+          connectFigma()
           return
         }
 

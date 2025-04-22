@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { EventRequestType } from '../../../../../../../../../../shared/protocol'
 import { FileIcon } from '../../../../../../../../common/ui/FileIcon'
 import {
@@ -8,16 +8,13 @@ import {
   TooltipTrigger
 } from '../../../../../../../../common/ui/Tooltip'
 import { getFileName } from '../../../../../../../../common/utils'
-import { usePostMessage } from '../../../../../../../layers/global/hooks/usePostMessage'
 import { cn } from '../../../../../../../../common/utils'
-import { Loader2 } from 'lucide-react'
+import { usePostMessage } from '../../../../../../../layers/global/hooks/usePostMessage'
 
 export const CodeBlockName = ({
-  filePath,
-  isLoading = false
+  filePath
 }: {
   filePath: string
-  isLoading?: boolean
 }) => {
   const postMessage = usePostMessage()
 
@@ -26,32 +23,19 @@ export const CodeBlockName = ({
     [postMessage, filePath]
   )
 
-  const shimmerClass = useMemo(() => {
-    if (!isLoading) {
-      return ''
-    }
-
-    return 'relative after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:animate-shimmer'
-  }, [isLoading])
-
   return (
     <div className='flex items-center gap-1 min-w-0'>
-      {isLoading ? (
-        <Loader2 className='size-4 text-muted-foreground animate-spin' />
-      ) : (
-        <FileIcon
-          filePath={filePath}
-          className='size-4'
-        />
-      )}
+      <FileIcon
+        filePath={filePath}
+        className='size-4'
+      />
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <p
               onClick={handleFileNameClick}
               className={cn(
-                'text-[11px] text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0 cursor-pointer',
-                shimmerClass
+                'text-[11px] text-foreground truncate max-w-full overflow-hidden whitespace-nowrap text-overflow-ellipsis m-0 cursor-pointer'
               )}
             >
               {getFileName(filePath)}

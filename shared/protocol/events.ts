@@ -16,6 +16,7 @@ import type {
   FetchThreadsResponse,
   FilePayload,
   InitChatState,
+  OpenFilePayload,
   SendNotificationPayload,
   SyncProjectProgressPayload
 } from './types'
@@ -489,7 +490,7 @@ export interface EventRequestPayload {
   [EventRequestType.FAST_APPLY]: FastApplyPayload
   [EventRequestType.FAST_APPLY_ACCEPT]: { filePath: string }
   [EventRequestType.FAST_APPLY_REJECT]: { filePath: string }
-  [EventRequestType.OPEN_FILE]: { filePath: string }
+  [EventRequestType.OPEN_FILE]: OpenFilePayload
   [EventRequestType.FETCH_FILES]: void
   [EventRequestType.FETCH_FILE_CONTENT]: FilePayload
   [EventRequestType.FETCH_CURRENT_OPEN_FILE]: void

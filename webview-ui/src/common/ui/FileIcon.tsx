@@ -2,11 +2,6 @@ import DOMPurify from 'dompurify'
 import { themeIcons } from 'seti-file-icons'
 import { cn, getFileName } from '../../common/utils'
 
-interface FileIconProps {
-  filePath: string
-  className?: string
-}
-
 const iconColors = {
   blue: '#268bd2',
   grey: '#657b83',
@@ -21,7 +16,13 @@ const iconColors = {
   ignore: '#586e75'
 }
 
-export const FileIcon: React.FC<FileIconProps> = ({ filePath, className }) => {
+export const FileIcon = ({
+  filePath,
+  className
+}: {
+  filePath: string
+  className?: string
+}) => {
   const filename = getFileName(filePath)
 
   if (filename.startsWith('.superflex')) {
@@ -35,7 +36,14 @@ export const FileIcon: React.FC<FileIconProps> = ({ filePath, className }) => {
   }
 
   const getIcon = themeIcons(iconColors)
-  const { svg, color } = getIcon(filename)
+
+  let iconPath = filename
+
+  if (filename.includes('preview')) {
+    iconPath = 'preview.png'
+  }
+
+  const { svg, color } = getIcon(iconPath)
   const sanitizedSVG = DOMPurify.sanitize(svg)
 
   return (

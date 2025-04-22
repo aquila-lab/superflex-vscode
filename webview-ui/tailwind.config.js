@@ -127,6 +127,10 @@ export default {
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' }
+        },
+        shine: {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' }
         }
       },
       animation: {
@@ -135,7 +139,8 @@ export default {
         'collapsible-down': 'collapsible-down 0.15s ease-out',
         'collapsible-up': 'collapsible-up 0.15s ease-out',
         gradient: 'gradient',
-        shimmer: 'shimmer 1.5s infinite'
+        shimmer: 'shimmer 1.5s infinite',
+        shine: 'shine 2s linear infinite'
       }
     }
   },
@@ -146,7 +151,6 @@ export default {
     require('@tailwindcss/typography'),
     require('daisyui'),
     plugin(({ addVariant }) => {
-      // Allows use to customize styling for VS Code light and dark themes
       addVariant(
         'high-contrast-dark',
         'body[data-vscode-theme-kind="vscode-high-contrast"] &'

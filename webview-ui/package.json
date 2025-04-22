@@ -5,6 +5,7 @@
   "scripts": {
     "start": "vite build --watch",
     "build": "tsc -b && vite build",
+    "postinstall": "node scripts/fix-react-virtualized.js",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format .",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@rollup/pluginutils": "^5.1.4",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.0.3",
     "@types/react": "^19.0.8",
