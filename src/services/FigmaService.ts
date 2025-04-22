@@ -137,6 +137,10 @@ export class FigmaService {
       return []
     }
 
+    if ('backgroundColor' in node) {
+      colorPalette.add(rgbaToHex(node.backgroundColor))
+    }
+
     if ('fills' in node && Array.isArray(node.fills) && node.fills.length > 0) {
       const fill = node.fills[0]
       if (fill.type === 'SOLID' && 'color' in fill && fill.color) {
