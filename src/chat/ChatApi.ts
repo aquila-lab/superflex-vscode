@@ -340,17 +340,16 @@ export class ChatAPI {
           const colorPalette = await getFigmaSelectionColorPalette(
             figmaSelectionDocument
           )
-          console.log('colorPalette', colorPalette)
 
           Telemetry.capture('figma_request_used', {
             isFreePlan
           })
 
-          // TODO: Extend return type to include color palette
           return {
             fileID: figmaSelectionUrl.fileID,
             nodeID: figmaSelectionUrl.nodeID,
             imageUrl,
+            colorPalette,
             warning
           }
         }
