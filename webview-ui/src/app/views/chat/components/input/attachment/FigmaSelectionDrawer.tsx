@@ -21,8 +21,9 @@ import {
 import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
+import { ColorToken } from '../../message/assistant/ColorToken'
 
-const ColorToken = ({ color }: { color: string }) => {
+const ColorCircle = ({ color }: { color: string }) => {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -33,13 +34,7 @@ const ColorToken = ({ color }: { color: string }) => {
           />
         </TooltipTrigger>
         <TooltipContent>
-          <div className='flex items-center gap-1.5'>
-            <div
-              className='w-3 h-3 rounded-sm'
-              style={{ backgroundColor: color }}
-            />
-            <span>{color}</span>
-          </div>
+          <ColorToken color={color} />
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -126,8 +121,6 @@ export const FigmaSelectionDrawer = () => {
     }
 
     if (isConfirmStep && figmaPlaceholderAttachment) {
-      console.log(figmaPlaceholderAttachment)
-
       return (
         <div className='flex flex-col px-4 gap-4'>
           {figmaPlaceholderAttachment.imageUrl && (
@@ -150,7 +143,7 @@ export const FigmaSelectionDrawer = () => {
                 </p>
                 <div className='flex gap-2 flex-wrap'>
                   {figmaPlaceholderAttachment.colorPalette.map(color => (
-                    <ColorToken
+                    <ColorCircle
                       key={color}
                       color={color}
                     />

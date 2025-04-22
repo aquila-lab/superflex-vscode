@@ -404,3 +404,5 @@ export const createPreviewPayload = (
 
   return null
 }
+
+export const HEX_COLOR_REGEX = /#([0-9A-Fa-f]{3}){1,2}\b/g
