@@ -44,7 +44,7 @@ export const FileTab = ({ file }: { file: FilePayload }) => {
             filePath={file.relativePath}
             className='size-5'
           />
-          <p className='text-xxs text-foreground truncate max-w-16'>
+          <p className='text-xxs text-foreground truncate max-w-24'>
             {file.name.startsWith('.superflex')
               ? file.name.slice('.superflex'.length)
               : file.name}

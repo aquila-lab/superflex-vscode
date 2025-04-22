@@ -70,7 +70,7 @@ export const AttachmentTab = () => {
     return null
   }
 
-  const attachmentName = figmaAttachment ? 'figma.png' : 'image.png'
+  const attachmentName = figmaAttachment ? 'figma.preview' : 'image.preview'
 
   return (
     <div className='flex flex-col'>
@@ -86,7 +86,7 @@ export const AttachmentTab = () => {
             filePath={attachmentName}
             className='size-5'
           />
-          <p className='text-xxs text-foreground truncate max-w-16'>
+          <p className='text-xxs text-foreground truncate max-w-24'>
             {attachmentName}
           </p>
         </div>
