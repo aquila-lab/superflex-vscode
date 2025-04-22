@@ -677,12 +677,11 @@ export class ChatAPI {
                       align-items: center;
                     }
                     h1 {
-                      color: #333;
+                      color: #fff;
                       margin-bottom: 20px;
                     }
                     .image-container {
                       max-width: 90%;
-                      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                       border-radius: 8px;
                       overflow: hidden;
                     }
@@ -692,7 +691,7 @@ export class ChatAPI {
                       display: block;
                     }
                     .info {
-                      margin-top: 20px;
+                      margin-top: 40px;
                       font-size: 12px;
                       color: #666;
                     }
@@ -729,12 +728,11 @@ export class ChatAPI {
                       align-items: center;
                     }
                     h1 {
-                      color: #333;
+                      color: #fff;
                       margin-bottom: 20px;
                     }
                     .image-container {
                       max-width: 90%;
-                      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                       border-radius: 8px;
                       overflow: hidden;
                     }
@@ -765,7 +763,7 @@ export class ChatAPI {
                       text-align: center;
                     }
                     h1 {
-                      color: #333;
+                      color: #fff;
                     }
                     .placeholder {
                       margin-top: 20px;

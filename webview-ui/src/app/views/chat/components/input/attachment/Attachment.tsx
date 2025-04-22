@@ -4,6 +4,7 @@ import { useEditMode } from '../../../providers/EditModeProvider'
 import { usePostMessage } from '../../../../../layers/global/hooks/usePostMessage'
 import { ImagePreview } from './ImagePreview'
 import { useAttachmentPreview } from '../../../hooks/useAttachmentPreview'
+import { ExternalLinkIcon } from '@radix-ui/react-icons'
 
 export const Attachment = () => {
   const { imageAttachment, figmaAttachment, removeAttachment } = useAttachment()
@@ -46,14 +47,23 @@ export const Attachment = () => {
   }
 
   return (
-    <div className='m-2 bg-background'>
-      <div className='max-h-52 overflow-hidden relative'>
-        <ImagePreview
-          size='default'
-          alt='preview image'
-          src={src}
-          onClick={handlePreviewAttachment}
-        />
+    <div className='m-2 rounded-md overflow-hidden border border-border shadow-sm'>
+      <div className='relative'>
+        <div className='max-h-52 overflow-hidden'>
+          <ImagePreview
+            size='default'
+            alt='preview image'
+            src={src}
+            onClick={handlePreviewAttachment}
+            className='bg-white/95 w-full object-cover'
+          />
+        </div>
+        <div className='absolute inset-0 bg-gradient-to-t from-background/40 via-background/30 to-background/40 pointer-events-none' />
+        <div className='absolute top-2 right-2 pointer-events-none'>
+          <div className='bg-muted size-8 rounded-full flex items-center justify-center opacity-80 shadow-sm'>
+            <ExternalLinkIcon className='size-4' />
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -9,12 +9,15 @@ import { CoreTextarea } from './core/CoreTextarea'
 import { AdvancedTextareaFooter } from './footer/AdvancedTextareaFooter'
 import { AdvancedTextareaHeader } from './header/AdvancedTextareaHeader'
 import { Attachment } from './attachment/Attachment'
+import { useEditMode } from '../../providers/EditModeProvider'
 
 export const AdvancedTextareaContent = ({
   content
 }: {
   content?: MessageContent
 }) => {
+  const { isMainTextarea } = useEditMode()
+
   return (
     <AdvancedTextareaContainer>
       <FilesProvider files={content?.files}>
@@ -27,7 +30,7 @@ export const AdvancedTextareaContent = ({
             <TextareaFooterProvider>
               <AdvancedTextareaFooter />
             </TextareaFooterProvider>
-            <Attachment />
+            {!isMainTextarea && <Attachment />}
           </SendMessageProvider>
         </AddSelectedCodeHandler>
       </FilesProvider>
