@@ -142,10 +142,11 @@ export class FigmaService {
     }
 
     if ('fills' in node && Array.isArray(node.fills) && node.fills.length > 0) {
-      const fill = node.fills[0]
-      if (fill.type === 'SOLID' && 'color' in fill && fill.color) {
-        colorPalette.add(rgbaToHex(fill.color))
-      }
+      node.fills.forEach((fill) => {
+        if (fill.type === 'SOLID' && 'color' in fill && fill.color) {
+          colorPalette.add(rgbaToHex(fill.color))
+        }
+      })
     }
 
     if (
@@ -153,11 +154,11 @@ export class FigmaService {
       Array.isArray(node.strokes) &&
       node.strokes.length > 0
     ) {
-      // Add stroke color and width if available
-      const stroke = node.strokes[0]
-      if (stroke.type === 'SOLID' && 'color' in stroke && stroke.color) {
-        colorPalette.add(rgbaToHex(stroke.color))
-      }
+      node.strokes.forEach((stroke) => {
+        if (stroke.type === 'SOLID' && 'color' in stroke && stroke.color) {
+          colorPalette.add(rgbaToHex(stroke.color))
+        }
+      })
     }
 
     if (
