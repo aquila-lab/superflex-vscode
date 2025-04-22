@@ -1,11 +1,14 @@
 import { useCallback, useMemo } from 'react'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useEditMode } from '../../../providers/EditModeProvider'
+import { usePostMessage } from '../../../../../layers/global/hooks/usePostMessage'
 import { ImagePreview } from './ImagePreview'
+import { useAttachmentPreview } from '../../../hooks/useAttachmentPreview'
 
 export const Attachment = () => {
   const { imageAttachment, figmaAttachment, removeAttachment } = useAttachment()
   const { isEditMode, isMainTextarea } = useEditMode()
+  const postMessage = usePostMessage()
 
   const handleRemoveAttachment = useCallback(
     () => removeAttachment(),
@@ -15,6 +18,12 @@ export const Attachment = () => {
   const src = useMemo(
     () => figmaAttachment?.imageUrl || imageAttachment || '',
     [figmaAttachment, imageAttachment]
+  )
+
+  const handlePreviewAttachment = useAttachmentPreview(
+    imageAttachment,
+    figmaAttachment,
+    postMessage
   )
 
   if (!(imageAttachment || figmaAttachment)) {
@@ -29,6 +38,7 @@ export const Attachment = () => {
           spinnerSize='sm'
           alt='preview image'
           src={src}
+          onClick={handlePreviewAttachment}
           {...(isEditMode && { onRemove: handleRemoveAttachment })}
         />
       </div>
@@ -42,7 +52,7 @@ export const Attachment = () => {
           size='default'
           alt='preview image'
           src={src}
-          {...(isEditMode && { onRemove: handleRemoveAttachment })}
+          onClick={handlePreviewAttachment}
         />
       </div>
     </div>

@@ -9,11 +9,12 @@ import {
   isValidImageUrl
 } from '../../../../../../common/utils'
 import { useEditMode } from '../../../providers/EditModeProvider'
-import type { ImgHTMLAttributes } from 'react'
+import type { ImgHTMLAttributes, MouseEvent } from 'react'
 
 export const ImagePreview = ({
   isLoading = false,
   onRemove,
+  onClick,
   size,
   spinnerSize = 'default',
   src,
@@ -23,10 +24,12 @@ export const ImagePreview = ({
   VariantProps<typeof imagePreviewVariants> & {
     isLoading?: boolean
     onRemove?: () => void
+    onClick?: (e: MouseEvent<HTMLImageElement>) => void
     spinnerSize?: 'sm' | 'default'
   }) => {
   const { isMainTextarea } = useEditMode()
   const isValidSrc = src && (isBase64Image(src) || isValidImageUrl(src))
+  const isClickable = !!onClick && !isLoading && isValidSrc
 
   return (
     <div className={cn('relative bg-muted', imagePreviewVariants({ size }))}>
@@ -37,7 +40,12 @@ export const ImagePreview = ({
       ) : isValidSrc ? (
         <img
           src={formatImageSrc(src)}
-          className={cn(imagePreviewVariants({ size }), className)}
+          className={cn(
+            imagePreviewVariants({ size }),
+            isClickable && 'cursor-pointer hover:opacity-90 transition-opacity',
+            className
+          )}
+          onClick={onClick}
           {...props}
         />
       ) : (

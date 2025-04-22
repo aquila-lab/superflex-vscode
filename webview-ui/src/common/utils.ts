@@ -5,6 +5,10 @@ import { twMerge } from 'tailwind-merge'
 import { Role } from '../../../shared/model'
 import type { TypedEventResponseMessage } from '../../../shared/protocol'
 import { cva } from 'class-variance-authority'
+import type {
+  AttachmentPreviewData,
+  OpenFilePayload
+} from '../../../shared/protocol/types'
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -358,3 +362,45 @@ export const imagePreviewVariants = cva('object-cover rounded-md', {
     size: 'default'
   }
 })
+
+export const createPreviewPayload = (
+  imageAttachment: string | null | undefined,
+  figmaAttachment:
+    | { imageUrl: string; fileID: string; nodeID: string }
+    | null
+    | undefined
+) => {
+  const hasFigmaWithImage =
+    figmaAttachment &&
+    typeof figmaAttachment === 'object' &&
+    'imageUrl' in figmaAttachment &&
+    figmaAttachment.imageUrl
+
+  if (hasFigmaWithImage) {
+    const figmaPreviewData: AttachmentPreviewData = {
+      type: 'figma',
+      imageUrl: figmaAttachment.imageUrl,
+      fileID: figmaAttachment.fileID,
+      nodeID: figmaAttachment.nodeID
+    }
+
+    return {
+      filePath: `attachment://figma/${Date.now()}`,
+      attachmentData: figmaPreviewData
+    } as OpenFilePayload
+  }
+
+  if (imageAttachment) {
+    const imagePreviewData: AttachmentPreviewData = {
+      type: 'image',
+      base64Data: imageAttachment
+    }
+
+    return {
+      filePath: `attachment://image/${Date.now()}`,
+      attachmentData: imagePreviewData
+    } as OpenFilePayload
+  }
+
+  return null
+}

@@ -1,16 +1,12 @@
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { type MouseEvent, useCallback, useMemo } from 'react'
-import { EventRequestType } from '../../../../../../../../shared/protocol'
-import type {
-  AttachmentPreviewData,
-  OpenFilePayload
-} from '../../../../../../../../shared/protocol/types'
 import { Button } from '../../../../../../common/ui/Button'
 import { cn } from '../../../../../../common/utils'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useEditMode } from '../../../providers/EditModeProvider'
 import { usePostMessage } from '../../../../../layers/global/hooks/usePostMessage'
 import { FileIcon } from '../../../../../../common/ui/FileIcon'
+import { useAttachmentPreview } from '../../../hooks/useAttachmentPreview'
 
 export const AttachmentTab = () => {
   const { imageAttachment, figmaAttachment, removeAttachment } = useAttachment()
@@ -30,41 +26,11 @@ export const AttachmentTab = () => {
     [removeAttachment]
   )
 
-  const handlePreviewAttachment = useCallback(() => {
-    const hasFigmaWithImage =
-      figmaAttachment &&
-      typeof figmaAttachment === 'object' &&
-      'imageUrl' in figmaAttachment &&
-      figmaAttachment.imageUrl
-
-    if (hasFigmaWithImage) {
-      const figmaPreviewData: AttachmentPreviewData = {
-        type: 'figma',
-        imageUrl: figmaAttachment.imageUrl,
-        fileID: figmaAttachment.fileID,
-        nodeID: figmaAttachment.nodeID
-      }
-
-      const payload: OpenFilePayload = {
-        filePath: `attachment://figma/${Date.now()}`,
-        attachmentData: figmaPreviewData
-      }
-
-      postMessage(EventRequestType.OPEN_FILE, payload)
-    } else if (imageAttachment) {
-      const imagePreviewData: AttachmentPreviewData = {
-        type: 'image',
-        base64Data: imageAttachment
-      }
-
-      const payload: OpenFilePayload = {
-        filePath: `attachment://image/${Date.now()}`,
-        attachmentData: imagePreviewData
-      }
-
-      postMessage(EventRequestType.OPEN_FILE, payload)
-    }
-  }, [figmaAttachment, imageAttachment, postMessage])
+  const handlePreviewAttachment = useAttachmentPreview(
+    imageAttachment,
+    figmaAttachment,
+    postMessage
+  )
 
   if (!isAttachmentActive) {
     return null

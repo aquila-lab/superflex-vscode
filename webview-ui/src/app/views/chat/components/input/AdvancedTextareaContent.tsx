@@ -8,6 +8,7 @@ import { AdvancedTextareaContainer } from './AdvancedTextareaContainer'
 import { CoreTextarea } from './core/CoreTextarea'
 import { AdvancedTextareaFooter } from './footer/AdvancedTextareaFooter'
 import { AdvancedTextareaHeader } from './header/AdvancedTextareaHeader'
+import { Attachment } from './attachment/Attachment'
 
 export const AdvancedTextareaContent = ({
   content
@@ -26,6 +27,7 @@ export const AdvancedTextareaContent = ({
             <TextareaFooterProvider>
               <AdvancedTextareaFooter />
             </TextareaFooterProvider>
+            <Attachment />
           </SendMessageProvider>
         </AddSelectedCodeHandler>
       </FilesProvider>
