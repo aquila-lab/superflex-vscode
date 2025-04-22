@@ -12,9 +12,39 @@ import {
 } from '../../../../../../common/ui/Drawer'
 import { Input } from '../../../../../../common/ui/Input'
 import { Skeleton } from '../../../../../../common/ui/Skeleton'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '../../../../../../common/ui/Tooltip'
 import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
+
+const ColorToken = ({ color }: { color: string }) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className='w-6 h-6 rounded-full border border-border cursor-pointer'
+            style={{ backgroundColor: color }}
+          />
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className='flex items-center gap-1.5'>
+            <div
+              className='w-3 h-3 rounded-sm'
+              style={{ backgroundColor: color }}
+            />
+            <span>{color}</span>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
 
 export const FigmaSelectionDrawer = () => {
   const { focusInput } = useInput()
@@ -96,6 +126,8 @@ export const FigmaSelectionDrawer = () => {
     }
 
     if (isConfirmStep && figmaPlaceholderAttachment) {
+      console.log(figmaPlaceholderAttachment)
+
       return (
         <div className='flex flex-col px-4 gap-4'>
           {figmaPlaceholderAttachment.imageUrl && (
@@ -109,6 +141,23 @@ export const FigmaSelectionDrawer = () => {
               />
             </div>
           )}
+
+          {figmaPlaceholderAttachment.colorPalette &&
+            figmaPlaceholderAttachment.colorPalette.length > 0 && (
+              <div className='mt-2 flex flex-col gap-2'>
+                <p className='text-xs font-medium text-muted-foreground'>
+                  Design Tokens
+                </p>
+                <div className='flex gap-2 flex-wrap'>
+                  {figmaPlaceholderAttachment.colorPalette.map(color => (
+                    <ColorToken
+                      key={color}
+                      color={color}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
           <p className='text-sm text-muted-foreground'>
             Confirm this Figma selection to add it to your message.
