@@ -26,6 +26,8 @@ import {
 import * as api from '../api'
 import {
   HttpStatusCode,
+  getFigmaSelectionColorPalette,
+  getFigmaSelectionData as getFigmaSelectionDocument,
   getFigmaSelectionImageUrl,
   validateFigmaSelection
 } from '../api'
@@ -327,11 +329,17 @@ export class ChatAPI {
 
           const imageUrl = await getFigmaSelectionImageUrl(figmaSelectionUrl)
 
+          const figmaSelectionDocument =
+            await getFigmaSelectionDocument(figmaSelectionUrl)
+
           const warning = await validateFigmaSelection({
-            fileID: figmaSelectionUrl.fileID,
-            nodeID: figmaSelectionUrl.nodeID,
+            document: figmaSelectionDocument,
             isFreePlan
           })
+
+          const colorPalette = await getFigmaSelectionColorPalette(
+            figmaSelectionDocument
+          )
 
           Telemetry.capture('figma_request_used', {
             isFreePlan
@@ -341,6 +349,7 @@ export class ChatAPI {
             fileID: figmaSelectionUrl.fileID,
             nodeID: figmaSelectionUrl.nodeID,
             imageUrl,
+            colorPalette,
             warning
           }
         }

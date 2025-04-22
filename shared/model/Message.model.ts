@@ -10,6 +10,7 @@ export interface FigmaAttachment {
   fileID: string
   nodeID: string
   imageUrl: string
+  colorPalette?: string[],
   warning?: AppWarning
 }
 
