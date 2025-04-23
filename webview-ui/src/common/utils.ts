@@ -406,3 +406,19 @@ export const createPreviewPayload = (
 }
 
 export const HEX_COLOR_REGEX = /#([0-9A-Fa-f]{3}){1,2}\b/g
+
+export const getColorWithoutOpacity = (color: string) => {
+  if (color.startsWith('#') && color.length === 9) {
+    return color.substring(0, 7)
+  }
+
+  if (color.startsWith('rgba')) {
+    return color.replace(/rgba\((.*),\s*[\d.]+\)/, 'rgb($1)')
+  }
+
+  if (color.startsWith('hsla')) {
+    return color.replace(/hsla\((.*),\s*[\d.]+%?\)/, 'hsl($1)')
+  }
+
+  return color
+}

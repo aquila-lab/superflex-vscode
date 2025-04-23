@@ -22,6 +22,7 @@ import { useFigmaFreePlanLimits } from '../../../hooks/useFigmaFreePlanLimits'
 import { useAttachment } from '../../../providers/AttachmentProvider'
 import { useInput } from '../../../providers/InputProvider'
 import { ColorToken } from '../../message/assistant/ColorToken'
+import { getColorWithoutOpacity } from '../../../../../../common/utils'
 
 const ColorCircle = ({ color }: { color: string }) => {
   return (
@@ -30,7 +31,7 @@ const ColorCircle = ({ color }: { color: string }) => {
         <TooltipTrigger asChild>
           <div
             className='w-6 h-6 rounded-full border border-border cursor-pointer'
-            style={{ backgroundColor: color }}
+            style={{ backgroundColor: getColorWithoutOpacity(color) }}
           />
         </TooltipTrigger>
         <TooltipContent>
