@@ -43,7 +43,7 @@ export const CollapsibleCodeBlock = memo(
       [estimatedHeight]
     )
 
-    if (!shouldRenderCollapsible) {
+    if (!shouldRenderCollapsible && !isLoadingState) {
       return (
         <CodeBlock
           filePath={filePath}
@@ -77,20 +77,26 @@ export const CollapsibleCodeBlock = memo(
                 {draft}
               </CodeEditor>
 
-              {!isOpen && (
+              {!isOpen && !isLoadingState && (
                 <div className='absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none' />
+              )}
+
+              {isLoadingState && (
+                <div className='absolute inset-0 bg-gradient-to-t from-background to-transparent pointer-events-none' />
               )}
             </div>
 
-            <div className='flex justify-center'>
-              <CollapsibleTrigger
-                className={
-                  'flex items-center justify-center pb-1 text-muted-secondary-foreground ml-0 absolute bottom-0 left-0 right-0'
-                }
-                isOpen={isOpen}
-                disabled={isLoadingState}
-              />
-            </div>
+            {!isLoadingState && (
+              <div className='flex justify-center'>
+                <CollapsibleTrigger
+                  className={
+                    'flex items-center justify-center pb-1 text-muted-secondary-foreground ml-0 absolute bottom-0 left-0 right-0'
+                  }
+                  isOpen={isOpen}
+                  disabled={isLoadingState}
+                />
+              </div>
+            )}
           </Collapsible>
         </div>
       </div>
