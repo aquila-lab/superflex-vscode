@@ -4,7 +4,7 @@
   "displayName": "Superflex: AI Frontend Assistant, Figma to React/Vue/NextJS/Angular (Powered by GPT & Claude)",
   "description": "Transform Figma designs into production-ready code with Superflex, your AI-powered assistant in VSCode. Built on GPT & Claude, Superflex generates clean, reusable code in seconds, saving hours on frontend work while preserving your design standards and coding style.",
   "icon": "small_logo.png",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "author": "Riphal <https://x.com/_riphal_>",
   "license": "MIT",
   "galleryBanner": {
