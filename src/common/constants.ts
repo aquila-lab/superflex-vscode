@@ -26,23 +26,23 @@ export const FIGMA_AUTH_PROVIDER_ID = `${AUTH_PROVIDER_ID}.figma`
 
 export const FIGMA_PROVIDER_ID = `${BRAND_NAME}.figma`
 
-// file extensions that are supported by the extension (without . in the name)
+// file extensions that are supported by the extension
 export const SUPPORTED_FILE_EXTENSIONS = [
-  'htm',
-  'html',
-  'css',
-  'scss',
-  'js',
-  'ts',
-  'jsx',
-  'tsx',
-  'vue',
-  'svelte',
-  'md',
-  'markdown'
+  '.htm',
+  '.html',
+  '.css',
+  '.scss',
+  '.js',
+  '.ts',
+  '.jsx',
+  '.tsx',
+  '.vue',
+  '.svelte',
+  '.md',
+  '.markdown'
 ]
 
-// project json files that are relevant for code generation (writing .json at the end is optional)
+// project json files that are relevant for code generation
 export const RELEVANT_JSON_FILES = [
   'theme.json',
   'tailwind.json',
