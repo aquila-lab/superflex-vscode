@@ -94,10 +94,10 @@ export async function findWorkspaceFiles(
 ): Promise<string[]> {
   if (!globPatterns) {
     globPatterns = [
-      ...SUPPORTED_FILE_EXTENSIONS.map(ext => `**/*${ext}`),
+      ...SUPPORTED_FILE_EXTENSIONS.map(ext => `**/*\.${ext}`),
       ...RELEVANT_JSON_FILES.map(filename => {
         const name = filename.split('.')[0]
-        return `**/${name}*`
+        return `**/${name}*\.json`
       })
     ]
   }
