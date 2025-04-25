@@ -15,6 +15,10 @@ async function uploadFiles({
   files
 }: UploadFilesArgs): Promise<void> {
   try {
+    if (files.length === 0) {
+      return Promise.resolve()
+    }
+
     await Api.post(`/repos/${owner}/${repo}/files`, {
       files: files.map(file => ({
         relative_path: file.relativePath,
@@ -35,6 +39,10 @@ export type RemoveFilesArgs = RepoArgs & {
 
 async function removeFiles({ owner, repo, files }: RemoveFilesArgs) {
   try {
+    if (files.length === 0) {
+      return Promise.resolve()
+    }
+
     await Api.delete(`/repos/${owner}/${repo}/files`, { data: { files } })
     return Promise.resolve()
   } catch (err) {
