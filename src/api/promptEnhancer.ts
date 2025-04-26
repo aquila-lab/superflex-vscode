@@ -1,3 +1,4 @@
+import { checkRequestBodySize } from 'src/common/files'
 import type { EnhanceRun, MessageContent } from '../../shared/model'
 import { Api } from './api'
 import { ApiError, parseError } from './error'
@@ -18,6 +19,7 @@ async function enhancePrompt({
 }: EnhancePromptArgs): Promise<EnhanceRun> {
   try {
     const reqBody = buildPromptEnhancementRequest(threadID, message)
+    checkRequestBodySize(reqBody)
     const response = await Api.post('/prompt/enhance', reqBody, {
       headers: { 'x-is-stream': 'true' },
       responseType: 'stream',

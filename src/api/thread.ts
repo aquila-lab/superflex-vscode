@@ -1,3 +1,4 @@
+import { checkRequestBodySize } from 'src/common/files'
 import type {
   Message,
   MessageContent,
@@ -13,6 +14,7 @@ import {
   buildThreadFromResponse,
   buildThreadRunRequest
 } from './transformers'
+
 export type CreateThreadArgs = RepoArgs & {
   title?: string
 }
@@ -134,6 +136,8 @@ async function sendThreadMessage({
 }: SendThreadMessageArgs): Promise<ThreadRun> {
   try {
     const reqBody = buildThreadRunRequest(message)
+    checkRequestBodySize(reqBody)
+
     const response = await Api.post(
       `/repos/${owner}/${repo}/threads/${threadID}/runs`,
       reqBody,
