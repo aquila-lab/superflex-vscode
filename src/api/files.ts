@@ -1,4 +1,4 @@
-import { checkRequestBodySize } from 'src/common/files'
+import { checkRequestBodySize } from '../common/files'
 import { Api } from './api'
 import { parseError } from './error'
 import type { RepoArgs } from './repo'

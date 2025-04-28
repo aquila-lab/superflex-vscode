@@ -37,7 +37,7 @@ function calculateStringSize(str: string): number {
   return new TextEncoder().encode(str).length
 }
 
-export function checkRequestBodySize(reqBody: any): void {
+export function checkRequestBodySize(reqBody: Record<string, any>): void {
   if (!reqBody) {
     return
   }

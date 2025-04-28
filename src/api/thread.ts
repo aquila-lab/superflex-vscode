@@ -1,4 +1,4 @@
-import { checkRequestBodySize } from 'src/common/files'
+import { checkRequestBodySize } from '../common/files'
 import type {
   Message,
   MessageContent,

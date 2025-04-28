@@ -1,4 +1,4 @@
-import { checkRequestBodySize } from 'src/common/files'
+import { checkRequestBodySize } from '../common/files'
 import type { EnhanceRun, MessageContent } from '../../shared/model'
 import { Api } from './api'
 import { ApiError, parseError } from './error'
