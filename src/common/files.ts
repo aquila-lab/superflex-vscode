@@ -67,7 +67,7 @@ export function checkRequestBodySize(reqBody: Record<string, any>): void {
   // Check image attachment size
   if (reqBody.attachment?.image || reqBody.image) {
     const base64Data = reqBody.attachment?.image || reqBody.image
-    const size = Math.ceil((base64Data.length * 3) / 4) // Approximate size in bytes
+    const size = calculateStringSize(base64Data)
     if (size > MAX_IMAGE_SIZE) {
       throw new ApiError(
         413,
