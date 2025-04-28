@@ -33,6 +33,9 @@ export function enrichFilePayloads(
   })
 }
 
+/**
+ * Calculate the size of a string in bytes
+ */
 function calculateStringSize(str: string): number {
   return new TextEncoder().encode(str).length
 }
