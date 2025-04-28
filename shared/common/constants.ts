@@ -16,3 +16,4 @@ export const MAX_FREE_NODES = 100
 
 export const MAX_FILE_SIZE = 0.2 * 1024 * 1024 // 200KB
 export const MAX_IMAGE_SIZE = 3 * 1024 * 1024 // 3MB
+export const MAX_FILE_LENGTH_IN_TOKENS_TO_UPLOAD = 100000
