@@ -14,5 +14,5 @@ export const FIGMA_SELECTION_URL_REGEX =
 
 export const MAX_FREE_NODES = 100
 
-export const MAX_FILE_SIZE = 0.5 * 1024 * 1024 // 500KB
+export const MAX_FILE_SIZE = 0.1 * 1024 * 1024 // 100KB
 export const MAX_IMAGE_SIZE = 3 * 1024 * 1024 // 3MB
