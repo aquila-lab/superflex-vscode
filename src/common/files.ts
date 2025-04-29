@@ -6,9 +6,9 @@ import {
   MAX_FILE_LENGTH_IN_TOKENS_TO_UPLOAD,
   MAX_FILE_SIZE,
   MAX_IMAGE_SIZE
-} from 'shared/common/constants'
-import { ApiError } from 'src/api'
-import { ApiErrorSlug } from 'src/api/error'
+} from '../../shared/common/constants'
+import { ApiError } from '../api'
+import { ApiErrorSlug } from '../api/error'
 
 /**
  * Enriches file payloads with absolute paths and content from the workspace
