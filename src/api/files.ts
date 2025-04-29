@@ -1,3 +1,4 @@
+import { checkRequestBodySize } from '../common/files'
 import { Api } from './api'
 import { parseError } from './error'
 import type { RepoArgs } from './repo'
@@ -19,6 +20,7 @@ async function uploadFiles({
       return Promise.resolve()
     }
 
+    checkRequestBodySize({ files })
     await Api.post(`/repos/${owner}/${repo}/files`, {
       files: files.map(file => ({
         relative_path: file.relativePath,

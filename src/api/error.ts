@@ -1,6 +1,13 @@
 import { AppError } from 'shared/model/AppError.model'
 import { IS_PROD } from '../common/constants'
 
+export const ApiErrorSlug = {
+  Unknown: 'unknown',
+  FileSizeLimitExceeded: 'file_size_limit_exceeded',
+  ImageSizeLimitExceeded: 'image_size_limit_exceeded',
+  TotalTokenLimitExceeded: 'total_token_limit_exceeded',
+}
+
 export class ApiError extends Error {
   statusCode: number
   slug: string

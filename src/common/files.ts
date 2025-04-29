@@ -2,6 +2,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import type { FilePayload } from '../../shared/protocol'
+import {
+  MAX_FILE_LENGTH_IN_TOKENS_TO_UPLOAD,
+  MAX_FILE_SIZE,
+  MAX_IMAGE_SIZE
+} from '../../shared/common/constants'
+import { ApiError } from '../api'
+import { ApiErrorSlug } from '../api/error'
 
 /**
  * Enriches file payloads with absolute paths and content from the workspace
@@ -28,4 +35,74 @@ export function enrichFilePayloads(
     }
     return file
   })
+}
+
+/**
+ * Calculate the size of a string in bytes
+ */
+function calculateStringSize(str: string): number {
+  return new TextEncoder().encode(str).length
+}
+
+/**
+ * Calculates the total token count of the given string contents
+ * @param contents Array of contents to calculate the total token count from
+ * @returns The total token count of the given contents
+ */
+function calculateTotalTokenCount(contents: string[]): number {
+  const totalCharacters = contents.reduce(
+    (acc, content) => acc + content.length,
+    0
+  )
+  return totalCharacters / 3.5 // Worst case approximation of code content
+}
+
+export function checkRequestBodySize(reqBody: Record<string, any>): void {
+  if (!reqBody) {
+    return
+  }
+
+  // Check files size
+  if (reqBody.files && Array.isArray(reqBody.files)) {
+    const contents: string[] = []
+    for (const file of reqBody.files) {
+      if (!file.content && !file.source) {
+        continue
+      }
+      const content = file.content || file.source
+      contents.push(content)
+      const size = calculateStringSize(content)
+
+      if (size > MAX_FILE_SIZE) {
+        throw new ApiError(
+          413,
+          ApiErrorSlug.FileSizeLimitExceeded,
+          'File size exceeds the limit. Please try again with a fewer/smaller attached files.'
+        )
+      }
+    }
+
+    if (
+      calculateTotalTokenCount(contents) > MAX_FILE_LENGTH_IN_TOKENS_TO_UPLOAD
+    ) {
+      throw new ApiError(
+        413,
+        ApiErrorSlug.TotalTokenLimitExceeded,
+        'Attached files exceed the size limit. Please try again with a fewer/smaller attached files.'
+      )
+    }
+  }
+
+  // Check image attachment size
+  if (reqBody.attachment?.image || reqBody.image) {
+    const base64Data = reqBody.attachment?.image || reqBody.image
+    const size = calculateStringSize(base64Data)
+    if (size > MAX_IMAGE_SIZE) {
+      throw new ApiError(
+        413,
+        ApiErrorSlug.ImageSizeLimitExceeded,
+        'Image size exceeds the limit. Please try again with a smaller attachment.'
+      )
+    }
+  }
 }
