@@ -77,7 +77,7 @@ export function checkRequestBodySize(reqBody: Record<string, any>): void {
         throw new ApiError(
           413,
           ApiErrorSlug.FileSizeLimitExceeded,
-          'File size exceeds the limit'
+          'File size exceeds the limit. Please try again with a fewer/smaller attached files.'
         )
       }
     }
@@ -88,7 +88,7 @@ export function checkRequestBodySize(reqBody: Record<string, any>): void {
       throw new ApiError(
         413,
         ApiErrorSlug.TotalTokenLimitExceeded,
-        'Related files content exceed the size limit. Please try again with a fewer/smaller attached files.'
+        'Attached files exceed the size limit. Please try again with a fewer/smaller attached files.'
       )
     }
   }
@@ -101,7 +101,7 @@ export function checkRequestBodySize(reqBody: Record<string, any>): void {
       throw new ApiError(
         413,
         ApiErrorSlug.ImageSizeLimitExceeded,
-        'Image size exceeds the limit'
+        'Image size exceeds the limit. Please try again with a smaller attachment.'
       )
     }
   }
