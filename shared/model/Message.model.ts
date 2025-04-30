@@ -38,6 +38,11 @@ export type MessageContent = {
   enhancedText?: string
 
   /**
+   * Whether enhance prompt is enabled for this message.
+   */
+  enhancePromptEnabled?: boolean
+
+  /**
    * Optional attachment for the message. Can include either an Image or Figma.
    * See MessageAttachment interface for details.
    */
@@ -48,11 +53,6 @@ export type MessageContent = {
    * to give the AI additional context about the codebase when processing the message.
    */
   files?: FilePayload[]
-
-  /**
-   * Whether enhance prompt is enabled for this message.
-   */
-  enhancePromptEnabled?: boolean
 } & ({ text: string } | { attachment: MessageAttachment })
 
 export interface MessageStream {
