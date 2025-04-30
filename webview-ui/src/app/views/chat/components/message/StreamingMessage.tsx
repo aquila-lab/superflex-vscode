@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react'
 import { DotLoader } from '../../../../../common/ui/DotLoader'
 import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
+import { useEnhancePrompt } from '../../../../layers/authenticated/providers/EnhancePromptProvider'
 import { AssistantMessage } from './assistant/AssistantMessage'
 import { ThinkingMessage } from './thinking/ThinkingMessage'
 
@@ -16,6 +17,8 @@ const StreamingMessageComponent = ({
     isEnhanceComplete,
     enhancedTextDelta
   } = useNewMessage()
+
+  const { isEnhancePromptEnabled } = useEnhancePrompt()
 
   const { thinkingContent, assistantContent, isThinkingComplete } =
     useMemo(() => {
@@ -75,7 +78,7 @@ const StreamingMessageComponent = ({
 
   return (
     <>
-      {!isFollowUp && (
+      {!isFollowUp && isEnhancePromptEnabled && (
         <ThinkingMessage
           content={enhancedTextDelta}
           type='enhance'
@@ -84,7 +87,7 @@ const StreamingMessageComponent = ({
         />
       )}
 
-      {(isFollowUp || isEnhanceComplete) &&
+      {(isFollowUp || isEnhanceComplete || !isEnhancePromptEnabled) &&
         !thinkingContent &&
         !assistantContent && <DotLoader />}
 
