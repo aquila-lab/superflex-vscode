@@ -507,9 +507,9 @@ export class ChatAPI {
 
             const document =
               await vscode.workspace.openTextDocument(resolvedPath)
-            let originalCode = fs
+            const originalCode = fs
               .readFileSync(resolvedPath, 'utf8')
-              .replaceAll('\r', '')
+              .replaceAll('\r\n', '\n')
 
             let modifiedCode = payload.edits
             if (originalCode !== '') {
