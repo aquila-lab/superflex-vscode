@@ -10,11 +10,11 @@ export const EnhanceToggleCard = () => {
 
   return (
     <SettingsCard title='Prompt Enhancement'>
-      <div className='space-y-2'>
+      <div className='space-y-4'>
         <p className='text-sm'>
           Enable or disable AI prompt enhancement for more detailed responses
         </p>
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3'>
           <div className='space-y-0.5'>
             <p className='text-sm font-medium'>Enhance Prompts</p>
             <p className='text-xs text-muted-foreground'>
@@ -24,7 +24,7 @@ export const EnhanceToggleCard = () => {
             </p>
           </div>
           <Button
-            variant={isEnhancePromptEnabled ? 'default' : 'outline'}
+            variant={isEnhancePromptEnabled ? 'outline' : 'default'}
             onClick={handleToggle}
           >
             {isEnhancePromptEnabled ? 'Disable' : 'Enable'}
