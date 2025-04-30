@@ -20,6 +20,7 @@ import {
 import { useConsumeMessage } from '../../global/hooks/useConsumeMessage'
 import { usePostMessage } from '../../global/hooks/usePostMessage'
 import { useMessages } from './MessagesProvider'
+import { useEnhancePrompt } from './EnhancePromptProvider'
 
 const NewMessageContext = createContext<{
   message: Message | null
@@ -36,6 +37,7 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
   const postMessage = usePostMessage()
   const { messages, addMessages, removeMessagesFrom, setIdToLastUserMessage } =
     useMessages()
+  const { isEnhancePromptEnabled } = useEnhancePrompt()
 
   const [message, setMessage] = useState<Message | null>(null)
   const [streamTextDelta, setStreamTextDelta] = useState('')
@@ -196,7 +198,10 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         id: uuidv4(),
         threadID: messages[0]?.threadID || uuidv4(),
         role: Role.User,
-        content,
+        content: {
+          ...content,
+          enhancePromptEnabled: isEnhancePromptEnabled
+        },
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -217,7 +222,10 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
         })
       }
 
-      postMessage(EventRequestType.SEND_MESSAGE, content)
+      postMessage(EventRequestType.SEND_MESSAGE, {
+        ...content,
+        enhancePromptEnabled: isEnhancePromptEnabled
+      })
     },
     [
       postMessage,
@@ -225,7 +233,8 @@ export const NewMessageProvider = ({ children }: { children: ReactNode }) => {
       addMessages,
       removeMessagesFrom,
       stopStreaming,
-      setIdToLastUserMessage
+      setIdToLastUserMessage,
+      isEnhancePromptEnabled
     ]
   )
 

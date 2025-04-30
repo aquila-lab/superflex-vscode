@@ -10,7 +10,7 @@ export interface FigmaAttachment {
   fileID: string
   nodeID: string
   imageUrl: string
-  colorPalette?: string[],
+  colorPalette?: string[]
   warning?: AppWarning
 }
 
@@ -48,6 +48,11 @@ export type MessageContent = {
    * to give the AI additional context about the codebase when processing the message.
    */
   files?: FilePayload[]
+
+  /**
+   * Whether enhance prompt is enabled for this message.
+   */
+  enhancePromptEnabled?: boolean
 } & ({ text: string } | { attachment: MessageAttachment })
 
 export interface MessageStream {
