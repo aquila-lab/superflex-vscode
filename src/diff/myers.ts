@@ -18,7 +18,9 @@ export function convertMyersChangeToDiffLines(change: Change): DiffLine[] {
 }
 
 export function myersDiff(oldContent: string, newContent: string): DiffLine[] {
-  const theirFormat = diffLines(oldContent, newContent)
+  const theirFormat = diffLines(oldContent, newContent, {
+    ignoreNewlineAtEof: true
+  })
   const ourFormat = theirFormat.flatMap(convertMyersChangeToDiffLines)
 
   return ourFormat
