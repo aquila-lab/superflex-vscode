@@ -507,7 +507,7 @@ export class ChatAPI {
 
             const document =
               await vscode.workspace.openTextDocument(resolvedPath)
-            const originalCode = fs.readFileSync(resolvedPath, 'utf8')
+            let originalCode = fs.readFileSync(resolvedPath, 'utf8')
 
             let modifiedCode = payload.edits
             if (originalCode !== '') {
@@ -518,6 +518,7 @@ export class ChatAPI {
             }
 
             // Create diff lines using Myers diff algorithm
+            originalCode = originalCode.replaceAll('\r', '')
             const diffLines = myersDiff(originalCode, modifiedCode)
 
             // Show the document
