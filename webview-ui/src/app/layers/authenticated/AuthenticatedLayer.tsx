@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { LoadingGuard } from './components/LoadingGuard'
 import { ReloadHandler } from './components/ReloadHandler'
 import { ThreadReset } from './components/ThreadReset'
+import { EnhancePromptProvider } from './providers/EnhancePromptProvider'
 import { MessagesProvider } from './providers/MessagesProvider'
 import { NewMessageProvider } from './providers/NewMessageProvider'
 import { ThreadsProvider } from './providers/ThreadsProvider'
@@ -15,9 +16,11 @@ export const AuthenticatedLayer = () => {
           <ThreadReset>
             <ReloadHandler>
               <MessagesProvider>
-                <NewMessageProvider>
-                  <Outlet />
-                </NewMessageProvider>
+                <EnhancePromptProvider>
+                  <NewMessageProvider>
+                    <Outlet />
+                  </NewMessageProvider>
+                </EnhancePromptProvider>
               </MessagesProvider>
             </ReloadHandler>
           </ThreadReset>
