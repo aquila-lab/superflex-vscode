@@ -155,3 +155,7 @@ export function rgbaToHex(color: {
 
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
+
+export function stringContainsFastApplyComments(input: string): boolean {
+  return /\/\/\s*\.\.\./.test(input)
+}

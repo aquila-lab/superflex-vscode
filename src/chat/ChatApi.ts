@@ -44,6 +44,7 @@ import {
   decodeUriAndRemoveFilePrefix,
   generateFileID,
   getOpenWorkspace,
+  stringContainsFastApplyComments,
   toKebabCase
 } from '../common/utils'
 import { createDiffStream, myersDiff } from '../diff/myers'
@@ -512,7 +513,7 @@ export class ChatAPI {
               .replaceAll('\r\n', '\n')
 
             let modifiedCode = payload.edits
-            if (originalCode !== '') {
+            if (originalCode !== '' && stringContainsFastApplyComments(originalCode)) {
               modifiedCode = await this._assistant.fastApply(
                 originalCode,
                 payload.edits
