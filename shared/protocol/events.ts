@@ -166,6 +166,18 @@ export enum EventRequestType {
    */
   FAST_APPLY_REJECT = 'fast_apply_reject',
 
+  /**
+   * GET_ENHANCE_PROMPT_STATE will request the current state of enhance prompt toggle.
+   * @returns {boolean} indicating if the enhance prompt is enabled.
+   */
+  GET_ENHANCE_PROMPT_STATE = 'get_enhance_prompt_state',
+
+  /**
+   * SET_ENHANCE_PROMPT_STATE will set the enhance prompt toggle state.
+   * @returns {boolean} indicating the new state of enhance prompt toggle.
+   */
+  SET_ENHANCE_PROMPT_STATE = 'set_enhance_prompt_state',
+
   // ---------------- FILE EVENTS ----------------
 
   /**
@@ -370,6 +382,18 @@ export enum EventResponseType {
    */
   ENHANCE_PROMPT_COMPLETE = 'enhance_prompt_complete',
 
+  /**
+   * @triggered by {EventRequestType.GET_ENHANCE_PROMPT_STATE}
+   * GET_ENHANCE_PROMPT_STATE is used to send the current state of enhance prompt toggle to the webview.
+   */
+  GET_ENHANCE_PROMPT_STATE = 'get_enhance_prompt_state',
+
+  /**
+   * @triggered by {EventRequestType.SET_ENHANCE_PROMPT_STATE}
+   * SET_ENHANCE_PROMPT_STATE is used to send the new state of enhance prompt toggle to the webview.
+   */
+  SET_ENHANCE_PROMPT_STATE = 'set_enhance_prompt_state',
+
   // ---------------- FILE EVENTS ----------------
 
   /**
@@ -455,6 +479,10 @@ export const EventRequestToResponseTypeMap: {
   [EventRequestType.STOP_MESSAGE]: EventResponseType.STOP_MESSAGE,
   [EventRequestType.SEND_MESSAGE]: EventResponseType.SEND_MESSAGE,
   [EventRequestType.FAST_APPLY]: EventResponseType.FAST_APPLY,
+  [EventRequestType.GET_ENHANCE_PROMPT_STATE]:
+    EventResponseType.GET_ENHANCE_PROMPT_STATE,
+  [EventRequestType.SET_ENHANCE_PROMPT_STATE]:
+    EventResponseType.SET_ENHANCE_PROMPT_STATE,
   [EventRequestType.OPEN_FILE]: EventResponseType.SET_CURRENT_OPEN_FILE,
   [EventRequestType.FETCH_FILES]: EventResponseType.FETCH_FILES,
   [EventRequestType.FETCH_FILE_CONTENT]: EventResponseType.FETCH_FILE_CONTENT,
@@ -490,6 +518,8 @@ export interface EventRequestPayload {
   [EventRequestType.FAST_APPLY]: FastApplyPayload
   [EventRequestType.FAST_APPLY_ACCEPT]: { filePath: string }
   [EventRequestType.FAST_APPLY_REJECT]: { filePath: string }
+  [EventRequestType.GET_ENHANCE_PROMPT_STATE]: void
+  [EventRequestType.SET_ENHANCE_PROMPT_STATE]: { enabled: boolean }
   [EventRequestType.OPEN_FILE]: OpenFilePayload
   [EventRequestType.FETCH_FILES]: void
   [EventRequestType.FETCH_FILE_CONTENT]: FilePayload
@@ -521,6 +551,8 @@ export interface EventResponsePayload {
   [EventResponseType.MESSAGE_TEXT_DELTA]: string
   [EventResponseType.MESSAGE_COMPLETE]: Message
   [EventResponseType.FAST_APPLY]: boolean
+  [EventResponseType.GET_ENHANCE_PROMPT_STATE]: boolean
+  [EventResponseType.SET_ENHANCE_PROMPT_STATE]: boolean
   [EventResponseType.FETCH_FILES]: FilePayload[]
   [EventResponseType.FETCH_FILE_CONTENT]: string | null
   [EventResponseType.SET_CURRENT_OPEN_FILE]: FilePayload | null
