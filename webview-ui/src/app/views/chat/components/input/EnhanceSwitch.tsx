@@ -9,15 +9,17 @@ import { Button } from '../../../../../common/ui/Button'
 import { cn } from '../../../../../common/utils'
 import { TbBrain } from 'react-icons/tb'
 import { useEnhancePrompt } from '../../../../layers/authenticated/providers/EnhancePromptProvider'
+import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 
 export const EnhanceSwitch = () => {
   const { isEnhancePromptEnabled, toggleEnhancePrompt } = useEnhancePrompt()
+  const { isMessageProcessing, isMessageStreaming } = useNewMessage()
 
   const tooltipText = useMemo(
     () =>
       isEnhancePromptEnabled
-        ? 'AI enhancement enabled'
-        : 'AI enhancement disabled',
+        ? 'AI prompt enhancement enabled'
+        : 'AI prompt    enhancement disabled',
     [isEnhancePromptEnabled]
   )
 
@@ -31,6 +33,7 @@ export const EnhanceSwitch = () => {
               size='xs'
               variant='text'
               onClick={toggleEnhancePrompt}
+              disabled={isMessageProcessing || isMessageStreaming}
               className={cn(
                 'gap-0.5',
                 isEnhancePromptEnabled
