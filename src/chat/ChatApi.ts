@@ -513,7 +513,10 @@ export class ChatAPI {
               .replaceAll('\r\n', '\n')
 
             let modifiedCode = payload.edits
-            if (originalCode !== '' && stringContainsFastApplyComments(originalCode)) {
+            if (
+              originalCode !== '' &&
+              stringContainsFastApplyComments(modifiedCode)
+            ) {
               modifiedCode = await this._assistant.fastApply(
                 originalCode,
                 payload.edits
