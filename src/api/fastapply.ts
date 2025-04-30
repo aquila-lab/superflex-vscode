@@ -12,7 +12,7 @@ async function fastApply({ code, edits }: FastApplyArgs): Promise<string> {
       code,
       edits
     })
-    return Promise.resolve(data.result)
+    return Promise.resolve(JSON.parse(data.result))
   } catch (err) {
     return Promise.reject(parseError(err))
   }
