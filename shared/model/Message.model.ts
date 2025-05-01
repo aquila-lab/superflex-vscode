@@ -10,7 +10,7 @@ export interface FigmaAttachment {
   fileID: string
   nodeID: string
   imageUrl: string
-  colorPalette?: string[],
+  colorPalette?: string[]
   warning?: AppWarning
 }
 
@@ -36,6 +36,11 @@ export type MessageContent = {
    * Optional enhanced text that the AI has generated.
    */
   enhancedText?: string
+
+  /**
+   * Whether enhance prompt is enabled for this message.
+   */
+  enhancePromptEnabled?: boolean
 
   /**
    * Optional attachment for the message. Can include either an Image or Figma.

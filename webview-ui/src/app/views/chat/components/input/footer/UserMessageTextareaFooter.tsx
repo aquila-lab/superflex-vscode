@@ -1,6 +1,7 @@
 import { useTextareaFooter } from '../../../providers/TextareaFooterProvider'
-import { AddAttachmentButtons } from './AddAttachmentButtons'
+import { EnhanceSwitch } from '../EnhanceSwitch'
 import { ResendButton } from './ResendButton'
+import { AddAttachmentButtons } from './AddAttachmentButtons'
 
 export const UserMessageTextareaFooter = () => {
   const { hasContent, isFigmaLoading, handleSend } = useTextareaFooter()
@@ -10,6 +11,7 @@ export const UserMessageTextareaFooter = () => {
       <AddAttachmentButtons />
 
       <div className='flex flex-row items-center gap-1'>
+        <EnhanceSwitch />
         <ResendButton
           hasContent={hasContent}
           isFigmaLoading={isFigmaLoading}

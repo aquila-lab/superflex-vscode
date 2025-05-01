@@ -102,6 +102,25 @@ async function backgroundInit(
     }
   )
 
+  const ENHANCE_PROMPT_STATE_KEY = 'enhancePromptState'
+  appState.chatApi.registerEvent(
+    EventRequestType.GET_ENHANCE_PROMPT_STATE,
+    async () => {
+      // Default to true if the setting hasn't been set yet
+      return context.globalState.get<boolean>(ENHANCE_PROMPT_STATE_KEY, true)
+    }
+  )
+  appState.chatApi.registerEvent(
+    EventRequestType.SET_ENHANCE_PROMPT_STATE,
+    async (payload: { enabled: boolean }) => {
+      await context.globalState.update(
+        ENHANCE_PROMPT_STATE_KEY,
+        payload.enabled
+      )
+      return payload.enabled
+    }
+  )
+
   // Store the interval ID in appState
   appState.projectSyncInterval = setInterval(
     () =>

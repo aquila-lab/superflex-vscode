@@ -2,8 +2,9 @@ import { TrashIcon } from '@radix-ui/react-icons'
 import { Button } from '../../../../../../common/ui/Button'
 import { DotLoader } from '../../../../../../common/ui/DotLoader'
 import { useTextareaFooter } from '../../../providers/TextareaFooterProvider'
-import { AddAttachmentButtons } from './AddAttachmentButtons'
+import { EnhanceSwitch } from '../EnhanceSwitch'
 import { SendButton } from './SendButton'
+import { AddAttachmentButtons } from './AddAttachmentButtons'
 
 export const MainTextareaFooter = () => {
   const { isDisabled, hasContent, handleStop, handleSend } = useTextareaFooter()
@@ -15,11 +16,14 @@ export const MainTextareaFooter = () => {
 
       <div className='flex flex-row items-center gap-1'>
         {!isDisabled && (
-          <SendButton
-            hasContent={hasContent}
-            isDisabled={isDisabled}
-            onSend={handleSend}
-          />
+          <>
+            <EnhanceSwitch />
+            <SendButton
+              hasContent={hasContent}
+              isDisabled={isDisabled}
+              onSend={handleSend}
+            />
+          </>
         )}
         {isDisabled && (
           <Button
