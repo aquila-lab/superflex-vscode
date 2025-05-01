@@ -9,9 +9,11 @@ import {
 import { Button } from '../../../../../common/ui/Button'
 import { cn } from '../../../../../common/utils'
 import { useEnhancePrompt } from '../../../../layers/authenticated/providers/EnhancePromptProvider'
+import { useNewMessage } from '../../../../layers/authenticated/providers/NewMessageProvider'
 
 export const EnhanceSwitch = () => {
   const { isEnhancePromptEnabled, toggleEnhancePrompt } = useEnhancePrompt()
+  const { isMessageProcessing, isMessageStreaming } = useNewMessage()
 
   const tooltipText = useMemo(
     () =>
@@ -31,6 +33,7 @@ export const EnhanceSwitch = () => {
               size='xs'
               variant='text'
               onClick={toggleEnhancePrompt}
+              disabled={isMessageProcessing || isMessageStreaming}
               className={cn(
                 'gap-0.5 transition-opacity duration-150',
                 'active:scale-110 active:opacity-80 transition-transform',
