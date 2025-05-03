@@ -7,7 +7,7 @@ export const UserMessageTextareaFooter = () => {
   const { hasContent, isFigmaLoading, handleSend } = useTextareaFooter()
 
   return (
-    <div className='flex flex-row justify-between items-center gap-4 pt-0.5 pb-1 pl-0.5 pr-2'>
+    <div className='flex flex-row justify-between items-center gap-4 py-0.5 pl-0.5 pr-2 border-t border-border'>
       <AddAttachmentButtons />
 
       <div className='flex flex-row items-center gap-1'>
