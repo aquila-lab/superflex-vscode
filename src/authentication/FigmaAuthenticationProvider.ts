@@ -222,7 +222,7 @@ export default class FigmaAuthenticationProvider
           ['redirect_uri', FIGMA_OAUTH_CALLBACK_URL],
           [
             'scope',
-            'file_content:read,file_variables:read,file_dev_resources:read'
+            'current_user:read,file_content:read,file_variables:read,file_dev_resources:read'
           ],
           ['state', encodeURIComponent(callbackUri.toString(true))],
           ['response_type', 'code']
