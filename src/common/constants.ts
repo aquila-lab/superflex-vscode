@@ -15,7 +15,7 @@ export const ApiErrorTypes = {
   SESSION_EXPIRED: 'session_expired'
 }
 
-export const FIGMA_OAUTH_CLIENT_ID = 'ZnoCj0vPEwDoLR0jimrfMX'
+export const FIGMA_OAUTH_CLIENT_ID = 'Bnl5o8T7PXPOQTlPxv9frt'
 export const FIGMA_OAUTH_CALLBACK_URL = `${API_BASE_URL}/auth/figma-callback`
 
 export const EXTENSION_ID = 'aquilalabs.superflex'
